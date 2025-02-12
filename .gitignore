@@ -1,0 +1,27 @@
+# Ignore everything by default
+*
+
+# Allow directories to be checked
+!*/
+
+# Allow Python files
+!*.py
+
+# Allow Cython files
+!*.pyx
+
+# Allow Pyproject.toml
+!*.toml
+
+# Allow LICENSE
+!*LICENSE
+
+# Allow test/example data
+!tests/test_data/*
+!examples/example_data/*
+
+# Allow readme
+!*.md
+
+# Allow gitignore
+!*.gitignore
