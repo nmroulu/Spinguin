@@ -250,7 +250,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
     
     return rho_zeeman
 
-def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool=False, zero_value=1e-32) -> Union[np.ndarray, csc_array]:
+def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool=False, zero_value=1e-18) -> Union[np.ndarray, csc_array]:
     """
     Returns state vector corresponding to the thermal equilibrium.
 
@@ -264,7 +264,7 @@ def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool
     sparse : bool
         False (default) returns NumPy array. True returns SciPy csc_array.
     zero_value : float
-        Used to estimate the convergence of matrix exponential.
+        Default: 1e-18. Used to estimate the convergence of matrix exponential.
 
     Returns
     -------
