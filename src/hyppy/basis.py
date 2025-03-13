@@ -43,12 +43,12 @@ class Basis():
             A dictionary, where the keys contain tuples of integers that
             represent the product operators. The values contain the indices of
             the specific operator. Set directly by `make_basis`.
-        ZQ_map : list
-            An index map from the original basis to the zero-quantum basis. Created
-            by `ZQ_basis`.
         op_def_table : dict
             Relates string descriptions of single-spin operators into integers and their
             corresponding coefficients arising from different norms.
+        ZQ_map : list
+            An index map from the original basis to the zero-quantum basis. Created
+            by `ZQ_basis`.
         """
 
         # Create the basis
@@ -74,9 +74,6 @@ class Basis():
         # Save to attributes
         self.op_def_table = op_def_table
 
-        # Calculate an unique ID for the basis
-        self.uid = hash(self.arr.tobytes())
-
     @property
     def dim(self) -> int:
         return self.arr.shape[0]
@@ -84,6 +81,10 @@ class Basis():
     @property
     def nspins(self) -> int:
         return self.arr.shape[1]
+    
+    @property
+    def uid(self) -> int:
+        return hash(self.arr.tobytes())
         
     def make_basis(self, spin_system: SpinSystem):
         """
@@ -302,9 +303,6 @@ def ZQ_basis(spin_system:SpinSystem):
     spin_system.basis.arr = basis
     spin_system.basis.dict = basis_dict
     spin_system.basis.ZQ_map = ZQ_map
-
-    # Recompute the unique ID
-    spin_system.basis.uid = hash(basis.tobytes())
 
     print("Zero-quantum basis created.")
     print(f"Elapsed time: {time.time() - time_start} seconds.")
