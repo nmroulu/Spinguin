@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import os
-from hyppy import data_io
+from spinguin import data_io
 
 class TestDataIOMethods(unittest.TestCase):
 

@@ -2,9 +2,9 @@ import unittest
 import numpy as np
 import math
 import copy
-from hyppy.spin_system import SpinSystem
-from hyppy.basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, ZQ_basis, ZQ_filter
-from hyppy.operators import superoperator
+from spinguin.spin_system import SpinSystem
+from spinguin.basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, ZQ_basis, ZQ_filter
+from spinguin.operators import superoperator
 
 class TestBasis(unittest.TestCase):
 

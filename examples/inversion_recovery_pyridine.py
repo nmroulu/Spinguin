@@ -1,12 +1,12 @@
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
-from hyppy.spin_system import SpinSystem
-from hyppy.hamiltonian import hamiltonian
-from hyppy.states import thermal_equilibrium, measure
-from hyppy.relaxation import relaxation, thermalize
-from hyppy.propagation import propagator, pulse
-from hyppy.basis import ZQ_basis, ZQ_filter
+from spinguin.spin_system import SpinSystem
+from spinguin.hamiltonian import hamiltonian
+from spinguin.states import thermal_equilibrium, measure
+from spinguin.relaxation import relaxation, thermalize
+from spinguin.propagation import propagator, pulse
+from spinguin.basis import ZQ_basis, ZQ_filter
 
 # Example system
 isotopes = np.array(['1H', '1H', '1H', '1H', '1H', '14N'])

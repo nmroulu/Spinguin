@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from hyppy.spin_system import SpinSystem
+    from spinguin.spin_system import SpinSystem
 
 # Imports
 import time
@@ -17,9 +17,9 @@ import numpy as np
 import scipy.constants as const
 from scipy.sparse import csc_array, eye_array, lil_array
 from scipy.special import eval_legendre
-from hyppy import la, operators
-from hyppy.basis import idx_to_lq, lq_to_idx, str_to_op_def, state_idx
-from hyppy.hamiltonian import hamiltonian_zeeman
+from spinguin import la, operators
+from spinguin.basis import idx_to_lq, lq_to_idx, str_to_op_def, state_idx
+from spinguin.hamiltonian import hamiltonian_zeeman
 
 def dd_constant(y1: float, y2: float) -> float:
     """

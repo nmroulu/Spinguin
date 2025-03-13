@@ -10,14 +10,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from hyppy.spin_system import SpinSystem
+    from spinguin.spin_system import SpinSystem
 
 # Imports
 import numpy as np
 from functools import lru_cache
 from itertools import product
-from hyppy import la
-from hyppy.basis import idx_to_lq, str_to_op_def
+from spinguin import la
+from spinguin.basis import idx_to_lq, str_to_op_def
 from scipy.sparse import csc_array, eye_array
 from typing import Union
 

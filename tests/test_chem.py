@@ -1,6 +1,6 @@
 import unittest
-from hyppy import chem, states
-from hyppy.spin_system import SpinSystem
+from spinguin import chem, states
+from spinguin.spin_system import SpinSystem
 import numpy as np
 
 class TestChemMethods(unittest.TestCase):

@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from hyppy.spin_system import SpinSystem
+    from spinguin.spin_system import SpinSystem
 
 # Imports
 import numpy as np
@@ -19,7 +19,7 @@ import time
 import math
 from itertools import product, combinations
 from scipy.sparse import csc_array
-from hyppy import la
+from spinguin import la
 from typing import Union, Iterator, Tuple
 
 class Basis():

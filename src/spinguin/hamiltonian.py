@@ -9,14 +9,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from hyppy.spin_system import SpinSystem
+    from spinguin.spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import time
 from scipy.sparse import csc_array
-from hyppy import la
-from hyppy.operators import sop_P
+from spinguin import la
+from spinguin.operators import sop_P
 
 def hamiltonian_zeeman(spin_system:SpinSystem, B: float, side: str='comm') -> csc_array:
     """

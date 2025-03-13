@@ -9,12 +9,12 @@ Takes about 10-15 minutes to run on a laptop with 11th generation i5 processor.
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
-from hyppy.spin_system import SpinSystem
-from hyppy.hamiltonian import hamiltonian
-from hyppy.relaxation import relaxation
-from hyppy.propagation import propagator
-from hyppy.states import unit_state, singlet, measure
-from hyppy.chem import associate, dissociate, rotate_molecule
+from spinguin.spin_system import SpinSystem
+from spinguin.hamiltonian import hamiltonian
+from spinguin.relaxation import relaxation
+from spinguin.propagation import propagator
+from spinguin.states import unit_state, singlet, measure
+from spinguin.chem import associate, dissociate, rotate_molecule
 
 # Simulation settings
 max_spin_order = 4

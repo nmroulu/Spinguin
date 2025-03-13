@@ -10,13 +10,13 @@ Takes about 72 hours to run on a laptop with 11th generation i5 processor.
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from hyppy.spin_system import SpinSystem
-from hyppy.hamiltonian import hamiltonian
-from hyppy.relaxation import relaxation
-from hyppy.propagation import propagator
-from hyppy.states import unit_state, singlet, measure
-from hyppy.chem import associate, dissociate, rotate_molecule
-from hyppy.basis import ZQ_basis, ZQ_filter
+from spinguin.spin_system import SpinSystem
+from spinguin.hamiltonian import hamiltonian
+from spinguin.relaxation import relaxation
+from spinguin.propagation import propagator
+from spinguin.states import unit_state, singlet, measure
+from spinguin.chem import associate, dissociate, rotate_molecule
+from spinguin.basis import ZQ_basis, ZQ_filter
 from tqdm.auto import tqdm
 
 # Simulation settings

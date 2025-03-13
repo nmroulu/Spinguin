@@ -9,16 +9,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from hyppy.spin_system import SpinSystem
+    from spinguin.spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import scipy.constants as const
 from scipy.sparse import lil_array, csc_array, issparse
-from hyppy import la
-from hyppy.operators import op_P
-from hyppy.hamiltonian import hamiltonian_zeeman
-from hyppy.basis import str_to_op_def, state_idx
+from spinguin import la
+from spinguin.operators import op_P
+from spinguin.hamiltonian import hamiltonian_zeeman
+from spinguin.basis import str_to_op_def, state_idx
 from typing import Union
 from functools import lru_cache
 

@@ -1,5 +1,5 @@
 import unittest
-from hyppy import la, operators
+from spinguin import la, operators
 import numpy as np
 from scipy.sparse.linalg import expm
 from scipy.sparse import csc_array, random_array

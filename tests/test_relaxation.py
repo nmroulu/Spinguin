@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-from hyppy.spin_system import SpinSystem
-from hyppy import nmr_isotopes, relaxation, hamiltonian, states, propagation
-from hyppy.basis import ZQ_basis, ZQ_filter
+from spinguin.spin_system import SpinSystem
+from spinguin import nmr_isotopes, relaxation, hamiltonian, states, propagation
+from spinguin.basis import ZQ_basis, ZQ_filter
 
 class TestRelaxation(unittest.TestCase):
 

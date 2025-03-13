@@ -2,10 +2,10 @@ import unittest
 import numpy as np
 import math
 from scipy.sparse import lil_array
-from hyppy.spin_system import SpinSystem
-from hyppy.la import comm, cartesian_tensor_to_spherical_tensor
-from hyppy.basis import idx_to_lq, str_to_op_def, ZQ_basis
-from hyppy import operators
+from spinguin.spin_system import SpinSystem
+from spinguin.la import comm, cartesian_tensor_to_spherical_tensor
+from spinguin.basis import idx_to_lq, str_to_op_def, ZQ_basis
+from spinguin import operators
 
 class TestOperators(unittest.TestCase):
 

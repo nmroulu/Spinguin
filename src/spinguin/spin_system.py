@@ -10,8 +10,8 @@ from __future__ import annotations
 import numpy as np
 import hashlib
 from pickle import dumps
-from hyppy import data_io, nmr_isotopes
-from hyppy.basis import Basis
+from spinguin import data_io, nmr_isotopes
+from spinguin.basis import Basis
 from typing import Union
 
 class SpinSystem:

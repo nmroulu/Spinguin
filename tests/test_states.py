@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
-from hyppy.spin_system import SpinSystem
-from hyppy import operators, states
+from spinguin.spin_system import SpinSystem
+from spinguin import operators, states
 import scipy.constants as const
 
 class TestStates(unittest.TestCase):
