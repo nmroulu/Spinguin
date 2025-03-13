@@ -40,7 +40,7 @@ efg[5] = np.array([\
     [0.0000, 0.0000, -1.1037]
 ])
 spin_system = SpinSystem(isotopes, chemical_shifts, scalar_couplings, xyz, shielding, efg, max_spin_order=3)
-field = 1e-3
+field = 1
 tau_c = 50e-12
 temp = 273
 time_step = 2e-3
