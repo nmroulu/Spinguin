@@ -7,6 +7,9 @@
 # Allow Python files
 !*.py
 
+# Allow JuPyter notebooks
+!*.ipynb
+
 # Allow Cython files
 !*.pyx
 
