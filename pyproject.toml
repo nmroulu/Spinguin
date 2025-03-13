@@ -1,18 +1,18 @@
 [project]
-name = "hyppy"
+name = "spinguin"
 version = "1.0"
-dependencies = ["numpy", "scipy", "sympy"]
+dependencies = ["numpy >= 1.26.4", "scipy >= 1.14.1", "sympy >= 1.13.1"]
 requires-python = ">=3.11"
 authors = [
     {name = "Joni Eronen", email = "joni.eronen@oulu.fi"},
     {name = "Perttu Hilla", email = "perttu.hilla@oulu.fi"}
 ]
-description = "HypPy is a spin-dynamics package for Python tailored for hyperpolarization experiments."
+description = "Spinguin is an intuitive Python package for versatile numerical spin-dynamics simulations."
 readme = "README.md"
 license = {file = "LICENSE"}
 
 [project.optional-dependencies]
-dev = ["cython", "build", "setuptools"]
+dev = ["cython >= 3.0.11", "build", "setuptools"]
 
 [build-system]
 requires = ["setuptools", "wheel", "Cython"]
@@ -20,7 +20,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["hyppy*"]
+include = ["spinguin*"]
 
 [tool.setuptools.package-data]
-"hyppy" = ["*.pyx", "*.pxd"]
+"spinguin" = ["*.pyx", "*.pxd"]
