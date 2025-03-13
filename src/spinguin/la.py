@@ -14,7 +14,7 @@ from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
 from typing import Union, Tuple
-from hyppy.sparse_dot import sparse_dot as spdotcy
+from spinguin.sparse_dot import sparse_dot as spdotcy
 
 def isvector(v: Union[csc_array, np.ndarray], ord: str="col") -> bool:
     """
