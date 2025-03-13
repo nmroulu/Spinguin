@@ -16,8 +16,8 @@ elif sys.platform == "linux":
 
 ext_modules = [
     Extension(
-        "hyppy.sparse_dot",
-        ["src/hyppy/sparse_dot.pyx"],
+        "spinguin.sparse_dot",
+        ["src/spinguin/sparse_dot.pyx"],
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
         language='c++'
