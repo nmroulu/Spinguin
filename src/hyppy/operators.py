@@ -512,7 +512,6 @@ def superoperator(spin_system: SpinSystem, operators: Union[str, list], spins: U
     """
 
     # Extract the necessary information from the spin system
-    basis = spin_system.basis
     dim = spin_system.basis.dim
 
     # Initialize the superoperator
