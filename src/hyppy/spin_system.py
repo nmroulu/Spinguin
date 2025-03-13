@@ -8,6 +8,8 @@ the other modules can be used to calculate properties for the spin system.
 # Imports
 from __future__ import annotations
 import numpy as np
+import hashlib
+from pickle import dumps
 from hyppy import data_io, nmr_isotopes
 from hyppy.basis import Basis
 from typing import Union
@@ -176,3 +178,16 @@ class SpinSystem:
     def quad(self) -> np.ndarray:
         """Quadrupolar moments in m^2."""
         return np.array([nmr_isotopes.ISOTOPES[isotope][2] * 1e-28 for isotope in self.isotopes])
+    
+    @property
+    def unique_id(self) -> float:
+        """Computes an unique ID for the spin system based on the properties."""
+        properties_bytes = dumps(self.isotopes) \
+                         + dumps(self.chemical_shifts) \
+                         + dumps(self.scalar_couplings) \
+                         + dumps(self.xyz) \
+                         + dumps(self.shielding) \
+                         + dumps(self.efg) \
+                         + dumps(self.max_spin_order) \
+                         + dumps(self.basis.arr)
+        return hashlib.md5(properties_bytes).hexdigest()
