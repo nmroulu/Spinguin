@@ -17,7 +17,7 @@ import scipy.constants as const
 from scipy.sparse import lil_array, csc_array, issparse
 from spinguin import la
 from spinguin.operators import op_P
-from spinguin.hamiltonian import hamiltonian_zeeman
+from spinguin.hamiltonian import hamiltonian
 from spinguin.basis import str_to_op_def, state_idx
 from typing import Union
 from functools import lru_cache
@@ -275,8 +275,8 @@ def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool
     # Extract the necessary information from spin system
     mults = spin_system.mults
 
-    # Build the left Zeeman Hamiltonian
-    H = hamiltonian_zeeman(spin_system, B, 'left')
+    # Build the left Hamiltonian superoperator
+    H = hamiltonian(spin_system, B, 'left')
 
     # Get the matrix exponential corresponding to Boltzmann distribution
     P = la.expm(-const.hbar/(const.k*T)*H, zero_value)
