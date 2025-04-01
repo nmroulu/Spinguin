@@ -20,7 +20,7 @@ import math
 from itertools import product, combinations
 from scipy.sparse import csc_array
 from spinguin import _la
-from typing import Union, Iterator, Tuple
+from typing import Iterator, Tuple
 
 class Basis():
 
@@ -43,38 +43,15 @@ class Basis():
             A dictionary, where the keys contain tuples of integers that
             represent the product operators. The values contain the indices of
             the specific operator. Set directly by `make_basis`.
-        op_def_table : dict
-            Relates string descriptions of single-spin operators into integers and their
-            corresponding coefficients arising from different norms.
         ZQ_map : list
             An index map from the original basis to the zero-quantum basis. Created
             by `ZQ_basis`.
 
-        TODO: Siirrä op_def_table ja ZQ_map pois. Yleinen funktio kantafilttereille
+        TODO: Siirrä ZQ_map pois. Yleinen funktio kantafilttereille
         """
 
         # Create the basis
         self.make_basis(spin_system)
-
-        # Assign each operator string to the corresponding integer
-        op_def_table = {
-            'E' : ([0], [1]),
-            'I_+': ([1], [-np.sqrt(2)]),
-            'I_z': ([2], [1]),
-            'I_-': ([3], [np.sqrt(2)]),
-            'I_x' : ([1, 3], [-np.sqrt(2)/2, np.sqrt(2)/2]),
-            'I_y' : ([1, 3], [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)])
-        }
-
-        # Assign spherical tensors to the table
-        for l in range(10):
-            for q in range(-l, l+1):
-                op = f"T_{l}{q}"
-                idx = lq_to_idx(l, q)
-                op_def_table[op] = ([idx], [1])
-
-        # Save to attributes
-        self.op_def_table = op_def_table
 
     @property
     def dim(self) -> int:
@@ -142,7 +119,7 @@ class Basis():
         # Assign to instance variable
         self.arr = basis
 
-    def make_subsystem_basis(self, spin_system:SpinSystem, subsystem:tuple) -> Iterator:
+    def make_subsystem_basis(self, spin_system: SpinSystem, subsystem: tuple) -> Iterator:
         """
         This function is called automatically from basis().
 
@@ -186,7 +163,7 @@ class Basis():
 
         return basis
     
-def state_idx(spin_system:SpinSystem, op_def:tuple) -> int:
+def state_idx(spin_system: SpinSystem, op_def: tuple) -> int:
     """
     Finds the index that corresponds to the operator definition.
 
@@ -207,62 +184,7 @@ def state_idx(spin_system:SpinSystem, op_def:tuple) -> int:
 
     return idx
 
-def str_to_op_def(spin_system:SpinSystem, operators: list, spins: list) -> Tuple[list, list]:
-    """
-    Converts a product operator described by lists of strings and spin indices to the
-    tuple(s) of integers that defines the operator.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-    operators : list
-        List of operators that describe the product operator. Operators that are not
-        specified will be treated as unit operators.
-        Example: ['I_z', 'I_+']
-    spins : list
-        Indices of the spins. Must match the length of `operators`.
-        Example: [0, 2]
-
-    Returns
-    -------
-    op_defs : list of tuples
-        A list that contains tuples, which describe the requested operator with integers.
-        Example: [(2, 0, 1)]
-    coeffs : list of floats
-        Coefficients that take care of the different norms of operator relations.
-    """
-
-    # Get the size of the operator definitions
-    size = spin_system.size
-
-    # Fill the rest of the operator array with unit operators
-    operators_full = np.array(['E' for _ in range(size)], dtype='<U5')
-    for op, spin in zip(operators, spins):
-        operators_full[spin] = op
-
-    # Create empty lists of lists to hold the op_defs and the coefficients
-    op_defs = [[]]
-    coeffs = [[]]
-
-    # Loop over all of the operator strings
-    for op in operators_full:
-
-        # Get the corresponding integers and coefficients
-        op_ints, op_coeffs = spin_system.basis.op_def_table[op]
-
-        # Add each possible value
-        op_defs = [op_def + [op_int] for op_def in op_defs for op_int in op_ints]
-        coeffs = [coeff + [op_coeff] for coeff in coeffs for op_coeff in op_coeffs]
-
-    # Convert the operator definition to tuple
-    op_defs = [tuple(op_def) for op_def in op_defs]
-
-    # Calculate the coefficients
-    coeffs = [np.prod(coeff) for coeff in coeffs]
-
-    return op_defs, coeffs
-
-def ZQ_basis(spin_system:SpinSystem):
+def ZQ_basis(spin_system: SpinSystem):
     """
     This function modifies the existing basis by leaving only the 
     zero-quantum (ZQ) terms.
@@ -309,7 +231,7 @@ def ZQ_basis(spin_system:SpinSystem):
     print("Zero-quantum basis created.")
     print(f"Elapsed time: {time.time() - time_start} seconds.")
 
-def ZQ_filter(spin_system:SpinSystem, A: Union[csc_array, np.ndarray]) -> Union[csc_array, np.ndarray]:
+def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray) -> csc_array | np.ndarray:
     """
     This function returns a superoperator or a state vector where only the ZQC terms
     are retained. The zero-quantum basis must have been created prior to calling this
@@ -419,3 +341,75 @@ def coherence_order(op_def: tuple) -> int:
         order += q
 
     return order
+
+# Assign each operator string to the corresponding integer
+op_def_table = {
+    'E' : ([0], [1]),
+    'I_+': ([1], [-np.sqrt(2)]),
+    'I_z': ([2], [1]),
+    'I_-': ([3], [np.sqrt(2)]),
+    'I_x' : ([1, 3], [-np.sqrt(2)/2, np.sqrt(2)/2]),
+    'I_y' : ([1, 3], [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)])
+}
+
+# Assign spherical tensors to the table
+for l in range(10):
+    for q in range(-l, l+1):
+        op = f"T_{l}{q}"
+        idx = lq_to_idx(l, q)
+        op_def_table[op] = ([idx], [1])
+
+def str_to_op_def(spin_system: SpinSystem, operators: list, spins: list) -> Tuple[list, list]:
+    """
+    Converts a product operator described by lists of strings and spin indices to the
+    tuple(s) of integers that defines the operator.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+    operators : list
+        List of operators that describe the product operator. Operators that are not
+        specified will be treated as unit operators.
+        Example: ['I_z', 'I_+']
+    spins : list
+        Indices of the spins. Must match the length of `operators`.
+        Example: [0, 2]
+
+    Returns
+    -------
+    op_defs : list of tuples
+        A list that contains tuples, which describe the requested operator with integers.
+        Example: [(2, 0, 1)]
+    coeffs : list of floats
+        Coefficients that take care of the different norms of operator relations.
+    """
+
+    # Get the size of the operator definitions
+    size = spin_system.size
+
+    # Fill the rest of the operator array with unit operators
+    operators_full = np.array(['E' for _ in range(size)], dtype='<U5')
+    for op, spin in zip(operators, spins):
+        operators_full[spin] = op
+
+    # Create empty lists of lists to hold the op_defs and the coefficients
+    op_defs = [[]]
+    coeffs = [[]]
+
+    # Loop over all of the operator strings
+    for op in operators_full:
+
+        # Get the corresponding integers and coefficients
+        op_ints, op_coeffs = op_def_table[op]
+
+        # Add each possible value
+        op_defs = [op_def + [op_int] for op_def in op_defs for op_int in op_ints]
+        coeffs = [coeff + [op_coeff] for coeff in coeffs for op_coeff in op_coeffs]
+
+    # Convert the operator definition to tuple
+    op_defs = [tuple(op_def) for op_def in op_defs]
+
+    # Calculate the coefficients
+    coeffs = [np.prod(coeff) for coeff in coeffs]
+
+    return op_defs, coeffs
