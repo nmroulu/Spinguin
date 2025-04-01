@@ -112,14 +112,14 @@ class TestBasis(unittest.TestCase):
         basis_org = copy.copy(spin_system.basis)
 
         # Convert to ZQ basis
-        ZQ_basis(spin_system)
+        ZQ_map = ZQ_basis(spin_system)
 
         # Check that only the ZQ terms remain and that the index map is correct
         for op, idx in basis_org.dict.items():
             if op in spin_system.basis.dict:
                 
                 self.assertEqual(coherence_order(op), 0)
-                self.assertEqual(spin_system.basis.ZQ_map[spin_system.basis.dict[op]], idx)
+                self.assertEqual(ZQ_map[spin_system.basis.dict[op]], idx)
 
     def test_ZQ_filter(self):
 
@@ -127,7 +127,7 @@ class TestBasis(unittest.TestCase):
         isotopes = np.array(['1H', '1H', '1H'])
         spin_system = SpinSystem(isotopes, max_spin_order=2)
         spin_system_ZQ = SpinSystem(isotopes, max_spin_order=2)
-        ZQ_basis(spin_system_ZQ)
+        ZQ_map = ZQ_basis(spin_system_ZQ)
 
         # Operators to test
         operators = ['E', 'I_x', 'I_y', 'I_z', 'I_+', 'I_-']
@@ -142,4 +142,4 @@ class TestBasis(unittest.TestCase):
                     sop_ZQ = superoperator(spin_system_ZQ, [i, j, k], [0, 1, 2])
 
                     # Applying the ZQ-filter should result in same result
-                    self.assertTrue(np.allclose(sop_ZQ.toarray(), ZQ_filter(spin_system_ZQ, sop).toarray()))
+                    self.assertTrue(np.allclose(sop_ZQ.toarray(), ZQ_filter(spin_system_ZQ, sop, ZQ_map).toarray()))

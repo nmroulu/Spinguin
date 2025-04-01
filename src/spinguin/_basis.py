@@ -43,11 +43,8 @@ class Basis():
             A dictionary, where the keys contain tuples of integers that
             represent the product operators. The values contain the indices of
             the specific operator. Set directly by `make_basis`.
-        ZQ_map : list
-            An index map from the original basis to the zero-quantum basis. Created
-            by `ZQ_basis`.
 
-        TODO: Siirrä ZQ_map pois. Yleinen funktio kantafilttereille
+        TODO: Yleiset funktiot kantafilttereille.
         """
 
         # Create the basis
@@ -184,7 +181,7 @@ def state_idx(spin_system: SpinSystem, op_def: tuple) -> int:
 
     return idx
 
-def ZQ_basis(spin_system: SpinSystem):
+def ZQ_basis(spin_system: SpinSystem) -> list:
     """
     This function modifies the existing basis by leaving only the 
     zero-quantum (ZQ) terms.
@@ -195,6 +192,12 @@ def ZQ_basis(spin_system: SpinSystem):
     Parameters
     ----------
     spin_system : SpinSystem
+
+    Returns
+    -------
+    ZQ_map : list
+        Index mapping from the original basis set to the modified basis set. This index map
+        is used to convert the operators to the modified basis.
     """
 
     print("Constructing the zero-quantum basis.")
@@ -223,15 +226,16 @@ def ZQ_basis(spin_system: SpinSystem):
     # Convert basis to NumPy
     basis = np.array(list(basis_dict.keys()))
 
-    # Save the basis and ZQ map
+    # Save the basis
     spin_system.basis.arr = basis
     spin_system.basis.dict = basis_dict
-    spin_system.basis.ZQ_map = ZQ_map
 
     print("Zero-quantum basis created.")
     print(f"Elapsed time: {time.time() - time_start} seconds.")
 
-def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray) -> csc_array | np.ndarray:
+    return ZQ_map
+
+def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray, ZQ_map: list) -> csc_array | np.ndarray:
     """
     This function returns a superoperator or a state vector where only the ZQC terms
     are retained. The zero-quantum basis must have been created prior to calling this
@@ -256,13 +260,13 @@ def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray) -> csc_array |
     if _la.isvector(A):
 
         # Apply the filter
-        A = A[spin_system.basis.ZQ_map]
+        A = A[ZQ_map]
 
     # Process superoperators
     else:
 
         # Apply the filter
-        A = A[np.ix_(spin_system.basis.ZQ_map, spin_system.basis.ZQ_map)]
+        A = A[np.ix_(ZQ_map, ZQ_map)]
 
     print("Zero-quantum coherence filter applied.")
     print(f"Elapsed time: {time.time() - time_start} seconds.")

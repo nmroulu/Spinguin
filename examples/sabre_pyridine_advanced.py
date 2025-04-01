@@ -123,15 +123,15 @@ R_c = relaxation(spin_system_c, H_c, magnetic_field, tau_c_c, include_sr2k=True)
 R_s = relaxation(spin_system_s, H_s, magnetic_field, tau_c_s, include_sr2k=True)
 
 # Switch to ZQ basis
-ZQ_basis(spin_system_c)
-ZQ_basis(spin_system_s)
+ZQ_map_c = ZQ_basis(spin_system_c)
+ZQ_map_s = ZQ_basis(spin_system_s)
 ZQ_basis(spin_system_H2)
 
 # Change the Hamiltonians and the Relaxation superoperators to the ZQ basis
-H_c = ZQ_filter(spin_system_c, H_c)
-H_s = ZQ_filter(spin_system_s, H_s)
-R_c = ZQ_filter(spin_system_c, R_c)
-R_s = ZQ_filter(spin_system_s, R_s)
+H_c = ZQ_filter(spin_system_c, H_c, ZQ_map_c)
+H_s = ZQ_filter(spin_system_s, H_s, ZQ_map_s)
+R_c = ZQ_filter(spin_system_c, R_c, ZQ_map_c)
+R_s = ZQ_filter(spin_system_s, R_s, ZQ_map_s)
 
 # Make the time propagator
 P_c = propagator(time_step, H_c, R_c)

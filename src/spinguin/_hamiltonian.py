@@ -20,7 +20,6 @@ from spinguin._operators import sop_P
 
 def hamiltonian_zeeman(spin_system:SpinSystem, B: float, side: str='comm') -> csc_array:
     """
-    TODO: KATSO MERKIT!
     Calculates the Hamiltonian superoperator of Zeeman interaction.
 
     Parameters

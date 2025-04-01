@@ -79,10 +79,10 @@ class TestRelaxation(unittest.TestCase):
         rho = pul_180 @ rho
 
         # Switch to ZQ subspace
-        ZQ_basis(spin_system)
-        H = ZQ_filter(spin_system, H)
-        R = ZQ_filter(spin_system, R)
-        rho = ZQ_filter(spin_system, rho)
+        ZQ_map = ZQ_basis(spin_system)
+        H = ZQ_filter(spin_system, H, ZQ_map)
+        R = ZQ_filter(spin_system, R, ZQ_map)
+        rho = ZQ_filter(spin_system, rho, ZQ_map)
 
         # Thermalize R
         R = _relaxation.thermalize(spin_system, R, field, temp)
