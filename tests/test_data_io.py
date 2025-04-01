@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import os
-from spinguin import data_io
+from spinguin._data_io import read_array, read_tensors, read_xyz
 
 class TestDataIOMethods(unittest.TestCase):
 
@@ -18,9 +18,9 @@ class TestDataIOMethods(unittest.TestCase):
 
         # Read values from .txt files
         test_dir = os.path.dirname(__file__)
-        isotopes_2 = data_io.read_array(os.path.join(test_dir, 'test_data', 'isotopes.txt'), data_type=str)
-        chemical_shifts_2 = data_io.read_array(os.path.join(test_dir, 'test_data', 'chemical_shifts.txt'), data_type=float)
-        scalar_couplings_2 = data_io.read_array(os.path.join(test_dir, 'test_data', 'scalar_couplings.txt'), data_type=float)
+        isotopes_2 = read_array(os.path.join(test_dir, 'test_data', 'isotopes.txt'), data_type=str)
+        chemical_shifts_2 = read_array(os.path.join(test_dir, 'test_data', 'chemical_shifts.txt'), data_type=float)
+        scalar_couplings_2 = read_array(os.path.join(test_dir, 'test_data', 'scalar_couplings.txt'), data_type=float)
 
         # Make a comparison
         self.assertTrue((isotopes_1 == isotopes_2).all())
@@ -38,7 +38,7 @@ class TestDataIOMethods(unittest.TestCase):
 
         # Read values from .txt files
         test_dir = os.path.dirname(__file__)
-        xyz_2 = data_io.read_xyz(os.path.join(test_dir, 'test_data', 'xyz.txt'))
+        xyz_2 = read_xyz(os.path.join(test_dir, 'test_data', 'xyz.txt'))
 
         # Make a comparison
         self.assertTrue((xyz_1 == xyz_2).all())
@@ -71,8 +71,8 @@ class TestDataIOMethods(unittest.TestCase):
 
         # Read values from .txt files
         test_dir = os.path.dirname(__file__)
-        shielding_2 = data_io.read_tensors(os.path.join(test_dir, 'test_data', 'shielding.txt'))
-        efg_2 = data_io.read_tensors(os.path.join(test_dir, 'test_data', 'efg.txt'))
+        shielding_2 = read_tensors(os.path.join(test_dir, 'test_data', 'shielding.txt'))
+        efg_2 = read_tensors(os.path.join(test_dir, 'test_data', 'efg.txt'))
 
         # Make a comparison
         self.assertTrue((shielding_1 == shielding_2).all())

@@ -4,7 +4,7 @@ This function tests the speed of SciPy sparse matrix multiplications.
 
 # Imports
 from scipy.sparse import random_array
-from spinguin.la import sparse_dot
+from spinguin import sparse_dot
 from time import perf_counter
 import numpy as np
 import matplotlib.pyplot as plt

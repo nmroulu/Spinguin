@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 import os
-from spinguin.spin_system import SpinSystem
-from spinguin.hamiltonian import hamiltonian
+from spinguin._spin_system import SpinSystem
+from spinguin._hamiltonian import hamiltonian
 from scipy.sparse import load_npz
 
 class TestHamiltonian(unittest.TestCase):

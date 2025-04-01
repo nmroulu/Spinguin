@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import time
@@ -17,9 +17,9 @@ import numpy as np
 import scipy.constants as const
 from scipy.sparse import csc_array, eye_array, lil_array
 from scipy.special import eval_legendre
-from spinguin import la, operators
-from spinguin.basis import idx_to_lq, lq_to_idx, str_to_op_def, state_idx
-from spinguin.hamiltonian import hamiltonian_zeeman
+from spinguin import _la, _operators
+from spinguin._basis import idx_to_lq, lq_to_idx, str_to_op_def, state_idx
+from spinguin._hamiltonian import hamiltonian_zeeman
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -94,15 +94,15 @@ def G0(tensor1: np.ndarray, tensor2: np.ndarray, l:int) -> float:
         Time correlation function evaluated at t = 0.
     """
     # Find the principal axis systems of the tensors
-    _, eigvecs1, tensor1_pas = la.principal_axis_system(tensor1)
-    _, eigvecs2, tensor2_pas = la.principal_axis_system(tensor2)
+    _, eigvecs1, tensor1_pas = _la.principal_axis_system(tensor1)
+    _, eigvecs2, tensor2_pas = _la.principal_axis_system(tensor2)
 
     # Find the angle between the principal axes
-    angle = la.angle_between_vectors(eigvecs1[0], eigvecs2[0])
+    angle = _la.angle_between_vectors(eigvecs1[0], eigvecs2[0])
 
     # Write the tensors in the spherical tensor notation
-    V1_pas = la.cartesian_tensor_to_spherical_tensor(tensor1_pas)
-    V2_pas = la.cartesian_tensor_to_spherical_tensor(tensor2_pas)
+    V1_pas = _la.cartesian_tensor_to_spherical_tensor(tensor1_pas)
+    V2_pas = _la.cartesian_tensor_to_spherical_tensor(tensor2_pas)
 
     # Compute G0
     G_0 = 1 / (2*l+1) * eval_legendre(2, np.cos(angle)) * sum([V1_pas[l, q] * np.conj(V2_pas[l, q]) for q in range(-l, l+1)])
@@ -287,14 +287,14 @@ def interactions(spin_system:SpinSystem, intrs: dict, zero_intr: float=1e-9) -> 
             # Consider single-spin interactions
             if interaction == "CSA" or interaction == "Q":
                 for spin_1 in range(size):
-                    if la.norm_1(tensors[spin_1], ord='row') > zero_intr:
+                    if _la.norm_1(tensors[spin_1], ord='row') > zero_intr:
                         interactions[rank].append((interaction, spin_1, None, tensors[spin_1]))
 
             # Consider two-spin interactions
             if interaction == "DD":
                 for spin_1 in range(size):
                     for spin_2 in range(size):
-                        if la.norm_1(tensors[spin_1, spin_2], ord='row') > zero_intr:
+                        if _la.norm_1(tensors[spin_1, spin_2], ord='row') > zero_intr:
                             interactions[rank].append((interaction, spin_1, spin_2, tensors[spin_1, spin_2]))
 
     return interactions
@@ -330,18 +330,18 @@ def sop_T(spin_system:SpinSystem, l: int, q: int, interaction_type: str, spin_1:
 
     # Single-spin linear interaction
     if interaction_type == "CSA":
-        sop = operators.sop_T_coupled(spin_system, l, q, spin_1)
+        sop = _operators.sop_T_coupled(spin_system, l, q, spin_1)
 
     # Single-spin quadratic interaction
     elif interaction_type == "Q":
         op_def = np.zeros(size, dtype=int)
         op_def[spin_1] = lq_to_idx(l, q)
         op_def = tuple(op_def)
-        sop = operators.sop_P(spin_system, op_def, 'comm')
+        sop = _operators.sop_P(spin_system, op_def, 'comm')
 
     # Two-spin bilinear interaction
     elif interaction_type == "DD":
-        sop = operators.sop_T_coupled(spin_system, l, q, spin_1, spin_2)
+        sop = _operators.sop_T_coupled(spin_system, l, q, spin_1, spin_2)
 
     # Otherwise incorrect interaction type
     else:
@@ -360,7 +360,7 @@ def sop_R_redfield(spin_system: SpinSystem,
 
     Sources:
     
-    Eq. 54 from Hilla & Vaara: Rel2x: Analytic and automatic NMR relaxation theory
+    Eq. 54 from Hilla & Vaara: Rela2x: Analytic and automatic NMR relaxation theory
     https://doi.org/10.1016/j.jmr.2024.107828
 
     Eq. 24 and 25 from Goodwin & Kuprov: Auxiliary matrix formalism for interaction
@@ -432,9 +432,9 @@ def sop_R_redfield(spin_system: SpinSystem,
 
                 # Calculate the Redfield integral using the auxiliary matrix method
                 if l == 1:
-                    sop_T_right = la.auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, zero_aux)
+                    sop_T_right = _la.auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, zero_aux)
                 elif l == 2:
-                    sop_T_right = la.auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, zero_aux)
+                    sop_T_right = _la.auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, zero_aux)
 
                 # Get top left and top right blocks
                 top_left = sop_T_right[:dim, :dim]
@@ -708,7 +708,7 @@ def relaxation(spin_system: SpinSystem,
         sop_R = sop_R.real
 
     # Remove small elements from the relaxation superoperator
-    la.increase_sparsity(sop_R, zero_R)
+    _la.increase_sparsity(sop_R, zero_R)
 
     print("Relaxation superoperator constructed.")
     print(f"Elapsed time: {time.time() - time_start} seconds.")
@@ -741,7 +741,7 @@ def thermalize(spin_system:SpinSystem, R: csc_array, B: float, T: float, zero_va
     H = hamiltonian_zeeman(spin_system, B, 'left')
 
     # Get the matrix exponential corresponding to Boltzmann distribution
-    P = la.expm(const.hbar/(const.k*T)*H, zero_value)
+    P = _la.expm(const.hbar/(const.k*T)*H, zero_value)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P

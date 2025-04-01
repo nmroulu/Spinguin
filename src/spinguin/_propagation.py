@@ -9,14 +9,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import time
 import numpy as np
 from scipy.sparse import csc_array
-from spinguin import la
-from spinguin.operators import superoperator
+from spinguin import _la
+from spinguin._operators import superoperator
 from typing import Union
 
 def propagator(t:float,
@@ -71,9 +71,9 @@ def propagator(t:float,
 
     # Calculate the matrix exponential
     if custom_dot:
-        expm_Lt = la.expm_custom_dot(L*t, zero_value)
+        expm_Lt = _la.expm_custom_dot(L*t, zero_value)
     else:
-        expm_Lt = la.expm(L*t, zero_value)
+        expm_Lt = _la.expm(L*t, zero_value)
 
     # Find out the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
@@ -130,6 +130,6 @@ def pulse(spin_system:SpinSystem, operators: Union[str, list], indices: Union[in
     angle = angle / 180 * np.pi
 
     # Make the pulse
-    pul = la.expm(-1j*angle*op, zero_value)
+    pul = _la.expm(-1j*angle*op, zero_value)
 
     return pul

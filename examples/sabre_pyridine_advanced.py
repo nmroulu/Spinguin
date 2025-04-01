@@ -9,12 +9,7 @@ Takes about 10-15 minutes to run on a laptop with 11th generation i5 processor.
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
-from spinguin.spin_system import SpinSystem
-from spinguin.hamiltonian import hamiltonian
-from spinguin.relaxation import relaxation
-from spinguin.propagation import propagator
-from spinguin.states import unit_state, singlet, measure
-from spinguin.chem import associate, dissociate, rotate_molecule
+from spinguin import SpinSystem, hamiltonian, relaxation, propagator, unit_state, singlet, measure, associate, dissociate, rotate_molecule, ZQ_basis, ZQ_filter
 
 # Simulation settings
 max_spin_order = 4
@@ -128,15 +123,15 @@ R_c = relaxation(spin_system_c, H_c, magnetic_field, tau_c_c, include_sr2k=True)
 R_s = relaxation(spin_system_s, H_s, magnetic_field, tau_c_s, include_sr2k=True)
 
 # Switch to ZQ basis
-spin_system_c.basis.ZQ_basis()
-spin_system_s.basis.ZQ_basis()
-spin_system_H2.basis.ZQ_basis()
+ZQ_basis(spin_system_c)
+ZQ_basis(spin_system_s)
+ZQ_basis(spin_system_H2)
 
 # Change the Hamiltonians and the Relaxation superoperators to the ZQ basis
-H_c = spin_system_c.basis.ZQ_filter(H_c)
-H_s = spin_system_s.basis.ZQ_filter(H_s)
-R_c = spin_system_c.basis.ZQ_filter(R_c)
-R_s = spin_system_s.basis.ZQ_filter(R_s)
+H_c = ZQ_filter(spin_system_c, H_c)
+H_s = ZQ_filter(spin_system_s, H_s)
+R_c = ZQ_filter(spin_system_c, R_c)
+R_s = ZQ_filter(spin_system_s, R_s)
 
 # Make the time propagator
 P_c = propagator(time_step, H_c, R_c)

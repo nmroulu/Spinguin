@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import numpy as np
@@ -19,7 +19,7 @@ import time
 import math
 from itertools import product, combinations
 from scipy.sparse import csc_array
-from spinguin import la
+from spinguin import _la
 from typing import Union, Iterator, Tuple
 
 class Basis():
@@ -49,6 +49,8 @@ class Basis():
         ZQ_map : list
             An index map from the original basis to the zero-quantum basis. Created
             by `ZQ_basis`.
+
+        TODO: Siirrä op_def_table ja ZQ_map pois. Yleinen funktio kantafilttereille
         """
 
         # Create the basis
@@ -92,7 +94,7 @@ class Basis():
         The following attributes will be assigned:
 
         self.arr : numpy.ndarray
-        self.dct : dict
+        self.dict : dict
 
         Called when initiating a basis.
 
@@ -329,7 +331,7 @@ def ZQ_filter(spin_system:SpinSystem, A: Union[csc_array, np.ndarray]) -> Union[
     time_start = time.time()
 
     # Process density vectors
-    if la.isvector(A):
+    if _la.isvector(A):
 
         # Apply the filter
         A = A[spin_system.basis.ZQ_map]

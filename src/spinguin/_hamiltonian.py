@@ -9,17 +9,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import time
 from scipy.sparse import csc_array
-from spinguin import la
-from spinguin.operators import sop_P
+from spinguin import _la
+from spinguin._operators import sop_P
 
 def hamiltonian_zeeman(spin_system:SpinSystem, B: float, side: str='comm') -> csc_array:
     """
+    TODO: KATSO MERKIT!
     Calculates the Hamiltonian superoperator of Zeeman interaction.
 
     Parameters
@@ -142,7 +143,7 @@ def hamiltonian(spin_system:SpinSystem, B: float, side: str='comm', zero_value: 
     sop_H = sop_Hz + sop_Hj
 
     # Remove small values
-    la.increase_sparsity(sop_H, zero_value)
+    _la.increase_sparsity(sop_H, zero_value)
 
     print("Hamiltonian constructed.")
     print(f"Elapsed time: {time.time() - time_start} seconds.")

@@ -9,10 +9,7 @@ Takes about a minute to run on a laptop with 11th generation i5 processor.
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
-from spinguin.spin_system import SpinSystem
-from spinguin.hamiltonian import hamiltonian
-from spinguin.propagation import propagator
-from spinguin.states import singlet, measure
+from spinguin import SpinSystem, hamiltonian, propagator, singlet, measure
 
 # Simulation settings
 max_spin_order = 4

@@ -1,25 +1,26 @@
 import unittest
 import numpy as np
-from spinguin.spin_system import SpinSystem
-from spinguin import nmr_isotopes, relaxation, hamiltonian, states, propagation
-from spinguin.basis import ZQ_basis, ZQ_filter
+from spinguin._spin_system import SpinSystem
+from spinguin import _hamiltonian, _propagation, _relaxation, _states
+from spinguin._nmr_isotopes import ISOTOPES
+from spinguin._basis import ZQ_basis, ZQ_filter
 
 class TestRelaxation(unittest.TestCase):
 
     def test_dd_constant(self):
 
         # Get gammas in Hz/T
-        y_13C = 2*np.pi * nmr_isotopes.ISOTOPES['13C'][1] * 1e6
-        y_1H = 2*np.pi * nmr_isotopes.ISOTOPES['1H'][1] * 1e6
-        y_15N = 2*np.pi * nmr_isotopes.ISOTOPES['15N'][1] * 1e6
+        y_13C = 2*np.pi * ISOTOPES['13C'][1] * 1e6
+        y_1H = 2*np.pi * ISOTOPES['1H'][1] * 1e6
+        y_15N = 2*np.pi * ISOTOPES['15N'][1] * 1e6
 
         # Test against tabulated values (in Hz in the book)
         r_13C_13C = 0.153e-9
         r_13C_1H = 0.106e-9
         r_13C_15N = 0.147e-9
-        dd_13C_13C = -relaxation.dd_constant(y_13C, y_13C) / r_13C_13C**3 / (2*np.pi)
-        dd_13C_1H = -relaxation.dd_constant(y_13C, y_1H) / r_13C_1H**3 / (2*np.pi)
-        dd_13C_15N = relaxation.dd_constant(y_13C, y_15N) / r_13C_15N**3 / (2*np.pi)
+        dd_13C_13C = -_relaxation.dd_constant(y_13C, y_13C) / r_13C_13C**3 / (2*np.pi)
+        dd_13C_1H = -_relaxation.dd_constant(y_13C, y_1H) / r_13C_1H**3 / (2*np.pi)
+        dd_13C_15N = _relaxation.dd_constant(y_13C, y_15N) / r_13C_15N**3 / (2*np.pi)
 
         # Compare with: Apperley, Harris & Hodgkinson: Solid-state NMR: Basic principles and practice
         self.assertTrue(np.allclose(2.12e3, dd_13C_13C, rtol=0.01))
@@ -67,14 +68,14 @@ class TestRelaxation(unittest.TestCase):
         nsteps = 50000
 
         # Get the Hamiltonian
-        H = hamiltonian.hamiltonian(spin_system, field)
-        R = relaxation.relaxation(spin_system, H, field, tau_c)
+        H = _hamiltonian.hamiltonian(spin_system, field)
+        R = _relaxation.relaxation(spin_system, H, field, tau_c)
 
         # Create the thermal equilibrium
-        rho = states.thermal_equilibrium(spin_system, temp, field)
+        rho = _states.thermal_equilibrium(spin_system, temp, field)
 
         # Apply 180-degree pulse
-        pul_180 = propagation.pulse(spin_system, 'I_x', [0, 1, 2, 3, 4, 5], angle=180)
+        pul_180 = _propagation.pulse(spin_system, 'I_x', [0, 1, 2, 3, 4, 5], angle=180)
         rho = pul_180 @ rho
 
         # Switch to ZQ subspace
@@ -84,10 +85,10 @@ class TestRelaxation(unittest.TestCase):
         rho = ZQ_filter(spin_system, rho)
 
         # Thermalize R
-        R = relaxation.thermalize(spin_system, R, field, temp)
+        R = _relaxation.thermalize(spin_system, R, field, temp)
 
         # Get the propagator
-        P = propagation.propagator(time_step, H, R)
+        P = _propagation.propagator(time_step, H, R)
         
         # Simulation
         for _ in range(nsteps):
@@ -96,4 +97,4 @@ class TestRelaxation(unittest.TestCase):
             rho = P @ rho
 
         # Should result in thermal equilibrium
-        self.assertTrue(np.allclose(rho, states.thermal_equilibrium(spin_system, temp, field)))
+        self.assertTrue(np.allclose(rho, _states.thermal_equilibrium(spin_system, temp, field)))

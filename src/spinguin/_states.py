@@ -9,16 +9,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import scipy.constants as const
 from scipy.sparse import lil_array, csc_array, issparse
-from spinguin import la
-from spinguin.operators import op_P
-from spinguin.hamiltonian import hamiltonian
-from spinguin.basis import str_to_op_def, state_idx
+from spinguin import _la
+from spinguin._operators import op_P
+from spinguin._hamiltonian import hamiltonian
+from spinguin._basis import str_to_op_def, state_idx
 from typing import Union
 from functools import lru_cache
 
@@ -279,7 +279,7 @@ def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool
     H = hamiltonian(spin_system, B, 'left')
 
     # Get the matrix exponential corresponding to Boltzmann distribution
-    P = la.expm(-const.hbar/(const.k*T)*H, zero_value)
+    P = _la.expm(-const.hbar/(const.k*T)*H, zero_value)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)

@@ -10,14 +10,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import numpy as np
 from functools import lru_cache
 from itertools import product
-from spinguin import la
-from spinguin.basis import idx_to_lq, str_to_op_def
+from spinguin import _la
+from spinguin._basis import idx_to_lq, str_to_op_def
 from scipy.sparse import csc_array, eye_array
 from typing import Union
 
@@ -197,7 +197,7 @@ def op_T(S: float, l: int, q: int) -> np.ndarray:
         q = l-i
 
         # Perform the lowering
-        T = la.comm(op_Sm(S), T) / np.sqrt(l*(l+1) - q*(q-1))
+        T = _la.comm(op_Sm(S), T) / np.sqrt(l*(l+1) - q*(q-1))
 
     return T
 
@@ -236,7 +236,7 @@ def op_T_coupled(l:int, q:int, l1:int, s1:float, l2:int, s2:float) -> np.ndarray
         for q2 in range(-l2, l2+1):
 
             # Use coupling of angular momenta equation
-            T += la.CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1), op_T(s2, l2, q2))
+            T += _la.CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1), op_T(s2, l2, q2))
 
     return T
 
@@ -457,7 +457,7 @@ def sop_P(spin_system: SpinSystem, op_def: tuple, side: str) -> csc_array:
             op_def_k = np.delete(op_def_k, idx_spins, axis=1)
             
             # Operator definitions must match in order for the product of structure coefficients to be nonzero
-            ind_j, ind_k = la.find_common_rows(op_def_j, op_def_k)
+            ind_j, ind_k = _la.find_common_rows(op_def_j, op_def_k)
 
             # Append the products of structure coefficients and the indices to the lists
             sop_vals.append(prod_c_jk[m]*np.ones(len(ind_j)))
@@ -599,7 +599,7 @@ def sop_T_coupled(spin_system: SpinSystem, l: int, q: int, spin_1: int, spin_2: 
                 op_def = tuple(op_def)
 
                 # Use coupling of angular momenta equation
-                sop += la.CG_coeff(1, q1, 1, q2, l, q) * sop_P(spin_system, op_def, 'comm')
+                sop += _la.CG_coeff(1, q1, 1, q2, l, q) * sop_P(spin_system, op_def, 'comm')
 
     # Process linear single-spin interactions differently
     else:
@@ -613,6 +613,6 @@ def sop_T_coupled(spin_system: SpinSystem, l: int, q: int, spin_1: int, spin_2: 
             op_def = tuple(op_def)
 
             # Use coupling of angular momenta equation
-            sop += la.CG_coeff(1, q1, 1, 1, l, q) * sop_P(spin_system, op_def, 'comm')
+            sop += _la.CG_coeff(1, q1, 1, 1, l, q) * sop_P(spin_system, op_def, 'comm')
 
     return sop

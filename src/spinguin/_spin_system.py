@@ -10,8 +10,9 @@ from __future__ import annotations
 import numpy as np
 import hashlib
 from pickle import dumps
-from spinguin import data_io, nmr_isotopes
-from spinguin.basis import Basis
+from spinguin._nmr_isotopes import ISOTOPES
+from spinguin._data_io import read_array, read_tensors, read_xyz
+from spinguin._basis import Basis
 from typing import Union
 
 class SpinSystem:
@@ -33,6 +34,8 @@ class SpinSystem:
         max_spin_order: int=None):
         """
         Initialization of the spin system.
+
+        TODO: Explaiin which parameters are used where
 
         Parameters
         ----------
@@ -74,7 +77,7 @@ class SpinSystem:
         if isinstance(isotopes, np.ndarray):
             self.isotopes = isotopes
         elif isinstance(isotopes, str):
-            self.isotopes = data_io.read_array(isotopes, data_type=str)
+            self.isotopes = read_array(isotopes, data_type=str)
         else:
             raise TypeError(f"Isotopes should be a NumPy array or a string.")
         
@@ -82,7 +85,7 @@ class SpinSystem:
         if isinstance(chemical_shifts, np.ndarray):
             self.chemical_shifts = chemical_shifts
         elif isinstance(chemical_shifts, str):
-            self.chemical_shifts = data_io.read_array(chemical_shifts, data_type=float)
+            self.chemical_shifts = read_array(chemical_shifts, data_type=float)
         elif chemical_shifts is None:
             self.chemical_shifts = np.zeros(self.size, dtype=float)
         else:
@@ -92,7 +95,7 @@ class SpinSystem:
         if isinstance(scalar_couplings, np.ndarray):
             self.scalar_couplings = scalar_couplings
         elif isinstance(scalar_couplings, str):
-            self.scalar_couplings = data_io.read_array(scalar_couplings, data_type=float)
+            self.scalar_couplings = read_array(scalar_couplings, data_type=float)
         elif scalar_couplings is None:
             self.scalar_couplings = np.zeros((self.size, self.size), dtype=float)
         else:
@@ -102,7 +105,7 @@ class SpinSystem:
         if isinstance(xyz, np.ndarray):
             self.xyz = xyz
         elif isinstance(xyz, str):
-            self.xyz = data_io.read_xyz(xyz)
+            self.xyz = read_xyz(xyz)
         elif xyz is None:
             self.xyz = None
         else:
@@ -112,7 +115,7 @@ class SpinSystem:
         if isinstance(shielding, np.ndarray):
             self.shielding = shielding
         elif isinstance(shielding, str):
-            self.shielding = data_io.read_tensors(shielding)
+            self.shielding = read_tensors(shielding)
         elif shielding is None:
             self.shielding = None
         else:
@@ -122,7 +125,7 @@ class SpinSystem:
         if isinstance(efg, np.ndarray):
             self.efg = efg
         elif isinstance(efg, str):
-            self.efg = data_io.read_tensors(efg)
+            self.efg = read_tensors(efg)
         elif efg is None:
             self.efg = None
         else:
@@ -162,22 +165,22 @@ class SpinSystem:
     @property
     def spins(self) -> np.ndarray:
         """Spin quantum numbers of the spin system."""
-        return np.array([nmr_isotopes.ISOTOPES[isotope][0] for isotope in self.isotopes])
+        return np.array([ISOTOPES[isotope][0] for isotope in self.isotopes])
     
     @property
     def mults(self) -> np.ndarray:
         """Spin multiplicities of the spin system."""
-        return np.array([int(2*nmr_isotopes.ISOTOPES[isotope][0] + 1) for isotope in self.isotopes], dtype=int)
+        return np.array([int(2*ISOTOPES[isotope][0] + 1) for isotope in self.isotopes], dtype=int)
     
     @property
     def gammas(self) -> np.ndarray:
         """Gyromagnetic ratios in rad/s/T."""
-        return np.array([2*np.pi*nmr_isotopes.ISOTOPES[isotope][1] * 1e6 for isotope in self.isotopes])
+        return np.array([2*np.pi*ISOTOPES[isotope][1] * 1e6 for isotope in self.isotopes])
     
     @property
     def quad(self) -> np.ndarray:
         """Quadrupolar moments in m^2."""
-        return np.array([nmr_isotopes.ISOTOPES[isotope][2] * 1e-28 for isotope in self.isotopes])
+        return np.array([ISOTOPES[isotope][2] * 1e-28 for isotope in self.isotopes])
     
     @property
     def unique_id(self) -> float:
