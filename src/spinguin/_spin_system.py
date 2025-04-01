@@ -13,7 +13,6 @@ from pickle import dumps
 from spinguin._nmr_isotopes import ISOTOPES
 from spinguin._data_io import read_array, read_tensors, read_xyz
 from spinguin._basis import Basis
-from typing import Union
 
 class SpinSystem:
 
@@ -25,51 +24,82 @@ class SpinSystem:
 
     def __init__(
         self, 
-        isotopes: Union[np.ndarray, str], 
-        chemical_shifts: Union[np.ndarray, str]=None, 
-        scalar_couplings: Union[np.ndarray, str]=None,
-        xyz: Union[np.ndarray, str]=None,
-        shielding: Union[np.ndarray, str]=None,
-        efg: Union[np.ndarray, str]=None,
-        max_spin_order: int=None):
+        isotopes: np.ndarray | str, 
+        chemical_shifts: np.ndarray | str = None, 
+        scalar_couplings: np.ndarray | str = None,
+        xyz: np.ndarray | str = None,
+        shielding: np.ndarray | str = None,
+        efg: np.ndarray | str=None,
+        max_spin_order: int = None):
         """
         Initialization of the spin system.
-
-        TODO: Explaiin which parameters are used where
 
         Parameters
         ----------
         isotopes : numpy.ndarray or str
-            If a numpy.ndarray, includes the names of the isotopes. Example: np.array(['1H', '15N', '19F'])
-            If a string, includes the file path to the data.
+            Specifies the isotopes that constitute the spin system and determine other properties,
+            such as spin quantum numbers and gyromagnetic ratios.
+
+            - If a `numpy.ndarray`: A 1D array of size N isotope names as strings. Example:
+
+            ```python
+            np.array(['1H', '15N', '19F'])
+            ```
+
+            - If a `str`: Path to the file containing the isotopes.
         
         chemical_shifts : numpy.ndarray or str
-            If a numpy.ndarray, includes the chemical shifts in ppm. Example: np.array([8.00, -200, -130])
-            If a string, includes the file path to the data.
+            Chemical shifts that arise from the isotropic component of the nuclear shielding tensors.
+            Used when calculating the coherent Hamiltonian.
+
+            - If a `numpy.ndarray`: A 1D array of size N including the chemical shifts in ppm. Example:
+
+            ```python
+            np.array([8.00, -200, -130])
+            ```
+
+            - If a `str`: Path to the file containing the chemical shifts.
 
         scalar_couplings : numpy.ndarray or str
-            If a numpy.ndarray, has to be a 2D array of size (N, N) that includes the scalar couplings between nuclei in Hz.
+            Specifies the scalar coupling constants between each spin pair in the spin system. Used when
+            calculating the coherent Hamiltonian.
+
+            - If a `numpy.ndarray`: A 2D array of size (N, N) specifying the scalar couplings between nuclei in Hz.
             Only the bottom triangle is specified. Example:
+
+            ```python
             np.array([
                 [0,    0,    0],
-                [1,    0.5,  0],
-                [0.2,  8,    0]])
-            If a string, includes the file path to the data.
+                [1,    0,    0],
+                [0.2,  8,    0]
+            ])
+            ```
+
+            - If a `str`: Path to the file containing the scalar couplings.
 
         xyz : numpy.ndarray or str
-            If a numpy.ndarray, has to be a 2D array of size (N, 3) that includes the cartesian coordinates in Å.
-            If a string, specifies the path to the .xyz file.
+            Coordinates in the XYZ format for each of the nuclei in the spin system. Used in relaxation when calculating
+            the dipole-dipole coupling tensors.  
+        
+            - If a `numpy.ndarray`: A 2D array of size (N, 3) including the cartesian coordinates in Å.
+            - If a `str`: Path to the file containing the XYZ coordinates.
 
         shielding : numpy.ndarray or str
-            If a numpy.ndarray, has to be a 3D array of size (N, 3, 3) that includes the 3x3 shielding tensors in ppm.
-            If a string, specifies the path to the .txt file.
+            Specifies the nuclear shielding tensors for each nucleus. Note that the isotropic part of the tensor
+            is handled by `chemical_shifts`: the shielding tensors are used only for relaxation.
+
+            If a `numpy.ndarray`: A 3D array of size (N, 3, 3) including the 3x3 shielding tensors in ppm.
+            If a `str`: Path to the file containing the shielding tensors.
 
         efg : numpy.ndarray or str
-            If a numpy.ndarray, has to be a 3D array of size (N, 3, 3) that includes the 3x3 EFG tensors in atomic units.
-            If a string, specifies the path to the .txt file.
+            Electric field gradient tensors that are used for incorporating the quadrupolar interaction relaxation
+            mechanism.
+
+            If a `numpy.ndarray`: A 3D array of size (N, 3, 3) including the 3x3 EFG tensors in atomic units.
+            If a `str`: Path to the file containing the EFG tensors.
 
         max_spin_order : int
-            Defines the maximum spin order that is taken into account.
+            Defines the maximum spin order that is included in the basis set.
             If left empty, spin order is set to the size of the system.
         """
 
