@@ -1,12 +1,12 @@
 """
-Necessary for compiling the sparse_dot() Cython function.
+This script is required for compiling the sparse_dot() Cython function.
 """
 
 from setuptools import Extension, setup
 from Cython.Build import cythonize
 import sys
 
-# Platform-specific settings
+# Platform-specific compiler and linker settings
 if sys.platform == "win32":
     extra_compile_args = ['/openmp', '/O2', '/arch:SSE2', '/GS-']
     extra_link_args = []

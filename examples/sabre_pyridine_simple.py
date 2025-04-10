@@ -1,9 +1,9 @@
 """
-This is a simple example of a SABRE simulation of pyridine.
+This script simulates a simple example of SABRE hyperpolarization of pyridine.
 The spin system consists of the hydride protons and one pyridine ligand (excluding 14N).
-Chemical exchange and relaxation are not simulated.
+Chemical exchange and relaxation effects are not included in this simulation.
 
-Takes about a minute to run on a laptop with 11th generation i5 processor.
+Execution time is approximately one minute on a laptop with an 11th-generation i5 processor.
 """
 
 # Imports
@@ -12,19 +12,19 @@ import matplotlib.pyplot as plt
 from spinguin import SpinSystem, hamiltonian, propagator, singlet, measure
 
 # Simulation settings
-max_spin_order = 4
-magnetic_field = 7e-3
-time_step = 1e-3
-nsteps = 1000
+max_spin_order = 4  # Maximum spin order to consider
+B0 = 7e-3  # Magnetic field strength in Tesla
+dt = 1e-3  # Time step for simulation in seconds
+N_steps = 1000  # Number of simulation steps
 
-# Assign isotopes
+# Define isotopes
 isotopes = np.array(['1H', '1H', '1H', '1H', '1H', '1H', '1H'])
 
-# Assign chemical shifts
+# Define chemical shifts (in ppm)
 chemical_shifts = np.array([-22.7, -22.7, 8.34, 8.34, 7.12, 7.12, 7.77])
 
-# Assign scalar couplings
-scalar_couplings = np.array([\
+# Define scalar couplings (in Hz)
+J_couplings = np.array([
     [ 0,     0,      0,      0,      0,      0,      0],
     [-6.53,  0,      0,      0,      0,      0,      0],
     [ 0.00,  1.66,   0,      0,      0,      0,      0],
@@ -35,22 +35,22 @@ scalar_couplings = np.array([\
 ])
 
 # Initialize the spin system
-spin_system = SpinSystem(isotopes, chemical_shifts, scalar_couplings, max_spin_order=max_spin_order)
+spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings, max_spin_order=max_spin_order)
 
-# Make the Hamiltonian
-H = hamiltonian(spin_system, magnetic_field)
+# Generate the Hamiltonian
+H = hamiltonian(spin_system, B0)
 
-# Make the time propagator
-P = propagator(time_step, H)
+# Generate the time propagator
+P = propagator(dt, H)
 
-# Create the initial state (singlet for hydride spins)
+# Create the initial state (singlet state for hydride spins)
 rho = singlet(spin_system, 0, 1)
 
-# Create an array for storing the magnetizations during evolution
-magnetizations = np.empty((nsteps, isotopes.size), dtype=complex)
+# Initialize an array to store magnetizations during evolution
+magnetizations = np.empty((N_steps, isotopes.size), dtype=complex)
 
-# Evolve for the number of steps
-for step in range(nsteps):
+# Perform time evolution for the specified number of steps
+for step in range(N_steps):
 
     # Propagate the system forward in time
     rho = P @ rho
@@ -59,12 +59,12 @@ for step in range(nsteps):
     for i in range(isotopes.size):
         magnetizations[step, i] = measure(spin_system, rho, 'I_z', i)
 
-# Plot the magnetizations and show the result
+# Plot the magnetizations and display the results
 for i in range(isotopes.size):
-    plt.plot(np.real(magnetizations[:,i]), label=f"Spin {i+1}")
+    plt.plot(np.real(magnetizations[:, i]), label=f"Spin {i+1}")
 plt.legend(loc="upper right")
 plt.xlabel("Time step")
 plt.ylabel("Magnetization")
-plt.title("SABRE-hyperpolarization of Pyridine")
+plt.title("SABRE Hyperpolarization of Pyridine")
 plt.show()
 plt.clf()

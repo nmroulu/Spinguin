@@ -1,30 +1,30 @@
-# Ignore everything by default
+# Ignore all files by default
 *
 
-# Allow directories to be checked
+# Allow directories to be tracked
 !*/
 
 # Allow Python files
 !*.py
 
-# Allow JuPyter notebooks
+# Allow Jupyter notebooks
 !*.ipynb
 
 # Allow Cython files
 !*.pyx
 
-# Allow Pyproject.toml
+# Allow Pyproject.toml file
 !*.toml
 
-# Allow LICENSE
+# Allow LICENSE file
 !*LICENSE
 
-# Allow test/example data
+# Allow test and example data
 !tests/test_data/*
 !examples/example_data/*
 
-# Allow readme
+# Allow README files
 !*.md
 
-# Allow gitignore
+# Allow .gitignore file
 !*.gitignore

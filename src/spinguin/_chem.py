@@ -1,7 +1,7 @@
 """
 chem.py
 
-This module contains functions that are responsible for the chemical kinetics.
+This module contains functions responsible for chemical kinetics.
 """
 # For referencing the SpinSystem class
 from __future__ import annotations
@@ -18,34 +18,40 @@ from typing import Tuple, Union
 from spinguin._basis import state_idx
 
 @lru_cache(maxsize=16)
-def dissociate_index_map(spin_system_A:SpinSystem,
-                         spin_system_B:SpinSystem,
-                         spin_system_C:SpinSystem,
-                         spin_map_A:tuple,
-                         spin_map_B:tuple) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def dissociate_index_map(spin_system_A: SpinSystem,
+                         spin_system_B: SpinSystem,
+                         spin_system_C: SpinSystem,
+                         spin_map_A: tuple,
+                         spin_map_B: tuple) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Generates arrays that map the state indices from spin system C to
-    the spin systems A and B. This function is called from dissociate().
+    Generates arrays that map the state indices from the composite spin system C 
+    to the individual spin systems A and B. This function is used in `dissociate()`.
 
     Parameters
     ----------
     spin_system_A : SpinSystem
+        The first spin system (A).
     spin_system_B : SpinSystem
+        The second spin system (B).
     spin_system_C : SpinSystem
+        The composite spin system (C).
     spin_map_A : tuple
-        Indices of spin system A in spin system C.
+        Indices of spin system A within spin system C.
     spin_map_B : tuple
-        Indices of spin system B in spin system C.
+        Indices of spin system B within spin system C.
 
     Returns
     -------
     index_map_A : numpy.ndarray
+        Mapping of indices for spin system A.
     index_map_CA : numpy.ndarray
+        Mapping of indices from spin system C to A.
     index_map_B : numpy.ndarray
-    index_map_CB : numpy.ndarray 
+        Mapping of indices for spin system B.
+    index_map_CB : numpy.ndarray
+        Mapping of indices from spin system C to B.
     """
-
-    # Make empty arrays for the index maps
+    # Create empty arrays for the index mappings
     index_map_A = np.zeros(spin_system_C.basis.dim, dtype=int)
     index_map_CA = np.zeros(spin_system_C.basis.dim, dtype=int)
     index_map_B = np.zeros(spin_system_C.basis.dim, dtype=int)
@@ -53,11 +59,10 @@ def dissociate_index_map(spin_system_A:SpinSystem,
 
     # Loop over the basis set of spin system A
     for i, (state, idx_A) in enumerate(spin_system_A.basis.dict.items()):
-
-        # Initialize the state definition
+        # Initialize the state definition for spin system C
         op_def_C = np.zeros(spin_system_C.size, dtype=int)
 
-        # Set the states
+        # Map the states
         for op, idx in zip(state, spin_map_A):
             op_def_C[idx] = op
 
@@ -70,11 +75,10 @@ def dissociate_index_map(spin_system_A:SpinSystem,
 
     # Loop over the basis set of spin system B
     for i, (state, idx_B) in enumerate(spin_system_B.basis.dict.items()):
-
-        # Initialize the state definition
+        # Initialize the state definition for spin system C
         op_def_C = np.zeros(spin_system_C.size, dtype=int)
 
-        # Set the states
+        # Map the states
         for op, idx in zip(state, spin_map_B):
             op_def_C[idx] = op
 
@@ -94,20 +98,23 @@ def dissociate(spin_system_A: SpinSystem,
                spin_map_A: tuple,
                spin_map_B: tuple) -> Tuple[Union[np.ndarray, csc_array], Union[np.ndarray, csc_array]]:
     """
-    This function is used in chemical reactions to dissociate spins C -> A + B.
-    Spin system C is thought to be the composite system of A and B.
+    Dissociates spins in a chemical reaction C -> A + B.
+    Spin system C is treated as the composite system of A and B.
 
     Parameters
     ----------
     spin_system_A : SpinSystem
+        The first spin system (A).
     spin_system_B : SpinSystem
+        The second spin system (B).
     spin_system_C : SpinSystem
+        The composite spin system (C).
     rho_C : numpy.ndarray or csc_array
-        Density vector of spin system C.
+        Density vector of the composite spin system C.
     spin_map_A : tuple
-        Indices of spin system A in spin system C.
+        Indices of spin system A within spin system C.
     spin_map_B : tuple
-        Indices of spin system B in spin system C.
+        Indices of spin system B within spin system C.
 
     Returns
     -------
@@ -116,12 +123,11 @@ def dissociate(spin_system_A: SpinSystem,
     rho_B : numpy.ndarray or csc_array
         Density vector of spin system B.
     """
-
     # Get spin multiplicities for normalization
     mults_A = spin_system_A.mults
     mults_B = spin_system_B.mults
 
-    # Get index maps
+    # Get index mappings
     idx_A, idx_CA, idx_B, idx_CB = dissociate_index_map(spin_system_A, spin_system_B, spin_system_C, spin_map_A, spin_map_B)
 
     # Initialize empty state vectors
@@ -133,13 +139,13 @@ def dissociate(spin_system_A: SpinSystem,
         rho_A = rho_A.toarray()
         rho_B = rho_B.toarray()
 
-    # Set the value
+    # Populate the state vectors
     rho_A[idx_A, [0]] = rho_C[idx_CA, [0]]
     rho_B[idx_B, [0]] = rho_C[idx_CB, [0]]
 
-    # Normalize
-    rho_A = rho_A / (rho_A[0,0] * np.sqrt(np.prod(mults_A)))
-    rho_B = rho_B / (rho_B[0,0] * np.sqrt(np.prod(mults_B)))
+    # Normalize the state vectors
+    rho_A = rho_A / (rho_A[0, 0] * np.sqrt(np.prod(mults_A)))
+    rho_B = rho_B / (rho_B[0, 0] * np.sqrt(np.prod(mults_B)))
 
     # Convert to csc_array if needed
     if not isinstance(rho_C, np.ndarray):
@@ -155,42 +161,45 @@ def associate_index_map(spin_system_A: SpinSystem,
                         spin_map_A: tuple,
                         spin_map_B: tuple) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Generates arrays that map the state indices from spin systems A and B to
-    the spin system C. This function is called from associate().
+    Generates arrays that map the state indices from spin systems A and B 
+    to the composite spin system C. This function is used in `associate()`.
 
     Parameters
     ----------
     spin_system_A : SpinSystem
+        The first spin system (A).
     spin_system_B : SpinSystem
+        The second spin system (B).
     spin_system_C : SpinSystem
+        The composite spin system (C).
     spin_map_A : tuple
-        Indices of spin system A in spin system C.
+        Indices of spin system A within spin system C.
     spin_map_B : tuple
-        Indices of spin system B in spin system C.
+        Indices of spin system B within spin system C.
 
     Returns
     -------
     index_map_A : numpy.ndarray
+        Mapping of indices for spin system A.
     index_map_B : numpy.ndarray
-    index_map_C : numpy.ndarray 
+        Mapping of indices for spin system B.
+    index_map_C : numpy.ndarray
+        Mapping of indices for spin system C.
     """
-
-    # Make empty lists for the index maps
+    # Create empty lists for the index mappings
     index_map_A = []
     index_map_B = []
     index_map_C = []
 
-    # Loop over the destination states
+    # Loop over the basis states of spin system C
     for state, idx_C in spin_system_C.basis.dict.items():
-
-        # Get the corresponding states of A and B
+        # Extract the corresponding states of A and B
         state_A = tuple(state[i] for i in spin_map_A)
         state_B = tuple(state[i] for i in spin_map_B)
 
-        # Continue only if states A and B are found in basis A and B
+        # Only include states that exist in both A and B
         if (state_A in spin_system_A.basis.dict) and (state_B in spin_system_B.basis.dict):
-
-            # Append the index maps
+            # Append the index mappings
             index_map_A.append(spin_system_A.basis.dict[state_A])
             index_map_B.append(spin_system_B.basis.dict[state_B])
             index_map_C.append(idx_C)
@@ -205,39 +214,40 @@ def associate(spin_system_A: SpinSystem,
               spin_map_A: tuple,
               spin_map_B: tuple) -> Union[np.ndarray, csc_array]:
     """
-    This function is used to merge two state vectors together when the two
-    spin systems associate in a chemical reaction A + B -> C.
+    Combines two state vectors when spin systems associate in a chemical reaction A + B -> C.
 
     Parameters
     ----------
     spin_system_A : SpinSystem
+        The first spin system (A).
     spin_system_B : SpinSystem
+        The second spin system (B).
     spin_system_C : SpinSystem
+        The composite spin system (C).
     rho_A : numpy.ndarray or csc_array
         State vector of spin system A.
     rho_B : numpy.ndarray or csc_array
         State vector of spin system B.
     spin_map_A : tuple
-        Indices where the spins in spin system A go to in spin system C.
+        Indices of spin system A within spin system C.
     spin_map_B : tuple
-        Indices where the spins in spin system B go to in spin system C.
+        Indices of spin system B within spin system C.
 
     Returns
     -------
     rho_C : numpy.ndarray or csc_array
-        State vector of a composite system A + B.
+        State vector of the composite spin system C.
     """
-
-    # Get the index map
+    # Get the index mappings
     idx_A, idx_B, idx_C = associate_index_map(spin_system_A, spin_system_B, spin_system_C, spin_map_A, spin_map_B)
 
-    # Initialize an empty spin density vector
+    # Initialize an empty state vector for the composite system
     if isinstance(rho_A, np.ndarray):
         rho_C = np.zeros((spin_system_C.basis.dim, 1), dtype=complex)
     else:
         rho_C = lil_array((spin_system_C.basis.dim, 1), dtype=complex)
 
-    # Associate the two spin density vectors
+    # Combine the state vectors
     rho_C[idx_C, [0]] = rho_A[idx_A, [0]] * rho_B[idx_B, [0]]
 
     # Convert to csc_array if needed
@@ -247,69 +257,67 @@ def associate(spin_system_A: SpinSystem,
     return rho_C
 
 @lru_cache(maxsize=16)
-def rotation_matrix(spin_system: SpinSystem, spin_map: tuple) -> csc_array:
+def transformation_matrix(spin_system: SpinSystem, spin_map: tuple) -> csc_array:
     """
-    Creates a rotation matrix that is used to rotate a density vector from
-    a basis set to another.
+    Creates a transformation matrix to map a density vector from one basis set to another.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system.
     spin_map : tuple
-        Indices of the spins in the spin system after rotation.
+        Indices of the spins in the spin system after transformation.
 
     Returns
     -------
-    rot : csc_array
-        Rotation matrix.
+    transform : csc_array
+        The transformation matrix.
     """
-
-    # Create an empty array for the rotated indices
+    # Create an empty array for the transformed indices
     indices = np.empty(spin_system.basis.dim, dtype=int)
 
-    # Go through the basis set
+    # Loop through the basis set
     for state, idx in spin_system.basis.dict.items():
+        # Find the transformed state
+        state_transformed = tuple(state[i] for i in spin_map)
 
-        # Find out the rotated state
-        state_rot = tuple(state[i] for i in spin_map)
-
-        # Find the index of the rotated state
-        idx_rot = state_idx(spin_system, state_rot)
+        # Find the index of the transformed state
+        idx_transformed = state_idx(spin_system, state_transformed)
 
         # Add to the list of indices
-        indices[idx] = idx_rot
+        indices[idx] = idx_transformed
 
-    # Initialize the rotation matrix
-    rot = eye_array(spin_system.basis.dim, dtype=int, format='lil')
+    # Initialize the transformation matrix
+    transform = eye_array(spin_system.basis.dim, dtype=int, format='lil')
 
-    # Re-order the rows and convert to CSC
-    rot = rot[indices].tocsc()
+    # Re-order the rows and convert to CSC format
+    transform = transform[indices].tocsc()
 
-    return rot
+    return transform
 
-def rotate_molecule(spin_system:SpinSystem, rho:Union[np.ndarray, csc_array], spin_map:tuple) -> Union[np.ndarray, csc_array]:
+def permute_spins(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], spin_map: tuple) -> Union[np.ndarray, csc_array]:
     """
-    Rotates the density vector of a molecule to correspond to basis oriented
-    differently. Useful for making different conformers.
+    Permutes the density vector of a spin system to correspond to a differently ordered basis.
+    Useful for reordering spins in the system.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system.
     rho : numpy.ndarray or csc_array
         Density vector of the spin system.
     spin_map : tuple
-        Indices of the spins in the spin system after rotation.
+        Indices of the spins in the spin system after permutation.
 
     Returns
     -------
     rho : numpy.ndarray or csc_array
-        Rotated density vector of the spin system.
+        Permuted density vector of the spin system.
     """
+    # Get the transformation matrix
+    transform = transformation_matrix(spin_system, spin_map)
 
-    # Get the rotation matrix
-    rot = rotation_matrix(spin_system, spin_map)
-
-    # Rotate the density vector
-    rho = rot @ rho
+    # Apply the transformation to the density vector
+    rho = transform @ rho
 
     return rho

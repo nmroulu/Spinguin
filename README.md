@@ -1,37 +1,38 @@
 # Spinguin
 
 ## Description
-Spinguin is an intuitive Python package for versatile numerical spin-dynamics simulations. It provides tools for performing spin-dynamics simulations using restricted basis sets, allowing the use of large spin systems of more than 10 spins on a consumer-level hardware. Spinguin supports the simulation of coherent dynamics, relaxation, and chemical exchange.
+Spinguin is a user-friendly Python package designed for versatile numerical spin-dynamics simulations. It offers tools for performing simulations using restricted basis sets, enabling the use of large spin systems with more than 10 spins on consumer-level hardware. Spinguin supports the simulation of coherent dynamics, relaxation, and chemical exchange processes.
 
 ## Installation
 
 ### Requirements
-Spinguin has been developed and tested using Python 3.11.9 with the following versions of the freely-available modules:
+Spinguin has been developed and tested with Python 3.11.9 and the following module versions:
 - `numpy`: 1.26.4
 - `scipy`: 1.14.1
 - `sympy`: 1.13.1
 - `cython`: 3.0.11
 
-While it is not required to use the exact same versions, it is not quaranteed that the program works properly on more recent versions.
+While exact versions are not mandatory, compatibility with newer versions is not guaranteed.
 
 ### Install using the prebuilt wheel
-1. Download the prebuild wheel (.whl file). Ensure that the python version and the platform matches your system. For example, `spinguin-1.0-cp311-cp311-win_amd64.whl`, requires Python version 3.11 and Windows. If there are no compatible wheels, the installation must be performed using the source distribution.
-2. Install using pip:
+1. Download the prebuilt wheel (.whl file) matching your Python version and platform. For example, `spinguin-1.0-cp311-cp311-win_amd64.whl` requires Python 3.11 on Windows. If no compatible wheels are available, use the source distribution for installation.
+2. Install the wheel using pip:
     ```bash
     pip install spinguin-1.0-cpXXX-cpXXX-PLATFORM.whl
     ```
+
 ### Install using the source distribution
-1. Ensure that `build` is installed:
+1. Ensure the `build` module is installed:
     ```bash
     pip install build
     ```
-2. Download the source code (.zip or.tar.gz file).
-3. Extract the archive (for example, using 7-Zip).
-4. Navigate into the extracted folder:
+2. Download the source code archive (.zip or .tar.gz).
+3. Extract the archive (e.g., using 7-Zip).
+4. Navigate to the extracted folder:
     ```bash
     cd /your/path/spinguin-1.0
     ```
-5. Build the wheel from the extracted source:
+5. Build the wheel from the source:
     ```bash
     python -m build --wheel
     ```
@@ -39,13 +40,13 @@ While it is not required to use the exact same versions, it is not quaranteed th
     ```bash
     cd /your/path/spinguin-1.0/dist
     ```
-7. Install using pip:
+7. Install the wheel using pip:
     ```bash
     pip install spinguin-1.0-cpXXX-cpXXX-PLATFORM.whl
     ```
 
 ## Usage
-Functionality of Spinguin has been divided into several modules, which are:
+Spinguin's functionality is organized into several modules:
 - `basis`
 - `chem`
 - `data_io`
@@ -58,18 +59,19 @@ Functionality of Spinguin has been divided into several modules, which are:
 - `spin_system`
 - `states`
 
-These modules can be imported normally. For example, `spin_system` can be imported using:
+Modules can be imported as needed. For example, to import the `spin_system` module:
 ```python
 from spinguin import spin_system
 ```
-Usually it is more convenient to import only the items that are required:
+Alternatively, import specific items:
 ```python
 from spinguin.spin_system import SpinSystem
 ```
 
-### Simple example
-We will now go through a simple SABRE example, which can easily be extended for other purposes. This example, as well as more sophisticated examples, can be found from the GitHub repository under `examples`.
-1. Import the necessary modules.
+### Simple Example
+Below is a basic SABRE example, which can be extended for other purposes. Additional examples are available in the GitHub repository under `examples`.
+
+1. Import the required modules:
     ```python
     import numpy as np
     import matplotlib.pyplot as plt
@@ -78,50 +80,50 @@ We will now go through a simple SABRE example, which can easily be extended for 
     from spinguin.propagation import propagator
     from spinguin.states import singlet, measure
     ```
-2. Write down the simulation settings.
+2. Define simulation settings:
     ```python
     magnetic_field = 7e-3
     time_step = 1e-3
     nsteps = 1000
     ```
-3. Define the spin system.
+3. Define the spin system:
     ```python
     isotopes = np.array(['1H', '1H', '1H'])
     chemical_shifts = np.array([-22.7, -22.7, 8.34])
-    scalar_couplings = np.array([\
+    J_couplings = np.array([\
         [ 0,     0,      0],
         [-6.53,  0,      0],
         [ 0.00,  1.66,   0]
     ])
     ```
-4. Create the SpinSystem object.
+4. Create a `SpinSystem` object:
     ```python
-    spin_system = SpinSystem(isotopes, chemical_shifts, scalar_couplings)
+    spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings)
     ```
-5. Calculate the Hamiltonian.
+5. Calculate the Hamiltonian:
     ```python
     H = hamiltonian(spin_system, magnetic_field)
     ```
-6. Calculate the time propagator.
+6. Compute the time propagator:
     ```python
     P = propagator(time_step, H)
     ```
-7. Create the initial state.
+7. Define the initial state:
     ```python
     rho = singlet(spin_system, 0, 1)
     ```
-8. Create an empty array for storing the result.
+8. Initialize an array to store results:
     ```python
     magnetizations = np.empty((nsteps, isotopes.size), dtype=complex)
     ```
-9. Evolve the spin system, and perform a measurement on every time step.
+9. Evolve the spin system and measure at each time step:
     ```python
     for step in range(nsteps):
         rho = P @ rho
         for i in range(isotopes.size):
             magnetizations[step, i] = measure(spin_system, rho, 'I_z', i)
     ```
-10. Plot the results.
+10. Plot the results:
     ```python
     for i in range(isotopes.size):
         plt.plot(np.real(magnetizations[:,i]), label=f"Spin {i+1}")

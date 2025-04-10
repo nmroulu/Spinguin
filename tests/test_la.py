@@ -9,7 +9,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
     def test_isvector(self):
 
-        # Create column vectors, row vectors and arrays
+        # Create column vectors, row vectors, and arrays
         row1 = np.array([[1, 0, 0]])
         row2 = csc_array([[0, 1, 0, 7]])
         col1 = row1.T
@@ -20,13 +20,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         arr2 = np.array([[[1], [2], [3]]])
         arr3 = np.array([1, 0, 0])
 
-        # Check vectors with correct order
+        # Check vectors with the correct order
         self.assertEqual(_la.isvector(row1, 'row'), True)
         self.assertEqual(_la.isvector(row2, 'row'), True)
         self.assertEqual(_la.isvector(col1, 'col'), True)
         self.assertEqual(_la.isvector(col2, 'col'), True)
 
-        # Check vectors with incorrect order
+        # Check vectors with the incorrect order
         self.assertEqual(_la.isvector(row1, 'col'), False)
         self.assertEqual(_la.isvector(row2, 'col'), False)
         self.assertEqual(_la.isvector(col1, 'row'), False)
@@ -36,7 +36,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         self.assertEqual(_la.isvector(arr1, 'col'), False)
         self.assertEqual(_la.isvector(arr1, 'row'), False)
 
-        # Check incorrect shapes
+        # Check arrays with incorrect shapes
         self.assertRaises(ValueError, _la.isvector, arr2, 'col')
         self.assertRaises(ValueError, _la.isvector, arr2, 'row')
         self.assertRaises(ValueError, _la.isvector, arr3, 'col')
@@ -45,7 +45,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
     def test_norm_1(self):
 
         # Create a 3x3 array
-        A = np.random.rand(3,3)
+        A = np.random.rand(3, 3)
 
         # Test using NumPy arrays against the value given by NumPy
         self.assertAlmostEqual(_la.norm_1(A, 'row'), np.linalg.norm(A, ord=np.inf))
@@ -57,7 +57,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
     def test_expm(self):
 
-        # Create a 3x3 array with big numbers
+        # Create a 3x3 array with large numbers
         A = np.array([[1, 2, 3],
                       [4, 5, 6],
                       [7, 8, 9]])
@@ -65,7 +65,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         # Compare against the value given by SciPy
         self.assertTrue(np.allclose(_la.expm(A, 1e-32), expm(A)))
 
-        # Perform the same test with SciPy sparse array
+        # Perform the same test with a SciPy sparse array
         A = csc_array(A)
 
         # Compare against the value given by SciPy
@@ -73,10 +73,10 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
     def test_expm_custom_dot(self):
 
-        # Create a 3x3 array with big numbers
-        A =csc_array([[1, 2, 3],
-                      [4, 5, 6],
-                      [7, 8, 9]])
+        # Create a 3x3 array with large numbers
+        A = csc_array([[1, 2, 3],
+                       [4, 5, 6],
+                       [7, 8, 9]])
 
         # Compare against the value given by SciPy
         self.assertTrue(np.allclose(_la.expm_custom_dot(A, 1e-32).toarray(), expm(A).toarray()))
@@ -88,7 +88,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                        [4, 5, 6],
                        [7, 8, 9]])
         
-        # Increase sparsity of the array
+        # Increase the sparsity of the array
         _la.increase_sparsity(A, zero_value=5)
 
         # Create a comparison array
@@ -117,12 +117,12 @@ class TestLinearAlgebraMethods(unittest.TestCase):
     def test_comm(self):
 
         # Create a random array
-        A = np.random.rand(3,3)
+        A = np.random.rand(3, 3)
 
         # Commutator with itself should be zero
         self.assertTrue(np.allclose(_la.comm(A, A), np.zeros_like(A)))
 
-        # Commutator with identity array should be zero
+        # Commutator with the identity array should be zero
         self.assertTrue(np.allclose(_la.comm(A, np.eye(3)), np.zeros_like(A)))
 
     def test_find_common_rows(self):
@@ -182,7 +182,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
     def test_angle_between_vectors(self):
 
-        # Make test vectors
+        # Create test vectors
         v1 = np.array([1, 0])
         v2 = np.array([0, 1])
         v3 = np.array([1, 1])
@@ -196,7 +196,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
     def test_decompose_matrix(self):
 
         # Generate a test array
-        A = np.random.rand(3,3)
+        A = np.random.rand(3, 3)
 
         # Decompose the matrix
         iso, asym, sym = _la.decompose_matrix(A)
@@ -209,7 +209,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
     def test_principal_axis_system(self):
 
         # Generate a test array
-        A = np.random.rand(3,3)
+        A = np.random.rand(3, 3)
         _, _, A_sym = _la.decompose_matrix(A)
 
         eigenvalues, eigenvectors, tensor_PAS = _la.principal_axis_system(A)
@@ -223,12 +223,12 @@ class TestLinearAlgebraMethods(unittest.TestCase):
     def test_cartesian_tensor_to_spherical_tensor(self):
 
         # Create a random tensor
-        tensor = np.random.rand(3,3)
+        tensor = np.random.rand(3, 3)
 
-        # Project the the components of the spherical tensors (double outer product convention) and compare
+        # Project the components of the spherical tensors (double outer product convention) and compare
         for l in range(0, 3):
             for q in range(-l, l+1):
-                self.assertAlmostEqual((tensor @ spherical_tensor(l, q)).trace(), _la.cartesian_tensor_to_spherical_tensor(tensor)[(l,q)])
+                self.assertAlmostEqual((tensor @ spherical_tensor(l, q)).trace(), _la.cartesian_tensor_to_spherical_tensor(tensor)[(l, q)])
 
     def test_vector_to_spherical_tensor(self):
 
@@ -237,12 +237,12 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
         # Project the components of the spherical tensors and compare
         for q in range(-1, 2):
-            self.assertAlmostEqual(np.inner(spherical_vector(1,q), vector), _la.vector_to_spherical_tensor(vector)[(1, q)])
+            self.assertAlmostEqual(np.inner(spherical_vector(1, q), vector), _la.vector_to_spherical_tensor(vector)[(1, q)])
 
     def test_cartesian_to_spherical_tensor_conventions(self):
 
-        # Make a random Cartesian interaction tensor
-        A = np.random.rand(3,3)
+        # Create a random Cartesian interaction tensor
+        A = np.random.rand(3, 3)
 
         # Single-spin unit operator
         E = _operators.op_E(1/2)
@@ -267,14 +267,14 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         left = np.zeros_like(Ix)
         for i in range(A.shape[0]):
             for s in range(A.shape[1]):
-                left += A[i,s] * I[0,i] @ S[s,0]
+                left += A[i, s] * I[0, i] @ S[s, 0]
 
         # Convert A to spherical tensors
         A = _la.cartesian_tensor_to_spherical_tensor(A)
 
         # Use spherical tensors
         right = np.zeros_like(Ix)
-        for l in range(0,3):
+        for l in range(0, 3):
             for q in range(-l, l+1):
                 right += (-1)**(q) * A[(l, q)] * _operators.op_T_coupled(l, -q, 1, 1/2, 1, 1/2)
 
@@ -320,7 +320,7 @@ def spherical_tensor(l, q):
     """
 
     # Initialize the tensor
-    t_lq = np.zeros((3,3), dtype=complex)
+    t_lq = np.zeros((3, 3), dtype=complex)
 
     # Coupling of angular momenta
     for q1 in range(-1, 2):
@@ -333,8 +333,8 @@ def spherical_vector(l, q):
     """
     Helper function for tests.
 
-    Constructs a covariant a spherical vector of rank l and projection q expressed
-    in the cartesian basis.
+    Constructs a covariant spherical vector of rank l and projection q expressed
+    in the Cartesian basis.
     """
 
     # Cartesian basis vectors
@@ -343,11 +343,11 @@ def spherical_vector(l, q):
     e_z = np.array([0, 0, 1])
 
     # Get the spherical vector
-    if l==1 and q==1:
+    if l == 1 and q == 1:
         v = -1/np.sqrt(2) * (e_x + 1j*e_y)
-    elif l==1 and q==0:
+    elif l == 1 and q == 0:
         v = e_z
-    elif l==1 and q==-1:
+    elif l == 1 and q == -1:
         v = 1/np.sqrt(2) * (e_x - 1j*e_y)
 
     return v

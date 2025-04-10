@@ -10,8 +10,12 @@ from spinguin import _operators
 class TestOperators(unittest.TestCase):
 
     def test_op_S(self):
+        """
+        Test spin operators (E, Sx, Sy, Sz, Sp, Sm) against hard-coded values 
+        and verify commutation relations.
+        """
 
-        # Test against hard-coded operators
+        # Hard-coded operators for different spins
         E = {
             1/2 : np.array([[1, 0],
                             [0, 1]]),
@@ -109,8 +113,11 @@ class TestOperators(unittest.TestCase):
             self.assertTrue(np.allclose(comm(_operators.op_Sm(spin), _operators.op_Sz(spin)), _operators.op_Sm(spin)))
 
     def test_op_T(self):
+        """
+        Test commutation relations for spherical tensor operators.
+        """
 
-        # Test commutation relations for spherical tensors
+        # Test for various spin quantum numbers
         spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
         for spin in spins:
             for l in range(0, int(2*spin+1)):
@@ -125,8 +132,11 @@ class TestOperators(unittest.TestCase):
                         self.assertTrue(np.allclose(comm(_operators.op_Sp(spin), _operators.op_T(spin, l, q)), math.sqrt(l*(l+1) - q*(q+1)) * _operators.op_T(spin, l, q+1)))
 
     def test_op_P(self):
+        """
+        Test the construction of product operators for a spin system.
+        """
 
-        # Make a test system
+        # Create a test spin system
         isotopes = np.array(['1H', '14N', '23Na'])
         spin_system = SpinSystem(isotopes)
         spins = spin_system.spins
@@ -165,29 +175,32 @@ class TestOperators(unittest.TestCase):
                     oper2 = 1
                     if i != 'E':
                         oper2 = np.kron(oper2, opers[(i, spins[0])])
-                    if j!= 'E':
+                    if j != 'E':
                         oper2 = np.kron(oper2, opers[(j, spins[1])])
-                    if k!= 'E':
+                    if k != 'E':
                         oper2 = np.kron(oper2, opers[(k, spins[2])])
                     self.assertTrue(np.allclose(oper1, oper2))
 
     def test_structure_coefficients(self):
+        """
+        Test the structure coefficients for a spin system.
+        """
 
-        # Make a test system
+        # Create a test spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
         basis = spin_system.basis.arr
         dim = spin_system.basis.dim
         spins = spin_system.spins
 
-        # Test operator
+        # Define the operator to be constructed
         op_def_i = (1, 3)
 
-        # Assign empty array for the left and right superoperators
+        # Initialize empty arrays for the left and right superoperators
         sop_L = np.zeros((dim, dim), dtype=complex)
         sop_R = np.zeros((dim, dim), dtype=complex)
 
-        # Get the operator to be constructed
+        # Construct the operator
         op_i = 1
         for n in range(len(op_def_i)):
             l_i, q_i = idx_to_lq(op_def_i[n])
@@ -196,7 +209,7 @@ class TestOperators(unittest.TestCase):
         # Loop over the bras
         for j in range(dim):
 
-            # Get the operator bra
+            # Construct the operator bra
             op_def_j = basis[j]
             op_j = 1
             for n in range(len(op_def_j)):
@@ -206,7 +219,7 @@ class TestOperators(unittest.TestCase):
             # Loop over the kets
             for k in range(dim):
 
-                # Get the operator ket
+                # Construct the operator ket
                 op_def_k = basis[k]
                 op_k = 1
                 for n in range(len(op_def_k)):
@@ -222,8 +235,11 @@ class TestOperators(unittest.TestCase):
         self.assertTrue(np.allclose(sop_R, _operators.sop_P(spin_system, op_def_i, "right").toarray()))
     
     def test_sop_P(self):
+        """
+        Test the superoperator construction for various spin systems.
+        """
 
-        # Make the test spin systems
+        # Define test spin systems
         systems = []
 
         # Assign isotopes
@@ -234,7 +250,7 @@ class TestOperators(unittest.TestCase):
         for isotopes in systems:
 
             # Test all possible spin orders
-            for max_so in range(1, isotopes.size+1):
+            for max_so in range(1, isotopes.size + 1):
 
                 # Initialize the spin system
                 spin_system = SpinSystem(isotopes, max_spin_order=max_so)
@@ -245,7 +261,7 @@ class TestOperators(unittest.TestCase):
                     # Convert to tuple
                     op = tuple(op)
 
-                    # Test left, right and commutation superoperators against the "idiot-proof" function
+                    # Test left, right, and commutation superoperators against the "idiot-proof" function
                     self.assertTrue(np.allclose(_operators.sop_P(spin_system, op, "left").toarray(), 
                                                 sop_P(spin_system, op, "left").toarray()))
                     self.assertTrue(np.allclose(_operators.sop_P(spin_system, op, "right").toarray(), 
@@ -254,6 +270,9 @@ class TestOperators(unittest.TestCase):
                                                 sop_P(spin_system, op, "comm").toarray()))
 
     def test_sop_P_cache(self):
+        """
+        Test caching behavior of the sop_P function when the basis changes.
+        """
 
         # Example system
         isotopes = np.array(['1H', '1H', '1H'])
@@ -262,13 +281,16 @@ class TestOperators(unittest.TestCase):
         # Create an operator, change the basis, and create an operator again
         op_def = (2, 0, 0)
         Iz = _operators.sop_P(spin_system, op_def, side='comm')
-        ZQ_basis(spin_system)
+        ZQ_basis_map(spin_system)
         Iz_ZQ = _operators.sop_P(spin_system, op_def, side='comm')
 
         # Resulting shapes should be different
         self.assertNotEqual(Iz.shape, Iz_ZQ.shape)
 
     def test_superoperator(self):
+        """
+        Test the superoperator function against sop_P for consistency.
+        """
 
         # Example system
         isotopes = np.array(['1H', '1H'])
@@ -278,19 +300,22 @@ class TestOperators(unittest.TestCase):
         self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', 0, "left").toarray(), _operators.sop_P(spin_system, (2, 0), "left").toarray()))
         self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', 0, "right").toarray(), _operators.sop_P(spin_system, (2, 0), "right").toarray()))
         self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', 0, "comm").toarray(), _operators.sop_P(spin_system, (2, 0), "comm").toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', [0,1], "comm").toarray(),
-                                    (_operators.sop_P(spin_system, (2, 0), "comm")+_operators.sop_P(spin_system, (0, 2), "comm")).toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, ['I_+', 'I_-'], [0,1], "comm").toarray(),
-                                    -2*_operators.sop_P(spin_system, (1, 3), "comm").toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_x', [0,1], "comm").toarray(),
-                                    + (-1/np.sqrt(2)*_operators.sop_P(spin_system, (1, 0), "comm") + 1/np.sqrt(2)*_operators.sop_P(spin_system, (3, 0), "comm")).toarray()
-                                    + (-1/np.sqrt(2)*_operators.sop_P(spin_system, (0, 1), "comm") + 1/np.sqrt(2)*_operators.sop_P(spin_system, (0, 3), "comm")).toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', [0, 1], "comm").toarray(),
+                                    (_operators.sop_P(spin_system, (2, 0), "comm") + _operators.sop_P(spin_system, (0, 2), "comm")).toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, ['I_+', 'I_-'], [0, 1], "comm").toarray(),
+                                    -2 * _operators.sop_P(spin_system, (1, 3), "comm").toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_x', [0, 1], "comm").toarray(),
+                                    + (-1 / np.sqrt(2) * _operators.sop_P(spin_system, (1, 0), "comm") + 1 / np.sqrt(2) * _operators.sop_P(spin_system, (3, 0), "comm")).toarray()
+                                    + (-1 / np.sqrt(2) * _operators.sop_P(spin_system, (0, 1), "comm") + 1 / np.sqrt(2) * _operators.sop_P(spin_system, (0, 3), "comm")).toarray()))
         
     def test_op_T_coupled(self):
+        """
+        Test the coupled spherical tensor operators for two spins.
+        """
 
         spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
 
-        # Test with all possiblem spin quantum numbers
+        # Test with all possible spin quantum numbers
         for s1 in spins:
             for s2 in spins:
 
@@ -306,15 +331,15 @@ class TestOperators(unittest.TestCase):
                 SzIz = np.kron(_operators.op_Sz(s1), _operators.op_Sz(s2))
 
                 # Test relations given in Eq. 254-262, Man: Cartesian and Spherical Tensors in NMR Hamiltonians
-                self.assertTrue(np.allclose(_operators.op_T_coupled(0, 0, 1, s1, 1, s2), -1/np.sqrt(3) * (SxIx + SyIy + SzIz)))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(1, 1, 1, s1, 1, s2), 1/2 * (SzIx - SxIz + 1j*(SzIy - SyIz))))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(1, 0, 1, s1, 1, s2), 1j/np.sqrt(2) * (SxIy - SyIx)))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(1, -1, 1, s1, 1, s2), 1/2 * (SzIx - SxIz - 1j*(SzIy - SyIz))))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(2, 2, 1, s1, 1, s2), 1/2 * (SxIx - SyIy + 1j*(SxIy + SyIx))))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(2, 1, 1, s1, 1, s2), -1/2 * (SxIz + SzIx + 1j*(SyIz + SzIy))))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(2, 0, 1, s1, 1, s2), 1/np.sqrt(6) * (-SxIx + 2*SzIz - SyIy)))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(2, -1, 1, s1, 1, s2), 1/2 * (SxIz + SzIx - 1j*(SyIz + SzIy))))
-                self.assertTrue(np.allclose(_operators.op_T_coupled(2, -2, 1, s1, 1, s2), 1/2 * (SxIx - SyIy - 1j*(SxIy + SyIx))))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(0, 0, 1, s1, 1, s2), -1 / np.sqrt(3) * (SxIx + SyIy + SzIz)))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(1, 1, 1, s1, 1, s2), 1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz))))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(1, 0, 1, s1, 1, s2), 1j / np.sqrt(2) * (SxIy - SyIx)))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(1, -1, 1, s1, 1, s2), 1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz))))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(2, 2, 1, s1, 1, s2), 1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx))))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(2, 1, 1, s1, 1, s2), -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy))))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(2, 0, 1, s1, 1, s2), 1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy)))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(2, -1, 1, s1, 1, s2), 1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy))))
+                self.assertTrue(np.allclose(_operators.op_T_coupled(2, -2, 1, s1, 1, s2), 1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))))
 
     def test_sop_T_coupled(self):
         """
@@ -330,7 +355,7 @@ class TestOperators(unittest.TestCase):
         dim = spin_system.basis.dim
 
         # Make a random Cartesian interaction tensor
-        A = np.random.rand(3,3)
+        A = np.random.rand(3, 3)
 
         # Cartesian spin operators
         I = np.array(['I_x', 'I_y', 'I_z'])
@@ -339,29 +364,29 @@ class TestOperators(unittest.TestCase):
         left = np.zeros((dim, dim), dtype=complex)
         for i in range(A.shape[0]):
             for s in range(A.shape[1]):
-                left += A[i,s] * _operators.superoperator(spin_system, [I[i], I[s]], [0, 1], 'comm').toarray()
+                left += A[i, s] * _operators.superoperator(spin_system, [I[i], I[s]], [0, 1], 'comm').toarray()
 
         # Convert A to spherical tensors
         A = cartesian_tensor_to_spherical_tensor(A)
 
         # Use spherical tensors
         right = np.zeros((dim, dim), dtype=complex)
-        for l in range(0,3):
-            for q in range(-l, l+1):
+        for l in range(0, 3):
+            for q in range(-l, l + 1):
                 right += (-1)**(q) * A[(l, q)] * _operators.sop_T_coupled(spin_system, l, -q, 0, 1).toarray()
 
         # Both conventions should give the same result
         self.assertTrue(np.allclose(left, right))
                     
-def sop_P(spin_system:SpinSystem, op_def:tuple, side:str):
+def sop_P(spin_system: SpinSystem, op_def: tuple, side: str):
     """
-    An idiot-proof method for calculating the superoperator. Used for testing purposes.
+    A reference method for calculating the superoperator. Used for testing purposes.
     """
 
     # If commutation superoperator, calculate left and right superoperators and return their difference
     if side == 'comm':
-        sop = sop_P(spin_system, op_def,'left') \
-            - sop_P(spin_system, op_def,'right')
+        sop = sop_P(spin_system, op_def, 'left') \
+            - sop_P(spin_system, op_def, 'right')
         return sop
     
     # Initialize the superoperator
@@ -391,6 +416,6 @@ def sop_P(spin_system:SpinSystem, op_def:tuple, side:str):
                 sop_jk = sop_jk * c[i_ind, j_ind, k_ind]
 
             # Add to the superoperator
-            sop[j,k] = sop_jk
+            sop[j, k] = sop_jk
 
     return sop

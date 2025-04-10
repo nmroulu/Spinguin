@@ -1,51 +1,51 @@
 """
 data_io.py
 
-This module contains functions that are used to read data and convert that to suitable
-formats.
+This module contains functions for reading data from files and converting it into suitable formats.
 """
 
 # Imports
 import numpy as np
 
-def read_array(file_path:str, data_type:type) -> np.ndarray:
+def read_array(file_path: str, data_type: type) -> np.ndarray:
     """
-    Read a .txt file where the values are written in a space-separated format.
+    Reads a .txt file where values are stored in a space-separated format.
 
     Parameters
     ----------
     file_path : str
+        Path to the file to be read.
     data_type : type
-        Data type to be read. For example: float or str
+        Data type of the values to be read (e.g., float or str).
 
     Returns
     -------
     value_array : numpy.ndarray
+        A NumPy array containing the values read from the file.
     """
 
     # Open the file
     with open(file_path, 'r') as file:
 
-        # Get the isotopes
+        # Read the values into a NumPy array
         value_array = np.loadtxt(file, delimiter=None, dtype=data_type)
 
     return value_array
 
-def read_xyz(file_path:str) -> np.ndarray:
+def read_xyz(file_path: str) -> np.ndarray:
     """
-    Read a .xyz file where the first line contains the number of atoms and the second line contains
-    the comment line. The following lines contain the atom symbol and the coordinates in Cartesian
-    coordinates.
+    Reads a .xyz file where the first line specifies the number of atoms, the second line 
+    contains a comment, and the subsequent lines contain the atom symbols and Cartesian coordinates.
 
     Parameters
     ----------
     file_path : str
-    
+        Path to the .xyz file to be read.
+
     Returns
     -------
     xyz : numpy.ndarray
-
-    Returns the atom symbols and the coordinates as NumPy arrays.
+        A NumPy array containing the atom symbols and Cartesian coordinates.
     """
 
     # Open the file
@@ -58,34 +58,36 @@ def read_xyz(file_path:str) -> np.ndarray:
         n_atoms = int(file.readline())
         file.readline()
 
-        # Get the coordinates for each atom
+        # Extract the coordinates for each atom
         for _ in range(n_atoms):
 
             # Read only the coordinates
             xyz.append(file.readline().split()[1:])
 
-    # Convert the list to NumPy array
+    # Convert the list to a NumPy array
     xyz = np.array(xyz, dtype=float)
 
     return xyz
 
-def read_tensors(file_path:str) -> np.ndarray:
+def read_tensors(file_path: str) -> np.ndarray:
     """
-    Reads a file with Cartesian interaction tensors (from quantum chemistry calculations)
+    Reads a file containing Cartesian interaction tensors (from quantum chemistry calculations)
     for each spin or spin pair.
-    
+
     The file should have the following format:
         - The first column is the index of the spin.
-        - The following columns are the components of a 3x3 tensor.
-    This is repeated for each spin.
+        - The subsequent columns represent the components of a 3x3 tensor.
+    This structure is repeated for each spin.
 
     Parameters
     ----------
     file_path : str
+        Path to the file containing the tensors.
 
     Returns
     -------
     tensors : numpy.ndarray
+        A NumPy array containing the tensors.
     """
 
     # Initialize the lists and the current index
@@ -99,7 +101,7 @@ def read_tensors(file_path:str) -> np.ndarray:
         # Process each line
         for line in file:
 
-            # Process the index lines differently
+            # Handle lines with spin indices differently
             if line.strip().split()[0].isdigit() and len(line.strip().split()) == 4:
                 if current_index is not None:
                     tensors.append(np.array(matrix_rows, dtype=float))
@@ -112,7 +114,7 @@ def read_tensors(file_path:str) -> np.ndarray:
         if current_index is not None:
             tensors.append(np.array(matrix_rows, dtype=float))
     
-    # Convert to NumPy
+    # Convert to a NumPy array
     tensors = np.array(tensors, dtype=float)
 
     return tensors

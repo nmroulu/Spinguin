@@ -6,21 +6,27 @@ from spinguin._hamiltonian import hamiltonian
 from scipy.sparse import load_npz
 
 class TestHamiltonian(unittest.TestCase):
+    """
+    Unit test for the Hamiltonian generation functionality.
+    """
 
     def test_hamiltonian(self):
+        """
+        Test the Hamiltonian generation against a previously calculated result.
+        """
 
         # Simulation settings
-        max_so = 3
-        magnetic_field = 7e-3
+        max_so = 3  # Maximum spin order
+        magnetic_field = 7e-3  # Magnetic field strength in Tesla
 
-        # Assign isotopes
+        # Define isotopes
         isotopes_c = np.array(['1H', '1H', '1H', '1H', '1H', '1H', '1H', '14N'])
 
-        # Assign chemical shifts
+        # Define chemical shifts (in ppm)
         chemical_shifts_c = np.array([-22.7, -22.7, 8.34, 8.34, 7.12, 7.12, 7.77, 43.60])
 
-        # Assign scalar couplings
-        scalar_couplings_c = np.array([\
+        # Define scalar couplings (in Hz)
+        J_couplings_c = np.array([\
             [ 0,     0,      0,      0,      0,      0,      0,     0],
             [-6.53,  0,      0,      0,      0,      0,      0,     0],
             [ 0.00,  1.66,   0,      0,      0,      0,      0,     0],
@@ -31,13 +37,15 @@ class TestHamiltonian(unittest.TestCase):
             [-0.30,  15.91,  4.47,   0.04,   1.79,   0,     -0.46,  0]
         ])
 
-        # Initialize the spin systems
-        spin_system_c = SpinSystem(isotopes_c, chemical_shifts_c, scalar_couplings_c, max_spin_order=max_so)
+        # Initialize the spin system
+        spin_system_c = SpinSystem(isotopes_c, chemical_shifts_c, J_couplings_c, max_spin_order=max_so)
 
-        # Compare to a previously calculated result
+        # Load the previously calculated Hamiltonian for comparison
         test_dir = os.path.dirname(__file__)
         H_c_previous = load_npz(os.path.join(test_dir, 'test_data', 'hamiltonian.npz'))
 
-        # Make the Hamiltonian
+        # Generate the Hamiltonian
         H_c = hamiltonian(spin_system_c, magnetic_field)
+
+        # Assert that the generated Hamiltonian matches the reference
         self.assertTrue(np.allclose(H_c_previous.toarray(), H_c.toarray()))

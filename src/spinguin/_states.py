@@ -1,7 +1,7 @@
 """
 states.py
 
-This module provides functions for creating the state vectors.
+This module provides functions for creating state vectors.
 """
 
 # For referencing the SpinSystem class
@@ -31,11 +31,12 @@ def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=Tru
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the unit state vector is generated.
     sparse : bool
-        False (default) returns NumPy array. True returns SciPy csc_array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
     normalized : bool
         Default: True. If set to True, the function will return a state vector that
-        represents the trace-normalized density matrix. False returns a state vector
+        represents the trace-normalized density matrix. If False, returns a state vector
         that corresponds to the identity operator.
 
     Returns
@@ -53,9 +54,9 @@ def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=Tru
 
     # Assign unit state coefficient
     if normalized:
-        rho[0,0] = 1/np.sqrt(np.prod(mults))
+        rho[0, 0] = 1 / np.sqrt(np.prod(mults))
     else:
-        rho[0,0] = np.sqrt(np.prod(mults))
+        rho[0, 0] = np.sqrt(np.prod(mults))
 
     # Convert to csc_array if requesting sparse
     if sparse:
@@ -77,14 +78,15 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
     
     Normalization:
     The basis set operators are constructed from products of single-spin spherical tensor
-    operators and they are normalized. Therefore, requesting for a state that corresponds
-    to any operator O, will result in a coefficient of norm(O) for the state.
+    operators and they are normalized. Therefore, requesting a state that corresponds
+    to any operator O will result in a coefficient of norm(O) for the state.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the state vector is generated.
     operators : str or tuple
-        Defines the state to be generated. Can be either a string, or a tuple of strings.
+        Defines the state to be generated. Can be either a string or a tuple of strings.
         - str :
             The requested state is generated for each spin specified in `indices`.
             A sum of the states is returned.
@@ -92,11 +94,11 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
         - tuple :
             A product state corresponding to the operators specified in the tuple is
             generated. Must match the length of `indices`.
-            For example: ['I_+', 'I_-']
+            For example: ('I_+', 'I_-')
     indices : int or tuple
         Indices of the spins. Can be either an integer or a tuple of integers.
     sparse : bool
-        False (default) returns NumPy array. True returns SciPy csc_array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -130,8 +132,8 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
         for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
 
             # Find indices of the active and inactive spins
-            idx_active = np.where(np.array(op_def)!=0)[0]
-            idx_inactive = np.where(np.array(op_def)==0)[0]
+            idx_active = np.where(np.array(op_def) != 0)[0]
+            idx_inactive = np.where(np.array(op_def) == 0)[0]
 
             # Calculate the norm of the active operator part if there are active spins
             if len(idx_active) != 0:
@@ -170,8 +172,8 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
             for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
 
                 # Find indices of the active and inactive spins
-                idx_active = np.where(np.array(op_def)!=0)[0]
-                idx_inactive = np.where(np.array(op_def)==0)[0]
+                idx_active = np.where(np.array(op_def) != 0)[0]
+                idx_inactive = np.where(np.array(op_def) == 0)[0]
 
                 # Calculate the norm of the active operator part if there are active spins
                 if len(idx_active) != 0:
@@ -206,19 +208,20 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
 
 def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) -> np.ndarray:
     """
-    Takes the state vector defined in normalized spherical tensor basis
+    Takes the state vector defined in the normalized spherical tensor basis
     and converts it into the Zeeman eigenbasis. Useful for error checking.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the conversion is performed.
     rho : numpy.ndarray or csc_array
         State vector defined in the normalized spherical tensor basis.
 
     Returns
-    --------
+    -------
     rho_zeeman : numpy.ndarray
-        Spin density matrix defined in Zeeman eigenbasis.
+        Spin density matrix defined in the Zeeman eigenbasis.
     """
 
     # Extract the necessary information from the spin system
@@ -241,7 +244,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
         # Get the corresponding operator definition
         op_def = basis[idx]
 
-        # Get the normalized product operator in Zeeman eigenbasis with normalization
+        # Get the normalized product operator in the Zeeman eigenbasis with normalization
         oper = op_P(op_def, spins, include_unit=True)
         oper = oper / np.linalg.norm(oper, ord='fro')
         
@@ -250,21 +253,22 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
     
     return rho_zeeman
 
-def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool=False, zero_value=1e-18) -> Union[np.ndarray, csc_array]:
+def rho_thermal_equilibrium(spin_system: SpinSystem, T: float, B: float, sparse: bool = False, zero_value: float = 1e-18) -> Union[np.ndarray, csc_array]:
     """
-    Returns state vector corresponding to the thermal equilibrium.
+    Returns the state vector corresponding to thermal equilibrium.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the thermal equilibrium state is generated.
     T : float
-        Temperature in the units of K.
+        Temperature in Kelvin.
     B : float
-        Magnetic field in the units of T.
+        Magnetic field in Tesla.
     sparse : bool
-        False (default) returns NumPy array. True returns SciPy csc_array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
     zero_value : float
-        Default: 1e-18. Used to estimate the convergence of matrix exponential.
+        Default: 1e-18. Used to estimate the convergence of the matrix exponential.
 
     Returns
     -------
@@ -272,36 +276,37 @@ def thermal_equilibrium(spin_system:SpinSystem, T: float, B: float, sparse: bool
         Thermal equilibrium state vector.
     """
 
-    # Extract the necessary information from spin system
+    # Extract the necessary information from the spin system
     mults = spin_system.mults
 
     # Build the left Hamiltonian superoperator
     H = hamiltonian(spin_system, B, 'left')
 
-    # Get the matrix exponential corresponding to Boltzmann distribution
-    P = _la.expm(-const.hbar/(const.k*T)*H, zero_value)
+    # Get the matrix exponential corresponding to the Boltzmann distribution
+    P = _la.expm(-const.hbar / (const.k * T) * H, zero_value)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)
     rho_eq = P @ unit
 
     # Normalize such that the trace of the corresponding density matrix is one
-    rho_eq = rho_eq / (rho_eq[0,0]*np.sqrt(np.prod(mults)))
+    rho_eq = rho_eq / (rho_eq[0, 0] * np.sqrt(np.prod(mults)))
 
     return rho_eq
 
-def alpha(spin_system, index: int, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def alpha(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Assigns an alpha state for the given spin-1/2 nucleus. Other spins in the system
+    Generates the alpha state for a given spin-1/2 nucleus. Other spins in the system
     are in thermal equilibrium.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the alpha state is generated.
     index : int
-        Index of the spin that has alpha state.
+        Index of the spin that has the alpha state.
     sparse : bool
-        False (default) returns NumPy array and True returns SciPy sparse array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -318,22 +323,23 @@ def alpha(spin_system, index: int, sparse: bool=False) -> Union[np.ndarray, csc_
     I_z = state(spin_system, 'I_z', index, sparse=sparse)
 
     # Make the alpha state
-    rho = 1/dim*E + 2/dim*I_z
+    rho = 1 / dim * E + 2 / dim * I_z
 
     return rho
 
-def beta(spin_system: SpinSystem, index: int, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def beta(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Assigns a beta state for the given spin-1/2 nucleus. Other spins in the system
+    Generates the beta state for a given spin-1/2 nucleus. Other spins in the system
     are in thermal equilibrium.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the beta state is generated.
     index : int
-        Index of the spin that has beta state.
+        Index of the spin that has the beta state.
     sparse : bool
-        False (default) returns NumPy array and True returns SciPy sparse array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -350,28 +356,29 @@ def beta(spin_system: SpinSystem, index: int, sparse: bool=False) -> Union[np.nd
     I_z = state(spin_system, 'I_z', index, sparse=sparse)
 
     # Make the beta state
-    rho = 1/dim*E - 2/dim*I_z
+    rho = 1 / dim * E - 2 / dim * I_z
 
     return rho
 
-def singlet(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def singlet(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the singlet state between two spin-1/2 nuclei. Other spins in the system are
-    in thermal equilibrium.
+    Generates the singlet state between two spin-1/2 nuclei. Other spins in the system
+    are in thermal equilibrium.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the singlet state is generated.
     index_1 : int
         Index of the first spin in the singlet state.
     index_2 : int
         Index of the second spin in the singlet state.
     sparse : bool
-        False (default) returns NumPy array and True returns SciPy sparse array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho :  numpy.ndarray or csc_array
+    rho : numpy.ndarray or csc_array
         State vector corresponding to the singlet state.
     """
 
@@ -386,11 +393,11 @@ def singlet(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool=False
     ImIp = state(spin_system, ('I_-', 'I_+'), (index_1, index_2), sparse=sparse)
 
     # Make the singlet
-    rho = 1/dim*E - 4/dim*IzIz - 2/dim*(IpIm + ImIp)
+    rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
 
     return rho
 
-def triplet_zero(spin_system: SpinSystem, index_1:int, index_2:int, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def triplet_zero(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
     Generates the triplet zero state between two spin-1/2 nuclei. Other spins in the system
     are in thermal equilibrium.
@@ -398,16 +405,17 @@ def triplet_zero(spin_system: SpinSystem, index_1:int, index_2:int, sparse: bool
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the triplet zero state is generated.
     index_1 : int
         Index of the first spin in the triplet zero state.
     index_2 : int
         Index of the second spin in the triplet zero state.
     sparse : bool
-        False (default) returns NumPy array and True returns SciPy sparse array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho :  numpy.ndarray or csc_array
+    rho : numpy.ndarray or csc_array
         State vector corresponding to the triplet zero state.
     """
 
@@ -422,11 +430,11 @@ def triplet_zero(spin_system: SpinSystem, index_1:int, index_2:int, sparse: bool
     ImIp = state(spin_system, ('I_-', 'I_+'), (index_1, index_2), sparse=sparse)
 
     # Make the triplet zero
-    rho = 1/dim*E - 4/dim*IzIz + 2/dim*(IpIm + ImIp)
+    rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
 
     return rho
 
-def triplet_plus(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def triplet_plus(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
     Generates the triplet plus state between two spin-1/2 nuclei. Other spins in the system
     are in thermal equilibrium.
@@ -434,16 +442,17 @@ def triplet_plus(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool=
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the triplet plus state is generated.
     index_1 : int
         Index of the first spin in the triplet plus state.
     index_2 : int
         Index of the second spin in the triplet plus state.
     sparse : bool
-        False (default) returns NumPy array and True returns SciPy sparse array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho :  numpy.ndarray or csc_array
+    rho : numpy.ndarray or csc_array
         State vector corresponding to the triplet plus state.
     """
 
@@ -458,11 +467,11 @@ def triplet_plus(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool=
     IzIz = state(spin_system, ('I_z', 'I_z'), (index_1, index_2), sparse=sparse)
 
     # Make the triplet plus
-    rho = 1/dim*E + 2/dim*IzE + 2/dim*EIz + 4/dim*IzIz
+    rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
-def triplet_minus(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def triplet_minus(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
     Generates the triplet minus state between two spin-1/2 nuclei. Other spins in the system
     are in thermal equilibrium.
@@ -470,16 +479,17 @@ def triplet_minus(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the triplet minus state is generated.
     index_1 : int
         Index of the first spin in the triplet minus state.
     index_2 : int
         Index of the second spin in the triplet minus state.
     sparse : bool
-        False (default) returns NumPy array and True returns SciPy sparse array.
+        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho :  numpy.ndarray or csc_array
+    rho : numpy.ndarray or csc_array
         State vector corresponding to the triplet minus state.
     """
 
@@ -494,25 +504,24 @@ def triplet_minus(spin_system:SpinSystem, index_1:int, index_2:int, sparse: bool
     IzIz = state(spin_system, ('I_z', 'I_z'), (index_1, index_2), sparse=sparse)
 
     # Make the triplet minus
-    rho = 1/dim*E - 2/dim*IzE - 2/dim*EIz + 4/dim*IzIz
+    rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
-def measure(spin_system:SpinSystem, rho: Union[np.ndarray, csc_array], operators: Union[str, tuple], indices: Union[int, tuple]) -> complex:
+def measure(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], operators: Union[str, tuple], indices: Union[int, tuple]) -> complex:
     """
-    This function is used to obtain the expectation values of the operators.
-    It assumes that the state vector `rho` represents a trace-normalized density
-    matrix. In other words, the state vector should contain the coefficients of the
-    basis set operators, which are normalized.
+    Computes the expectation value of the specified operators for a given state vector.
+    Assumes that the state vector `rho` represents a trace-normalized density matrix.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the measurement is performed.
     rho : numpy.ndarray or csc_array
         State vector that describes the density matrix.
     operators : str or tuple
-        Defines the operator, whose expectation value is going to be measured.
-        Can be either a string, or a tuple of strings.
+        Defines the operator whose expectation value is to be measured.
+        Can be either a string or a tuple of strings.
         - str :
             Generates an "operator" for each spin specified in `indices`, measures the
             expectation value for each of them, and returns the sum of the expectation
@@ -520,9 +529,9 @@ def measure(spin_system:SpinSystem, rho: Union[np.ndarray, csc_array], operators
             For example: 'I_z'
         - tuple :
             Generates a "product operator" and measures its expectation value. Each spin
-            that participates to the product operator is defined in `indices`. Must match
+            that participates in the product operator is defined in `indices`. Must match
             the length of `indices`.
-            For example: ['I_z', 'I_z']
+            For example: ('I_z', 'I_z')
     indices : int or tuple
         Indices of the spins. Can be either an integer or a tuple of integers.
 

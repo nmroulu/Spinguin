@@ -1,9 +1,9 @@
 """
 basis.py
 
-Provides a class for the basis set. It is responsible for constructing the basis set,
-as well as making changes to it and searching the basis. A basis set is constructed
-automatically, when a spin system is initialized.
+Defines the `Basis` class, which manages the basis set for a spin system. 
+This includes constructing the basis set, modifying it, and enabling efficient searches. 
+The basis set is automatically created when a spin system is initialized.
 """
 
 # For referencing the SpinSystem class
@@ -22,7 +22,11 @@ from scipy.sparse import csc_array
 from spinguin import _la
 from typing import Iterator, Tuple
 
-class Basis():
+class Basis:
+    """
+    Represents the basis set for a spin system. Responsible for constructing the basis set,
+    making modifications, and enabling efficient searching.
+    """
 
     def __init__(self, spin_system: SpinSystem):
         """
@@ -36,13 +40,13 @@ class Basis():
         Attributes
         ----------
         arr : numpy.ndarray
-            A two-dimensional array, where each row contains integers that
+            A two-dimensional array where each row contains integers that
             represent the orthogonal product operators that construct the basis set.
             Set directly by `make_basis`.
         dict : dict
-            A dictionary, where the keys contain tuples of integers that
-            represent the product operators. The values contain the indices of
-            the specific operator. Set directly by `make_basis`.
+            A dictionary where the keys are tuples of integers that
+            represent the product operators. The values are the indices of
+            the specific operators. Set directly by `make_basis`.
 
         TODO: Yleiset funktiot kantafilttereille.
         """
@@ -52,65 +56,69 @@ class Basis():
 
     @property
     def dim(self) -> int:
+        """Returns the dimension (number of states) of the basis set."""
         return self.arr.shape[0]
     
     @property
     def nspins(self) -> int:
+        """Returns the number of spins in the system."""
         return self.arr.shape[1]
     
     @property
     def uid(self) -> int:
+        """Returns a unique identifier for the basis set."""
         return hash(self.arr.tobytes())
         
     def make_basis(self, spin_system: SpinSystem):
         """
-        Creates the basis set from all possible product operator combinations.
+        Constructs the basis set from all possible product operator combinations.
         The following attributes will be assigned:
 
         self.arr : numpy.ndarray
         self.dict : dict
 
-        Called when initiating a basis.
+        This method is called during the initialization of a basis.
 
         Parameters
         ----------
         spin_system : SpinSystem
+            The spin system for which the basis is being constructed.
         """
 
         # Extract the necessary information from the spin system
         size = spin_system.size
         max_spin_order = spin_system.max_spin_order
 
-        # Get all possible subsystems of maximum specified spin order
+        # Get all possible subsystems of the specified maximum spin order
         indices = [i for i in range(size)]
         subsystems = combinations(indices, max_spin_order)
 
         # Create an empty dictionary for the basis set
         basis = {}
 
-        # Go through all subsystems
+        # Iterate through all subsystems
         state_index = 0
         for subsystem in subsystems:
 
-            # Get the basis for subsystem
+            # Get the basis for the subsystem
             sub_basis = self.make_subsystem_basis(spin_system, subsystem)
 
-            # Go through the states in the subsystem basis
+            # Iterate through the states in the subsystem basis
             for state in sub_basis:
 
-                # Add state to basis set if not already added
+                # Add state to the basis set if not already added
                 if state not in basis:
                     basis[state] = state_index
                     state_index += 1
 
-        # Convert dictionary to NumPy
+        # Convert dictionary to NumPy array
         basis = np.array(list(basis.keys()))
 
-        # Sort the basis (index of first spin changes the slowest)
+        # Sort the basis (index of the first spin changes the slowest)
         sorted_indices = np.lexsort(tuple(basis[:, i] for i in reversed(range(basis.shape[1]))))
         basis = basis[sorted_indices]
 
-        # Make a dictionary of the basis set for fast searching
+        # Create a dictionary of the basis set for fast searching
         self.dict = {tuple(row): idx for idx, row in enumerate(basis)}
         
         # Assign to instance variable
@@ -118,20 +126,21 @@ class Basis():
 
     def make_subsystem_basis(self, spin_system: SpinSystem, subsystem: tuple) -> Iterator:
         """
-        This function is called automatically from basis().
+        Generates the basis set for a given subsystem.
 
         Parameters
         ----------
         spin_system : SpinSystem
+            The spin system containing the subsystem.
         subsystem : tuple
             Indices of the spins involved in the subsystem.
 
         Returns
         -------
         basis : Iterator
-            Basis set for a given subsystem as an iterator of tuples.
+            An iterator over the basis set for the given subsystem, represented as tuples.
 
-            For example, identity operator and z-operator for 3rd spin:
+            For example, identity operator and z-operator for the 3rd spin:
             [(0, 0, 0), (0, 0, 2), ...]
         """
 
@@ -145,7 +154,7 @@ class Basis():
         # Loop through every spin in the full system
         for spin in range(size):
 
-            # Add spin if it exists in subsystem
+            # Add spin if it exists in the subsystem
             if spin in subsystem:
 
                 # Add all possible states of the given spin
@@ -162,11 +171,12 @@ class Basis():
     
 def state_idx(spin_system: SpinSystem, op_def: tuple) -> int:
     """
-    Finds the index that corresponds to the operator definition.
+    Finds the index corresponding to the given operator definition.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system containing the basis.
     op_def : tuple
         Tuple of integers that describes the operator of interest.
 
@@ -181,21 +191,75 @@ def state_idx(spin_system: SpinSystem, op_def: tuple) -> int:
 
     return idx
 
-def ZQ_basis(spin_system: SpinSystem) -> list:
-    """
-    This function modifies the existing basis by leaving only the 
-    zero-quantum (ZQ) terms.
+# def ZQ_basis(spin_system: SpinSystem) -> list:
+#     """
+#     Modifies the existing basis by retaining only the zero-quantum (ZQ) terms.
 
-    Assigns self.ZQ_map variable for the basis that contains the index
+#     Assigns the `ZQ_map` variable for the basis, which contains the index
+#     mapping from the original basis to the zero-quantum basis.
+
+#     Parameters
+#     ----------
+#     spin_system : SpinSystem
+#         The spin system for which the zero-quantum basis is being created.
+
+#     Returns
+#     -------
+#     ZQ_map : list
+#         Index mapping from the original basis set to the modified basis set. This index map
+#         is used to convert the operators to the modified basis.
+#     """
+
+#     print("Constructing the zero-quantum basis.")
+#     time_start = time.time()
+
+#     # Create an empty dictionary for the new basis
+#     basis_dict = {}
+
+#     # Create an empty list for the mapping from old to new basis
+#     ZQ_map = []
+
+#     # Iterate over the basis
+#     i = 0
+#     for state, idx in spin_system.basis.dict.items():
+
+#         # Check if coherence order is zero
+#         if coherence_order(state) == 0:
+
+#             # Assign state to the ZQ basis and increment index
+#             basis_dict[state] = i
+#             i += 1
+
+#             # Assign index to the ZQ map
+#             ZQ_map.append(idx)
+
+#     # Convert basis to NumPy array
+#     basis = np.array(list(basis_dict.keys()))
+
+#     # Save the basis
+#     spin_system.basis.arr = basis
+#     spin_system.basis.dict = basis_dict
+
+#     print("Zero-quantum basis created.")
+#     print(f"Elapsed time: {time.time() - time_start:.4f} seconds.") # NOTE: Perttu's edit
+#     print()
+
+#     return ZQ_map
+
+# NOTE: Perttu's edit
+def ZQ_basis_map(spin_system: SpinSystem) -> list:
+    """
+    Generates the 'ZQ_basis_map' variable for the basis, which contains the index
     mapping from the original basis to the zero-quantum basis.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system for which the zero-quantum basis is being created.
 
     Returns
     -------
-    ZQ_map : list
+    ZQ_basis_map : list
         Index mapping from the original basis set to the modified basis set. This index map
         is used to convert the operators to the modified basis.
     """
@@ -203,13 +267,13 @@ def ZQ_basis(spin_system: SpinSystem) -> list:
     print("Constructing the zero-quantum basis.")
     time_start = time.time()
 
-    # Make an empty dictionary for the new basis
+    # Create an empty dictionary for the new basis
     basis_dict = {}
 
-    # Make an empty list for the mapping from old to new basis
-    ZQ_map = []
+    # Create an empty list for the mapping from old to new basis
+    ZQ_basis_map = []
 
-    # Loop over the basis
+    # Iterate over the basis
     i = 0
     for state, idx in spin_system.basis.dict.items():
 
@@ -221,9 +285,9 @@ def ZQ_basis(spin_system: SpinSystem) -> list:
             i += 1
 
             # Assign index to the ZQ map
-            ZQ_map.append(idx)
+            ZQ_basis_map.append(idx)
 
-    # Convert basis to NumPy
+    # Convert basis to NumPy array
     basis = np.array(list(basis_dict.keys()))
 
     # Save the basis
@@ -231,26 +295,29 @@ def ZQ_basis(spin_system: SpinSystem) -> list:
     spin_system.basis.dict = basis_dict
 
     print("Zero-quantum basis created.")
-    print(f"Elapsed time: {time.time() - time_start} seconds.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.") # NOTE: Perttu's edit
+    print()
 
-    return ZQ_map
+    return ZQ_basis_map
 
 def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray, ZQ_map: list) -> csc_array | np.ndarray:
     """
-    This function returns a superoperator or a state vector where only the ZQC terms
-    are retained. The zero-quantum basis must have been created prior to calling this
-    function.
+    Filters a superoperator or state vector to retain only the zero-quantum coherence (ZQC) terms.
+    The zero-quantum basis must have been created prior to calling this function.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system containing the basis.
     A : csc_array or numpy.ndarray
-        Any superoperator or state vector that has been written in the original basis.
+        Any superoperator or state vector written in the original basis.
+    ZQ_map : list
+        Index mapping from the original basis to the zero-quantum basis.
 
     Returns
     -------
     A : csc_array or numpy.ndarray
-        The given operator or state vector where only the ZQC terms are retained.
+        The filtered operator or state vector with only ZQC terms retained.
     """
 
     print("Applying zero-quantum coherence filter.")
@@ -269,13 +336,14 @@ def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray, ZQ_map: list) 
         A = A[np.ix_(ZQ_map, ZQ_map)]
 
     print("Zero-quantum coherence filter applied.")
-    print(f"Elapsed time: {time.time() - time_start} seconds.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.") # NOTE: Perttu's edit
+    print()
 
     return A
     
 def lq_to_idx(l: int, q: int) -> int:
     """
-    Returns index of a single-spin irreducible spherical tensor operator
+    Returns the index of a single-spin irreducible spherical tensor operator
     determined by rank l and projection q.
 
     Parameters
@@ -314,7 +382,7 @@ def idx_to_lq(idx: int) -> Tuple[int, int]:
     """
 
     # Calculate l
-    l = math.ceil(-1 + math.sqrt(1+idx))
+    l = math.ceil(-1 + math.sqrt(1 + idx))
 
     # Calculate q
     q = l**2 + l - idx
@@ -323,7 +391,7 @@ def idx_to_lq(idx: int) -> Tuple[int, int]:
 
 def coherence_order(op_def: tuple) -> int:
     """
-    Find the coherence order of a given operator defined by `op_def`.
+    Determines the coherence order of a given operator defined by `op_def`.
 
     Parameters
     ----------
@@ -333,13 +401,13 @@ def coherence_order(op_def: tuple) -> int:
     Returns
     -------
     order : int
-        Coherence order.
+        Coherence order of the operator.
     """
 
     # Initialize the coherence order
     order = 0
 
-    # Go over the product operator and sum the q values together
+    # Iterate over the product operator and sum the q values together
     for op in op_def:
         _, q = idx_to_lq(op)
         order += q
@@ -348,17 +416,18 @@ def coherence_order(op_def: tuple) -> int:
 
 # Assign each operator string to the corresponding integer
 op_def_table = {
-    'E' : ([0], [1]),
+    'E': ([0], [1]),
     'I_+': ([1], [-np.sqrt(2)]),
     'I_z': ([2], [1]),
     'I_-': ([3], [np.sqrt(2)]),
-    'I_x' : ([1, 3], [-np.sqrt(2)/2, np.sqrt(2)/2]),
-    'I_y' : ([1, 3], [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)])
+    'I_x': ([1, 3], [-np.sqrt(2)/2, np.sqrt(2)/2]),
+    'I_y': ([1, 3], [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)])
 }
 
 # Assign spherical tensors to the table
+# NOTE: Hardcoded for up to l=9
 for l in range(10):
-    for q in range(-l, l+1):
+    for q in range(-l, l + 1):
         op = f"T_{l}{q}"
         idx = lq_to_idx(l, q)
         op_def_table[op] = ([idx], [1])
@@ -366,11 +435,12 @@ for l in range(10):
 def str_to_op_def(spin_system: SpinSystem, operators: list, spins: list) -> Tuple[list, list]:
     """
     Converts a product operator described by lists of strings and spin indices to the
-    tuple(s) of integers that defines the operator.
+    tuple(s) of integers that define the operator.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system containing the basis.
     operators : list
         List of operators that describe the product operator. Operators that are not
         specified will be treated as unit operators.
@@ -385,7 +455,7 @@ def str_to_op_def(spin_system: SpinSystem, operators: list, spins: list) -> Tupl
         A list that contains tuples, which describe the requested operator with integers.
         Example: [(2, 0, 1)]
     coeffs : list of floats
-        Coefficients that take care of the different norms of operator relations.
+        Coefficients that account for the different norms of operator relations.
     """
 
     # Get the size of the operator definitions
@@ -400,7 +470,7 @@ def str_to_op_def(spin_system: SpinSystem, operators: list, spins: list) -> Tupl
     op_defs = [[]]
     coeffs = [[]]
 
-    # Loop over all of the operator strings
+    # Iterate over all of the operator strings
     for op in operators_full:
 
         # Get the corresponding integers and coefficients

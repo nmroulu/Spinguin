@@ -7,7 +7,6 @@ import scipy.constants as const
 class TestStates(unittest.TestCase):
 
     def test_alpha(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
@@ -17,10 +16,10 @@ class TestStates(unittest.TestCase):
         Iz = _operators.op_Sz(1/2)
 
         # Create Zeeman alpha states
-        alpha1_zeeman = 1/4*np.kron(E,E) + 1/2*np.kron(Iz,E)
-        alpha2_zeeman = 1/4*np.kron(E,E) + 1/2*np.kron(E,Iz)
+        alpha1_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(Iz, E)
+        alpha2_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz)
 
-        # Create alpha states in spherical tensor basis
+        # Create alpha states in the spherical tensor basis
         alpha1_sparse = _states.alpha(spin_system, 0, sparse=True)
         alpha2_sparse = _states.alpha(spin_system, 1, sparse=True)
         alpha1_dense = _states.alpha(spin_system, 0, sparse=False)
@@ -33,7 +32,6 @@ class TestStates(unittest.TestCase):
         self.assertTrue(np.allclose(_states.rho_to_zeeman(spin_system, alpha2_dense), alpha2_zeeman))
 
     def test_beta(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
@@ -43,10 +41,10 @@ class TestStates(unittest.TestCase):
         Iz = _operators.op_Sz(1/2)
 
         # Create Zeeman beta states
-        beta1_zeeman = 1/4*np.kron(E,E) - 1/2*np.kron(Iz,E)
-        beta2_zeeman = 1/4*np.kron(E,E) - 1/2*np.kron(E,Iz)
+        beta1_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(Iz, E)
+        beta2_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz)
 
-        # Create beta states in spherical tensor basis
+        # Create beta states in the spherical tensor basis
         beta1_sparse = _states.beta(spin_system, 0, sparse=True)
         beta2_sparse = _states.beta(spin_system, 1, sparse=True)
         beta1_dense = _states.beta(spin_system, 0, sparse=False)
@@ -59,7 +57,6 @@ class TestStates(unittest.TestCase):
         self.assertTrue(np.allclose(_states.rho_to_zeeman(spin_system, beta2_dense), beta2_zeeman))
 
     def test_singlet(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
@@ -70,15 +67,14 @@ class TestStates(unittest.TestCase):
         Ip = _operators.op_Sp(1/2)
         Im = _operators.op_Sm(1/2)
 
-        # Create the singlet states and compare
-        singlet_zeeman = 1/4*np.kron(E,E) - np.kron(Iz, Iz) - 1/2*(np.kron(Ip,Im) + np.kron(Im,Ip))
-        singlet_sparse = _states.singlet(spin_system, 0,1, sparse=True)
-        singlet_dense = _states.singlet(spin_system, 0,1, sparse=False)
+        # Create the singlet state and compare
+        singlet_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - 1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
+        singlet_sparse = _states.singlet(spin_system, 0, 1, sparse=True)
+        singlet_dense = _states.singlet(spin_system, 0, 1, sparse=False)
         self.assertTrue(np.allclose(singlet_zeeman, _states.rho_to_zeeman(spin_system, singlet_sparse)))
         self.assertTrue(np.allclose(singlet_zeeman, _states.rho_to_zeeman(spin_system, singlet_dense)))
 
     def test_triplet_zero(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
@@ -89,15 +85,14 @@ class TestStates(unittest.TestCase):
         Ip = _operators.op_Sp(1/2)
         Im = _operators.op_Sm(1/2)
 
-        # Create the triplet-zero states and compare
-        triplet_zero_zeeman = 1/4*np.kron(E,E) - np.kron(Iz,Iz) + 1/2*(np.kron(Ip,Im) + np.kron(Im,Ip))
-        triplet_zero_sparse = _states.triplet_zero(spin_system, 0,1, sparse=True)
-        triplet_zero_dense = _states.triplet_zero(spin_system, 0,1, sparse=False)
+        # Create the triplet-zero state and compare
+        triplet_zero_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + 1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
+        triplet_zero_sparse = _states.triplet_zero(spin_system, 0, 1, sparse=True)
+        triplet_zero_dense = _states.triplet_zero(spin_system, 0, 1, sparse=False)
         self.assertTrue(np.allclose(triplet_zero_zeeman, _states.rho_to_zeeman(spin_system, triplet_zero_sparse)))
         self.assertTrue(np.allclose(triplet_zero_zeeman, _states.rho_to_zeeman(spin_system, triplet_zero_dense)))
 
     def test_triplet_plus(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
@@ -106,15 +101,14 @@ class TestStates(unittest.TestCase):
         E = _operators.op_E(1/2)
         Iz = _operators.op_Sz(1/2)
 
-        # Create the triplet-plus states and compare
-        triplet_plus_zeeman = 1/4*np.kron(E,E) + 1/2*np.kron(E,Iz) + 1/2*np.kron(Iz,E) + np.kron(Iz,Iz)
-        triplet_plus_sparse = _states.triplet_plus(spin_system, 0,1, sparse=True)
-        triplet_plus_dense = _states.triplet_plus(spin_system, 0,1, sparse=False)
+        # Create the triplet-plus state and compare
+        triplet_plus_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + 1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
+        triplet_plus_sparse = _states.triplet_plus(spin_system, 0, 1, sparse=True)
+        triplet_plus_dense = _states.triplet_plus(spin_system, 0, 1, sparse=False)
         self.assertTrue(np.allclose(triplet_plus_zeeman, _states.rho_to_zeeman(spin_system, triplet_plus_sparse)))
         self.assertTrue(np.allclose(triplet_plus_zeeman, _states.rho_to_zeeman(spin_system, triplet_plus_dense)))
 
     def test_triplet_minus(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
@@ -123,15 +117,14 @@ class TestStates(unittest.TestCase):
         E = _operators.op_E(1/2)
         Iz = _operators.op_Sz(1/2)
 
-        # Create the triplet-minus states and compare
-        triplet_minus_zeeman = 1/4*np.kron(E,E) - 1/2*np.kron(E,Iz) - 1/2*np.kron(Iz,E) + np.kron(Iz,Iz)
-        triplet_minus_sparse = _states.triplet_minus(spin_system, 0,1, sparse=True)
-        triplet_minus_dense = _states.triplet_minus(spin_system, 0,1, sparse=False)
+        # Create the triplet-minus state and compare
+        triplet_minus_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - 1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
+        triplet_minus_sparse = _states.triplet_minus(spin_system, 0, 1, sparse=True)
+        triplet_minus_dense = _states.triplet_minus(spin_system, 0, 1, sparse=False)
         self.assertTrue(np.allclose(triplet_minus_zeeman, _states.rho_to_zeeman(spin_system, triplet_minus_sparse)))
         self.assertTrue(np.allclose(triplet_minus_zeeman, _states.rho_to_zeeman(spin_system, triplet_minus_dense)))
 
     def test_state_and_rho_to_zeeman(self):
-
         # Create an example spin system with different spin quantum numbers
         isotopes = np.array(['1H', '14N', '23Na'])
         spin_system = SpinSystem(isotopes)
@@ -150,17 +143,15 @@ class TestStates(unittest.TestCase):
             opers[('I_+', spin)] = _operators.op_Sp(spin)
             opers[('I_-', spin)] = _operators.op_Sm(spin)
 
-
         # Try all possible state combinations
         for i in test_states:
             for j in test_states:
                 for k in test_states:
-
-                    # Create the state vector in spherical tensor basis
+                    # Create the state vector in the spherical tensor basis
                     state_sparse = _states.state(spin_system, (i, j, k), (0, 1, 2), sparse=True)
                     state_dense = _states.state(spin_system, (i, j, k), (0, 1, 2), sparse=False)
 
-                    # Create the density matrix in Zeeman eigenbasis
+                    # Create the density matrix in the Zeeman eigenbasis
                     state_zeeman = np.kron(opers[(i, 1/2)], np.kron(opers[(j, 1)], opers[(k, 3/2)]))
 
                     # Convert state vectors to Zeeman and compare
@@ -168,18 +159,17 @@ class TestStates(unittest.TestCase):
                     self.assertTrue(np.allclose(_states.rho_to_zeeman(spin_system, state_dense), state_zeeman))
 
     def test_unit_state(self):
-
         # Create an example spin system with different spin quantum numbers
         isotopes = np.array(['1H', '14N', '23Na'])
         spin_system = SpinSystem(isotopes)
         spins = spin_system.spins
 
-        # Create the unit state in Zeeman eigenbasis
+        # Create the unit state in the Zeeman eigenbasis
         unit_zeeman = 1
         for spin in spins:
             unit_zeeman = np.kron(unit_zeeman, _operators.op_E(spin))
 
-        # Create the non-normalized unit state in spherical tensor basis
+        # Create the non-normalized unit state in the spherical tensor basis
         unit_sparse = _states.unit_state(spin_system, sparse=True, normalized=False)
         unit_dense = _states.unit_state(spin_system, sparse=False, normalized=False)
 
@@ -187,11 +177,11 @@ class TestStates(unittest.TestCase):
         self.assertTrue(np.allclose(_states.rho_to_zeeman(spin_system, unit_sparse), unit_zeeman))
         self.assertTrue(np.allclose(_states.rho_to_zeeman(spin_system, unit_dense), unit_zeeman))
 
-        # Create the trace-normalized unit state in spherical tensor basis
+        # Create the trace-normalized unit state in the spherical tensor basis
         unit_sparse = _states.unit_state(spin_system, sparse=True, normalized=True)
         unit_dense = _states.unit_state(spin_system, sparse=False, normalized=True)
 
-        # Apply trace normalization to the unit state in Zeeman eigenbasis
+        # Apply trace normalization to the unit state in the Zeeman eigenbasis
         unit_zeeman = unit_zeeman / unit_zeeman.trace()
 
         # Compare
@@ -199,7 +189,6 @@ class TestStates(unittest.TestCase):
         self.assertTrue(np.allclose(_states.rho_to_zeeman(spin_system, unit_dense), unit_zeeman))
 
     def test_measure(self):
-
         # Create an example spin system
         isotopes = np.array(['1H', '14N', '23Na'])
         spin_system = SpinSystem(isotopes)
@@ -222,12 +211,11 @@ class TestStates(unittest.TestCase):
         for i in test_states:
             for j in test_states:
                 for k in test_states:
-
                     # Create the state vector
                     state_sparse = _states.state(spin_system, (i, j, k), (0, 1, 2), sparse=True)
                     state_dense = _states.state(spin_system, (i, j, k), (0, 1, 2), sparse=False)
 
-                    # Create the density matrices in Zeeman eigenbasis
+                    # Create the density matrices in the Zeeman eigenbasis
                     op1, op2, op3 = opers[(i, 1/2)], opers[(j, 1)], opers[(k, 3/2)]
                     state_zeeman = np.kron(op1, np.kron(op2, op3))
 
@@ -235,8 +223,7 @@ class TestStates(unittest.TestCase):
                     for l in test_states:
                         for m in test_states:
                             for n in test_states:
-
-                                # Measure using Zeeman eigenbasis
+                                # Measure using the Zeeman eigenbasis
                                 op1, op2, op3 = opers[(l, 1/2)], opers[(m, 1)], opers[(n, 3/2)]
                                 oper_zeeman = np.kron(op1, np.kron(op2, op3))
                                 result_zeeman = (state_zeeman @ oper_zeeman.conj().T).trace()
@@ -249,8 +236,7 @@ class TestStates(unittest.TestCase):
                                 self.assertAlmostEqual(result_zeeman, result_sparse)
                                 self.assertAlmostEqual(result_zeeman, result_dense)
 
-    def test_thermal_equilibrium(self):
-
+    def test_rho_thermal_equilibrium(self):
         # Create an example spin system with different spin quantum numbers
         isotopes = np.array(['1H', '14N', '23Na', '17O'])
         spin_system = SpinSystem(isotopes)
@@ -263,39 +249,37 @@ class TestStates(unittest.TestCase):
         temperature = 273
 
         # Make the thermal equilibrium state
-        rho_eq_sparse = _states.thermal_equilibrium(spin_system, temperature, field, sparse=True)
-        rho_eq_dense = _states.thermal_equilibrium(spin_system, temperature, field, sparse=False)
+        rho_eq_sparse = _states.rho_thermal_equilibrium(spin_system, temperature, field, sparse=True)
+        rho_eq_dense = _states.rho_thermal_equilibrium(spin_system, temperature, field, sparse=False)
 
         # Test the thermal equilibrium for each spin
         for i in range(size):
-
             # Measure the magnetization
             Mz_measured_sparse = _states.measure(spin_system, rho_eq_sparse, 'I_z', i)
             Mz_measured_dense = _states.measure(spin_system, rho_eq_dense, 'I_z', i)
 
-            # Calculate the thermal magnetization directly using Boltzmann distribution
+            # Calculate the thermal magnetization directly using the Boltzmann distribution
             Mz_calculated = thermal_magnetization(gammas[i], spins[i], field, temperature)
 
             # Compare
             self.assertAlmostEqual(Mz_measured_sparse, Mz_calculated)
             self.assertAlmostEqual(Mz_measured_dense, Mz_calculated)
 
-        # Test that the code is future-proof (crazy conditions)
+        # Test that the code is future-proof (extreme conditions)
         field = 1000
         temperature = 1
 
         # Make the thermal equilibrium state
-        rho_eq_sparse = _states.thermal_equilibrium(spin_system, temperature, field, sparse=True)
-        rho_eq_dense = _states.thermal_equilibrium(spin_system, temperature, field, sparse=False)
+        rho_eq_sparse = _states.rho_thermal_equilibrium(spin_system, temperature, field, sparse=True)
+        rho_eq_dense = _states.rho_thermal_equilibrium(spin_system, temperature, field, sparse=False)
 
         # Test the thermal equilibrium for each spin
         for i in range(size):
-
             # Measure the magnetization
             Mz_measured_sparse = _states.measure(spin_system, rho_eq_sparse, 'I_z', i)
             Mz_measured_dense = _states.measure(spin_system, rho_eq_dense, 'I_z', i)
 
-            # Calculate the thermal magnetization directly using Boltzmann distribution
+            # Calculate the thermal magnetization directly using the Boltzmann distribution
             Mz_calculated = thermal_magnetization(gammas[i], spins[i], field, temperature)
 
             # Compare
@@ -313,33 +297,27 @@ def thermal_magnetization(gamma: float, S: float, B: float, T: float) -> float:
     S : float
         Spin quantum number.
     B : float
-        Magnetic field in the units of T.
+        Magnetic field in Tesla.
     T : float
-        Temperature in the units of K.
+        Temperature in Kelvin.
 
     Returns
     -------
     magnetization : float
         Magnetization at thermal equilibrium.
     """
-
     # Get the possible spin magnetic quantum numbers (from largest to smallest)
-    m = np.arange(-S, S+1)
+    m = np.arange(-S, S + 1)
 
     # Get the populations of the states
     populations = {}
     for m_i in m:
-
-        # Population according to Boltzmann distribution
-        numerator = np.exp(m_i*const.hbar*gamma*B/(const.k*T))
-        denominator = sum(np.exp(m_j*const.hbar*gamma*B/(const.k*T)) for m_j in m)
-        populations[m_i] = numerator/denominator
+        # Population according to the Boltzmann distribution
+        numerator = np.exp(m_i * const.hbar * gamma * B / (const.k * T))
+        denominator = sum(np.exp(m_j * const.hbar * gamma * B / (const.k * T)) for m_j in m)
+        populations[m_i] = numerator / denominator
 
     # Calculate the polarization
     magnetization = sum(m_i * populations[m_i] for m_i in m)
     
     return magnetization
-
-
-
-

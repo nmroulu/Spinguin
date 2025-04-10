@@ -1,4 +1,4 @@
-# Make the functions accessible directly from Spinguin pacakge
+# Make the functions accessible directly from the Spinguin package
 from spinguin._basis import *
 from spinguin._chem import *
 from spinguin._data_io import *

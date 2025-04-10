@@ -1,7 +1,7 @@
 """
 hamiltonian.py
 
-This module provides functions for calculating the Hamiltonian superoperators.
+This module provides functions for calculating Hamiltonian superoperators.
 """
 
 # For referencing the SpinSystem class
@@ -18,17 +18,18 @@ from scipy.sparse import csc_array
 from spinguin import _la
 from spinguin._operators import sop_P
 
-def hamiltonian_zeeman(spin_system:SpinSystem, B: float, side: str='comm') -> csc_array:
+def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm') -> csc_array:
     """
-    Calculates the Hamiltonian superoperator of Zeeman interaction.
+    Computes the Hamiltonian superoperator for the Zeeman interaction.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system object containing information about the spins.
     B : float
-        Magnetic field in the units of T.
+        Magnetic field strength in Tesla (T).
     side : str
-        Can be one of the options:
+        Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
@@ -36,10 +37,10 @@ def hamiltonian_zeeman(spin_system:SpinSystem, B: float, side: str='comm') -> cs
     Returns
     -------
     sop_Hz : csc_array
-        Hamiltonian superoperator of Zeeman interaction.
+        The Hamiltonian superoperator for the Zeeman interaction.
     """
 
-    # Extract the necessary information from the spin system
+    # Extract relevant information from the spin system
     dim = spin_system.basis.dim
     nspins = spin_system.size
     gammas = spin_system.gammas
@@ -48,26 +49,27 @@ def hamiltonian_zeeman(spin_system:SpinSystem, B: float, side: str='comm') -> cs
     # Initialize the Hamiltonian
     sop_Hz = csc_array((dim, dim), dtype=complex)
 
-    # Go over each spin in the system
+    # Iterate over each spin in the system
     for n in range(nspins):
 
-        # Make operator definition for Z term of n:th spin
-        op_def = tuple(2 if i==n else 0 for i in range(nspins))
+        # Define the operator for the Z term of the nth spin
+        op_def = tuple(2 if i == n else 0 for i in range(nspins))
 
-        # Calculate the Zeeman interaction for current spin
-        sop_Hz = sop_Hz - gammas[n] * B * (1 + chemical_shifts[n]*1e-6) * sop_P(spin_system, op_def, side)
+        # Compute the Zeeman interaction for the current spin
+        sop_Hz = sop_Hz - gammas[n] * B * (1 + chemical_shifts[n] * 1e-6) * sop_P(spin_system, op_def, side)
 
     return sop_Hz
 
-def hamiltonian_jcoupling(spin_system:SpinSystem, side: str='comm') -> csc_array:
+def hamiltonian_jcoupling(spin_system: SpinSystem, side: str = 'comm') -> csc_array:
     """
-    Calculates the J-coupling term of the Hamiltonian.
+    Computes the J-coupling term of the Hamiltonian.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system object containing information about the spins.
     side : str
-        Can be one of the options:
+        Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
@@ -75,76 +77,79 @@ def hamiltonian_jcoupling(spin_system:SpinSystem, side: str='comm') -> csc_array
     Returns
     -------
     sop_Hj : csc_array
-        J-coupling term of the Hamiltonian.
+        The J-coupling Hamiltonian superoperator.
     """
 
-    # Extract the necessary information from spin system
+    # Extract relevant information from the spin system
     dim = spin_system.basis.dim
-    scalar_couplings = spin_system.scalar_couplings
+    J_couplings = spin_system.J_couplings
     nspins = spin_system.size
 
     # Initialize the Hamiltonian
     sop_Hj = csc_array((dim, dim), dtype=complex)
     
-    # Loop over spin different spin pairs
+    # Loop over all spin pairs
     for n in range(nspins):
         for k in range(nspins):
 
-            # Process only bottom half of the J-coupling array
+            # Process only the lower triangular part of the J-coupling matrix
             if n > k:
                 
-                # Operator definition for zz-term
-                op_def_00 = tuple(2 if i==n or i==k else 0 for i in range(nspins))
+                # Define the operator for the zz-term
+                op_def_00 = tuple(2 if i == n or i == k else 0 for i in range(nspins))
 
-                # Operator definition for flip-flop terms
+                # Define the operators for flip-flop terms
                 op_def_p1m1 = tuple(1 if i == n else 3 if i == k else 0 for i in range(nspins))
                 op_def_m1p1 = tuple(3 if i == n else 1 if i == k else 0 for i in range(nspins))
 
-                # Calculate the J-coupling term
-                sop_Hj = sop_Hj + 2*np.pi * scalar_couplings[n][k] \
-                        * (sop_P(spin_system, op_def_00, side) - (sop_P(spin_system, op_def_p1m1, side) + sop_P(spin_system, op_def_m1p1, side)))
+                # Compute the J-coupling term
+                sop_Hj += 2 * np.pi * J_couplings[n][k] * (
+                    sop_P(spin_system, op_def_00, side) - 
+                    (sop_P(spin_system, op_def_p1m1, side) + sop_P(spin_system, op_def_m1p1, side))
+                )
 
     return sop_Hj
 
-def hamiltonian(spin_system:SpinSystem, B: float, side: str='comm', zero_value: float = 1e-12) -> csc_array:
+def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_value: float = 1e-12) -> csc_array:
     """
-    Calculates the coherent part of the Hamiltonian that includes the Zeeman
-    interaction and the J-couplings.
+    Computes the coherent part of the Hamiltonian, including the Zeeman
+    interaction and J-couplings.
 
     Parameters
     ----------
     spin_system : SpinSystem
+        The spin system object containing information about the spins.
     B : float
-        Magnetic field in the units of T.
+        Magnetic field strength in Tesla (T).
     side : str
-        Can be one of the options:
+        Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
     zero_value : float
-        Default: 1e-12. Values less than threshold will be set to zero after constructing
-        the total Hamiltonian.
+        Threshold for sparsity. Values smaller than this will be set to zero
+        after constructing the total Hamiltonian. Default is 1e-12.
 
     Returns
     -------
     sop_H : csc_array
-        Coherent Hamiltonian.
+        The coherent Hamiltonian.
     """
 
     time_start = time.time()
-    print("Starting to construct the Hamiltonian.")
+    print("Constructing Hamiltonian...") # NOTE: Perttu's edit
 
-    # Get the Zeeman and J-coupling Hamiltonians
+    # Compute the Zeeman and J-coupling Hamiltonians
     sop_Hz = hamiltonian_zeeman(spin_system, B, side)
     sop_Hj = hamiltonian_jcoupling(spin_system, side)
 
-    # Sum together
+    # Combine the terms
     sop_H = sop_Hz + sop_Hj
 
-    # Remove small values
+    # Remove small values to enhance sparsity
     _la.increase_sparsity(sop_H, zero_value)
 
-    print("Hamiltonian constructed.")
-    print(f"Elapsed time: {time.time() - time_start} seconds.")
+    print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
+    print()
 
     return sop_H

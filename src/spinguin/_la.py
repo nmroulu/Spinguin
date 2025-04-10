@@ -1,8 +1,7 @@
 """
 la.py
 
-Provides different linear algebra tools that are required in spin dynamics
-simulations.
+Provides various linear algebra tools required for spin dynamics simulations.
 """
 
 # Imports
@@ -16,7 +15,7 @@ from sympy.physics.quantum.cg import CG
 from typing import Union, Tuple
 from spinguin.sparse_dot import sparse_dot as spdotcy
 
-def isvector(v: Union[csc_array, np.ndarray], ord: str="col") -> bool:
+def isvector(v: Union[csc_array, np.ndarray], ord: str = "col") -> bool:
     """
     Checks if the given array is a vector.
 
@@ -30,14 +29,14 @@ def isvector(v: Union[csc_array, np.ndarray], ord: str="col") -> bool:
     Returns
     -------
     bool
-        True, if the array is a vector.
+        True if the array is a vector.
     """
 
     # Check whether the array is two-dimensional
     if len(v.shape) != 2:
-        raise ValueError("Invalid shape for the input array.")
+        raise ValueError("Input array must be two-dimensional.")
 
-    # Find whether row or column is checked
+    # Determine whether to check for row or column vector
     if ord == "col":
         i = 1
     elif ord == "row":
@@ -46,21 +45,18 @@ def isvector(v: Union[csc_array, np.ndarray], ord: str="col") -> bool:
         raise ValueError(f"Invalid value for ord: {ord}")
 
     # Check whether the array is a vector
-    if v.shape[i] == 1:
-        return True
-    else:
-        return False
+    return v.shape[i] == 1
 
-def norm_1(A: Union[csc_array, np.ndarray], ord: str='row') -> float:
+def norm_1(A: Union[csc_array, np.ndarray], ord: str = 'row') -> float:
     """
     Calculates the 1-norm of a matrix.
 
     Parameters
     ----------
     A : csc_array or numpy.ndarray
-        Norm is calclated for this array.
-    ord : String
-        Either 'row' or 'col' according to which the 1-norm is calculated.
+        Array for which the norm is calculated.
+    ord : str
+        Either 'row' or 'col', specifying the direction for the 1-norm calculation.
 
     Returns
     -------
@@ -77,29 +73,27 @@ def norm_1(A: Union[csc_array, np.ndarray], ord: str='row') -> float:
         raise ValueError(f"Invalid value for ord: {ord}")
 
     # Calculate sums along rows or columns and get the maximum of them
-    norm_1 = abs(A).sum(axis).max()
+    return abs(A).sum(axis).max()
 
-    return norm_1
-
-def expm_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
+def expm_custom_dot(A: csc_array, zero_value: float = 1e-24) -> csc_array:
     """
     Calculates the matrix exponential of a SciPy sparse CSC array using the
-    scaling and squaring method with the Taylor series, which was shown to
-    be the fastest method here:
+    scaling and squaring method with the Taylor series, shown to be the fastest
+    method in:
 
     https://doi.org/10.1016/j.jmr.2010.12.004
 
-    This function uses the custom dot product implementation, which is more
-    memory-friendly and is parallelized.
+    This function uses a custom dot product implementation, which is more
+    memory-efficient and parallelized.
 
     Parameters
     ----------
     A : csc_array
         Array to be exponentiated.
     zero_value : float
-        Default: 1e-24. Value that is considered to be zero. Used to increase
-        the sparsity of the end result as well as to estimate the convergence
-        of the Taylor series.
+        Default: 1e-24. Values below this threshold are considered zero. Used to
+        increase the sparsity of the result and estimate the convergence of the
+        Taylor series.
 
     Returns
     -------
@@ -113,45 +107,41 @@ def expm_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
     # If the norm of the matrix is too large, scale the matrix down
     if norm_A > 1:
 
-        # Calculate scaling factor for the matrix
+        # Calculate the scaling factor for the matrix
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2 ** scaling_count
 
         # Scale the matrix down
-        A = A / scaling_factor
+        A /= scaling_factor
 
-        # Calculate the matrix exponential of the scaled matrix using Taylor series
+        # Calculate the matrix exponential of the scaled matrix using the Taylor series
         expm_A = expm_taylor_custom_dot(A, zero_value)
 
-        # Scale the matrix exponential back up by multiplying with itself
+        # Scale the matrix exponential back up by repeated squaring
         for _ in range(scaling_count):
-
-            # Multiply the expm with itself
             expm_A = sparse_dot(expm_A, expm_A, zero_value)
     
-    # If the norm of the matrix is small, continue normally
+    # If the norm of the matrix is small, proceed without scaling
     else:
-
-        # Calculate the matrix exponential using Taylor series
         expm_A = expm_taylor_custom_dot(A, zero_value)
 
     return expm_A
 
 def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
     """
-    Compute the matrix exponential using Taylor series. Function adapted from 
-    old SciPy version.
+    Computes the matrix exponential using the Taylor series. This function is 
+    adapted from an older SciPy version.
 
-    This function uses the custom dot product implementation, which is more
-    memory-friendly and is parallelized.
+    It uses a custom dot product implementation, which is more memory-efficient 
+    and parallelized.
 
     Parameters
     ----------
     A : csc_array
         Matrix (N, N) to be exponentiated.
     zero_value : float
-        Default: 1e-24. Value that is considered to be zero. Used to increase
-        the sparsity and to check the convergence of the series. 
+        Default: 1e-24. Values below this threshold are considered zero. Used to 
+        increase sparsity and check the convergence of the series.
 
     Returns
     -------
@@ -162,36 +152,36 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
     # Increase sparsity of A
     increase_sparsity(A, zero_value)
     
-    # Create unit matrix for the first term
+    # Create a unit matrix for the first term
     eA = eye_array(A.shape[0], A.shape[0], dtype=complex, format='csc')
 
     # Make a copy for the terms
     trm = eA.copy()
 
-    # Calculate new term until its significance is tiny
-    k=1
+    # Calculate new terms until their significance becomes negligible
+    k = 1
     cont = True
     while cont:
 
         # Get the next term
         trm = sparse_dot(trm, A / k, zero_value)
 
-        # Sum to the existing term
+        # Add the term to the result
         eA += trm
 
-        # Increase counter
-        k+=1
+        # Increment the counter
+        k += 1
 
-        # Continue if convergence criterion is not met
+        # Continue if the convergence criterion is not met
         cont = (trm.nnz != 0)
 
     return eA
 
 def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_array, np.ndarray]:
     """
-    Calculates the matrix exponential of a SciPy sparse or NumPy array using
-    the scaling and squaring method with the Taylor series, which was shown
-    to be the fastest method here:
+    Calculates the matrix exponential of a SciPy sparse or NumPy array using 
+    the scaling and squaring method with the Taylor series. This method was 
+    shown to be the fastest in:
 
     https://doi.org/10.1016/j.jmr.2010.12.004
 
@@ -200,9 +190,9 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
     A : csc_array or numpy.ndarray
         Array to be exponentiated.
     zero_value : float
-        Default: 1e-24. Value that is considered to be zero. Used to increase
-        the sparsity of the end result as well as to estimate the convergence
-        of the Taylor series.
+        Default: 1e-24. Values below this threshold are considered zero. Used to 
+        increase sparsity of the result and estimate the convergence of the 
+        Taylor series.
 
     Returns
     -------
@@ -216,30 +206,30 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
     # If the norm of the matrix is too large, scale the matrix down
     if norm_A > 1:
 
-        # Calculate scaling factor for the matrix
+        # Calculate the scaling factor for the matrix
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2 ** scaling_count
 
         # Scale the matrix down
-        A = A / scaling_factor
+        A /= scaling_factor
 
-        # Calculate the matrix exponential of the scaled matrix using Taylor series
+        # Calculate the matrix exponential of the scaled matrix using the Taylor series
         expm_A = expm_taylor(A, zero_value)
 
-        # Scale the matrix exponential back up by multiplying with itself
+        # Scale the matrix exponential back up by repeated squaring
         for _ in range(scaling_count):
 
-            # Multiply the expm with itself
+            # Multiply the matrix exponential with itself
             expm_A = expm_A @ expm_A
             
             # Increase sparsity of the result if using sparse matrices
             if issparse(expm_A):
                 increase_sparsity(expm_A, zero_value)
     
-    # If the norm of the matrix is small, continue normally
+    # If the norm of the matrix is small, proceed without scaling
     else:
 
-        # Calculate the matrix exponential using Taylor series
+        # Calculate the matrix exponential using the Taylor series
         expm_A = expm_taylor(A, zero_value)
 
         # Increase sparsity of the result if using sparse matrices
@@ -250,16 +240,16 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
 
 def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_array, np.ndarray]:
     """
-    Compute the matrix exponential using Taylor series. Function adapted from 
-    old SciPy version.
+    Computes the matrix exponential using the Taylor series. This function is 
+    adapted from an older SciPy version.
 
     Parameters
     ----------
     A : csc_array or numpy.ndarray
         Matrix (N, N) to be exponentiated.
     zero_value : float
-        Default: 1e-24. Value that is considered to be zero. Used to increase
-        the sparsity and to check the convergence of the series. 
+        Default: 1e-24. Values below this threshold are considered zero. Used to 
+        increase sparsity and check the convergence of the series. 
 
     Returns
     -------
@@ -271,7 +261,7 @@ def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Uni
     if issparse(A):
         increase_sparsity(A, zero_value)
     
-    # Create unit matrix for the first term
+    # Create a unit matrix for the first term
     eA = eye_array(A.shape[0], A.shape[0], dtype=complex, format='csc')
 
     # Convert to NumPy if not using sparse matrices
@@ -281,8 +271,8 @@ def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Uni
     # Make a copy for the terms
     trm = eA.copy()
 
-    # Calculate new term until its significance is tiny
-    k=1
+    # Calculate new terms until their significance becomes negligible
+    k = 1
     cont = True
     while cont:
 
@@ -293,135 +283,140 @@ def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Uni
         if issparse(trm):
             increase_sparsity(trm, zero_value)
 
-        # Sum to the existing term
+        # Add the term to the result
         eA += trm
 
-        # Increase counter
-        k+=1
+        # Increment the counter
+        k += 1
 
-        # Continue if convergence criterion is not met
+        # Continue if the convergence criterion is not met
         if issparse(trm):
             cont = (trm.nnz != 0)
         else:
-            cont = np.all(np.abs(trm) > zero_value)
+            cont = np.any(np.abs(trm) > zero_value)
 
     return eA
 
 def increase_sparsity(A: csc_array, zero_value: float=1e-24):
     """
-    Increases sparsity of the given input matrix by replacing small values
-    with zeros. Modification happens inplace.
+    Increases the sparsity of the given input matrix by replacing small values
+    with zeros. Modification happens in-place.
 
     Parameters
     ----------
     A : csc_array
+        Sparse matrix to be modified.
     zero_value : float
-        Default: 1e-24. Values less than zero_value are set to zero.
+        Default: 1e-24. Values smaller than this threshold are set to zero.
     """
 
-    # Get values smaller than the threshold and make them zero
+    # Identify values smaller than the threshold and set them to zero
     nonzero_mask = np.abs(A.data) < zero_value
     A.data[nonzero_mask] = 0
     A.eliminate_zeros()
 
 def sparse_to_bytes(A: csc_array) -> bytes:
     """
-    Convert the given SciPy sparse array into byte representation.
+    Converts the given SciPy sparse array into a byte representation.
 
     Parameters
     ----------
     A : csc_array
-        Array to be converted into bytes.
+        Sparse matrix to be converted into bytes.
 
     Returns
     -------
     A_bytes : bytes
-        Input matrix in the byte representation.
+        Byte representation of the input matrix.
     """
     
-    # Initialize the BytesIO
+    # Initialize a BytesIO object
     bytes_io = BytesIO()
 
     # Write the matrix A to bytes
     mmwrite(bytes_io, A)
 
-    # Get the bytes
+    # Retrieve the bytes
     A_bytes = bytes_io.getvalue()
 
     return A_bytes
 
 def bytes_to_sparse(A_bytes: bytes) -> csc_array:
     """
-    Convert the bytes back to SciPy sparse array.
+    Converts a byte representation back to a SciPy sparse array.
 
     Parameters
     ----------
     A_bytes : bytes
-        Byte representation of a Scipy sparse array.
+        Byte representation of a SciPy sparse array.
 
     Returns
     -------
     A : csc_array
-        Bytes converted into a SciPy sparse array.
+        Sparse array reconstructed from the byte representation.
     """
 
-    # Initialize the bytesIO
+    # Initialize a BytesIO object
     bytes_io = BytesIO(A_bytes)
 
-    # Get the SciPy sparse array
+    # Read the SciPy sparse array from bytes
     A = mmread(bytes_io)
 
     return A
 
 def comm(A: Union[csc_array, np.ndarray], B: Union[csc_array, np.ndarray]) -> Union[csc_array, np.ndarray]:
     """
-    Calculates the commutator [`A`, `B`] of two operators.
+    Calculates the commutator [A, B] of two operators.
 
     Parameters
     ----------
     A : csc_array or numpy.ndarray
+        First operator.
     B : csc_array or numpy.ndarray
+        Second operator.
 
     Returns
     -------
     C : csc_array or numpy.ndarray
-        Commutator [`A`, `B`]
+        Commutator [A, B].
     """
 
-    # Calculate the commutator
+    # Compute the commutator
     C = A @ B - B @ A
 
     return C
 
 def find_common_rows(A: np.ndarray, B: np.ndarray) -> Tuple[list, list]:
     """
-    Compares two arrays, `A` and `B`, and finds the indices of the common rows.
+    Identifies the indices of common rows between two arrays, `A` and `B`.
     Each row must appear only once in the arrays.
 
     Parameters
     ----------
     A : numpy.ndarray
+        First array to compare.
     B : numpy.ndarray
+        Second array to compare.
 
     Returns
     -------
     A_ind : list
-        Indices that return the common elements from array `A`.
+        Indices of the common rows in array `A`.
     B_ind : list
-        Indices that return the common elements from array `B`.
+        Indices of the common rows in array `B`.
     """
 
-    # Make a dictionary of the rows of B
+    # Create a dictionary of the rows of B
     B_dict = {tuple(row): idx for idx, row in enumerate(B)}
 
-    # Make empty lists for the indices
+    # Initialize lists for the indices
     A_ind = []
     B_ind = []
 
-    # Loop over A
+    # Iterate over rows of A
     for idx_A, row in enumerate(A):
 
-        # Check whether the row of A is in B
+        # Check if the row of A exists in B
         if tuple(row) in B_dict:
 
             # Append the indices
@@ -432,25 +427,26 @@ def find_common_rows(A: np.ndarray, B: np.ndarray) -> Tuple[list, list]:
 
 def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, zero_value: float=1e-24) -> csc_array:   
     """
-    Calculates the matrix exponential of an auxiliary matrix. Used to compute
-    the Redfield integral.
+    Computes the matrix exponential of an auxiliary matrix. This is used to 
+    calculate the Redfield integral.
 
-    From Goodwin and Kuprov (Eq. 3): https://doi.org/10.1063/1.4928978
+    Based on Goodwin and Kuprov (Eq. 3): https://doi.org/10.1063/1.4928978
     
     Parameters
     ----------
     A : csc_array
-        Top-left of the auxiliary matrix.
+        Top-left block of the auxiliary matrix.
     B : csc_array
-        Top-right of the auxiliary matrix.
+        Top-right block of the auxiliary matrix.
     C : csc_array
-        Bottom-right of the auxiliary matrix.
+        Bottom-right block of the auxiliary matrix.
     t : float
-        The integration time.
+        Integration time.
     zero_value : float
-        Default: 1e-24. Value that is considered to be zero when exponentiating the
-        auxiliary matrix using Taylor series. Significantly impacts the performance.
-        Try to find largest value that still returns correct values.
+        Default: 1e-24. Threshold below which values are considered zero when 
+        exponentiating the auxiliary matrix using the Taylor series. This 
+        significantly impacts performance. Use the largest value that still 
+        provides correct results.
     
     Returns
     -------
@@ -463,29 +459,29 @@ def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, ze
     aux = block_array([[A, B],
                        [empty_array, C]], format='csc')
 
-    # Exponentiate the auxiliary matrix
-    expm_aux = expm(aux*t, zero_value)
+    # Compute the matrix exponential of the auxiliary matrix
+    expm_aux = expm(aux * t, zero_value)
 
     return expm_aux
 
 def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
     """
-    Find the angle between two vectors in radians.
+    Computes the angle between two vectors in radians.
 
     Parameters
     ----------
     v1 : numpy.ndarray
         First vector.
     v2 : numpy.ndarray
-        Second vector
+        Second vector.
 
     Returns
     -------
     theta : float
-        Angle between the vectors (rad).
+        Angle between the vectors in radians.
     """
 
-    # Consider identical vectors separately
+    # Handle the case where the vectors are identical
     if np.array_equal(v1, v2):
         theta = 0
     else:
@@ -495,15 +491,15 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
 
 def decompose_matrix(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Decomposes a matrix into three parts:
-        - isotropic part
-        - antisymmetric part
-        - symmetric traceless part
+    Decomposes a matrix into three components:
+        - Isotropic part.
+        - Antisymmetric part.
+        - Symmetric traceless part.
 
     Parameters
     ----------
     matrix : numpy.ndarray
-        Matrix to be decomposed.
+        Matrix to decompose.
 
     Returns
     -------
@@ -515,7 +511,7 @@ def decompose_matrix(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.nda
         Symmetric traceless part of the input matrix.
     """
 
-    # Find the isotropic, antisymmetric and symmetric traceless parts
+    # Compute the isotropic, antisymmetric, and symmetric traceless parts
     isotropic = np.trace(matrix) * np.eye(matrix.shape[0]) / matrix.shape[0]
     antisymmetric = (matrix - matrix.T) / 2
     symmetric_traceless = (matrix + matrix.T) / 2 - isotropic
@@ -524,41 +520,41 @@ def decompose_matrix(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.nda
 
 def principal_axis_system(tensor: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Finds the principal axis system (PAS) of a Cartesian tensor
-    and converts the tensor to the PAS.
+    Determines the principal axis system (PAS) of a Cartesian tensor
+    and transforms the tensor into the PAS.
 
-    The PAS is defined by the axis system that diagonalizes
+    The PAS is defined as the coordinate system that diagonalizes
     the symmetric traceless part of the tensor.
 
-    Order is (|largest|, |middle|, |smallest|) according to the eigenvalues.
+    The eigenvalues are ordered as (|largest|, |middle|, |smallest|).
 
     Parameters
     ----------
     tensor : np.ndarray
-        Cartesian tensor.
+        Cartesian tensor to transform.
 
     Returns
     -------
     eigenvalues : numpy.ndarray
-        Eigenvalues of the PAS.
+        Eigenvalues of the tensor in the PAS.
     eigenvectors : numpy.ndarray
-        Two-dimensional array, where the rows contain the eigenvectors of the PAS.
+        Two-dimensional array where rows contain the eigenvectors of the PAS.
     tensor_PAS : numpy.ndarray
-        Tensor in the PAS. 
+        Tensor transformed into the PAS.
     """
 
-    # Get the symmetric part of the tensor
+    # Extract the symmetric traceless part of the tensor
     _, _, symmetric_traceless = decompose_matrix(tensor)
 
     # Diagonalize the symmetric traceless part
     eigenvalues, eigenvectors = np.linalg.eig(symmetric_traceless)
 
-    # Sort the according to the eigenvalues
+    # Sort eigenvalues and eigenvectors by the absolute value of eigenvalues
     idx = np.argsort(np.abs(eigenvalues))[::-1]
     eigenvalues = eigenvalues[idx]
     eigenvectors = eigenvectors[:, idx].T
 
-    # Write the tensor in the principal axis system
+    # Transform the tensor into the principal axis system
     tensor_PAS = eigenvectors @ tensor @ np.linalg.inv(eigenvectors)
 
     return eigenvalues, eigenvectors, tensor_PAS
@@ -568,13 +564,13 @@ def cartesian_tensor_to_spherical_tensor(C: np.ndarray) -> dict:
     Converts a rank-2 Cartesian tensor to a spherical tensor.
 
     Uses the double outer product (DOP) convention from:
-    Eq. 293-298 in Man: Cartesian and Spherical Tensors in NMR Hamiltonians
+    Eqs. 293-298 in Man: Cartesian and Spherical Tensors in NMR Hamiltonians
     https://doi.org/10.1002/cmr.a.21289
 
     Parameters
     ----------
     C : numpy.ndarray
-        Rank-2 tensor in Cartesian coordinates
+        Rank-2 tensor in Cartesian coordinates.
 
     Returns
     -------
@@ -590,15 +586,15 @@ def cartesian_tensor_to_spherical_tensor(C: np.ndarray) -> dict:
     
     # Build the spherical tensor components
     spherical_tensor = {
-        (0, 0) : -1/math.sqrt(3) * (C_xx + C_yy + C_zz),
-        (1, 0) : -1j/math.sqrt(2) * (C_xy - C_yx),
-        (1, 1) : -1/2 * (C_zx - C_xz + 1j*(C_zy - C_yz)),
-        (1,-1) : -1/2 * (C_zx - C_xz - 1j*(C_zy - C_yz)),
-        (2, 0) :  1/math.sqrt(6) * (-C_xx + 2*C_zz - C_yy),
-        (2, 1) : -1/2 * (C_xz + C_zx + 1j*(C_yz + C_zy)),
-        (2,-1) :  1/2 * (C_xz + C_zx - 1j*(C_yz + C_zy)),
-        (2, 2) :  1/2 * (C_xx - C_yy + 1j*(C_xy + C_yx)),
-        (2,-2) :  1/2 * (C_xx - C_yy - 1j*(C_xy + C_yx))
+        (0, 0): -1 / math.sqrt(3) * (C_xx + C_yy + C_zz),
+        (1, 0): -1j / math.sqrt(2) * (C_xy - C_yx),
+        (1, 1): -1 / 2 * (C_zx - C_xz + 1j * (C_zy - C_yz)),
+        (1, -1): -1 / 2 * (C_zx - C_xz - 1j * (C_zy - C_yz)),
+        (2, 0): 1 / math.sqrt(6) * (-C_xx + 2 * C_zz - C_yy),
+        (2, 1): -1 / 2 * (C_xz + C_zx + 1j * (C_yz + C_zy)),
+        (2, -1): 1 / 2 * (C_xz + C_zx - 1j * (C_yz + C_zy)),
+        (2, 2): 1 / 2 * (C_xx - C_yy + 1j * (C_xy + C_yx)),
+        (2, -2): 1 / 2 * (C_xx - C_yy - 1j * (C_xy + C_yx))
     }
     
     return spherical_tensor
@@ -625,9 +621,9 @@ def vector_to_spherical_tensor(vector: np.ndarray) -> dict:
 
     # Build the spherical tensor
     spherical_tensor = {
-        (1, 1) : -1/math.sqrt(2) * (vector[0] + 1j * vector[1]),
-        (1, 0) : vector[2],
-        (1,-1) : 1/math.sqrt(2) * (vector[0] - 1j * vector[1])
+        (1, 1): -1 / math.sqrt(2) * (vector[0] + 1j * vector[1]),
+        (1, 0): vector[2],
+        (1, -1): 1 / math.sqrt(2) * (vector[0] - 1j * vector[1])
     }
 
     return spherical_tensor
@@ -663,11 +659,11 @@ def CG_coeff(j1: float, m1: float, j2: float, m2: float, j3: float, m3: float) -
 
     return coeff
 
-def sparse_dot(A: csc_array, B: csc_array, zero_value: float=1e-24) -> csc_array:
+def sparse_dot(A: csc_array, B: csc_array, zero_value: float = 1e-24) -> csc_array:
     """
     Custom sparse matrix multiplication, which saves memory usage by dropping
     values smaller than `zero_value` during the calculation. Matrices `A` and `B`
-    must be SciPy CSC arrays. This function is implemented with Cython and it is
+    must be SciPy CSC arrays. This function is implemented with Cython and is
     parallelized with OpenMP.
 
     Parameters
@@ -686,7 +682,7 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float=1e-24) -> csc_array
         Result of matrix multiplication.
     """
 
-    # Make sure that the data types are correct
+    # Ensure that the data types are correct
     A.data = A.data.astype(np.complex128)
     A.indices = A.indices.astype(np.longlong)
     A.indptr = A.indptr.astype(np.longlong)

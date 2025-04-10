@@ -3,13 +3,15 @@ import numpy as np
 import math
 import copy
 from spinguin._spin_system import SpinSystem
-from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, ZQ_basis, ZQ_filter
+from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, ZQ_basis_map, ZQ_filter
 from spinguin._operators import superoperator
 
 class TestBasis(unittest.TestCase):
 
     def test_make_basis(self):
-
+        """
+        Test the creation of the basis set for a spin system.
+        """
         # Hard-coded result for comparison
         basis_arr = np.array([[0, 0],
                               [0, 1],
@@ -32,7 +34,7 @@ class TestBasis(unittest.TestCase):
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes, max_spin_order=1)
 
-        # Compare
+        # Compare the generated basis with the hard-coded result
         self.assertTrue(np.array_equal(basis_arr, spin_system.basis.arr))
         self.assertEqual(basis_dict, spin_system.basis.dict)
 
@@ -42,26 +44,30 @@ class TestBasis(unittest.TestCase):
         # Compare the size of the basis set to a calculated value for different spin orders
         for max_so in range(1, isotopes.size):
             spin_system = SpinSystem(isotopes, max_spin_order=max_so)
-            size = sum([math.comb(isotopes.size, k) * 3**k for k in range(max_so+1)])
+            size = sum([math.comb(isotopes.size, k) * 3**k for k in range(max_so + 1)])
             self.assertEqual(size, spin_system.basis.dim)
 
     def test_state_idx(self):
-
+        """
+        Test the mapping of states to their corresponding indices.
+        """
         # Test system
         isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes, max_spin_order=1)
 
         # Test against known values
-        self.assertEqual(state_idx(spin_system, (0,0)), 0)
-        self.assertEqual(state_idx(spin_system, (0,1)), 1)
-        self.assertEqual(state_idx(spin_system, (0,2)), 2)
-        self.assertEqual(state_idx(spin_system, (0,3)), 3)
-        self.assertEqual(state_idx(spin_system, (1,0)), 4)
-        self.assertEqual(state_idx(spin_system, (2,0)), 5)
-        self.assertEqual(state_idx(spin_system, (3,0)), 6)
+        self.assertEqual(state_idx(spin_system, (0, 0)), 0)
+        self.assertEqual(state_idx(spin_system, (0, 1)), 1)
+        self.assertEqual(state_idx(spin_system, (0, 2)), 2)
+        self.assertEqual(state_idx(spin_system, (0, 3)), 3)
+        self.assertEqual(state_idx(spin_system, (1, 0)), 4)
+        self.assertEqual(state_idx(spin_system, (2, 0)), 5)
+        self.assertEqual(state_idx(spin_system, (3, 0)), 6)
 
     def test_str_to_op_def(self):
-
+        """
+        Test the conversion of operator strings to operator definitions.
+        """
         # Test system
         isotopes = np.array(['1H'])
         spin_system = SpinSystem(isotopes)
@@ -79,16 +85,20 @@ class TestBasis(unittest.TestCase):
         self.assertEqual(str_to_op_def(spin_system, ['T_1-1'], [0]), ([(3,)], [1]))
 
     def test_idx_conversions(self):
-
+        """
+        Test the conversion between index and (l, q) representations.
+        """
         # Convert back and forth and compare
         for l in range(10):
-            for q in range(-l, l+1):
-                self.assertEqual(idx_to_lq(lq_to_idx(l,q)), (l, q))    
+            for q in range(-l, l + 1):
+                self.assertEqual(idx_to_lq(lq_to_idx(l, q)), (l, q))    
         for idx in range(100):
             self.assertEqual(lq_to_idx(*idx_to_lq(idx)), idx)
 
     def test_coherence_order(self):
-
+        """
+        Test the calculation of coherence orders for given states.
+        """
         # Test against states and their known coherence orders
         self.assertEqual(coherence_order((0,)), 0)
         self.assertEqual(coherence_order((1,)), 1)
@@ -103,7 +113,9 @@ class TestBasis(unittest.TestCase):
         self.assertEqual(coherence_order((0, 1, 2, 3, 4, 5, 6, 7, 8)), 0)
 
     def test_ZQ_basis(self):
-
+        """
+        Test the creation of the zero-quantum (ZQ) basis.
+        """
         # Example system
         isotopes = np.array(['1H', '1H', '1H'])
         spin_system = SpinSystem(isotopes, max_spin_order=2)
@@ -112,22 +124,23 @@ class TestBasis(unittest.TestCase):
         basis_org = copy.copy(spin_system.basis)
 
         # Convert to ZQ basis
-        ZQ_map = ZQ_basis(spin_system)
+        ZQ_map = ZQ_basis_map(spin_system)
 
         # Check that only the ZQ terms remain and that the index map is correct
         for op, idx in basis_org.dict.items():
             if op in spin_system.basis.dict:
-                
                 self.assertEqual(coherence_order(op), 0)
                 self.assertEqual(ZQ_map[spin_system.basis.dict[op]], idx)
 
     def test_ZQ_filter(self):
-
+        """
+        Test the application of the zero-quantum (ZQ) filter.
+        """
         # Example systems
         isotopes = np.array(['1H', '1H', '1H'])
         spin_system = SpinSystem(isotopes, max_spin_order=2)
         spin_system_ZQ = SpinSystem(isotopes, max_spin_order=2)
-        ZQ_map = ZQ_basis(spin_system_ZQ)
+        ZQ_map = ZQ_basis_map(spin_system_ZQ)
 
         # Operators to test
         operators = ['E', 'I_x', 'I_y', 'I_z', 'I_+', 'I_-']
@@ -136,10 +149,9 @@ class TestBasis(unittest.TestCase):
         for i in operators:
             for j in operators:
                 for k in operators:
-
                     # Create the superoperators
                     sop = superoperator(spin_system, [i, j, k], [0, 1, 2])
                     sop_ZQ = superoperator(spin_system_ZQ, [i, j, k], [0, 1, 2])
 
-                    # Applying the ZQ-filter should result in same result
+                    # Applying the ZQ-filter should result in the same result
                     self.assertTrue(np.allclose(sop_ZQ.toarray(), ZQ_filter(spin_system_ZQ, sop, ZQ_map).toarray()))
