@@ -47,8 +47,6 @@ class Basis:
             A dictionary where the keys are tuples of integers that
             represent the product operators. The values are the indices of
             the specific operators. Set directly by `make_basis`.
-
-        TODO: Yleiset funktiot kantafilttereille.
         """
 
         # Create the basis
@@ -191,101 +189,51 @@ def state_idx(spin_system: SpinSystem, op_def: tuple) -> int:
 
     return idx
 
-# def ZQ_basis(spin_system: SpinSystem) -> list:
-#     """
-#     Modifies the existing basis by retaining only the zero-quantum (ZQ) terms.
-
-#     Assigns the `ZQ_map` variable for the basis, which contains the index
-#     mapping from the original basis to the zero-quantum basis.
-
-#     Parameters
-#     ----------
-#     spin_system : SpinSystem
-#         The spin system for which the zero-quantum basis is being created.
-
-#     Returns
-#     -------
-#     ZQ_map : list
-#         Index mapping from the original basis set to the modified basis set. This index map
-#         is used to convert the operators to the modified basis.
-#     """
-
-#     print("Constructing the zero-quantum basis.")
-#     time_start = time.time()
-
-#     # Create an empty dictionary for the new basis
-#     basis_dict = {}
-
-#     # Create an empty list for the mapping from old to new basis
-#     ZQ_map = []
-
-#     # Iterate over the basis
-#     i = 0
-#     for state, idx in spin_system.basis.dict.items():
-
-#         # Check if coherence order is zero
-#         if coherence_order(state) == 0:
-
-#             # Assign state to the ZQ basis and increment index
-#             basis_dict[state] = i
-#             i += 1
-
-#             # Assign index to the ZQ map
-#             ZQ_map.append(idx)
-
-#     # Convert basis to NumPy array
-#     basis = np.array(list(basis_dict.keys()))
-
-#     # Save the basis
-#     spin_system.basis.arr = basis
-#     spin_system.basis.dict = basis_dict
-
-#     print("Zero-quantum basis created.")
-#     print(f"Elapsed time: {time.time() - time_start:.4f} seconds.") # NOTE: Perttu's edit
-#     print()
-
-#     return ZQ_map
-
-# NOTE: Perttu's edit
-def ZQ_basis_map(spin_system: SpinSystem) -> list:
+def truncate_basis_by_coherence(spin_system: SpinSystem, coherence_orders: list) -> list:
     """
-    Generates the 'ZQ_basis_map' variable for the basis, which contains the index
-    mapping from the original basis to the zero-quantum basis.
+    Truncates the basis set of the `SpinSystem` object by retaining only the product operators
+    in the basis that correspond to coherence orders specified in the `coherence_orders` list.
+    The function generates also an index map from the original basis to the truncated basis.
+    This map can be used to transform superoperators or state vectors to the new basis by
+    using the `project_to_truncated_basis()` function.
 
     Parameters
     ----------
     spin_system : SpinSystem
-        The spin system for which the zero-quantum basis is being created.
+        The spin system whose basis set will be truncated.
+    coherence_orders : list
+        List of coherence orders to be retained in the basis.
 
     Returns
     -------
-    ZQ_basis_map : list
-        Index mapping from the original basis set to the modified basis set. This index map
-        is used to convert the operators to the modified basis.
+    index_map : list
+        List that contains an index map from the original basis to the truncated basis.
+
+    TODO: Funktion ja input parametrien nimeäminen? Onko Pertulla ideoita?
     """
 
-    print("Constructing the zero-quantum basis.")
+    print(f"Truncating the basis set. The following coherence orders are retained: {coherence_orders}")
     time_start = time.time()
 
     # Create an empty dictionary for the new basis
     basis_dict = {}
 
     # Create an empty list for the mapping from old to new basis
-    ZQ_basis_map = []
+    index_map = []
 
     # Iterate over the basis
     i = 0
     for state, idx in spin_system.basis.dict.items():
 
-        # Check if coherence order is zero
-        if coherence_order(state) == 0:
+        # Check if coherence order is in the list
+        if coherence_order(state) in coherence_orders:
 
-            # Assign state to the ZQ basis and increment index
+            # Assign state to the truncated basis and increment index
             basis_dict[state] = i
             i += 1
 
-            # Assign index to the ZQ map
-            ZQ_basis_map.append(idx)
+            # Assign index to the index map
+            index_map.append(idx)
 
     # Convert basis to NumPy array
     basis = np.array(list(basis_dict.keys()))
@@ -294,52 +242,58 @@ def ZQ_basis_map(spin_system: SpinSystem) -> list:
     spin_system.basis.arr = basis
     spin_system.basis.dict = basis_dict
 
-    print("Zero-quantum basis created.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.") # NOTE: Perttu's edit
+    print("Truncated basis created.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
     print()
 
-    return ZQ_basis_map
+    return index_map
 
-def ZQ_filter(spin_system: SpinSystem, A: csc_array | np.ndarray, ZQ_map: list) -> csc_array | np.ndarray:
+def transform_to_truncated_basis(index_map: list, *objs: csc_array | np.ndarray) -> csc_array | np.ndarray | Tuple[csc_array, ...] | Tuple[np.ndarray, ...]:
     """
-    Filters a superoperator or state vector to retain only the zero-quantum coherence (ZQC) terms.
-    The zero-quantum basis must have been created prior to calling this function.
+    Transforms superoperators or state vectors to a truncated basis using the `index_map`, which
+    is obtained from `truncate_basis_by_coherence()` function. Multiple objects can be transformed
+    simultaneously.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system containing the basis.
-    A : csc_array or numpy.ndarray
-        Any superoperator or state vector written in the original basis.
-    ZQ_map : list
-        Index mapping from the original basis to the zero-quantum basis.
+    index_map : list
+        Index mapping from the original basis to the truncated basis.
+    objs : csc_array or numpy.ndarray
+        Superoperators or state vectors written in the original basis.
 
     Returns
     -------
-    A : csc_array or numpy.ndarray
-        The filtered operator or state vector with only ZQC terms retained.
+    transformed_objs : csc_array or numpy.ndarray
+        Superoperators or state vectors transformed into the truncated basis.
+    TODO: Funktion ja input parametrien nimeäminen? Onko Pertulla ideoita?
     """
 
-    print("Applying zero-quantum coherence filter.")
+    print("Transforming superoperators or state vectors into a truncated basis.")
     time_start = time.time()
 
-    # Process density vectors
-    if _la.isvector(A):
+    # Empty list for transformed objects
+    transformed_objs = []
 
-        # Apply the filter
-        A = A[ZQ_map]
+    # Perform the transformation to each given superoperator or state vector
+    for obj in objs:
 
-    # Process superoperators
-    else:
+        # Process state vectors
+        if _la.isvector(obj):
+            transformed_objs.append(obj[index_map])
 
-        # Apply the filter
-        A = A[np.ix_(ZQ_map, ZQ_map)]
+        # Process superoperators
+        else:
+            transformed_objs.append(obj[np.ix_(index_map, index_map)])
 
-    print("Zero-quantum coherence filter applied.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.") # NOTE: Perttu's edit
+    # Do not return a tuple, if only one state vector or superoperator is transformed
+    if len(transformed_objs) == 1:
+        transformed_objs = transformed_objs[0]
+
+    print("Transformation completed.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
     print()
 
-    return A
+    return transformed_objs
     
 def lq_to_idx(l: int, q: int) -> int:
     """
