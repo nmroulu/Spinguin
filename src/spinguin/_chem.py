@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 import numpy as np
 from scipy.sparse import lil_array, eye_array, csc_array
 from functools import lru_cache
-from typing import Tuple, Union
+from typing import Tuple
 from spinguin._basis import state_idx
 
 @lru_cache(maxsize=16)
@@ -26,6 +26,15 @@ def dissociate_index_map(spin_system_A: SpinSystem,
     """
     Generates arrays that map the state indices from the composite spin system C 
     to the individual spin systems A and B. This function is used in `dissociate()`.
+
+    Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4). We want to dissociate
+    this into two subsystems A and B. Spins 0 and 2 should go to subsystem A and the rest to subsystem B.
+    In this case, we define the following spin maps:
+
+    ```python
+    spin_map_A = (0, 2)
+    spin_map_B = (1, 3, 4)
+    ```
 
     Parameters
     ----------
@@ -94,12 +103,21 @@ def dissociate_index_map(spin_system_A: SpinSystem,
 def dissociate(spin_system_A: SpinSystem,
                spin_system_B: SpinSystem,
                spin_system_C: SpinSystem,
-               rho_C: Union[np.ndarray, csc_array],
+               rho_C: np.ndarray | csc_array,
                spin_map_A: tuple,
-               spin_map_B: tuple) -> Tuple[Union[np.ndarray, csc_array], Union[np.ndarray, csc_array]]:
+               spin_map_B: tuple) -> Tuple[np.ndarray | csc_array, np.ndarray | csc_array]:
     """
     Dissociates spins in a chemical reaction C -> A + B.
     Spin system C is treated as the composite system of A and B.
+
+    Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4). We want to dissociate
+    this into two subsystems A and B. Spins 0 and 2 should go to subsystem A and the rest to subsystem B.
+    In this case, we define the following spin maps:
+
+    ```python
+    spin_map_A = (0, 2)
+    spin_map_B = (1, 3, 4)
+    ```
 
     Parameters
     ----------
@@ -110,7 +128,7 @@ def dissociate(spin_system_A: SpinSystem,
     spin_system_C : SpinSystem
         The composite spin system (C).
     rho_C : numpy.ndarray or csc_array
-        Density vector of the composite spin system C.
+        State vector of the composite spin system C.
     spin_map_A : tuple
         Indices of spin system A within spin system C.
     spin_map_B : tuple
@@ -119,9 +137,9 @@ def dissociate(spin_system_A: SpinSystem,
     Returns
     -------
     rho_A : numpy.ndarray or csc_array
-        Density vector of spin system A.
+        State vector of spin system A.
     rho_B : numpy.ndarray or csc_array
-        Density vector of spin system B.
+        State vector of spin system B.
     """
     # Get spin multiplicities for normalization
     mults_A = spin_system_A.mults
@@ -163,6 +181,16 @@ def associate_index_map(spin_system_A: SpinSystem,
     """
     Generates arrays that map the state indices from spin systems A and B 
     to the composite spin system C. This function is used in `associate()`.
+
+    Example. We have spin system A that has two spins and spin system B that has three
+    spins. These systems associate to form a composite spin system C that has five spins
+    that are indexed (0, 1, 2, 3, 4). We have to choose how the spin systems A and B will be
+    indexed in spin system C. For example, we may define the spin maps as follows:
+
+    ```python
+    spin_map_A = (2, 0)
+    spin_map_B = (1, 3, 4)
+    ```
 
     Parameters
     ----------
@@ -209,12 +237,22 @@ def associate_index_map(spin_system_A: SpinSystem,
 def associate(spin_system_A: SpinSystem,
               spin_system_B: SpinSystem,
               spin_system_C: SpinSystem,
-              rho_A: Union[np.ndarray, csc_array],
-              rho_B: Union[np.ndarray, csc_array],
+              rho_A: np.ndarray | csc_array,
+              rho_B: np.ndarray | csc_array,
               spin_map_A: tuple,
-              spin_map_B: tuple) -> Union[np.ndarray, csc_array]:
+              spin_map_B: tuple) -> np.ndarray | csc_array:
     """
     Combines two state vectors when spin systems associate in a chemical reaction A + B -> C.
+
+    Example. We have spin system A that has two spins and spin system B that has three
+    spins. These systems associate to form a composite spin system C that has five spins
+    that are indexed (0, 1, 2, 3, 4). We have to choose how the spin systems A and B will be
+    indexed in spin system C. For example, we may define the spin maps as follows:
+
+    ```python
+    spin_map_A = (2, 0)
+    spin_map_B = (1, 3, 4)
+    ```
 
     Parameters
     ----------
@@ -259,7 +297,14 @@ def associate(spin_system_A: SpinSystem,
 @lru_cache(maxsize=16)
 def transformation_matrix(spin_system: SpinSystem, spin_map: tuple) -> csc_array:
     """
-    Creates a transformation matrix to map a density vector from one basis set to another.
+    Creates a transformation matrix to reorder the spins in the system.
+
+    Example. Our spin system has three spins, which are indexed (0, 1, 2). Spins 0 and 2 switch positions and
+    we want to re-order our state vector accordingly. In this case, we want to assign the following map:
+
+    ```python
+    spin_map = (2, 1, 0)
+    ```
 
     Parameters
     ----------
@@ -295,24 +340,31 @@ def transformation_matrix(spin_system: SpinSystem, spin_map: tuple) -> csc_array
 
     return transform
 
-def permute_spins(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], spin_map: tuple) -> Union[np.ndarray, csc_array]:
+def permute_spins(spin_system: SpinSystem, rho: np.ndarray | csc_array, spin_map: tuple) -> np.ndarray | csc_array:
     """
-    Permutes the density vector of a spin system to correspond to a differently ordered basis.
-    Useful for reordering spins in the system.
+    Permutes the state vector of a spin system to correspond to a reordering of the spins
+    in the system. 
+
+    Example. Our spin system has three spins, which are indexed (0, 1, 2). Spins 0 and 2 switch positions and
+    we want to re-order our state vector accordingly. In this case, we want to assign the following map:
+
+    ```python
+    spin_map = (2, 1, 0)
+    ```
 
     Parameters
     ----------
     spin_system : SpinSystem
         The spin system.
     rho : numpy.ndarray or csc_array
-        Density vector of the spin system.
+        State vector of the spin system.
     spin_map : tuple
         Indices of the spins in the spin system after permutation.
 
     Returns
     -------
     rho : numpy.ndarray or csc_array
-        Permuted density vector of the spin system.
+        Permuted state vector of the spin system.
     """
     # Get the transformation matrix
     transform = transformation_matrix(spin_system, spin_map)
