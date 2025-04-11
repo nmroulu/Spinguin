@@ -3,7 +3,7 @@ import numpy as np
 import math
 import copy
 from spinguin._spin_system import SpinSystem
-from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, ZQ_basis_map, ZQ_filter
+from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, transform_to_truncated_basis, truncate_basis_by_coherence
 from spinguin._operators import superoperator
 
 class TestBasis(unittest.TestCase):
@@ -112,35 +112,36 @@ class TestBasis(unittest.TestCase):
         self.assertEqual(coherence_order((1, 4)), 3)
         self.assertEqual(coherence_order((0, 1, 2, 3, 4, 5, 6, 7, 8)), 0)
 
-    def test_ZQ_basis(self):
+    def test_truncate_basis_by_coherence(self):
         """
-        Test the creation of the zero-quantum (ZQ) basis.
+        Test the creation of the truncated basis.
         """
         # Example system
-        isotopes = np.array(['1H', '1H', '1H'])
-        spin_system = SpinSystem(isotopes, max_spin_order=2)
+        isotopes = np.array(['1H', '1H', '1H', '1H', '14N'])
+        spin_system = SpinSystem(isotopes, max_spin_order=4)
 
         # Save the original basis
         basis_org = copy.copy(spin_system.basis)
 
-        # Convert to ZQ basis
-        ZQ_map = ZQ_basis_map(spin_system)
+        # Truncate the basis (retain coherence orders of -2, 0, and 1)
+        coherence_orders = [-2, 0, 1]
+        index_map = truncate_basis_by_coherence(spin_system, coherence_orders)
 
-        # Check that only the ZQ terms remain and that the index map is correct
+        # Check that only the coherence orders [-2, 0, 1] remain and that the index map is correct
         for op, idx in basis_org.dict.items():
             if op in spin_system.basis.dict:
-                self.assertEqual(coherence_order(op), 0)
-                self.assertEqual(ZQ_map[spin_system.basis.dict[op]], idx)
+                self.assertTrue(coherence_order(op) in coherence_orders)
+                self.assertEqual(index_map[spin_system.basis.dict[op]], idx)
 
-    def test_ZQ_filter(self):
+    def test_transform_to_truncated_basis(self):
         """
-        Test the application of the zero-quantum (ZQ) filter.
+        Test the transformation of superoperators to truncated basis.
         """
         # Example systems
-        isotopes = np.array(['1H', '1H', '1H'])
-        spin_system = SpinSystem(isotopes, max_spin_order=2)
-        spin_system_ZQ = SpinSystem(isotopes, max_spin_order=2)
-        ZQ_map = ZQ_basis_map(spin_system_ZQ)
+        isotopes = np.array(['1H', '1H', '1H', '1H', '14N'])
+        spin_system = SpinSystem(isotopes, max_spin_order=4)
+        spin_system_tr = SpinSystem(isotopes, max_spin_order=4)
+        index_map = truncate_basis_by_coherence(spin_system_tr, [-2, 0, 1])
 
         # Operators to test
         operators = ['E', 'I_x', 'I_y', 'I_z', 'I_+', 'I_-']
@@ -151,7 +152,7 @@ class TestBasis(unittest.TestCase):
                 for k in operators:
                     # Create the superoperators
                     sop = superoperator(spin_system, [i, j, k], [0, 1, 2])
-                    sop_ZQ = superoperator(spin_system_ZQ, [i, j, k], [0, 1, 2])
+                    sop_ZQ = superoperator(spin_system_tr, [i, j, k], [0, 1, 2])
 
                     # Applying the ZQ-filter should result in the same result
-                    self.assertTrue(np.allclose(sop_ZQ.toarray(), ZQ_filter(spin_system_ZQ, sop, ZQ_map).toarray()))
+                    self.assertTrue(np.allclose(sop_ZQ.toarray(), transform_to_truncated_basis(index_map, sop).toarray()))
