@@ -60,7 +60,7 @@ def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm') ->
 
     return sop_Hz
 
-def hamiltonian_jcoupling(spin_system: SpinSystem, side: str = 'comm') -> csc_array:
+def hamiltonian_J_coupling(spin_system: SpinSystem, side: str = 'comm') -> csc_array:
     """
     Computes the J-coupling term of the Hamiltonian.
 
@@ -110,9 +110,9 @@ def hamiltonian_jcoupling(spin_system: SpinSystem, side: str = 'comm') -> csc_ar
 
     return sop_Hj
 
-def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_value: float = 1e-12) -> csc_array:
+def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_value: float = 1e-12, disable_outputs: bool = False) -> csc_array:
     """
-    Computes the coherent part of the Hamiltonian, including the Zeeman
+    Computes the coherent part of the Hamiltonian superoperator, including the Zeeman
     interaction and J-couplings.
 
     Parameters
@@ -129,6 +129,8 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_valu
     zero_value : float
         Threshold for sparsity. Values smaller than this will be set to zero
         after constructing the total Hamiltonian. Default is 1e-12.
+    disable_outputs : bool
+        Disables printing to the console. Default: False.
 
     Returns
     -------
@@ -137,11 +139,12 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_valu
     """
 
     time_start = time.time()
-    print("Constructing Hamiltonian...") # NOTE: Perttu's edit
+    if not disable_outputs:
+        print("Constructing Hamiltonian...")
 
     # Compute the Zeeman and J-coupling Hamiltonians
     sop_Hz = hamiltonian_zeeman(spin_system, B, side)
-    sop_Hj = hamiltonian_jcoupling(spin_system, side)
+    sop_Hj = hamiltonian_J_coupling(spin_system, side)
 
     # Combine the terms
     sop_H = sop_Hz + sop_Hj
@@ -149,7 +152,8 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_valu
     # Remove small values to enhance sparsity
     _la.increase_sparsity(sop_H, zero_value)
 
-    print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
-    print()
+    if not disable_outputs:
+        print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
+        print()
 
     return sop_H
