@@ -3,7 +3,7 @@ import numpy as np
 from spinguin._spin_system import SpinSystem
 from spinguin import _hamiltonian, _propagation, _relaxation, _states
 from spinguin._nmr_isotopes import ISOTOPES
-from spinguin._basis import ZQ_basis_map, ZQ_filter
+from spinguin._basis import truncate_basis_by_coherence, transform_to_truncated_basis
 
 class TestRelaxation(unittest.TestCase):
 
@@ -86,18 +86,15 @@ class TestRelaxation(unittest.TestCase):
         R = _relaxation.relaxation(spin_system, H, field, tau_c)
 
         # Create the thermal equilibrium state
-        rho = _states.rho_thermal_equilibrium(spin_system, temp, field)
+        rho = _states.equilibrium_state(spin_system, temp, field)
 
         # Apply a 180-degree pulse
-        pul_180 = _propagation.pulse(spin_system, 'I_x', [0, 1, 2, 3, 4, 5], angle=180)
+        pul_180 = _propagation.pulse(spin_system, "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)", angle=180)
         rho = pul_180 @ rho
 
         # Switch to the zero-quantum (ZQ) subspace
-        # ZQ_map = ZQ_basis
-        ZQ_map = ZQ_basis_map(spin_system) # NOTE: Perttu's edit
-        H = ZQ_filter(spin_system, H, ZQ_map)
-        R = ZQ_filter(spin_system, R, ZQ_map)
-        rho = ZQ_filter(spin_system, rho, ZQ_map)
+        ZQ_map = truncate_basis_by_coherence(spin_system, [0])
+        H, R, rho = transform_to_truncated_basis(ZQ_map, H, R, rho)
 
         # Thermalize the relaxation superoperator
         R = _relaxation.ldb_thermalization(spin_system, R, field, temp)
@@ -110,4 +107,4 @@ class TestRelaxation(unittest.TestCase):
             rho = P @ rho  # Propagate the density matrix
 
         # Verify that the final state matches the thermal equilibrium state
-        self.assertTrue(np.allclose(rho, _states.rho_thermal_equilibrium(spin_system, temp, field)))
+        self.assertTrue(np.allclose(rho, _states.equilibrium_state(spin_system, temp, field)))

@@ -88,6 +88,8 @@ def read_tensors(file_path: str) -> np.ndarray:
     -------
     tensors : numpy.ndarray
         A NumPy array containing the tensors.
+
+    TODO: Input mahdollinen ilman nollatensoreita?
     """
 
     # Initialize the lists and the current index

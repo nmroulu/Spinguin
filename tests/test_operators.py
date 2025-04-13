@@ -4,7 +4,7 @@ import math
 from scipy.sparse import lil_array
 from spinguin._spin_system import SpinSystem
 from spinguin._la import comm, cartesian_tensor_to_spherical_tensor
-from spinguin._basis import idx_to_lq, str_to_op_def, ZQ_basis
+from spinguin._basis import idx_to_lq, parse_operator_string, truncate_basis_by_coherence
 from spinguin import _operators
 
 class TestOperators(unittest.TestCase):
@@ -142,17 +142,16 @@ class TestOperators(unittest.TestCase):
         spins = spin_system.spins
 
         # States to test
-        states = ['E', 'I_x', 'I_y', 'I_z', 'I_+', 'I_-']
+        states = ['x', 'y', 'z', '+', '-']
 
         # Get the Zeeman eigenbasis operators
         opers = {}
         for spin in spins:
-            opers[('E', spin)] = _operators.op_E(spin)
-            opers[('I_x', spin)] = _operators.op_Sx(spin)
-            opers[('I_y', spin)] = _operators.op_Sy(spin)
-            opers[('I_z', spin)] = _operators.op_Sz(spin)
-            opers[('I_+', spin)] = _operators.op_Sp(spin)
-            opers[('I_-', spin)] = _operators.op_Sm(spin)
+            opers[('x', spin)] = _operators.op_Sx(spin)
+            opers[('y', spin)] = _operators.op_Sy(spin)
+            opers[('z', spin)] = _operators.op_Sz(spin)
+            opers[('+', spin)] = _operators.op_Sp(spin)
+            opers[('-', spin)] = _operators.op_Sm(spin)
 
         # Try all possible state combinations
         for i in states:
@@ -160,18 +159,18 @@ class TestOperators(unittest.TestCase):
                 for k in states:
 
                     # Create the operators with unit included and compare
-                    op_defs, coeffs = str_to_op_def(spin_system, [i, j, k], [0, 1, 2])
+                    op_defs, coeffs = parse_operator_string(spin_system, f"I({i},0)*I({j},1)*I({k},2)")
                     oper1 = 0
                     for op_def, coeff in zip(op_defs, coeffs):
-                        oper1 += coeff * _operators.op_P(op_def, spins, include_unit=True)
+                        oper1 += coeff * _operators.op_prod(op_def, spins, include_unit=True)
                     oper2 = np.kron(opers[(i, spins[0])], np.kron(opers[(j, spins[1])], opers[(k, spins[2])]))
                     self.assertTrue(np.allclose(oper1, oper2))
 
                     # Create the operators without unit included and compare
-                    op_defs, coeffs = str_to_op_def(spin_system, [i, j, k], [0, 1, 2])
+                    op_defs, coeffs = parse_operator_string(spin_system, f"I({i},0)*I({j},1)*I({k},2)")
                     oper1 = 0
                     for op_def, coeff in zip(op_defs, coeffs):
-                        oper1 += coeff * _operators.op_P(op_def, spins, include_unit=False)
+                        oper1 += coeff * _operators.op_prod(op_def, spins, include_unit=False)
                     oper2 = 1
                     if i != 'E':
                         oper2 = np.kron(oper2, opers[(i, spins[0])])
@@ -231,10 +230,10 @@ class TestOperators(unittest.TestCase):
                 sop_L[j, k] = (op_j.conj().T @ op_i @ op_k).trace() / norm
                 sop_R[j, k] = (op_j.conj().T @ op_k @ op_i).trace() / norm
 
-        self.assertTrue(np.allclose(sop_L, _operators.sop_P(spin_system, op_def_i, "left").toarray()))
-        self.assertTrue(np.allclose(sop_R, _operators.sop_P(spin_system, op_def_i, "right").toarray()))
+        self.assertTrue(np.allclose(sop_L, _operators.sop_prod(spin_system, op_def_i, "left").toarray()))
+        self.assertTrue(np.allclose(sop_R, _operators.sop_prod(spin_system, op_def_i, "right").toarray()))
     
-    def test_sop_P(self):
+    def test_sop_prod(self):
         """
         Test the superoperator construction for various spin systems.
         """
@@ -262,14 +261,14 @@ class TestOperators(unittest.TestCase):
                     op = tuple(op)
 
                     # Test left, right, and commutation superoperators against the "idiot-proof" function
-                    self.assertTrue(np.allclose(_operators.sop_P(spin_system, op, "left").toarray(), 
+                    self.assertTrue(np.allclose(_operators.sop_prod(spin_system, op, "left").toarray(), 
                                                 sop_P(spin_system, op, "left").toarray()))
-                    self.assertTrue(np.allclose(_operators.sop_P(spin_system, op, "right").toarray(), 
+                    self.assertTrue(np.allclose(_operators.sop_prod(spin_system, op, "right").toarray(), 
                                                 sop_P(spin_system, op, "right").toarray()))
-                    self.assertTrue(np.allclose(_operators.sop_P(spin_system, op, "comm").toarray(), 
+                    self.assertTrue(np.allclose(_operators.sop_prod(spin_system, op, "comm").toarray(), 
                                                 sop_P(spin_system, op, "comm").toarray()))
 
-    def test_sop_P_cache(self):
+    def test_sop_prod_cache(self):
         """
         Test caching behavior of the sop_P function when the basis changes.
         """
@@ -280,9 +279,9 @@ class TestOperators(unittest.TestCase):
 
         # Create an operator, change the basis, and create an operator again
         op_def = (2, 0, 0)
-        Iz = _operators.sop_P(spin_system, op_def, side='comm')
-        ZQ_basis_map(spin_system)
-        Iz_ZQ = _operators.sop_P(spin_system, op_def, side='comm')
+        Iz = _operators.sop_prod(spin_system, op_def, side='comm')
+        truncate_basis_by_coherence(spin_system, [0])
+        Iz_ZQ = _operators.sop_prod(spin_system, op_def, side='comm')
 
         # Resulting shapes should be different
         self.assertNotEqual(Iz.shape, Iz_ZQ.shape)
@@ -297,16 +296,16 @@ class TestOperators(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Test the superoperator function against sop_P
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', 0, "left").toarray(), _operators.sop_P(spin_system, (2, 0), "left").toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', 0, "right").toarray(), _operators.sop_P(spin_system, (2, 0), "right").toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', 0, "comm").toarray(), _operators.sop_P(spin_system, (2, 0), "comm").toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_z', [0, 1], "comm").toarray(),
-                                    (_operators.sop_P(spin_system, (2, 0), "comm") + _operators.sop_P(spin_system, (0, 2), "comm")).toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, ['I_+', 'I_-'], [0, 1], "comm").toarray(),
-                                    -2 * _operators.sop_P(spin_system, (1, 3), "comm").toarray()))
-        self.assertTrue(np.allclose(_operators.superoperator(spin_system, 'I_x', [0, 1], "comm").toarray(),
-                                    + (-1 / np.sqrt(2) * _operators.sop_P(spin_system, (1, 0), "comm") + 1 / np.sqrt(2) * _operators.sop_P(spin_system, (3, 0), "comm")).toarray()
-                                    + (-1 / np.sqrt(2) * _operators.sop_P(spin_system, (0, 1), "comm") + 1 / np.sqrt(2) * _operators.sop_P(spin_system, (0, 3), "comm")).toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, "I(z,0)", "left").toarray(), _operators.sop_prod(spin_system, (2, 0), "left").toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, "I(z,0)", "right").toarray(), _operators.sop_prod(spin_system, (2, 0), "right").toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, "I(z,0)", "comm").toarray(), _operators.sop_prod(spin_system, (2, 0), "comm").toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, "I(z,0) + I(z,1)", "comm").toarray(),
+                                    (_operators.sop_prod(spin_system, (2, 0), "comm") + _operators.sop_prod(spin_system, (0, 2), "comm")).toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, "I(+,0) * I(-,1)", "comm").toarray(),
+                                    -2 * _operators.sop_prod(spin_system, (1, 3), "comm").toarray()))
+        self.assertTrue(np.allclose(_operators.superoperator(spin_system, "I(x,0) + I(x,1)", "comm").toarray(),
+                                    + (-1 / np.sqrt(2) * _operators.sop_prod(spin_system, (1, 0), "comm") + 1 / np.sqrt(2) * _operators.sop_prod(spin_system, (3, 0), "comm")).toarray()
+                                    + (-1 / np.sqrt(2) * _operators.sop_prod(spin_system, (0, 1), "comm") + 1 / np.sqrt(2) * _operators.sop_prod(spin_system, (0, 3), "comm")).toarray()))
         
     def test_op_T_coupled(self):
         """
@@ -358,13 +357,13 @@ class TestOperators(unittest.TestCase):
         A = np.random.rand(3, 3)
 
         # Cartesian spin operators
-        I = np.array(['I_x', 'I_y', 'I_z'])
+        I = np.array(['x', 'y', 'z'])
         
         # Perform the dot product manually
         left = np.zeros((dim, dim), dtype=complex)
         for i in range(A.shape[0]):
             for s in range(A.shape[1]):
-                left += A[i, s] * _operators.superoperator(spin_system, [I[i], I[s]], [0, 1], 'comm').toarray()
+                left += A[i, s] * _operators.superoperator(spin_system, f"I({I[i]},0) * I({I[s]},1)", 'comm').toarray()
 
         # Convert A to spherical tensors
         A = cartesian_tensor_to_spherical_tensor(A)

@@ -17,7 +17,7 @@ import numpy as np
 from functools import lru_cache
 from itertools import product
 from spinguin import _la
-from spinguin._basis import idx_to_lq, str_to_op_def
+from spinguin._basis import idx_to_lq, parse_operator_string
 from scipy.sparse import csc_array, eye_array
 from typing import Union
 
@@ -319,7 +319,7 @@ def sop_E(spin_system: SpinSystem) -> csc_array:
 
     return unit
 
-def op_P(op_def: tuple, spins: tuple, include_unit: bool=True) -> np.ndarray:
+def op_prod(op_def: tuple, spins: tuple, include_unit: bool=True) -> np.ndarray:
     """
     Generates a product operator defined by `op_def` in the Zeeman eigenbasis.
 
@@ -358,7 +358,7 @@ def op_P(op_def: tuple, spins: tuple, include_unit: bool=True) -> np.ndarray:
     return op
 
 @lru_cache(maxsize=4096)
-def sop_P(spin_system: SpinSystem, op_def: tuple, side: str) -> csc_array:
+def sop_prod(spin_system: SpinSystem, op_def: tuple, side: str) -> csc_array:
     """
     Generates a product superoperator corresponding to the product operator
     defined by `op_def`.
@@ -387,8 +387,8 @@ def sop_P(spin_system: SpinSystem, op_def: tuple, side: str) -> csc_array:
 
     # If commutation superoperator, calculate left and right superoperators and return their difference
     if side == 'comm':
-        sop = sop_P(spin_system, op_def, 'left') \
-            - sop_P(spin_system, op_def, 'right')
+        sop = sop_prod(spin_system, op_def, 'left') \
+            - sop_prod(spin_system, op_def, 'right')
         return sop
     
     # Extract necessary information from the spin system
@@ -469,32 +469,23 @@ def sop_P(spin_system: SpinSystem, op_def: tuple, side: str) -> csc_array:
 
     return sop
 
-def superoperator(spin_system: SpinSystem, operators: Union[str, list], spins: Union[int, list], side: str='comm') -> csc_array:
+def superoperator(spin_system: SpinSystem, operator: str, side: str='comm') -> csc_array:
     """
-    Generates the requested superoperator for the specified spins.
+    Generates a superoperator from the user-specified `operators` string.
 
     Parameters
     ----------
     spin_system : SpinSystem
         The spin system for which the superoperator is generated.
-    operators : str or list
-        Defines the operator to be generated. Can be either a string or a list of strings.
-        - str :
-            The requested superoperator is generated for each spin specified in `spins`.
-            A sum of the operators is returned.
-            For example: 'I_z'
-        - list :
-            A product superoperator corresponding to the operators specified in the list
-            is generated. Must match the length of `spins`.
-            For example: ['I_+', 'I_-']
-    spins : int or list
-        Indices of the spins. Can be either an integer or a list of integers.
-        - int:
-            Operator corresponding to the string given in `operators` is generated for the
-            specified spin.
-        - list:
-            Indices of the spins that contribute to the product superoperator. Must match
-            the length of `operators`.
+    operator : str
+        Defines the operator to be generated. The operator string must follow the rules below:
+
+        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
+        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
+        - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
+        - Whitespace will be ignored in the input.
     side : str
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
@@ -513,38 +504,12 @@ def superoperator(spin_system: SpinSystem, operators: Union[str, list], spins: U
     # Initialize the superoperator
     sop = csc_array((dim, dim), dtype=complex)
 
-    # Process product superoperators
-    if isinstance(operators, list) and isinstance(spins, list):
+    # Get the operator definitions and coefficients
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
 
-        # Check that the lengths match
-        if len(operators) != len(spins):
-            raise ValueError("If 'operators' and 'spins' are lists, their lengths must match.")
-
-        # Get the operator definition and coefficients
-        op_defs, coeffs = str_to_op_def(spin_system, operators, spins)
-
-        # Add to the operator
-        for op_def, coeff in zip(op_defs, coeffs):
-            sop = sop + coeff * sop_P(spin_system, op_def, side)
-
-    # Process sum of superoperators
-    else:
-
-        # Convert to lists if not already
-        if not isinstance(operators, list):
-            operators = [operators]
-        if not isinstance(spins, list):
-            spins = [spins]
-
-        # Iterate through the list of spins
-        for spin in spins:
-
-            # Get the operator definition and coefficients
-            op_defs, coeffs = str_to_op_def(spin_system, operators, [spin])
-
-            # Add to the operator
-            for op_def, coeff in zip(op_defs, coeffs):
-                sop = sop + coeff * sop_P(spin_system, op_def, side)
+    # Add to the operator
+    for op_def, coeff in zip(op_defs, coeffs):
+        sop = sop + coeff * sop_prod(spin_system, op_def, side)
 
     return sop
 
@@ -596,7 +561,7 @@ def sop_T_coupled(spin_system: SpinSystem, l: int, q: int, spin_1: int, spin_2: 
                 op_def = tuple(op_def)
 
                 # Use the coupling of angular momenta equation
-                sop += _la.CG_coeff(1, q1, 1, q2, l, q) * sop_P(spin_system, op_def, 'comm')
+                sop += _la.CG_coeff(1, q1, 1, q2, l, q) * sop_prod(spin_system, op_def, 'comm')
 
     # Handle linear single-spin interactions
     else:
@@ -610,6 +575,6 @@ def sop_T_coupled(spin_system: SpinSystem, l: int, q: int, spin_1: int, spin_2: 
             op_def = tuple(op_def)
 
             # Use the coupling of angular momenta equation
-            sop += _la.CG_coeff(1, q1, 1, 1, l, q) * sop_P(spin_system, op_def, 'comm')
+            sop += _la.CG_coeff(1, q1, 1, 1, l, q) * sop_prod(spin_system, op_def, 'comm')
 
     return sop

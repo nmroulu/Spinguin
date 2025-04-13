@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 import numpy as np
 import time
 import math
+import re
 from itertools import product, combinations
 from scipy.sparse import csc_array
 from spinguin import _la
@@ -368,76 +369,132 @@ def coherence_order(op_def: tuple) -> int:
 
     return order
 
-# Assign each operator string to the corresponding integer
-op_def_table = {
-    'E': ([0], [1]),
-    'I_+': ([1], [-np.sqrt(2)]),
-    'I_z': ([2], [1]),
-    'I_-': ([3], [np.sqrt(2)]),
-    'I_x': ([1, 3], [-np.sqrt(2)/2, np.sqrt(2)/2]),
-    'I_y': ([1, 3], [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)])
-}
-
-# Assign spherical tensors to the table
-# NOTE: Hardcoded for up to l=9
-for l in range(10):
-    for q in range(-l, l + 1):
-        op = f"T_{l}{q}"
-        idx = lq_to_idx(l, q)
-        op_def_table[op] = ([idx], [1])
-
-def str_to_op_def(spin_system: SpinSystem, operators: list, spins: list) -> Tuple[list, list]:
+def parse_operator_string(spin_system: SpinSystem, operator: str):
     """
-    Converts a product operator described by lists of strings and spin indices to the
-    tuple(s) of integers that define the operator.
+    Parses operator strings and returns their definitions in the basis set as well as their corresponding coefficients.
+    The operator string must follow the rules below:
+
+    - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
+    - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
+    - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
+    - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
+    - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
+
+    Whitespace will be ignored in the input.
 
     Parameters
     ----------
     spin_system : SpinSystem
-        The spin system containing the basis.
-    operators : list
-        List of operators that describe the product operator. Operators that are not
-        specified will be treated as unit operators.
-        Example: ['I_z', 'I_+']
-    spins : list
-        Indices of the spins. Must match the length of `operators`.
-        Example: [0, 2]
+        The spin system for which the operator is going to be generated.
+    operator : str
+        String that defines the operator to be generated.
 
     Returns
     -------
     op_defs : list of tuples
         A list that contains tuples, which describe the requested operator with integers.
-        Example: [(2, 0, 1)]
+        Example: [(2, 0, 1)] --> T_1_0 * E * T_1_1
     coeffs : list of floats
         Coefficients that account for the different norms of operator relations.
     """
 
-    # Get the size of the operator definitions
-    size = spin_system.size
+    # Create empty lists of lists to hold the operator definitions and the coefficients
+    op_defs = []
+    coeffs = []
 
-    # Fill the rest of the operator array with unit operators
-    operators_full = np.array(['E' for _ in range(size)], dtype='<U5')
-    for op, spin in zip(operators, spins):
-        operators_full[spin] = op
+    # Remove spaces from the user input
+    operator = "".join(operator.split())
 
-    # Create empty lists of lists to hold the op_defs and the coefficients
-    op_defs = [[]]
-    coeffs = [[]]
+    # Split the user input into separate product operators
+    prod_ops = re.split(r'(?<=\))\+', operator)
 
-    # Iterate over all of the operator strings
-    for op in operators_full:
+    # Process each product operator separately
+    for prod_op in prod_ops:
 
-        # Get the corresponding integers and coefficients
-        op_ints, op_coeffs = op_def_table[op]
+        # Start from a unit operator
+        op = np.array(['E' for _ in range(spin_system.size)], dtype='<U5')
 
-        # Add each possible value
-        op_defs = [op_def + [op_int] for op_def in op_defs for op_int in op_ints]
-        coeffs = [coeff + [op_coeff] for coeff in coeffs for op_coeff in op_coeffs]
+        # Separate the terms in the product operator
+        op_terms = prod_op.split('*')
 
-    # Convert the operator definition to tuple
-    op_defs = [tuple(op_def) for op_def in op_defs]
+        # Process each term separately
+        for op_term in op_terms:
 
-    # Calculate the coefficients
-    coeffs = [np.prod(coeff) for coeff in coeffs]
+            # Obtain the component and index
+            component_and_index = re.search(r'\(([^)]*)\)', op_term).group(1).split(',')
+
+            # Handle Cartesian and ladder operators
+            if op_term[0] == 'I':
+                component = component_and_index[0]
+                index = int(component_and_index[1])
+                op[index] = f"I_{component}"
+
+            # Handle spherical tensor operators
+            elif op_term[0] == 'T':
+                l = component_and_index[0]
+                q = component_and_index[1]
+                index = int(component_and_index[2])
+                op[index] = f"T_{l}_{q}"
+
+            # Other input types are not supported
+            else:
+                raise ValueError(f"Cannot parse the following invalid operator: {op_term}")
+
+        # Create empty lists of lists to hold the current operator definitions and coefficients
+        op_defs_curr = [[]]
+        coeffs_curr = [[]]
+
+        # Iterate over all of the operator strings
+        for o in op:
+
+            # Get the corresponding integers and coefficients
+            match o:
+
+                case 'E':
+                    op_ints = [0]
+                    op_coeffs = [1]
+
+                case 'I_+':
+                    op_ints = [1]
+                    op_coeffs = [-np.sqrt(2)]
+
+                case 'I_z':
+                    op_ints = [2]
+                    op_coeffs = [1]
+
+                case 'I_-':
+                    op_ints = [3]
+                    op_coeffs = [np.sqrt(2)]
+
+                case 'I_x':
+                    op_ints = [1, 3]
+                    op_coeffs = [-np.sqrt(2)/2, np.sqrt(2)/2]
+
+                case 'I_y':
+                    op_ints = [1, 3]
+                    op_coeffs = [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)]
+
+                # Default case handles spherical tensors
+                case _:
+                    o = o.split('_')
+                    l = int(o[1])
+                    q = int(o[2])
+                    idx = lq_to_idx(l, q)
+                    op_ints = [idx]
+                    op_coeffs = [1]
+
+            # Add each possible value
+            op_defs_curr = [op_def + [op_int] for op_def in op_defs_curr for op_int in op_ints]
+            coeffs_curr = [coeff + [op_coeff] for coeff in coeffs_curr for op_coeff in op_coeffs]
+
+        # Convert the operator definition to tuple
+        op_defs_curr = [tuple(op_def) for op_def in op_defs_curr]
+
+        # Calculate the coefficients
+        coeffs_curr = [np.prod(coeff) for coeff in coeffs_curr]
+
+        # Extend the total lists
+        op_defs.extend(op_defs_curr)
+        coeffs.extend(coeffs_curr)
 
     return op_defs, coeffs

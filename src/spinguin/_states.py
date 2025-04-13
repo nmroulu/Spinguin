@@ -16,9 +16,9 @@ import numpy as np
 import scipy.constants as const
 from scipy.sparse import lil_array, csc_array, issparse
 from spinguin import _la
-from spinguin._operators import op_P
+from spinguin._operators import op_prod
 from spinguin._hamiltonian import hamiltonian
-from spinguin._basis import str_to_op_def, state_idx
+from spinguin._basis import parse_operator_string, state_idx
 from typing import Union
 from functools import lru_cache
 
@@ -69,9 +69,9 @@ def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=Tru
     return rho
 
 @lru_cache(maxsize=128)
-def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[int, tuple], sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def state(spin_system: SpinSystem, operator: str, sparse: bool=False) -> Union[np.ndarray, csc_array]:
     """
-    Generates a state vector from the given operators and spins. The output of the state
+    Generates a state vector from the given operator string. The output of the state
     function corresponds to a density matrix, which is expressed as a linear combination
     of the basis set operators. The output of this function is a column vector, which
     contains the coefficients.
@@ -85,18 +85,15 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
     ----------
     spin_system : SpinSystem
         The spin system for which the state vector is generated.
-    operators : str or tuple
-        Defines the state to be generated. Can be either a string or a tuple of strings.
-        - str :
-            The requested state is generated for each spin specified in `indices`.
-            A sum of the states is returned.
-            For example: 'I_z'
-        - tuple :
-            A product state corresponding to the operators specified in the tuple is
-            generated. Must match the length of `indices`.
-            For example: ('I_+', 'I_-')
-    indices : int or tuple
-        Indices of the spins. Can be either an integer or a tuple of integers.
+    operator : str
+        Defines the state to be generated. The operator string must follow the rules below:
+
+        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
+        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
+        - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
+        - Whitespace will be ignored in the input.
     sparse : bool
         If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
@@ -107,7 +104,6 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
     """
 
     # Extract the necessary information from the spin system
-    basis = spin_system.basis
     dim = spin_system.basis.dim
     mults = spin_system.mults
     spins = spin_system.spins
@@ -115,86 +111,35 @@ def state(spin_system: SpinSystem, operators: Union[str, tuple], indices: Union[
     # Initialize the state vector
     rho = lil_array((dim, 1), dtype=complex)
 
-    # Input is two tuples: Process product states
-    if isinstance(operators, tuple) and isinstance(indices, tuple):
+    # Get the operator definition and coefficients
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
 
-        # Check that the lengths match
-        if len(operators) != len(indices):
-            raise ValueError("If 'operators' and 'indices' are tuples, their lengths must match.")
+    # Get the state indices
+    idxs = [state_idx(spin_system, op_def) for op_def in op_defs]
 
-        # Get the operator definition and coefficients
-        op_defs, coeffs = str_to_op_def(spin_system, operators, indices)
+    # Assign the state
+    for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
 
-        # Get the state indices
-        idxs = [state_idx(spin_system, op_def) for op_def in op_defs]
+        # Find indices of the active and inactive spins
+        idx_active = np.where(np.array(op_def) != 0)[0]
+        idx_inactive = np.where(np.array(op_def) == 0)[0]
 
-        # Assign the state
-        for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
+        # Calculate the norm of the active operator part if there are active spins
+        if len(idx_active) != 0:
+            op_norm = np.linalg.norm(op_prod(op_def, spins, include_unit=False), ord='fro')
 
-            # Find indices of the active and inactive spins
-            idx_active = np.where(np.array(op_def) != 0)[0]
-            idx_inactive = np.where(np.array(op_def) == 0)[0]
+        # Otherwise set it to one
+        else:
+            op_norm = 1
+        
+        # Calculate the norm of the unit operator part
+        unit_norm = np.sqrt(np.prod(mults[idx_inactive]))
 
-            # Calculate the norm of the active operator part if there are active spins
-            if len(idx_active) != 0:
-                op_norm = np.linalg.norm(op_P(op_def, spins, include_unit=False), ord='fro')
+        # Total norm of the operator
+        norm = op_norm * unit_norm
 
-            # Otherwise set it to one
-            else:
-                op_norm = 1
-            
-            # Calculate the norm of the unit operator part
-            unit_norm = np.sqrt(np.prod(mults[idx_inactive]))
-
-            # Total norm of the operator
-            norm = op_norm * unit_norm
-
-            # Set the properly normalized coefficient
-            rho[idx, 0] = coeff * norm
-
-    # Process single-spin states
-    elif isinstance(operators, str):
-
-        # Convert indices to tuple, if not already
-        if not isinstance(indices, tuple):
-            indices = (indices,)
-
-        # Go over the tuple of indices
-        for spin_ind in indices:
-
-            # Get the operator definition and coefficients
-            op_defs, coeffs = str_to_op_def(spin_system, (operators,), (spin_ind,))
-
-            # Get the state indices
-            idxs = [state_idx(spin_system, op_def) for op_def in op_defs]
-
-            # Assign the state
-            for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
-
-                # Find indices of the active and inactive spins
-                idx_active = np.where(np.array(op_def) != 0)[0]
-                idx_inactive = np.where(np.array(op_def) == 0)[0]
-
-                # Calculate the norm of the active operator part if there are active spins
-                if len(idx_active) != 0:
-                    op_norm = np.linalg.norm(op_P(op_def, spins, include_unit=False), ord='fro')
-
-                # Otherwise set it to one
-                else:
-                    op_norm = 1
-                
-                # Calculate the norm of the unit operator part
-                unit_norm = np.sqrt(np.prod(mults[idx_inactive]))
-
-                # Total norm of the operator
-                norm = op_norm * unit_norm
-
-                # Set the properly normalized coefficient
-                rho[idx, 0] = coeff * norm
-
-    # Otherwise erroneous input
-    else:
-        raise ValueError("Operators and indices must be: (str and int), (str and tuple), or (tuple and tuple).")
+        # Set the properly normalized coefficient
+        rho[idx, 0] = coeff * norm
 
     # Convert to csc_array if requesting sparse
     if sparse:
@@ -245,7 +190,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
         op_def = basis[idx]
 
         # Get the normalized product operator in the Zeeman eigenbasis with normalization
-        oper = op_P(op_def, spins, include_unit=True)
+        oper = op_prod(op_def, spins, include_unit=True)
         oper = oper / np.linalg.norm(oper, ord='fro')
         
         # Add to the total density matrix
@@ -253,7 +198,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
     
     return rho_zeeman
 
-def rho_thermal_equilibrium(spin_system: SpinSystem, T: float, B: float, sparse: bool = False, zero_value: float = 1e-18) -> Union[np.ndarray, csc_array]:
+def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool = False, zero_value: float = 1e-18) -> Union[np.ndarray, csc_array]:
     """
     Returns the state vector corresponding to thermal equilibrium.
 
@@ -280,7 +225,7 @@ def rho_thermal_equilibrium(spin_system: SpinSystem, T: float, B: float, sparse:
     mults = spin_system.mults
 
     # Build the left Hamiltonian superoperator
-    H = hamiltonian(spin_system, B, 'left')
+    H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
     P = _la.expm(-const.hbar / (const.k * T) * H, zero_value)
@@ -294,10 +239,10 @@ def rho_thermal_equilibrium(spin_system: SpinSystem, T: float, B: float, sparse:
 
     return rho_eq
 
-def alpha(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def alpha_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the alpha state for a given spin-1/2 nucleus. Other spins in the system
-    are in thermal equilibrium.
+    Generates the alpha state for a given spin-1/2 nucleus. Unit state is assigned to the
+    other spins.
 
     Parameters
     ----------
@@ -320,17 +265,17 @@ def alpha(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np
 
     # Get states
     E = unit_state(spin_system, sparse=sparse, normalized=False)
-    I_z = state(spin_system, 'I_z', index, sparse=sparse)
+    I_z = state(spin_system, f"I(z, {index})", sparse=sparse)
 
     # Make the alpha state
     rho = 1 / dim * E + 2 / dim * I_z
 
     return rho
 
-def beta(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def beta_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the beta state for a given spin-1/2 nucleus. Other spins in the system
-    are in thermal equilibrium.
+    Generates the beta state for a given spin-1/2 nucleus. Unit state is assigned to the
+    other spins.
 
     Parameters
     ----------
@@ -353,17 +298,17 @@ def beta(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.
 
     # Get states
     E = unit_state(spin_system, sparse=sparse, normalized=False)
-    I_z = state(spin_system, 'I_z', index, sparse=sparse)
+    I_z = state(spin_system, f"I(z, {index})", sparse=sparse)
 
     # Make the beta state
     rho = 1 / dim * E - 2 / dim * I_z
 
     return rho
 
-def singlet(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def singlet_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the singlet state between two spin-1/2 nuclei. Other spins in the system
-    are in thermal equilibrium.
+    Generates the singlet state between two spin-1/2 nuclei. Unit state is assigned to the
+    other spins.
 
     Parameters
     ----------
@@ -387,20 +332,20 @@ def singlet(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = 
     dim = np.prod(mults)
 
     # Get states
-    E = state(spin_system, ('E', 'E'), (index_1, index_2), sparse=sparse)
-    IzIz = state(spin_system, ('I_z', 'I_z'), (index_1, index_2), sparse=sparse)
-    IpIm = state(spin_system, ('I_+', 'I_-'), (index_1, index_2), sparse=sparse)
-    ImIp = state(spin_system, ('I_-', 'I_+'), (index_1, index_2), sparse=sparse)
+    E = unit_state(spin_system, sparse=sparse, normalized=False)
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
+    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
 
     # Make the singlet
     rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
 
     return rho
 
-def triplet_zero(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def triplet_zero_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the triplet zero state between two spin-1/2 nuclei. Other spins in the system
-    are in thermal equilibrium.
+    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is assigned to the
+    other spins.
 
     Parameters
     ----------
@@ -424,20 +369,20 @@ def triplet_zero(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bo
     dim = np.prod(mults)
 
     # Get states
-    E = state(spin_system, ('E', 'E'), (index_1, index_2), sparse=sparse)
-    IzIz = state(spin_system, ('I_z', 'I_z'), (index_1, index_2), sparse=sparse)
-    IpIm = state(spin_system, ('I_+', 'I_-'), (index_1, index_2), sparse=sparse)
-    ImIp = state(spin_system, ('I_-', 'I_+'), (index_1, index_2), sparse=sparse)
+    E = unit_state(spin_system, sparse=sparse, normalized=False)
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
+    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
 
     # Make the triplet zero
     rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
 
     return rho
 
-def triplet_plus(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def triplet_plus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the triplet plus state between two spin-1/2 nuclei. Other spins in the system
-    are in thermal equilibrium.
+    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is assigned to the
+    other spins.
 
     Parameters
     ----------
@@ -461,20 +406,20 @@ def triplet_plus(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bo
     dim = np.prod(mults)
 
     # Get states
-    E = state(spin_system, ('E', 'E'), (index_1, index_2), sparse=sparse)
-    IzE = state(spin_system, ('I_z', 'E'), (index_1, index_2), sparse=sparse)
-    EIz = state(spin_system, ('E', 'I_z'), (index_1, index_2), sparse=sparse)
-    IzIz = state(spin_system, ('I_z', 'I_z'), (index_1, index_2), sparse=sparse)
+    E = unit_state(spin_system, sparse=sparse, normalized=False)
+    IzE = state(spin_system, f"I(z, {index_1})", sparse=sparse)
+    EIz = state(spin_system, f"I(z, {index_2})", sparse=sparse)
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
 
     # Make the triplet plus
     rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
-def triplet_minus(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def triplet_minus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
-    Generates the triplet minus state between two spin-1/2 nuclei. Other spins in the system
-    are in thermal equilibrium.
+    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is assigned to the
+    other spins.
 
     Parameters
     ----------
@@ -498,19 +443,19 @@ def triplet_minus(spin_system: SpinSystem, index_1: int, index_2: int, sparse: b
     dim = np.prod(mults)
 
     # Get states
-    E = state(spin_system, ('E', 'E'), (index_1, index_2), sparse=sparse)
-    IzE = state(spin_system, ('I_z', 'E'), (index_1, index_2), sparse=sparse)
-    EIz = state(spin_system, ('E', 'I_z'), (index_1, index_2), sparse=sparse)
-    IzIz = state(spin_system, ('I_z', 'I_z'), (index_1, index_2), sparse=sparse)
+    E = unit_state(spin_system, sparse=sparse, normalized=False)
+    IzE = state(spin_system, f"I(z, {index_1})", sparse=sparse)
+    EIz = state(spin_system, f"I(z, {index_2})", sparse=sparse)
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
 
     # Make the triplet minus
     rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
-def measure(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], operators: Union[str, tuple], indices: Union[int, tuple]) -> complex:
+def measure(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], operator: str) -> complex:
     """
-    Computes the expectation value of the specified operators for a given state vector.
+    Computes the expectation value of the specified operator for a given state vector.
     Assumes that the state vector `rho` represents a trace-normalized density matrix.
 
     Parameters
@@ -532,8 +477,6 @@ def measure(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], operator
             that participates in the product operator is defined in `indices`. Must match
             the length of `indices`.
             For example: ('I_z', 'I_z')
-    indices : int or tuple
-        Indices of the spins. Can be either an integer or a tuple of integers.
 
     Returns
     -------
@@ -542,7 +485,7 @@ def measure(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], operator
     """
 
     # Get the "operator" to be measured
-    oper = state(spin_system, operators, indices, sparse=issparse(rho))
+    oper = state(spin_system, operator, sparse=issparse(rho))
 
     # Perform the measurement
     ex = (oper.conj().T @ rho).trace()

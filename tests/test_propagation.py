@@ -21,20 +21,20 @@ class TestPropagation(unittest.TestCase):
         spin_system = SpinSystem(isotopes, max_spin_order=2)
 
         # Create initial states
-        rho_x = state(spin_system, 'I_x', 0)
-        rho_y = state(spin_system, 'I_y', 0)
-        rho_z = state(spin_system, 'I_z', 0)
-        rho_xz = state(spin_system, ('I_x', 'I_z'), (0, 1))
-        rho_yz = state(spin_system, ('I_y', 'I_z'), (0, 1))
+        rho_x = state(spin_system, "I(x,0)")
+        rho_y = state(spin_system, "I(y,0)")
+        rho_z = state(spin_system, "I(z,0)")
+        rho_xz = state(spin_system, "I(x,0)*I(z,1)")
+        rho_yz = state(spin_system, "I(y,0)*I(z,1)")
 
         # Create pulses
-        pul_90_x = pulse(spin_system, 'I_x', 0, angle=90)
-        pul_90_y = pulse(spin_system, 'I_y', 0, angle=90)
-        pul_90_z = pulse(spin_system, 'I_z', 0, angle=90)
-        pul_180_x = pulse(spin_system, 'I_x', 0, angle=180)
-        pul_180_y = pulse(spin_system, 'I_y', 0, angle=180)
-        pul_180_z = pulse(spin_system, 'I_z', 0, angle=180)
-        pul_180_zz = pulse(spin_system, ['I_z', 'I_z'], [0, 1], angle=180)
+        pul_90_x = pulse(spin_system, "I(x,0)", angle=90)
+        pul_90_y = pulse(spin_system, "I(y,0)", angle=90)
+        pul_90_z = pulse(spin_system, "I(z,0)", angle=90)
+        pul_180_x = pulse(spin_system, "I(x,0)", angle=180)
+        pul_180_y = pulse(spin_system, "I(y,0)", angle=180)
+        pul_180_z = pulse(spin_system, "I(z,0)", angle=180)
+        pul_180_zz = pulse(spin_system, "I(z,0)*I(z,1)", angle=180)
 
         # Verify the results
         self.assertTrue(np.allclose(-rho_y, pul_90_x @ rho_z))

@@ -98,6 +98,8 @@ class SpinSystem:
             - If a `numpy.ndarray`: A 3D array of size (N, 3, 3) containing the 3x3 EFG tensors in atomic units.
             - If a `str`: Path to the file containing the EFG tensors.
 
+        TODO: Merkin määrittely selväksi. (Perttu)
+
         max_spin_order : int
             Defines the maximum spin order included in the basis set.
             If left empty, the spin order is set to the size of the system.

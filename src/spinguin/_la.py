@@ -112,7 +112,7 @@ def expm_custom_dot(A: csc_array, zero_value: float = 1e-24) -> csc_array:
         scaling_factor = 2 ** scaling_count
 
         # Scale the matrix down
-        A /= scaling_factor
+        A = A / scaling_factor
 
         # Calculate the matrix exponential of the scaled matrix using the Taylor series
         expm_A = expm_taylor_custom_dot(A, zero_value)
@@ -211,7 +211,7 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
         scaling_factor = 2 ** scaling_count
 
         # Scale the matrix down
-        A /= scaling_factor
+        A = A / scaling_factor
 
         # Calculate the matrix exponential of the scaled matrix using the Taylor series
         expm_A = expm_taylor(A, zero_value)

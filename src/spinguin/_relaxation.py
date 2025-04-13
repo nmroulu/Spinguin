@@ -2,6 +2,8 @@
 relaxation.py
 
 This module provides functions for calculating relaxation superoperators.
+
+TODO: Random field malli relaksaatioon.
 """
 
 # For referencing the SpinSystem class
@@ -18,8 +20,8 @@ import scipy.constants as const
 from scipy.sparse import csc_array, eye_array, lil_array
 from scipy.special import eval_legendre
 from spinguin import _la, _operators
-from spinguin._basis import idx_to_lq, lq_to_idx, str_to_op_def, state_idx
-from spinguin._hamiltonian import hamiltonian_zeeman
+from spinguin._basis import idx_to_lq, lq_to_idx, parse_operator_string, state_idx
+from spinguin._hamiltonian import hamiltonian
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -342,7 +344,7 @@ def sop_T(spin_system: SpinSystem, l: int, q: int, interaction_type: str, spin_1
         op_def = np.zeros(size, dtype=int)
         op_def[spin_1] = lq_to_idx(l, q)
         op_def = tuple(op_def)
-        sop = _operators.sop_P(spin_system, op_def, 'comm')
+        sop = _operators.sop_prod(spin_system, op_def, 'comm')
 
     # Two-spin bilinear interaction
     elif interaction_type == "DD":
@@ -594,8 +596,8 @@ def sr2k(spin_system: SpinSystem, sop_R: csc_array, B: float) -> csc_array:
     for quad in quadrupolar:
 
         # Find the indices of the longitudinal and transverse states
-        op_def_z, _ = str_to_op_def(spin_system, ['I_z'], [quad])
-        op_def_p, _ = str_to_op_def(spin_system, ['I_+'], [quad])
+        op_def_z, _ = parse_operator_string(spin_system, f"I(z, {quad})")
+        op_def_p, _ = parse_operator_string(spin_system, f"I(+, {quad})")
         idx_long = state_idx(spin_system, op_def_z[0])
         idx_trans = state_idx(spin_system, op_def_p[0])
 
@@ -641,12 +643,14 @@ def relaxation(spin_system: SpinSystem,
                sop_H: csc_array,
                B: float,
                tau_c: float,
+               temperature: float = None,
                include_sr2k: bool = False,
                relative_error: float = 1e-6,
                real_only: bool = True,
                zero_aux: float = 1e-18,
                zero_R: float = 1e-12,
                zero_intr: float = 1e-9,
+               zero_thermalization: float = 1e-18,
                antisymmetric: bool = False) -> csc_array:
     """
     Calculates the relaxation superoperator.
@@ -661,8 +665,11 @@ def relaxation(spin_system: SpinSystem,
         Magnetic field in units of T.
     tau_c : float
         Isotropic rotational correlation time in units of s.
+    temperature : float
+        Default: None. Temperature of the spin bath in Kelvins. If specified, thermalization of the relaxation
+        superoperator is performed automatically.
     include_sr2k : bool
-        Whether to include scalar relaxation of the second kind (SR2K).
+        Default: False. Whether to include scalar relaxation of the second kind (SR2K).
         Applies only for spin systems with quadrupolar nuclei.
     relative_error : float
         Default: 1e-6. Relative error for the integration in the auxiliary matrix method.
@@ -677,8 +684,14 @@ def relaxation(spin_system: SpinSystem,
     zero_intr : float
         Default: 1e-9. Interactions are disregarded if the infinity-norm of the interaction tensor
         (upper limit for the largest eigenvalue) is smaller than this threshold.
+    zero_thermalization : float
+        Default: 1e-18. Used to estimate the convergence of the matrix exponential in the thermalization of
+        the relaxation superoperator.
     antisymmetric : bool
         Default: False. Whether to include rank-1 components for CSA interactions.
+
+    TODO: Automaattinen termalisaatio
+    - jos lämpötila annettu parametrina
 
     Returns
     -------
@@ -754,7 +767,7 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float
     """
 
     # Build the left Zeeman Hamiltonian
-    H = hamiltonian_zeeman(spin_system, B, 'left')
+    H = hamiltonian(spin_system, B, 'left')
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
     P = _la.expm(const.hbar / (const.k * T) * H, zero_value)

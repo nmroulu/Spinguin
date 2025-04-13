@@ -16,7 +16,7 @@ import numpy as np
 import time
 from scipy.sparse import csc_array
 from spinguin import _la
-from spinguin._operators import sop_P
+from spinguin._operators import sop_prod
 
 def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm') -> csc_array:
     """
@@ -56,7 +56,7 @@ def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm') ->
         op_def = tuple(2 if i == n else 0 for i in range(nspins))
 
         # Compute the Zeeman interaction for the current spin
-        sop_Hz = sop_Hz - gammas[n] * B * (1 + chemical_shifts[n] * 1e-6) * sop_P(spin_system, op_def, side)
+        sop_Hz = sop_Hz - gammas[n] * B * (1 + chemical_shifts[n] * 1e-6) * sop_prod(spin_system, op_def, side)
 
     return sop_Hz
 
@@ -104,8 +104,8 @@ def hamiltonian_J_coupling(spin_system: SpinSystem, side: str = 'comm') -> csc_a
 
                 # Compute the J-coupling term
                 sop_Hj += 2 * np.pi * J_couplings[n][k] * (
-                    sop_P(spin_system, op_def_00, side) - 
-                    (sop_P(spin_system, op_def_p1m1, side) + sop_P(spin_system, op_def_m1p1, side))
+                    sop_prod(spin_system, op_def_00, side) - 
+                    (sop_prod(spin_system, op_def_p1m1, side) + sop_prod(spin_system, op_def_m1p1, side))
                 )
 
     return sop_Hj

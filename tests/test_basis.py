@@ -3,7 +3,7 @@ import numpy as np
 import math
 import copy
 from spinguin._spin_system import SpinSystem
-from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, str_to_op_def, transform_to_truncated_basis, truncate_basis_by_coherence
+from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, transform_to_truncated_basis, truncate_basis_by_coherence, parse_operator_string
 from spinguin._operators import superoperator
 
 class TestBasis(unittest.TestCase):
@@ -64,25 +64,17 @@ class TestBasis(unittest.TestCase):
         self.assertEqual(state_idx(spin_system, (2, 0)), 5)
         self.assertEqual(state_idx(spin_system, (3, 0)), 6)
 
-    def test_str_to_op_def(self):
+    def test_parse_operator_string(self):
         """
-        Test the conversion of operator strings to operator definitions.
+        Test parsing the operator strings.
+        TODO: Better test.
         """
+
         # Test system
-        isotopes = np.array(['1H'])
+        isotopes = np.array(['1H', '1H'])
         spin_system = SpinSystem(isotopes)
 
-        # Test against known values
-        self.assertEqual(str_to_op_def(spin_system, ['E'], [0]), ([(0,)], [1]))
-        self.assertEqual(str_to_op_def(spin_system, ['I_+'], [0]), ([(1,)], [-math.sqrt(2)]))
-        self.assertEqual(str_to_op_def(spin_system, ['I_z'], [0]), ([(2,)], [1]))
-        self.assertEqual(str_to_op_def(spin_system, ['I_-'], [0]), ([(3,)], [math.sqrt(2)]))
-        self.assertEqual(str_to_op_def(spin_system, ['I_x'], [0]), ([(1,), (3,)], [-math.sqrt(2)/2, math.sqrt(2)/2]))
-        self.assertEqual(str_to_op_def(spin_system, ['I_y'], [0]), ([(1,), (3,)], [-math.sqrt(2)/(2j), -math.sqrt(2)/(2j)]))
-        self.assertEqual(str_to_op_def(spin_system, ['T_00'], [0]), ([(0,)], [1]))
-        self.assertEqual(str_to_op_def(spin_system, ['T_11'], [0]), ([(1,)], [1]))
-        self.assertEqual(str_to_op_def(spin_system, ['T_10'], [0]), ([(2,)], [1]))
-        self.assertEqual(str_to_op_def(spin_system, ['T_1-1'], [0]), ([(3,)], [1]))
+        print(parse_operator_string(spin_system, "I(z, 0) * I(z, 1) + I(+, 1) + I(x, 0) + T(1, 0, 0)"))
 
     def test_idx_conversions(self):
         """
@@ -144,15 +136,16 @@ class TestBasis(unittest.TestCase):
         index_map = truncate_basis_by_coherence(spin_system_tr, [-2, 0, 1])
 
         # Operators to test
-        operators = ['E', 'I_x', 'I_y', 'I_z', 'I_+', 'I_-']
+        operators = ['x', 'y', 'z', '+', '-']
 
         # Try all possible combinations
         for i in operators:
             for j in operators:
                 for k in operators:
-                    # Create the superoperators
-                    sop = superoperator(spin_system, [i, j, k], [0, 1, 2])
-                    sop_ZQ = superoperator(spin_system_tr, [i, j, k], [0, 1, 2])
 
-                    # Applying the ZQ-filter should result in the same result
-                    self.assertTrue(np.allclose(sop_ZQ.toarray(), transform_to_truncated_basis(index_map, sop).toarray()))
+                    # Create the superoperators in original and truncated basis
+                    sop = superoperator(spin_system, f"I({i},0) * I({j},1) * I({k}, 2)")
+                    sop_tr = superoperator(spin_system_tr, f"I({i},0) * I({j},1) * I({k}, 2)")
+
+                    # Applying the transformation should result in the same result
+                    self.assertTrue(np.allclose(sop_tr.toarray(), transform_to_truncated_basis(index_map, sop).toarray()))

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 # Imports
 import time
 import numpy as np
+import warnings
 from scipy.sparse import csc_array
 from spinguin import _la
 from spinguin._operators import superoperator
@@ -54,6 +55,10 @@ def propagator(t: float,
     -------
     exp_Lt : csc_array or numpy.ndarray
         Time propagator exp[(-iH - R)*t].
+
+    TODO: Inputtina vain Liouvillian. Erillinen liouvillian() funktio.
+    TODO: L ensin, sitten t.
+    TODO: Väliaikatietoja (expm funktioihin - mahdollisuus hiljentää output)
     """
 
     print("Constructing propagator...") # NOTE: Perttu's edit
@@ -91,29 +96,23 @@ def propagator(t: float,
 
     return expm_Lt
 
-# TODO: Update this
-def pulse(spin_system: SpinSystem, operators: Union[str, list], indices: Union[int, list], angle: float, zero_value: float = 1e-18) -> csc_array:
+def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: float = 1e-18) -> csc_array:
     """
     Generates a superoperator corresponding to the pulse described
-    by the given operator, list of spin indices, and angle.
+    by the given operator and angle.
 
     Parameters
     ----------
     spin_system : SpinSystem
         The spin system on which the pulse is applied.
-    operators : str or list
-        Defines the pulse to be generated. Can be either a string or a list of strings.
-        - str :
-            A superoperator is generated for each spin specified in `indices`, and the
-            sum of the operators is used to generate the pulse superoperator.
-            For example: 'I_z'
-        - list :
-            A product superoperator is generated based on the operators specified in the list.
-            The pulse superoperator is then constructed. The length of the list must match
-            the length of `indices`.
-            For example: ['I_+', 'I_-']
-    indices : int or list
-        Indices of the spins to which the pulse will be applied.
+    operator : str
+        Defines the operator to be generated. The operator string must follow the rules below:
+
+        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
+        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
+        - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
+        - Whitespace will be ignored in the input.
     angle : float
         Pulse angle in degrees.
     zero_value : float, optional
@@ -126,8 +125,12 @@ def pulse(spin_system: SpinSystem, operators: Union[str, list], indices: Union[i
         Superoperator corresponding to the applied pulse.
     """
 
+    # Show a warning if pulse is generated using a product operator
+    if '*' in operator:
+        warnings.warn("Applying a pulse using a product operator does not have a well-defined angle.")
+
     # Generate the operator
-    op = superoperator(spin_system, operators, indices)
+    op = superoperator(spin_system, operator)
 
     # Convert the angle to radians
     angle = angle / 180 * np.pi

@@ -11,7 +11,6 @@ Source: https://www.kherb.io/docs/nmr_table.html
 If your isotope is not listed, you can add it by following the format of the existing entries.
 """
 
-# TODO: Into Hz
 ISOTOPES = {
     '1H': [0.5, 42.577478615342585, 0],
     '2D': [1.0, 6.5359028540009305, 0],
