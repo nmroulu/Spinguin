@@ -107,6 +107,9 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: floa
         Superoperator corresponding to the applied pulse.
     """
 
+    time_start = time.time()
+    print("Creating a pulse superoperator...")
+
     # Show a warning if pulse is generated using a product operator
     if '*' in operator:
         warnings.warn("Applying a pulse using a product operator does not have a well-defined angle.")
@@ -118,6 +121,8 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: floa
     angle = angle / 180 * np.pi
 
     # Construct the pulse propagator
-    pul = _la.expm(-1j * angle * op, zero_value)
+    pul = _la.expm(-1j * angle * op, zero_value, disable_output=True)
+
+    print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 
     return pul
