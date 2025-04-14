@@ -18,25 +18,21 @@ import warnings
 from scipy.sparse import csc_array
 from spinguin import _la
 from spinguin._operators import superoperator
-from typing import Union
 
-def propagator(t: float,
-               H: csc_array = None,
-               R: csc_array = None,
+def propagator(L: csc_array,
+               t: float,
                zero_value: float = 1e-18,
                density_threshold: float = 0.5,
-               custom_dot: bool = False) -> Union[csc_array, np.ndarray]:
+               custom_dot: bool = False) -> csc_array | np.ndarray:
     """
     Constructs the time propagator.
     
     Parameters
     ----------
+    L : csc_array
+        Liouvillian superoperator, L = -iH - R + K.
     t : float
         Time step of the simulation in seconds.
-    H : csc_array, optional
-        SciPy sparse array containing the Hamiltonian superoperator.
-    R : csc_array, optional
-        SciPy sparse array containing the relaxation superoperator.
     zero_value : float, optional
         Default: 1e-18. Values smaller than zero_value are treated as zero
         in the matrix exponential. Larger values improve performance by increasing sparsity.
@@ -54,25 +50,11 @@ def propagator(t: float,
     Returns
     -------
     exp_Lt : csc_array or numpy.ndarray
-        Time propagator exp[(-iH - R)*t].
-
-    TODO: Inputtina vain Liouvillian. Erillinen liouvillian() funktio.
-    TODO: L ensin, sitten t.
-    TODO: Väliaikatietoja (expm funktioihin - mahdollisuus hiljentää output)
+        Time propagator exp[L*t].
     """
 
-    print("Constructing propagator...") # NOTE: Perttu's edit
+    print("Constructing propagator...")
     time_start = time.time()
-
-    # Compute the total Liouvillian. Handle cases where either H or R is None.
-    if H is None and R is None:
-        raise ValueError("Both H and R cannot be None.")
-    elif H is None:
-        L = -R
-    elif R is None:
-        L = -1j * H
-    else:
-        L = -1j * H - R
 
     # Compute the matrix exponential
     if custom_dot:
@@ -84,14 +66,14 @@ def propagator(t: float,
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
 
     # print(f"Propagator density: {density}")
-    print(f"Propagator density: {density:.4f}") # NOTE: Perttu's edit
+    print(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
     if density > density_threshold:
         print("Density exceeds threshold. Converting to NumPy array.")
         expm_Lt = expm_Lt.toarray()
 
-    print(f'Propagator constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
+    print(f'Propagator constructed in {time.time() - time_start:.4f} seconds.')
     print()
 
     return expm_Lt
