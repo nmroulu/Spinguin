@@ -666,8 +666,8 @@ def relaxation(spin_system: SpinSystem,
     tau_c : float
         Isotropic rotational correlation time in units of s.
     temperature : float
-        Default: None. Temperature of the spin bath in Kelvins. If specified, thermalization of the relaxation
-        superoperator is performed automatically.
+        Default: None. Temperature of the spin bath in Kelvins. If specified, Levitt-Di Bari
+        thermalization of the relaxation superoperator is performed automatically.
     include_sr2k : bool
         Default: False. Whether to include scalar relaxation of the second kind (SR2K).
         Applies only for spin systems with quadrupolar nuclei.
@@ -685,13 +685,10 @@ def relaxation(spin_system: SpinSystem,
         Default: 1e-9. Interactions are disregarded if the infinity-norm of the interaction tensor
         (upper limit for the largest eigenvalue) is smaller than this threshold.
     zero_thermalization : float
-        Default: 1e-18. Used to estimate the convergence of the matrix exponential in the thermalization of
-        the relaxation superoperator.
+        Default: 1e-18. Used to estimate the convergence of the matrix exponential in the
+        thermalization of the relaxation superoperator.
     antisymmetric : bool
         Default: False. Whether to include rank-1 components for CSA interactions.
-
-    TODO: Automaattinen termalisaatio
-    - jos lämpötila annettu parametrina
 
     Returns
     -------
@@ -700,7 +697,7 @@ def relaxation(spin_system: SpinSystem,
     """
 
     time_start = time.time()
-    print('Constructing relaxation superoperator...') # NOTE: Perttu's edit
+    print('Constructing relaxation superoperator...')
 
     # Get the incoherent interactions
     dd_tensors = dd_coupling_tensors(spin_system)
@@ -738,7 +735,11 @@ def relaxation(spin_system: SpinSystem,
     # Remove small elements from the relaxation superoperator
     _la.increase_sparsity(sop_R, zero_R)
 
-    print(f'Relaxation superoperator constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
+    # Apply thermalization, if temperature is supplied
+    if temperature is not None:
+        sop_R = ldb_thermalization(spin_system, sop_R, B, temperature, zero_thermalization)
+
+    print(f'Relaxation superoperator constructed in {time.time() - time_start:.4f} seconds.')
     print()
 
     return sop_R
@@ -767,7 +768,7 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float
     """
 
     # Build the left Zeeman Hamiltonian
-    H = hamiltonian(spin_system, B, 'left')
+    H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
     P = _la.expm(const.hbar / (const.k * T) * H, zero_value)
