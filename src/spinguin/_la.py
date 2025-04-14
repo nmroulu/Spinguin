@@ -12,10 +12,10 @@ from scipy.io import mmwrite, mmread
 from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
-from typing import Union, Tuple
+from typing import Tuple
 from spinguin.sparse_dot import sparse_dot as spdotcy
 
-def isvector(v: Union[csc_array, np.ndarray], ord: str = "col") -> bool:
+def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
     """
     Checks if the given array is a vector.
 
@@ -47,7 +47,7 @@ def isvector(v: Union[csc_array, np.ndarray], ord: str = "col") -> bool:
     # Check whether the array is a vector
     return v.shape[i] == 1
 
-def norm_1(A: Union[csc_array, np.ndarray], ord: str = 'row') -> float:
+def norm_1(A: csc_array | np.ndarray, ord: str = 'row') -> float:
     """
     Calculates the 1-norm of a matrix.
 
@@ -75,7 +75,7 @@ def norm_1(A: Union[csc_array, np.ndarray], ord: str = 'row') -> float:
     # Calculate sums along rows or columns and get the maximum of them
     return abs(A).sum(axis).max()
 
-def expm_custom_dot(A: csc_array, zero_value: float = 1e-24) -> csc_array:
+def expm_custom_dot(A: csc_array, zero_value: float = 1e-24, disable_output: bool = False) -> csc_array:
     """
     Calculates the matrix exponential of a SciPy sparse CSC array using the
     scaling and squaring method with the Taylor series, shown to be the fastest
@@ -94,12 +94,17 @@ def expm_custom_dot(A: csc_array, zero_value: float = 1e-24) -> csc_array:
         Default: 1e-24. Values below this threshold are considered zero. Used to
         increase the sparsity of the result and estimate the convergence of the
         Taylor series.
+    disable_output : bool
+        Default: False. If set to True, printing to the console will be disabled.
 
     Returns
     -------
     expm_A : csc_array
         Matrix exponential of `A`.
     """
+
+    if not disable_output:
+        print("Calculating the matrix exponential...")
 
     # Calculate the norm of A
     norm_A = norm_1(A, ord='col')
@@ -111,23 +116,31 @@ def expm_custom_dot(A: csc_array, zero_value: float = 1e-24) -> csc_array:
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2 ** scaling_count
 
+        if not disable_output:
+            print(f"Scaling the matrix down by {scaling_factor}.")
+
         # Scale the matrix down
         A = A / scaling_factor
 
         # Calculate the matrix exponential of the scaled matrix using the Taylor series
-        expm_A = expm_taylor_custom_dot(A, zero_value)
+        expm_A = expm_taylor_custom_dot(A, zero_value, disable_output)
 
         # Scale the matrix exponential back up by repeated squaring
-        for _ in range(scaling_count):
+        for i in range(scaling_count):
+            if not disable_output:
+                print(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
             expm_A = sparse_dot(expm_A, expm_A, zero_value)
     
     # If the norm of the matrix is small, proceed without scaling
     else:
-        expm_A = expm_taylor_custom_dot(A, zero_value)
+        expm_A = expm_taylor_custom_dot(A, zero_value, disable_output)
+
+    if not disable_output:
+        print("Matrix exponential completed.\n")
 
     return expm_A
 
-def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
+def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24, disable_output: bool=False) -> csc_array:
     """
     Computes the matrix exponential using the Taylor series. This function is 
     adapted from an older SciPy version.
@@ -142,12 +155,17 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
     zero_value : float
         Default: 1e-24. Values below this threshold are considered zero. Used to 
         increase sparsity and check the convergence of the series.
+    disable_output : bool
+        Default: False. If set to True, printing to the console will be disabled.
 
     Returns
     -------
     eA : csc_array
         Matrix exponential of A.
     """
+
+    if not disable_output:
+        print("Calculating the matrix exponential using Taylor series.")
 
     # Increase sparsity of A
     increase_sparsity(A, zero_value)
@@ -163,6 +181,9 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
     cont = True
     while cont:
 
+        if not disable_output:
+            print(f"Taylor series term: {k}")
+
         # Get the next term
         trm = sparse_dot(trm, A / k, zero_value)
 
@@ -175,9 +196,12 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24) -> csc_array:
         # Continue if the convergence criterion is not met
         cont = (trm.nnz != 0)
 
+    if not disable_output:
+        print("Taylor series converged.")
+
     return eA
 
-def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_array, np.ndarray]:
+def expm(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: bool=False) -> csc_array | np.ndarray:
     """
     Calculates the matrix exponential of a SciPy sparse or NumPy array using 
     the scaling and squaring method with the Taylor series. This method was 
@@ -193,12 +217,17 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
         Default: 1e-24. Values below this threshold are considered zero. Used to 
         increase sparsity of the result and estimate the convergence of the 
         Taylor series.
+    disable_output : bool
+        Default: False. If set to True, printing to the console will be disabled.
 
     Returns
     -------
     expm_A : csc_array or numpy.ndarray
         Matrix exponential of `A`.
     """
+
+    if not disable_output:
+        print("Calculating the matrix exponential...")
 
     # Calculate the norm of A
     norm_A = norm_1(A, ord='col')
@@ -210,14 +239,20 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2 ** scaling_count
 
+        if not disable_output:
+            print(f"Scaling the matrix down by {scaling_factor}.")
+
         # Scale the matrix down
         A = A / scaling_factor
 
         # Calculate the matrix exponential of the scaled matrix using the Taylor series
-        expm_A = expm_taylor(A, zero_value)
+        expm_A = expm_taylor(A, zero_value, disable_output)
 
         # Scale the matrix exponential back up by repeated squaring
-        for _ in range(scaling_count):
+        for i in range(scaling_count):
+
+            if not disable_output:
+                print(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
 
             # Multiply the matrix exponential with itself
             expm_A = expm_A @ expm_A
@@ -230,15 +265,18 @@ def expm(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_
     else:
 
         # Calculate the matrix exponential using the Taylor series
-        expm_A = expm_taylor(A, zero_value)
+        expm_A = expm_taylor(A, zero_value, disable_output)
 
         # Increase sparsity of the result if using sparse matrices
         if issparse(expm_A):
             increase_sparsity(expm_A, zero_value)
 
+    if not disable_output:
+        print("Matrix exponential completed.\n")
+
     return expm_A
 
-def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Union[csc_array, np.ndarray]:
+def expm_taylor(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: bool=False) -> csc_array | np.ndarray:
     """
     Computes the matrix exponential using the Taylor series. This function is 
     adapted from an older SciPy version.
@@ -249,13 +287,18 @@ def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Uni
         Matrix (N, N) to be exponentiated.
     zero_value : float
         Default: 1e-24. Values below this threshold are considered zero. Used to 
-        increase sparsity and check the convergence of the series. 
+        increase sparsity and check the convergence of the series.
+    disable_output : bool
+        Default: False. If set to True, printing to the console will be disabled.
 
     Returns
     -------
     eA : csc_array or numpy.ndarray
         Matrix exponential of A.
     """
+
+    if not disable_output:
+        print("Calculating the matrix exponential using Taylor series.")
 
     # Increase sparsity of A if using sparse matrices
     if issparse(A):
@@ -276,6 +319,9 @@ def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Uni
     cont = True
     while cont:
 
+        if not disable_output:
+            print(f"Taylor series term: {k}")
+
         # Get the next term
         trm = trm @ (A / k)
 
@@ -294,6 +340,9 @@ def expm_taylor(A: Union[csc_array, np.ndarray], zero_value: float=1e-24) -> Uni
             cont = (trm.nnz != 0)
         else:
             cont = np.any(np.abs(trm) > zero_value)
+
+    if not disable_output:
+        print("Taylor series converged.")
 
     return eA
 
@@ -364,7 +413,7 @@ def bytes_to_sparse(A_bytes: bytes) -> csc_array:
 
     return A
 
-def comm(A: Union[csc_array, np.ndarray], B: Union[csc_array, np.ndarray]) -> Union[csc_array, np.ndarray]:
+def comm(A: csc_array | np.ndarray, B: csc_array | np.ndarray) -> csc_array | np.ndarray:
     """
     Calculates the commutator [A, B] of two operators.
 
@@ -460,7 +509,7 @@ def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, ze
                        [empty_array, C]], format='csc')
 
     # Compute the matrix exponential of the auxiliary matrix
-    expm_aux = expm(aux * t, zero_value)
+    expm_aux = expm(aux * t, zero_value, disable_output=True)
 
     return expm_aux
 
