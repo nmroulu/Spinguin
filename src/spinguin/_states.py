@@ -228,7 +228,7 @@ def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool 
     H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = _la.expm(-const.hbar / (const.k * T) * H, zero_value)
+    P = _la.expm(-const.hbar / (const.k * T) * H, zero_value, disable_output=True)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)
