@@ -4,6 +4,7 @@ from spinguin._chem import *
 from spinguin._data_io import *
 from spinguin._hamiltonian import *
 from spinguin._la import *
+from spinguin._liouvillian import *
 from spinguin._nmr_isotopes import *
 from spinguin._operators import *
 from spinguin._propagation import *
