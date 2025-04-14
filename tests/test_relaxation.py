@@ -4,6 +4,7 @@ from spinguin._spin_system import SpinSystem
 from spinguin import _hamiltonian, _propagation, _relaxation, _states
 from spinguin._nmr_isotopes import ISOTOPES
 from spinguin._basis import truncate_basis_by_coherence, transform_to_truncated_basis
+from spinguin._liouvillian import liouvillian
 
 class TestRelaxation(unittest.TestCase):
 
@@ -83,7 +84,8 @@ class TestRelaxation(unittest.TestCase):
 
         # Get the Hamiltonian and relaxation superoperator
         H = _hamiltonian.hamiltonian(spin_system, field)
-        R = _relaxation.relaxation(spin_system, H, field, tau_c)
+        R = _relaxation.relaxation(spin_system, H, field, tau_c, temp)
+        L = liouvillian(H, R)
 
         # Create the thermal equilibrium state
         rho = _states.equilibrium_state(spin_system, temp, field)
@@ -94,13 +96,10 @@ class TestRelaxation(unittest.TestCase):
 
         # Switch to the zero-quantum (ZQ) subspace
         ZQ_map = truncate_basis_by_coherence(spin_system, [0])
-        H, R, rho = transform_to_truncated_basis(ZQ_map, H, R, rho)
-
-        # Thermalize the relaxation superoperator
-        R = _relaxation.ldb_thermalization(spin_system, R, field, temp)
+        L, rho = transform_to_truncated_basis(ZQ_map, L, rho)
 
         # Get the propagator
-        P = _propagation.propagator(time_step, H, R)
+        P = _propagation.propagator(L, time_step)
         
         # Simulate the evolution of the spin system
         for _ in range(nsteps):

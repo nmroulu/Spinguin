@@ -63,13 +63,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                       [7, 8, 9]])
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(_la.expm(A, 1e-32), expm(A)))
+        self.assertTrue(np.allclose(_la.expm(A, 1e-32, disable_output=True), expm(A)))
 
         # Perform the same test with a SciPy sparse array
         A = csc_array(A)
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(_la.expm(A, 1e-32).toarray(), expm(A).toarray()))
+        self.assertTrue(np.allclose(_la.expm(A, 1e-32, disable_output=True).toarray(), expm(A).toarray()))
 
     def test_expm_custom_dot(self):
 
@@ -79,7 +79,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                        [7, 8, 9]])
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(_la.expm_custom_dot(A, 1e-32).toarray(), expm(A).toarray()))
+        self.assertTrue(np.allclose(_la.expm_custom_dot(A, 1e-32, disable_output=True).toarray(), expm(A).toarray()))
 
     def test_increase_sparsity(self):
 
@@ -166,13 +166,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         bot_r1 = expm_aux[A.shape[0]:, A.shape[1]:].toarray()
 
         # Compute the components manually
-        top_l2 = _la.expm(A*T).toarray()
+        top_l2 = _la.expm(A*T, disable_output=True).toarray()
         top_r2 = csc_array(A.shape, dtype=complex)
         for t in np.linspace(0, T, 1000):
-            top_r2 += _la.expm(-A*t) @ B @ _la.expm(C*t) * (1/1000)
-        top_r2 = (_la.expm(A*T) @ top_r2).toarray()
+            top_r2 += _la.expm(-A*t, disable_output=True) @ B @ _la.expm(C*t, disable_output=True) * (1/1000)
+        top_r2 = (_la.expm(A*T, disable_output=True) @ top_r2).toarray()
         bot_l2 = np.zeros_like(bot_l1)
-        bot_r2 = _la.expm(C*T).toarray()
+        bot_r2 = _la.expm(C*T, disable_output=True).toarray()
 
         # Verify the components
         self.assertTrue(np.allclose(top_l1, top_l2))
