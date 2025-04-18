@@ -60,6 +60,48 @@ def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm') ->
 
     return sop_Hz
 
+def hamiltonian_zeeman_0(spin_system: SpinSystem, B: float, side: str = 'comm') -> csc_array:
+    """
+    Computes the Hamiltonian superoperator for the Zeeman interaction with zero chemical shifts,
+    corresponding to bare nuclei (no shielding).
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        The spin system object containing information about the spins.
+    B : float
+        Magnetic field strength in Tesla (T).
+    side : str
+        Specifies the type of superoperator:
+        - 'comm' -- commutation superoperator (default)
+        - 'left' -- left superoperator
+        - 'right' -- right superoperator
+
+    Returns
+    -------
+    sop_Hz : csc_array
+        The Hamiltonian superoperator for the Zeeman interaction with zero chemical shifts.
+    """
+
+    # Extract relevant information from the spin system
+    dim = spin_system.basis.dim
+    nspins = spin_system.size
+    gammas = spin_system.gammas
+
+    # Initialize the Hamiltonian
+    sop_Hz = csc_array((dim, dim), dtype=complex)
+
+    # Iterate over each spin in the system
+    for n in range(nspins):
+
+        # Define the operator for the Z term of the nth spin
+        op_def = tuple(2 if i == n else 0 for i in range(nspins))
+
+        # Compute the Zeeman interaction for the current spin
+        sop_Hz = sop_Hz - gammas[n] * B * sop_prod(spin_system, op_def, side)
+
+    return sop_Hz
+
 def hamiltonian_J_coupling(spin_system: SpinSystem, side: str = 'comm') -> csc_array:
     """
     Computes the J-coupling term of the Hamiltonian.

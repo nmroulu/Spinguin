@@ -18,21 +18,33 @@ import warnings
 from scipy.sparse import csc_array
 from spinguin import _la
 from spinguin._operators import superoperator
+from spinguin._hamiltonian import hamiltonian_zeeman_0
 
 def propagator(L: csc_array,
                t: float,
+               rotating_frame: bool = False,
+               spin_system: SpinSystem = None,
+               B: float = None,
                zero_value: float = 1e-18,
                density_threshold: float = 0.5,
                custom_dot: bool = False) -> csc_array | np.ndarray:
     """
-    Constructs the time propagator.
-    
+    Constructs the time propagator, with an optional transformation to the rotating frame.
+
     Parameters
     ----------
     L : csc_array
         Liouvillian superoperator, L = -iH - R + K.
     t : float
         Time step of the simulation in seconds.
+    rotating_frame : bool, optional
+        Default: False. If True, transforms the propagator to the rotating frame
+        with respect to the bare-nucleus Zeeman Hamiltonian.
+    spin_system : SpinSystem, optional
+        Required if rotating_frame is True. The spin system object containing
+        information about the spins.
+    B : float, optional
+        Required if rotating_frame is True. Magnetic field strength in Tesla (T).
     zero_value : float, optional
         Default: 1e-18. Values smaller than zero_value are treated as zero
         in the matrix exponential. Larger values improve performance by increasing sparsity.
@@ -46,11 +58,11 @@ def propagator(L: csc_array,
         using the default SciPy implementation. If True, the custom implementation is used,
         which removes small values during computation. The custom implementation is
         parallelized using OpenMP.
-        
+
     Returns
     -------
     exp_Lt : csc_array or numpy.ndarray
-        Time propagator exp[L*t].
+        Time propagator exp[L*t], optionally transformed to the rotating frame.
     """
 
     print("Constructing propagator...")
@@ -64,14 +76,28 @@ def propagator(L: csc_array,
 
     # Calculate the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
-
-    # print(f"Propagator density: {density}")
     print(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
     if density > density_threshold:
         print("Density exceeds threshold. Converting to NumPy array.")
         expm_Lt = expm_Lt.toarray()
+
+    # Apply rotating frame transformation if requested
+    if rotating_frame:
+        if spin_system is None or B is None:
+            raise ValueError("spin_system and B must be provided when rotating_frame is True.")
+        
+        print("Applying rotating frame transformation...")
+        H0 = hamiltonian_zeeman_0(spin_system, B)
+
+        if custom_dot:
+            expm_H0t = _la.expm_custom_dot(1j * H0 * t, zero_value, disable_output=True)
+        else:
+            expm_H0t = _la.expm(1j * H0 * t, zero_value, disable_output=True)
+
+        expm_Lt = expm_H0t @ expm_Lt
+        print("Rotating frame transformation applied.")
 
     print(f'Propagator constructed in {time.time() - time_start:.4f} seconds.')
     print()
@@ -126,3 +152,52 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: floa
     print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 
     return pul
+
+def rotating_frame_timestep(spin_system: SpinSystem,
+                            B: float,
+                            safety_factor: float = 1.2,
+                            return_bandwidth: bool = False) -> float | tuple[float, float]:
+    """
+    Computes the time step for a spectrum simulation in the rotating frame
+    based on the resonance frequencies of the spins and the spectrometer frequency.
+    Optionally returns the bandwidth as well.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        The spin system object containing information about the spins.
+    B : float
+        Magnetic field strength in Tesla (T).
+    safety_factor : float, optional
+        Default: 1.0. A factor to scale the bandwidth for safety.
+    return_bandwidth : bool, optional
+        Default: False. If True, also returns the bandwidth in rad/s.
+
+    Returns
+    -------
+    float or tuple[float, float]
+        The time step in seconds. If return_bandwidth is True, also returns the bandwidth in rad/s.
+    """
+    # Extract relevant parameters from the spin system
+    cs = spin_system.chemical_shifts
+    ys = spin_system.gammas
+
+    # Compute the resonance frequencies with respect to the spectrometer frequency
+    resonance_frequencies = [(-ys[i] * B * cs[i] * 1e-6) for i in range(spin_system.size)]
+
+    # Get the most negative and most positive resonance frequencies
+    min_freq = min(resonance_frequencies)
+    max_freq = max(resonance_frequencies)
+
+    # Calculate the bandwidth
+    bandwidth = abs(max_freq - min_freq)
+
+    # Apply the safety factor
+    bandwidth *= safety_factor
+
+    # Calculate the time step (Nyquist criterion)
+    time_step = 1 / (4 * bandwidth)
+
+    if return_bandwidth:
+        return time_step, bandwidth
+    return time_step

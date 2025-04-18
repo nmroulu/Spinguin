@@ -9,6 +9,7 @@ import math
 import numpy as np
 from scipy.sparse import eye_array, csc_array, block_array, issparse
 from scipy.io import mmwrite, mmread
+from scipy.signal import find_peaks
 from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
@@ -136,7 +137,7 @@ def expm_custom_dot(A: csc_array, zero_value: float = 1e-24, disable_output: boo
         expm_A = expm_taylor_custom_dot(A, zero_value, disable_output)
 
     if not disable_output:
-        print("Matrix exponential completed.\n")
+        print("Matrix exponential completed.")
 
     return expm_A
 
@@ -272,7 +273,7 @@ def expm(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: boo
             increase_sparsity(expm_A, zero_value)
 
     if not disable_output:
-        print("Matrix exponential completed.\n")
+        print("Matrix exponential completed.")
 
     return expm_A
 
@@ -751,3 +752,104 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float = 1e-24) -> csc_arr
     C = csc_array((C_data, C_indices, C_indptr), shape=(A_nrows, B_ncols))
 
     return C
+
+def fourier_transform(signal: np.ndarray, dt: float, normalize: bool = True) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Computes the Fourier transform of a given time-domain signal and returns 
+    the corresponding frequency-domain representation. The Fourier transform 
+    can be normalized to ensure consistent peak intensities regardless of the time step.
+
+    Parameters
+    ----------
+    signal : numpy.ndarray
+        Input signal in the time domain.
+    dt : float
+        Time step between consecutive samples in the signal.
+    normalize : bool
+        Whether to normalize the Fourier transform. Default is True.
+
+    Returns
+    -------
+    freqs : numpy.ndarray
+        Frequencies corresponding to the Fourier-transformed signal.
+    fft_signal : numpy.ndarray
+        Fourier-transformed signal in the frequency domain (normalized if specified).
+    """
+    # Compute the frequencies
+    freqs = np.fft.fftfreq(len(signal), dt)
+
+    # Compute the Fourier transform
+    fft_signal = np.fft.fft(signal)
+
+    # Normalize the Fourier transform if specified
+    if normalize:
+        fft_signal = fft_signal * dt
+
+    # Apply frequency shifting
+    freqs = np.fft.fftshift(freqs)
+    fft_signal = np.fft.fftshift(fft_signal)
+
+    return freqs, fft_signal
+
+def spectrum(signal: np.ndarray, dt: float, normalize: bool = True, part: str = "real") -> Tuple[np.ndarray, np.ndarray]:
+    """
+    A wrapper function for the Fourier transform. Computes the Fourier transform
+    and returns the frequency and spectrum (either the real or imaginary part of 
+    the Fourier transform).
+
+    Parameters
+    ----------
+    signal : numpy.ndarray
+        Input signal in the time domain.
+    dt : float
+        Time step between consecutive samples in the signal.
+    normalize : bool
+        Whether to normalize the Fourier transform. Default is True.
+    part : str
+        Specifies which part of the Fourier transform to return. Can be "real" 
+        or "imag". Default is "real".
+
+    Returns
+    -------
+    freqs : numpy.ndarray
+        Frequencies corresponding to the Fourier-transformed signal.
+    spectrum : numpy.ndarray
+        Specified part (real or imaginary) of the Fourier-transformed signal 
+        in the frequency domain.
+    """
+    # Compute the Fourier transform
+    freqs, fft_signal = fourier_transform(signal, dt, normalize=normalize)
+
+    # Get the specified part of the Fourier transform
+    if part == "real":
+        spectrum = np.real(fft_signal)
+    elif part == "imag":
+        spectrum = np.imag(fft_signal)
+    else:
+        raise ValueError("Invalid value for 'part'. Must be 'real' or 'imag'.")
+
+    return freqs, spectrum
+
+def frequency_to_chemical_shift(frequency: float | np.ndarray, 
+                                reference_frequency: float,
+                                spectrometer_frequency: float) -> float | np.ndarray:
+    """
+    Converts a frequency (or an array of frequencies, e.g., a frequency axis) to a
+    chemical shift value based on the reference frequency and the spectrometer
+    frequency.
+
+    Parameters
+    ----------
+    frequency : float or numpy.ndarray
+        Frequency (or array of frequencies) to convert [in Hz].
+    reference_frequency : float
+        Reference frequency for the conversion [in Hz].
+    spectrometer_frequency : float
+        Spectrometer frequency for the conversion [in Hz].
+
+    Returns
+    -------
+    chemical_shift : float or numpy.ndarray
+        Converted chemical shift value (or array of values).
+    """
+    return (frequency - reference_frequency) / spectrometer_frequency * 1e6
