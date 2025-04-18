@@ -153,14 +153,15 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: floa
 
     return pul
 
-def rotating_frame_timestep(spin_system: SpinSystem,
-                            B: float,
-                            safety_factor: float = 1.2,
-                            return_bandwidth: bool = False) -> float | tuple[float, float]:
+def spectrum_timestep(spin_system: SpinSystem,
+                      B: float,
+                      safety_factor: float = 1.2,
+                      rotating_frame: bool = False,
+                      return_bandwidth: bool = False) -> float | tuple[float, float]:
     """
-    Computes the time step for a spectrum simulation in the rotating frame
-    based on the resonance frequencies of the spins and the spectrometer frequency.
-    Optionally returns the bandwidth as well.
+    Computes the time step for a spectrum simulation based on the resonance frequencies
+    of the spins and the spectrometer frequency. Optionally includes the bare-nucleus
+    Zeeman frequencies if not in the rotating frame. Optionally returns the bandwidth as well.
 
     Parameters
     ----------
@@ -169,7 +170,10 @@ def rotating_frame_timestep(spin_system: SpinSystem,
     B : float
         Magnetic field strength in Tesla (T).
     safety_factor : float, optional
-        Default: 1.0. A factor to scale the bandwidth for safety.
+        Default: 1.2. A factor to scale the bandwidth for safety.
+    rotating_frame : bool, optional
+        Default: False. If True, uses the resonance frequencies in the rotating frame.
+        If False, includes the bare-nucleus Zeeman frequencies.
     return_bandwidth : bool, optional
         Default: False. If True, also returns the bandwidth in rad/s.
 
@@ -182,8 +186,12 @@ def rotating_frame_timestep(spin_system: SpinSystem,
     cs = spin_system.chemical_shifts
     ys = spin_system.gammas
 
-    # Compute the resonance frequencies with respect to the spectrometer frequency
-    resonance_frequencies = [(-ys[i] * B * cs[i] * 1e-6) for i in range(spin_system.size)]
+    if rotating_frame:
+        # Compute the resonance frequencies with respect to the spectrometer frequency
+        resonance_frequencies = [(-ys[i] * B * cs[i] * 1e-6) for i in range(spin_system.size)]
+    else:
+        # Include bare-nucleus Zeeman frequencies
+        resonance_frequencies = [(-ys[i] * B * (1 + cs[i] * 1e-6)) for i in range(spin_system.size)]
 
     # Get the most negative and most positive resonance frequencies
     min_freq = min(resonance_frequencies)
