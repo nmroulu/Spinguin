@@ -11,3 +11,4 @@ from spinguin._propagation import *
 from spinguin._relaxation import *
 from spinguin._spin_system import *
 from spinguin._states import *
+from spinguin._settings import *

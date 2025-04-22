@@ -16,17 +16,16 @@ import time
 import numpy as np
 import warnings
 from scipy.sparse import csc_array
-from spinguin import _la
-from spinguin._operators import superoperator
+from spinguin._la import expm, expm_custom_dot
+from spinguin._operators import superoperator, sop_prod
 from spinguin._hamiltonian import hamiltonian_zeeman_0
+from spinguin._settings import Settings
 
 def propagator(L: csc_array,
                t: float,
                rotating_frame: bool = False,
                spin_system: SpinSystem = None,
                B: float = None,
-               zero_value: float = 1e-18,
-               density_threshold: float = 0.5,
                custom_dot: bool = False) -> csc_array | np.ndarray:
     """
     Constructs the time propagator, with an optional transformation to the rotating frame.
@@ -45,14 +44,6 @@ def propagator(L: csc_array,
         information about the spins.
     B : float, optional
         Required if rotating_frame is True. Magnetic field strength in Tesla (T).
-    zero_value : float, optional
-        Default: 1e-18. Values smaller than zero_value are treated as zero
-        in the matrix exponential. Larger values improve performance by increasing sparsity.
-        If a thermalized relaxation superoperator is used, consider reducing this parameter,
-        especially at low fields.  
-    density_threshold : float, optional
-        Default: 0.5. If the propagator density exceeds density_threshold,
-        the propagator is returned as a dense NumPy array.
     custom_dot : bool, optional
         Default: False. If False, dot products in the matrix exponentials are computed
         using the default SciPy implementation. If True, the custom implementation is used,
@@ -70,16 +61,16 @@ def propagator(L: csc_array,
 
     # Compute the matrix exponential
     if custom_dot:
-        expm_Lt = _la.expm_custom_dot(L * t, zero_value)
+        expm_Lt = expm_custom_dot(L * t, Settings.ZERO_PROPAGATOR)
     else:
-        expm_Lt = _la.expm(L * t, zero_value)
+        expm_Lt = expm(L * t, Settings.ZERO_PROPAGATOR)
 
     # Calculate the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
     print(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
-    if density > density_threshold:
+    if density > Settings.DENSITY_THRESHOLD:
         print("Density exceeds threshold. Converting to NumPy array.")
         expm_Lt = expm_Lt.toarray()
 
@@ -92,9 +83,9 @@ def propagator(L: csc_array,
         H0 = hamiltonian_zeeman_0(spin_system, B)
 
         if custom_dot:
-            expm_H0t = _la.expm_custom_dot(1j * H0 * t, zero_value, disable_output=True)
+            expm_H0t = expm_custom_dot(1j * H0 * t, Settings.ZERO_PROPAGATOR, disable_output=True)
         else:
-            expm_H0t = _la.expm(1j * H0 * t, zero_value, disable_output=True)
+            expm_H0t = expm(1j * H0 * t, Settings.ZERO_PROPAGATOR, disable_output=True)
 
         expm_Lt = expm_H0t @ expm_Lt
         print("Rotating frame transformation applied.")
@@ -104,7 +95,7 @@ def propagator(L: csc_array,
 
     return expm_Lt
 
-def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: float = 1e-18) -> csc_array:
+def pulse(spin_system: SpinSystem, operator: str, angle: float) -> csc_array:
     """
     Generates a superoperator corresponding to the pulse described
     by the given operator and angle.
@@ -123,9 +114,6 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: floa
         - Whitespace will be ignored in the input.
     angle : float
         Pulse angle in degrees.
-    zero_value : float, optional
-        Default: 1e-18. Values smaller than zero_value are treated as zero when
-        computing the pulse superoperator.
 
     Returns
     -------
@@ -147,7 +135,7 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float, zero_value: floa
     angle = angle / 180 * np.pi
 
     # Construct the pulse propagator
-    pul = _la.expm(-1j * angle * op, zero_value, disable_output=True)
+    pul = expm(-1j * angle * op, Settings.ZERO_PULSE, disable_output=True)
 
     print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 

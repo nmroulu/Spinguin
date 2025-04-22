@@ -15,8 +15,9 @@ if TYPE_CHECKING:
 import numpy as np
 import time
 from scipy.sparse import csc_array
-from spinguin import _la
+from spinguin._la import increase_sparsity
 from spinguin._operators import sop_prod
+from spinguin._settings import Settings
 
 def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm') -> csc_array:
     """
@@ -152,7 +153,7 @@ def hamiltonian_J_coupling(spin_system: SpinSystem, side: str = 'comm') -> csc_a
 
     return sop_Hj
 
-def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_value: float = 1e-12, disable_outputs: bool = False) -> csc_array:
+def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', disable_outputs: bool = False) -> csc_array:
     """
     Computes the coherent part of the Hamiltonian superoperator, including the Zeeman
     interaction and J-couplings.
@@ -168,9 +169,6 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_valu
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
-    zero_value : float
-        Threshold for sparsity. Values smaller than this will be set to zero
-        after constructing the total Hamiltonian. Default is 1e-12.
     disable_outputs : bool
         Disables printing to the console. Default: False.
 
@@ -192,7 +190,7 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', zero_valu
     sop_H = sop_Hz + sop_Hj
 
     # Remove small values to enhance sparsity
-    _la.increase_sparsity(sop_H, zero_value)
+    increase_sparsity(sop_H, Settings.ZERO_HAMILTONIAN)
 
     if not disable_outputs:
         print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit

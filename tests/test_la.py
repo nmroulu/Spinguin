@@ -157,7 +157,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         T = 1
         
         # Compute the auxiliary matrix exponential
-        expm_aux = _la.auxiliary_matrix_expm(A, B, C, T)
+        expm_aux = _la.auxiliary_matrix_expm(A, B, C, T, zero_value=1e-18)
 
         # Extract the components
         top_l1 = expm_aux[:A.shape[0], :A.shape[1]].toarray()
@@ -166,13 +166,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         bot_r1 = expm_aux[A.shape[0]:, A.shape[1]:].toarray()
 
         # Compute the components manually
-        top_l2 = _la.expm(A*T, disable_output=True).toarray()
+        top_l2 = _la.expm(A*T, zero_value=1e-18, disable_output=True).toarray()
         top_r2 = csc_array(A.shape, dtype=complex)
         for t in np.linspace(0, T, 1000):
-            top_r2 += _la.expm(-A*t, disable_output=True) @ B @ _la.expm(C*t, disable_output=True) * (1/1000)
-        top_r2 = (_la.expm(A*T, disable_output=True) @ top_r2).toarray()
+            top_r2 += _la.expm(-A*t, zero_value=1e-18, disable_output=True) @ B @ _la.expm(C*t, zero_value=1e-18, disable_output=True) * (1/1000)
+        top_r2 = (_la.expm(A*T, zero_value=1e-18, disable_output=True) @ top_r2).toarray()
         bot_l2 = np.zeros_like(bot_l1)
-        bot_r2 = _la.expm(C*T, disable_output=True).toarray()
+        bot_r2 = _la.expm(C*T, zero_value=1e-18, disable_output=True).toarray()
 
         # Verify the components
         self.assertTrue(np.allclose(top_l1, top_l2))
@@ -304,7 +304,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
         # Compare against SciPy
         C_SciPy = A @ B
-        C_custom = _la.sparse_dot(A, B)
+        C_custom = _la.sparse_dot(A, B, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
 def spherical_tensor(l, q):

@@ -19,9 +19,12 @@ import numpy as np
 import scipy.constants as const
 from scipy.sparse import csc_array, eye_array, lil_array
 from scipy.special import eval_legendre
-from spinguin import _la, _operators
+from spinguin import _operators
+from spinguin._la import increase_sparsity, principal_axis_system, cartesian_tensor_to_spherical_tensor,\
+                         angle_between_vectors, norm_1, auxiliary_matrix_expm, expm
 from spinguin._basis import idx_to_lq, lq_to_idx, parse_operator_string, state_idx
 from spinguin._hamiltonian import hamiltonian
+from spinguin._settings import Settings
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -96,15 +99,15 @@ def G0(tensor1: np.ndarray, tensor2: np.ndarray, l: int) -> float:
         Time correlation function evaluated at t = 0.
     """
     # Find the principal axis systems of the tensors
-    _, eigvecs1, tensor1_pas = _la.principal_axis_system(tensor1)
-    _, eigvecs2, tensor2_pas = _la.principal_axis_system(tensor2)
+    _, eigvecs1, tensor1_pas = principal_axis_system(tensor1)
+    _, eigvecs2, tensor2_pas = principal_axis_system(tensor2)
 
     # Find the angle between the principal axes
-    angle = _la.angle_between_vectors(eigvecs1[0], eigvecs2[0])
+    angle = angle_between_vectors(eigvecs1[0], eigvecs2[0])
 
     # Write the tensors in the spherical tensor notation
-    V1_pas = _la.cartesian_tensor_to_spherical_tensor(tensor1_pas)
-    V2_pas = _la.cartesian_tensor_to_spherical_tensor(tensor2_pas)
+    V1_pas = cartesian_tensor_to_spherical_tensor(tensor1_pas)
+    V2_pas = cartesian_tensor_to_spherical_tensor(tensor2_pas)
 
     # Compute G0
     G_0 = 1 / (2 * l + 1) * eval_legendre(2, np.cos(angle)) * sum([V1_pas[l, q] * np.conj(V2_pas[l, q]) for q in range(-l, l + 1)])
@@ -246,7 +249,7 @@ def Q_intr_tensors(spin_system: SpinSystem) -> np.ndarray:
 
     return Q_tensors
 
-def interactions(spin_system: SpinSystem, intrs: dict, zero_intr: float = 1e-9) -> dict:
+def interactions(spin_system: SpinSystem, intrs: dict) -> dict:
     """
     Processes all incoherent interactions and organizes them by rank. 
     Disregards interactions below a specified threshold.
@@ -258,9 +261,6 @@ def interactions(spin_system: SpinSystem, intrs: dict, zero_intr: float = 1e-9) 
     intrs : dict
         A dictionary where the keys represent the interaction type, and the values 
         contain the interaction tensors and the ranks.
-    zero_intr : float
-        Default: 1e-9. If the row-wise 1-norm of the interaction tensor (upper limit 
-        for its eigenvalues) is smaller than this threshold, the interaction is disregarded.
 
     Returns
     -------
@@ -292,14 +292,14 @@ def interactions(spin_system: SpinSystem, intrs: dict, zero_intr: float = 1e-9) 
             # Process single-spin interactions
             if interaction in ["CSA", "Q"]:
                 for spin_1 in range(size):
-                    if _la.norm_1(tensors[spin_1], ord='row') > zero_intr:
+                    if norm_1(tensors[spin_1], ord='row') > Settings.ZERO_INTERACTION:
                         interactions[rank].append((interaction, spin_1, None, tensors[spin_1]))
 
             # Process two-spin interactions
             if interaction == "DD":
                 for spin_1 in range(size):
                     for spin_2 in range(size):
-                        if _la.norm_1(tensors[spin_1, spin_2], ord='row') > zero_intr:
+                        if norm_1(tensors[spin_1, spin_2], ord='row') > Settings.ZERO_INTERACTION:
                             interactions[rank].append((interaction, spin_1, spin_2, tensors[spin_1, spin_2]))
 
     return interactions
@@ -359,9 +359,7 @@ def sop_T(spin_system: SpinSystem, l: int, q: int, interaction_type: str, spin_1
 def sop_R_redfield(spin_system: SpinSystem,
                    sop_H: csc_array,
                    interactions: dict,
-                   tau_c: float,
-                   relative_error: float = 1e-6,
-                   zero_aux: float = 1e-18) -> csc_array:
+                   tau_c: float) -> csc_array:
     """
     Calculates the relaxation superoperator using Redfield relaxation theory.
 
@@ -385,11 +383,6 @@ def sop_R_redfield(spin_system: SpinSystem,
         in the format ("interaction", spin_1, spin_2, tensor).
     tau_c : float
         Isotropic rotational correlation time in seconds.
-    relative_error : float
-        Default: 1e-6. Relative error for the integration in the auxiliary matrix method.
-    zero_aux : float
-        Default: 1e-18. Values below this threshold are considered zero in the auxiliary 
-        matrix method. Tighten this parameter for extremely short correlation times.
 
     Returns
     -------
@@ -404,7 +397,7 @@ def sop_R_redfield(spin_system: SpinSystem,
     sop_R = csc_array((dim, dim), dtype=complex)
 
     # Define the integration limit for the auxiliary matrix method
-    t_max = np.log(1 / relative_error) * tau_c
+    t_max = np.log(1 / Settings.RELATIVE_ERROR) * tau_c
 
     # Diagonal matrices of correlation times
     tau_c_diagonal_l1 = 1 / tau_c_l(tau_c, 1) * eye_array(sop_H.shape[0], format='csc')
@@ -421,8 +414,7 @@ def sop_R_redfield(spin_system: SpinSystem,
         # Iterate over the projections (negative q values are handled by spherical tensor properties)
         for q in range(0, l + 1):
 
-            # print(f"Processing rank l:{l}, projection q:{q}")
-            print(f"Processing rank l={l}, projection q={q}") # NOTE: Perttu's edit
+            print(f"Processing rank l={l}, projection q={q}")
 
             # Iterate over the RIGHT interactions
             for interaction_right in interactions[l]:
@@ -433,8 +425,7 @@ def sop_R_redfield(spin_system: SpinSystem,
                 spin_right2 = interaction_right[2]
                 tensor_right = interaction_right[3]
 
-                # print(f"{type_right}: {spin_right1}-{spin_right2}")
-                # NOTE: Perttu's edit
+                # Show current status
                 if spin_right1 is None:
                     print(f"{type_right} for spin {spin_right2}")
                 elif spin_right2 is None:
@@ -447,9 +438,9 @@ def sop_R_redfield(spin_system: SpinSystem,
 
                 # Calculate the Redfield integral using the auxiliary matrix method
                 if l == 1:
-                    sop_T_right = _la.auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, zero_aux)
+                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, Settings.ZERO_AUX)
                 elif l == 2:
-                    sop_T_right = _la.auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, zero_aux)
+                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, Settings.ZERO_AUX)
 
                 # Extract top left and top right blocks
                 top_left = sop_T_right[:dim, :dim]
@@ -484,7 +475,6 @@ def sop_R_redfield(spin_system: SpinSystem,
 
     return sop_R
 
-# NOTE: Perttu's edit
 def relaxation_phenomenological(spin_system: SpinSystem, R_1: np.ndarray, R_2: np.ndarray) -> csc_array:
     """
     Constructs the relaxation superoperator from given R_1 and R_2 values
@@ -645,12 +635,7 @@ def relaxation(spin_system: SpinSystem,
                tau_c: float,
                temperature: float = None,
                include_sr2k: bool = False,
-               relative_error: float = 1e-6,
                real_only: bool = True,
-               zero_aux: float = 1e-18,
-               zero_R: float = 1e-12,
-               zero_intr: float = 1e-9,
-               zero_thermalization: float = 1e-18,
                antisymmetric: bool = False) -> csc_array:
     """
     Calculates the relaxation superoperator.
@@ -671,22 +656,8 @@ def relaxation(spin_system: SpinSystem,
     include_sr2k : bool
         Default: False. Whether to include scalar relaxation of the second kind (SR2K).
         Applies only for spin systems with quadrupolar nuclei.
-    relative_error : float
-        Default: 1e-6. Relative error for the integration in the auxiliary matrix method.
-        Can be increased to make the integration faster.
     real_only : bool
         Default: True. Whether to return only the real component (dynamic frequency shift excluded).
-    zero_aux : float
-        Default: 1e-18. Values below this threshold are considered zero in the auxiliary
-        matrix method. Tighten this parameter for extremely short correlation times.
-    zero_R : float
-        Default: 1e-12. Values smaller than this threshold are removed from the relaxation superoperator.
-    zero_intr : float
-        Default: 1e-9. Interactions are disregarded if the infinity-norm of the interaction tensor
-        (upper limit for the largest eigenvalue) is smaller than this threshold.
-    zero_thermalization : float
-        Default: 1e-18. Used to estimate the convergence of the matrix exponential in the
-        thermalization of the relaxation superoperator.
     antisymmetric : bool
         Default: False. Whether to include rank-1 components for CSA interactions.
 
@@ -719,10 +690,10 @@ def relaxation(spin_system: SpinSystem,
     }
     
     # Remove small interactions and reorganize them rank-wise
-    intrs = interactions(spin_system, intrs, zero_intr)
+    intrs = interactions(spin_system, intrs)
     
     # Calculate R using Redfield theory
-    sop_R = sop_R_redfield(spin_system, sop_H, intrs, tau_c, relative_error, zero_aux)
+    sop_R = sop_R_redfield(spin_system, sop_H, intrs, tau_c)
 
     # Process SR2K if enabled
     if include_sr2k:
@@ -733,18 +704,18 @@ def relaxation(spin_system: SpinSystem,
         sop_R = sop_R.real
 
     # Remove small elements from the relaxation superoperator
-    _la.increase_sparsity(sop_R, zero_R)
+    increase_sparsity(sop_R, Settings.ZERO_RELAXATION)
 
     # Apply thermalization, if temperature is supplied
     if temperature is not None:
-        sop_R = ldb_thermalization(spin_system, sop_R, B, temperature, zero_thermalization)
+        sop_R = ldb_thermalization(spin_system, sop_R, B, temperature)
 
     print(f'Relaxation superoperator constructed in {time.time() - time_start:.4f} seconds.')
     print()
 
     return sop_R
 
-def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float, zero_value: float = 1e-18) -> csc_array:
+def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float) -> csc_array:
     """
     Applies the Levitt-Di Bari thermalization to the relaxation superoperator.
 
@@ -758,8 +729,6 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float
         Magnetic field in units of T.
     T : float
         Temperature in units of K.
-    zero_value : float
-        Default: 1e-18. Used to estimate the convergence of the matrix exponential.
 
     Returns
     -------
@@ -771,7 +740,7 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float
     H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = _la.expm(const.hbar / (const.k * T) * H, zero_value, disable_output=True)
+    P = expm(const.hbar / (const.k * T) * H, Settings.ZERO_THERMALIZATION, disable_output=True)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P

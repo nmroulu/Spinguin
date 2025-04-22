@@ -76,7 +76,7 @@ def norm_1(A: csc_array | np.ndarray, ord: str = 'row') -> float:
     # Calculate sums along rows or columns and get the maximum of them
     return abs(A).sum(axis).max()
 
-def expm_custom_dot(A: csc_array, zero_value: float = 1e-24, disable_output: bool = False) -> csc_array:
+def expm_custom_dot(A: csc_array, zero_value: float, disable_output: bool = False) -> csc_array:
     """
     Calculates the matrix exponential of a SciPy sparse CSC array using the
     scaling and squaring method with the Taylor series, shown to be the fastest
@@ -92,9 +92,8 @@ def expm_custom_dot(A: csc_array, zero_value: float = 1e-24, disable_output: boo
     A : csc_array
         Array to be exponentiated.
     zero_value : float
-        Default: 1e-24. Values below this threshold are considered zero. Used to
-        increase the sparsity of the result and estimate the convergence of the
-        Taylor series.
+        Values below this threshold are considered zero. Used to increase the sparsity
+        of the result and estimate the convergence of the Taylor series.
     disable_output : bool
         Default: False. If set to True, printing to the console will be disabled.
 
@@ -141,7 +140,7 @@ def expm_custom_dot(A: csc_array, zero_value: float = 1e-24, disable_output: boo
 
     return expm_A
 
-def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24, disable_output: bool=False) -> csc_array:
+def expm_taylor_custom_dot(A: csc_array, zero_value: float, disable_output: bool=False) -> csc_array:
     """
     Computes the matrix exponential using the Taylor series. This function is 
     adapted from an older SciPy version.
@@ -154,8 +153,8 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24, disable_output
     A : csc_array
         Matrix (N, N) to be exponentiated.
     zero_value : float
-        Default: 1e-24. Values below this threshold are considered zero. Used to 
-        increase sparsity and check the convergence of the series.
+        Values below this threshold are considered zero. Used to increase sparsity
+        and check the convergence of the series.
     disable_output : bool
         Default: False. If set to True, printing to the console will be disabled.
 
@@ -202,7 +201,7 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float=1e-24, disable_output
 
     return eA
 
-def expm(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: bool=False) -> csc_array | np.ndarray:
+def expm(A: csc_array | np.ndarray, zero_value: float, disable_output: bool=False) -> csc_array | np.ndarray:
     """
     Calculates the matrix exponential of a SciPy sparse or NumPy array using 
     the scaling and squaring method with the Taylor series. This method was 
@@ -215,9 +214,8 @@ def expm(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: boo
     A : csc_array or numpy.ndarray
         Array to be exponentiated.
     zero_value : float
-        Default: 1e-24. Values below this threshold are considered zero. Used to 
-        increase sparsity of the result and estimate the convergence of the 
-        Taylor series.
+        Values below this threshold are considered zero. Used to  increase sparsity of
+        the result and estimate the convergence of the Taylor series.
     disable_output : bool
         Default: False. If set to True, printing to the console will be disabled.
 
@@ -277,7 +275,7 @@ def expm(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: boo
 
     return expm_A
 
-def expm_taylor(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_output: bool=False) -> csc_array | np.ndarray:
+def expm_taylor(A: csc_array | np.ndarray, zero_value: float, disable_output: bool=False) -> csc_array | np.ndarray:
     """
     Computes the matrix exponential using the Taylor series. This function is 
     adapted from an older SciPy version.
@@ -287,7 +285,7 @@ def expm_taylor(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_outp
     A : csc_array or numpy.ndarray
         Matrix (N, N) to be exponentiated.
     zero_value : float
-        Default: 1e-24. Values below this threshold are considered zero. Used to 
+        Values below this threshold are considered zero. Used to 
         increase sparsity and check the convergence of the series.
     disable_output : bool
         Default: False. If set to True, printing to the console will be disabled.
@@ -347,7 +345,7 @@ def expm_taylor(A: csc_array | np.ndarray, zero_value: float=1e-24, disable_outp
 
     return eA
 
-def increase_sparsity(A: csc_array, zero_value: float=1e-24):
+def increase_sparsity(A: csc_array, zero_value: float):
     """
     Increases the sparsity of the given input matrix by replacing small values
     with zeros. Modification happens in-place.
@@ -357,7 +355,7 @@ def increase_sparsity(A: csc_array, zero_value: float=1e-24):
     A : csc_array
         Sparse matrix to be modified.
     zero_value : float
-        Default: 1e-24. Values smaller than this threshold are set to zero.
+        Values smaller than this threshold are set to zero.
     """
 
     # Identify values smaller than the threshold and set them to zero
@@ -475,7 +473,7 @@ def find_common_rows(A: np.ndarray, B: np.ndarray) -> Tuple[list, list]:
 
     return A_ind, B_ind
 
-def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, zero_value: float=1e-24) -> csc_array:   
+def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, zero_value: float) -> csc_array:   
     """
     Computes the matrix exponential of an auxiliary matrix. This is used to 
     calculate the Redfield integral.
@@ -493,10 +491,9 @@ def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, ze
     t : float
         Integration time.
     zero_value : float
-        Default: 1e-24. Threshold below which values are considered zero when 
-        exponentiating the auxiliary matrix using the Taylor series. This 
-        significantly impacts performance. Use the largest value that still 
-        provides correct results.
+        Threshold below which values are considered zero when exponentiating the auxiliary
+        matrix using the Taylor series. This significantly impacts performance. Use the
+        largest value that still provides correct results.
     
     Returns
     -------
@@ -709,7 +706,7 @@ def CG_coeff(j1: float, m1: float, j2: float, m2: float, j3: float, m3: float) -
 
     return coeff
 
-def sparse_dot(A: csc_array, B: csc_array, zero_value: float = 1e-24) -> csc_array:
+def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
     """
     Custom sparse matrix multiplication, which saves memory usage by dropping
     values smaller than `zero_value` during the calculation. Matrices `A` and `B`
@@ -723,8 +720,7 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float = 1e-24) -> csc_arr
     B : csc_array
         Second matrix in the multiplication.
     zero_value : float
-        Default: 1e-24. Threshold under which the resulting matrix elements are
-        considered as zero.
+        Threshold under which the resulting matrix elements are considered as zero.
 
     Returns
     -------

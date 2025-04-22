@@ -15,10 +15,11 @@ if TYPE_CHECKING:
 import numpy as np
 import scipy.constants as const
 from scipy.sparse import lil_array, csc_array, issparse
-from spinguin import _la
+from spinguin._la import expm
 from spinguin._operators import op_prod
 from spinguin._hamiltonian import hamiltonian
 from spinguin._basis import parse_operator_string, state_idx
+from spinguin._settings import Settings
 from typing import Union
 from functools import lru_cache
 
@@ -198,7 +199,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
     
     return rho_zeeman
 
-def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool = False, zero_value: float = 1e-18) -> Union[np.ndarray, csc_array]:
+def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
     Returns the state vector corresponding to thermal equilibrium.
 
@@ -212,8 +213,6 @@ def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool 
         Magnetic field in Tesla.
     sparse : bool
         If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
-    zero_value : float
-        Default: 1e-18. Used to estimate the convergence of the matrix exponential.
 
     Returns
     -------
@@ -228,7 +227,7 @@ def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool 
     H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = _la.expm(-const.hbar / (const.k * T) * H, zero_value, disable_output=True)
+    P = expm(-const.hbar / (const.k * T) * H, Settings.ZERO_EQUILIBRIUM, disable_output=True)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)
