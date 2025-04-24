@@ -6,6 +6,7 @@ from spinguin._spin_system import SpinSystem
 from spinguin._la import comm, cartesian_tensor_to_spherical_tensor
 from spinguin._basis import idx_to_lq, parse_operator_string, truncate_basis_by_coherence
 from spinguin import _operators
+from spinguin._operators import op_E, op_Sy, op_Sz, op_Sm, operator
 
 class TestOperators(unittest.TestCase):
 
@@ -376,6 +377,30 @@ class TestOperators(unittest.TestCase):
 
         # Both conventions should give the same result
         self.assertTrue(np.allclose(left, right))
+
+    def test_operator(self):
+        """
+        A test for creating the Hilbert-space operators using the operators string.
+        """
+        
+        # Test system
+        isotopes = np.array(['1H', '1H'])
+        spin_system = SpinSystem(isotopes)
+
+        # Operators to test
+        op2 = "I(z,0)"
+        op3 = "I(z,0) * I(y,1)"
+        op4 = "I(-,0) + I(-,1)"
+
+        # Create reference operators
+        op2_ref = np.kron(op_Sz(1/2), op_E(1/2))
+        op3_ref = np.kron(op_Sz(1/2), op_Sy(1/2))
+        op4_ref = np.kron(op_Sm(1/2), op_E(1/2)) + np.kron(op_E(1/2), op_Sm(1/2))
+
+        # Compare with the function
+        self.assertTrue(np.allclose(op2_ref, operator(spin_system, op2)))
+        self.assertTrue(np.allclose(op3_ref, operator(spin_system, op3)))
+        self.assertTrue(np.allclose(op4_ref, operator(spin_system, op4)))
                     
 def sop_P(spin_system: SpinSystem, op_def: tuple, side: str):
     """

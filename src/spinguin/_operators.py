@@ -469,6 +469,45 @@ def sop_prod(spin_system: SpinSystem, op_def: tuple, side: str) -> csc_array:
 
     return sop
 
+def operator(spin_system: SpinSystem, operator: str) -> np.ndarray:
+    """
+    Generates an operator for the `spin_system` in Hilbert space from the user-specified `operators` string.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        The spin system for which the operator is generated.
+    operator : str
+        Defines the operator to be generated. The operator string must follow the rules below:
+
+        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
+        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
+        - The unit operator is not typed. Example: I(z,1) will generate E*I_z in case of a two-spin system. 
+        - Whitespace will be ignored in the input.
+
+    Returns
+    -------
+    op : numpy.ndarray
+        The requested operator.
+    """
+
+    # Get the dimension of the operator
+    dim = np.prod(spin_system.mults)
+
+    # Initialize the operator
+    op = np.zeros((dim, dim), dtype=complex)
+
+    # Get the operator definitions and coefficients
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
+
+    # Construct the operator
+    for op_def, coeff in zip(op_defs, coeffs):
+        op = op + coeff * op_prod(op_def, spin_system.spins)
+
+    return op
+
 def superoperator(spin_system: SpinSystem, operator: str, side: str='comm') -> csc_array:
     """
     Generates a superoperator from the user-specified `operators` string.
