@@ -670,24 +670,29 @@ def relaxation(spin_system: SpinSystem,
     time_start = time.time()
     print('Constructing relaxation superoperator...')
 
-    # Get the incoherent interactions
-    dd_tensors = dd_coupling_tensors(spin_system)
-    sh_tensors = shielding_intr_tensors(spin_system, B)
-    q_tensors = Q_intr_tensors(spin_system)
+    # Initialize a dictionary for incoherent interactions
+    intrs = {}
 
-    # Choose the interaction ranks
-    dd_ranks = [2]
-    sh_ranks = [2]
-    q_ranks = [2]
-    if antisymmetric:
-        sh_ranks = [1, 2]
+    # Process dipole-dipole couplings
+    if spin_system.xyz is not None:
+        dd_tensors = dd_coupling_tensors(spin_system)
+        dd_ranks = [2]
+        intrs['DD'] = (dd_tensors, dd_ranks)
 
-    # Generate the default incoherent interactions dictionary
-    intrs = {
-        'DD':  (dd_tensors, dd_ranks),
-        'CSA': (sh_tensors, sh_ranks),
-        'Q':   (q_tensors, q_ranks)
-    }
+    # Process nuclear shielding
+    if spin_system.shielding is not None:
+        sh_tensors = shielding_intr_tensors(spin_system, B)
+        if antisymmetric:
+            sh_ranks = [1, 2]
+        else:
+            sh_ranks = [2]
+        intrs['CSA'] = (sh_tensors, sh_ranks)
+
+    # Process quadrupolar coupling
+    if spin_system.efg is not None:
+        q_tensors = Q_intr_tensors(spin_system)
+        q_ranks = [2]
+        intrs['Q'] = (q_tensors, q_ranks)
     
     # Remove small interactions and reorganize them rank-wise
     intrs = interactions(spin_system, intrs)
