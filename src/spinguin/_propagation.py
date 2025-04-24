@@ -17,8 +17,8 @@ import numpy as np
 import warnings
 from scipy.sparse import csc_array
 from spinguin._la import expm, expm_custom_dot
+from spinguin._hamiltonian import hamiltonian_zeeman
 from spinguin._operators import superoperator, sop_prod
-from spinguin._hamiltonian import hamiltonian_zeeman_0
 from spinguin._settings import Settings
 
 def propagator(L: csc_array,
@@ -80,7 +80,7 @@ def propagator(L: csc_array,
             raise ValueError("spin_system and B must be provided when rotating_frame is True.")
         
         print("Applying rotating frame transformation...")
-        H0 = hamiltonian_zeeman_0(spin_system, B)
+        H0 = hamiltonian_zeeman(spin_system, B, include_shifts=False)
 
         if custom_dot:
             expm_H0t = expm_custom_dot(1j * H0 * t, Settings.ZERO_PROPAGATOR, disable_output=True)
