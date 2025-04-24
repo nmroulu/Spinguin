@@ -244,12 +244,12 @@ class TestStates(unittest.TestCase):
         size = spin_system.size
 
         # Conditions
-        field = 14.1
-        temperature = 273
+        Settings.magnetic_field = 14.1
+        Settings.temperature = 273
 
         # Make the thermal equilibrium state
-        rho_eq_sparse = equilibrium_state(spin_system, temperature, field, sparse=True)
-        rho_eq_dense = equilibrium_state(spin_system, temperature, field, sparse=False)
+        rho_eq_sparse = equilibrium_state(spin_system, sparse=True)
+        rho_eq_dense = equilibrium_state(spin_system, sparse=False)
 
         # Test the thermal equilibrium for each spin
         for i in range(size):
@@ -258,19 +258,19 @@ class TestStates(unittest.TestCase):
             Mz_measured_dense = measure(spin_system, rho_eq_dense, f"I(z, {i})")
 
             # Calculate the thermal magnetization directly using the Boltzmann distribution
-            Mz_calculated = thermal_magnetization(gammas[i], spins[i], field, temperature)
+            Mz_calculated = thermal_magnetization(gammas[i], spins[i], Settings.magnetic_field, Settings.temperature)
 
             # Compare
             self.assertAlmostEqual(Mz_measured_sparse, Mz_calculated)
             self.assertAlmostEqual(Mz_measured_dense, Mz_calculated)
 
         # Test that the code is future-proof (extreme conditions)
-        field = 1000
-        temperature = 1
+        Settings.magnetic_field = 1000
+        Settings.temperature = 1
 
         # Make the thermal equilibrium state
-        rho_eq_sparse = equilibrium_state(spin_system, temperature, field, sparse=True)
-        rho_eq_dense = equilibrium_state(spin_system, temperature, field, sparse=False)
+        rho_eq_sparse = equilibrium_state(spin_system, sparse=True)
+        rho_eq_dense = equilibrium_state(spin_system, sparse=False)
 
         # Test the thermal equilibrium for each spin
         for i in range(size):
@@ -279,7 +279,7 @@ class TestStates(unittest.TestCase):
             Mz_measured_dense = measure(spin_system, rho_eq_dense, f"I(z, {i})")
 
             # Calculate the thermal magnetization directly using the Boltzmann distribution
-            Mz_calculated = thermal_magnetization(gammas[i], spins[i], field, temperature)
+            Mz_calculated = thermal_magnetization(gammas[i], spins[i], Settings.magnetic_field, Settings.temperature)
 
             # Compare
             self.assertAlmostEqual(Mz_measured_sparse, Mz_calculated)

@@ -1,9 +1,13 @@
-class Settings(dict):
+class Settings():
     """
-    Settings for the spin dynamics simulations.
+    Contains global settings for the spin dynamics simulations.
 
     Attributes
     ----------
+    magnetic_field : float, default=None
+        External magnetic field in the simulations in the units of T.
+    temperature : float, default=None
+        Temperature of the spin bath in the units of K.
     ZERO_HAMILTONIAN : float
         Hamiltonian is calculated as a sparse matrix. Matrix elements below this threshold
         will be set to zero after constructing the total Hamiltonian.
@@ -48,6 +52,11 @@ class Settings(dict):
         Time propagators are converted from csc_array to numpy.ndarray if the density of the matrix
         exceeds this threshold.
     """
+    # Simulation settings
+    magnetic_field: float=None
+    temperature: float=None
+
+    # Numerical settings
     ZERO_HAMILTONIAN = 1e-12
     ZERO_AUX = 1e-18
     ZERO_RELAXATION = 1e-12

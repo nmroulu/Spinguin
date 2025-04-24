@@ -19,7 +19,7 @@ from spinguin._la import increase_sparsity
 from spinguin._operators import sop_prod
 from spinguin._settings import Settings
 
-def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm', include_shifts: bool=True) -> csc_array:
+def hamiltonian_zeeman(spin_system: SpinSystem, side: str = 'comm', include_shifts: bool=True) -> csc_array:
     """
     Computes the Hamiltonian superoperator for the Zeeman interaction.
 
@@ -27,8 +27,6 @@ def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm', in
     ----------
     spin_system : SpinSystem
         The spin system object containing information about the spins.
-    B : float
-        Magnetic field strength in Tesla (T).
     side : str
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
@@ -60,9 +58,9 @@ def hamiltonian_zeeman(spin_system: SpinSystem, B: float, side: str = 'comm', in
 
         # Compute the Zeeman interaction for the current spin
         if include_shifts:
-            sop_Hz = sop_Hz - gammas[n] * B * (1 + chemical_shifts[n] * 1e-6) * sop_prod(spin_system, op_def, side)
+            sop_Hz = sop_Hz - gammas[n] * Settings.magnetic_field * (1 + chemical_shifts[n] * 1e-6) * sop_prod(spin_system, op_def, side)
         else:
-            sop_Hz = sop_Hz - gammas[n] * B * sop_prod(spin_system, op_def, side)
+            sop_Hz = sop_Hz - gammas[n] * Settings.magnetic_field * sop_prod(spin_system, op_def, side)
 
     return sop_Hz
 
@@ -116,7 +114,7 @@ def hamiltonian_J_coupling(spin_system: SpinSystem, side: str = 'comm') -> csc_a
 
     return sop_Hj
 
-def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', disable_outputs: bool = False) -> csc_array:
+def hamiltonian(spin_system: SpinSystem, side: str = 'comm', disable_outputs: bool = False) -> csc_array:
     """
     Computes the coherent part of the Hamiltonian superoperator, including the Zeeman
     interaction and J-couplings.
@@ -125,8 +123,6 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', disable_o
     ----------
     spin_system : SpinSystem
         The spin system object containing information about the spins.
-    B : float
-        Magnetic field strength in Tesla (T).
     side : str
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
@@ -146,7 +142,7 @@ def hamiltonian(spin_system: SpinSystem, B: float, side: str = 'comm', disable_o
         print("Constructing Hamiltonian...")
 
     # Compute the Zeeman and J-coupling Hamiltonians
-    sop_Hz = hamiltonian_zeeman(spin_system, B, side)
+    sop_Hz = hamiltonian_zeeman(spin_system, side)
     sop_Hj = hamiltonian_J_coupling(spin_system, side)
 
     # Combine the terms

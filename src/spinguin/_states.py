@@ -199,7 +199,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
     
     return rho_zeeman
 
-def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> Union[np.ndarray, csc_array]:
     """
     Returns the state vector corresponding to thermal equilibrium.
 
@@ -207,10 +207,6 @@ def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool 
     ----------
     spin_system : SpinSystem
         The spin system for which the thermal equilibrium state is generated.
-    T : float
-        Temperature in Kelvin.
-    B : float
-        Magnetic field in Tesla.
     sparse : bool
         If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
 
@@ -224,10 +220,10 @@ def equilibrium_state(spin_system: SpinSystem, T: float, B: float, sparse: bool 
     mults = spin_system.mults
 
     # Build the left Hamiltonian superoperator
-    H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
+    H = hamiltonian(spin_system, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(-const.hbar / (const.k * T) * H, Settings.ZERO_EQUILIBRIUM, disable_output=True)
+    P = expm(-const.hbar / (const.k * Settings.temperature) * H, Settings.ZERO_EQUILIBRIUM, disable_output=True)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)

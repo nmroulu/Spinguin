@@ -3,6 +3,7 @@ import numpy as np
 import os
 from spinguin._spin_system import SpinSystem
 from spinguin._hamiltonian import hamiltonian
+from spinguin._settings import Settings
 from scipy.sparse import load_npz
 
 class TestHamiltonian(unittest.TestCase):
@@ -16,8 +17,7 @@ class TestHamiltonian(unittest.TestCase):
         """
 
         # Simulation settings
-        max_so = 3  # Maximum spin order
-        magnetic_field = 7e-3  # Magnetic field strength in Tesla
+        Settings.magnetic_field = 7e-3  # Magnetic field strength in Tesla
 
         # Define isotopes
         isotopes_c = np.array(['1H', '1H', '1H', '1H', '1H', '1H', '1H', '14N'])
@@ -37,6 +37,9 @@ class TestHamiltonian(unittest.TestCase):
             [-0.30,  15.91,  4.47,   0.04,   1.79,   0,     -0.46,  0]
         ])
 
+        # Maximum spin order
+        max_so = 3  
+
         # Initialize the spin system
         spin_system_c = SpinSystem(isotopes_c, chemical_shifts_c, J_couplings_c, max_spin_order=max_so)
 
@@ -45,7 +48,7 @@ class TestHamiltonian(unittest.TestCase):
         H_c_previous = load_npz(os.path.join(test_dir, 'test_data', 'hamiltonian.npz'))
 
         # Generate the Hamiltonian
-        H_c = hamiltonian(spin_system_c, magnetic_field)
+        H_c = hamiltonian(spin_system_c)
 
         # Assert that the generated Hamiltonian matches the reference
         self.assertTrue(np.allclose(H_c_previous.toarray(), H_c.toarray()))

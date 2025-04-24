@@ -629,8 +629,6 @@ def sr2k(spin_system: SpinSystem, sop_R: csc_array, B: float) -> csc_array:
 
 def relaxation(spin_system: SpinSystem, 
                sop_H: csc_array,
-               B: float,
-               temperature: float = None,
                include_sr2k: bool = False,
                real_only: bool = True,
                antisymmetric: bool = False) -> csc_array:
@@ -643,11 +641,6 @@ def relaxation(spin_system: SpinSystem,
         The spin system object containing information about the spins.
     sop_H : csc_array
         Hamiltonian superoperator (coherent part).
-    B : float
-        Magnetic field in units of T.
-    temperature : float
-        Default: None. Temperature of the spin bath in Kelvins. If specified, Levitt-Di Bari
-        thermalization of the relaxation superoperator is performed automatically.
     include_sr2k : bool
         Default: False. Whether to include scalar relaxation of the second kind (SR2K).
         Applies only for spin systems with quadrupolar nuclei.
@@ -676,7 +669,7 @@ def relaxation(spin_system: SpinSystem,
 
     # Process nuclear shielding
     if spin_system.shielding is not None:
-        sh_tensors = shielding_intr_tensors(spin_system, B)
+        sh_tensors = shielding_intr_tensors(spin_system, Settings.magnetic_field)
         if antisymmetric:
             sh_ranks = [1, 2]
         else:
@@ -697,7 +690,7 @@ def relaxation(spin_system: SpinSystem,
 
     # Process SR2K if enabled
     if include_sr2k:
-        sop_R = sr2k(spin_system, sop_R, B)
+        sop_R = sr2k(spin_system, sop_R, Settings.magnetic_field)
 
     # Return only real values if requested
     if real_only:
@@ -706,16 +699,16 @@ def relaxation(spin_system: SpinSystem,
     # Remove small elements from the relaxation superoperator
     increase_sparsity(sop_R, Settings.ZERO_RELAXATION)
 
-    # Apply thermalization, if temperature is supplied
-    if temperature is not None:
-        sop_R = ldb_thermalization(spin_system, sop_R, B, temperature)
+    # Apply thermalization, if temperature is defined
+    if Settings.temperature is not None:
+        sop_R = ldb_thermalization(spin_system, sop_R)
 
     print(f'Relaxation superoperator constructed in {time.time() - time_start:.4f} seconds.')
     print()
 
     return sop_R
 
-def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float) -> csc_array:
+def ldb_thermalization(spin_system: SpinSystem, R: csc_array) -> csc_array:
     """
     Applies the Levitt-Di Bari thermalization to the relaxation superoperator.
 
@@ -725,10 +718,6 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float
         The spin system object containing information about the spins.
     R : csc_array
         Relaxation superoperator to be thermalized.
-    B : float
-        Magnetic field in units of T.
-    T : float
-        Temperature in units of K.
 
     Returns
     -------
@@ -737,10 +726,10 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array, B: float, T: float
     """
 
     # Build the left Zeeman Hamiltonian
-    H = hamiltonian(spin_system, B, 'left', disable_outputs=True)
+    H = hamiltonian(spin_system, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(const.hbar / (const.k * T) * H, Settings.ZERO_THERMALIZATION, disable_output=True)
+    P = expm(const.hbar / (const.k * Settings.temperature) * H, Settings.ZERO_THERMALIZATION, disable_output=True)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P

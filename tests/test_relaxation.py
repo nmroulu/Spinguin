@@ -5,6 +5,7 @@ from spinguin import _hamiltonian, _propagation, _relaxation, _states
 from spinguin._nmr_isotopes import ISOTOPES
 from spinguin._basis import truncate_basis_by_coherence, transform_to_truncated_basis
 from spinguin._liouvillian import liouvillian
+from spinguin._settings import Settings
 
 class TestRelaxation(unittest.TestCase):
 
@@ -76,19 +77,21 @@ class TestRelaxation(unittest.TestCase):
         tau_c = 50e-12  # Correlation time in seconds
         spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings, xyz, shielding, efg, tau_c, max_spin_order=3)
 
+        # Simulation settings
+        Settings.magnetic_field = 1 # 1T
+        Settings.temperature = 273  # 273 K
+
         # Simulation parameters
-        field = 1  # Magnetic field strength in Tesla
-        temp = 273  # Temperature in Kelvin
         time_step = 2e-3  # Time step in seconds
         nsteps = 50000  # Number of simulation steps
 
         # Get the Hamiltonian and relaxation superoperator
-        H = _hamiltonian.hamiltonian(spin_system, field)
-        R = _relaxation.relaxation(spin_system, H, field, temp)
+        H = _hamiltonian.hamiltonian(spin_system)
+        R = _relaxation.relaxation(spin_system, H)
         L = liouvillian(H, R)
 
         # Create the thermal equilibrium state
-        rho = _states.equilibrium_state(spin_system, temp, field)
+        rho = _states.equilibrium_state(spin_system)
 
         # Apply a 180-degree pulse
         pul_180 = _propagation.pulse(spin_system, "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)", angle=180)
@@ -106,4 +109,4 @@ class TestRelaxation(unittest.TestCase):
             rho = P @ rho  # Propagate the density matrix
 
         # Verify that the final state matches the thermal equilibrium state
-        self.assertTrue(np.allclose(rho, _states.equilibrium_state(spin_system, temp, field)))
+        self.assertTrue(np.allclose(rho, _states.equilibrium_state(spin_system)))
