@@ -119,13 +119,13 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
                 val_k = A_data[k]
 
                 # Multiply and add to the array
-                C_col_data[ind_k_thread] += val_j * val_k
+                C_col_data[ind_k_thread] = C_col_data[ind_k_thread] + val_j * val_k
                 
                 # Check if a non-zero value is found for the matrix element for the first time
                 if C_col_nonzero[ind_k_thread] == 0:
                     C_col_indices[C_col_nnz + thread_start] = ind_k
                     C_col_nonzero[ind_k_thread] = 1
-                    C_col_nnz += 1
+                    C_col_nnz = C_col_nnz + 1
 
         # Counter for the number of non-zeros greater than the threshold (thread-local)
         nnz_th = 0
@@ -140,7 +140,7 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
 
             # Increment the counter if the value is larger than the threshold
             if abs(val_k) > zero_value:
-                nnz_th += 1
+                nnz_th = nnz_th + 1
 
             # Clear the arrays
             C_col_data[ind_k_thread] = 0
@@ -151,7 +151,7 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
 
     # Calculate the cumulative sum (the true index pointers)
     for i in range(B_ncols):
-        C_indptr[i+1] += C_indptr[i]
+        C_indptr[i+1] = C_indptr[i+1] + C_indptr[i]
 
     # Get the total number of non-zeros
     nnz = C_indptr[B_ncols]
@@ -198,13 +198,13 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
                 val_k = A_data[k]
 
                 # Multiply and add to the array
-                C_col_data[ind_k_thread] += val_j * val_k
+                C_col_data[ind_k_thread] = C_col_data[ind_k_thread] + val_j * val_k
                 
                 # Check if a non-zero value is found for the matrix element for the first time
                 if C_col_nonzero[ind_k_thread] == 0:
                     C_col_indices[C_col_nnz + thread_start] = ind_k
                     C_col_nonzero[ind_k_thread] = 1
-                    C_col_nnz += 1
+                    C_col_nnz = C_col_nnz + 1
 
         # Counter for the number of non-zeros greater than the threshold (thread-local)
         nnz_th = C_indptr[i]
@@ -221,7 +221,7 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
             if abs(val_k) > zero_value:
                 C_data[nnz_th] = val_k
                 C_indices[nnz_th] = ind_k
-                nnz_th += 1
+                nnz_th = nnz_th + 1
 
             # Clear the arrays
             C_col_data[ind_k_thread] = 0
