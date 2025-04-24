@@ -30,6 +30,7 @@ class SpinSystem:
         xyz: np.ndarray | str = None,
         shielding: np.ndarray | str = None,
         efg: np.ndarray | str = None,
+        tau_c: float = None,
         max_spin_order: int = None):
         """
         Initializes the spin system.
@@ -98,6 +99,10 @@ class SpinSystem:
             - If a `numpy.ndarray`: A 3D array of size (N, 3, 3) containing the 3x3 EFG tensors in atomic units.
             - If a `str`: Path to the file containing the EFG tensors.
 
+        tau_c : float
+            Isotropic rotational correlation time in units of s. Must be defined to use
+            the Redfield relaxation theory.
+
         TODO: Merkin määrittely selväksi. (Perttu)
 
         max_spin_order : int
@@ -162,6 +167,12 @@ class SpinSystem:
             self.efg = None
         else:
             raise TypeError("EFG should be a NumPy array, a string, or None.")
+        
+        # Assign correlation time
+        if isinstance(tau_c, float) or tau_c is None:
+            self.tau_c = tau_c
+        else:
+            raise TypeError("Correlation time tau_c must be a float or None.")
 
         # Assign maximum spin order
         if isinstance(max_spin_order, int):

@@ -73,18 +73,18 @@ class TestRelaxation(unittest.TestCase):
             [0.0000, 0.7969,  0.0000],
             [0.0000, 0.0000, -1.1037]
         ])
-        spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings, xyz, shielding, efg, max_spin_order=3)
+        tau_c = 50e-12  # Correlation time in seconds
+        spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings, xyz, shielding, efg, tau_c, max_spin_order=3)
 
         # Simulation parameters
         field = 1  # Magnetic field strength in Tesla
-        tau_c = 50e-12  # Correlation time in seconds
         temp = 273  # Temperature in Kelvin
         time_step = 2e-3  # Time step in seconds
         nsteps = 50000  # Number of simulation steps
 
         # Get the Hamiltonian and relaxation superoperator
         H = _hamiltonian.hamiltonian(spin_system, field)
-        R = _relaxation.relaxation(spin_system, H, field, tau_c, temp)
+        R = _relaxation.relaxation(spin_system, H, field, temp)
         L = liouvillian(H, R)
 
         # Create the thermal equilibrium state

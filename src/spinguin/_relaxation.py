@@ -358,8 +358,7 @@ def sop_T(spin_system: SpinSystem, l: int, q: int, interaction_type: str, spin_1
 
 def sop_R_redfield(spin_system: SpinSystem,
                    sop_H: csc_array,
-                   interactions: dict,
-                   tau_c: float) -> csc_array:
+                   interactions: dict) -> csc_array:
     """
     Calculates the relaxation superoperator using Redfield relaxation theory.
 
@@ -381,8 +380,6 @@ def sop_R_redfield(spin_system: SpinSystem,
     interactions : dict
         Interactions organized by rank. Within each rank, contains a list of interactions 
         in the format ("interaction", spin_1, spin_2, tensor).
-    tau_c : float
-        Isotropic rotational correlation time in seconds.
 
     Returns
     -------
@@ -390,7 +387,8 @@ def sop_R_redfield(spin_system: SpinSystem,
         Relaxation superoperator.
     """
 
-    # Extract the dimension of the spin system basis
+    # Extract necessary information from spin system
+    tau_c = spin_system.tau_c
     dim = spin_system.basis.dim
 
     # Initialize the relaxation superoperator
@@ -632,7 +630,6 @@ def sr2k(spin_system: SpinSystem, sop_R: csc_array, B: float) -> csc_array:
 def relaxation(spin_system: SpinSystem, 
                sop_H: csc_array,
                B: float,
-               tau_c: float,
                temperature: float = None,
                include_sr2k: bool = False,
                real_only: bool = True,
@@ -648,8 +645,6 @@ def relaxation(spin_system: SpinSystem,
         Hamiltonian superoperator (coherent part).
     B : float
         Magnetic field in units of T.
-    tau_c : float
-        Isotropic rotational correlation time in units of s.
     temperature : float
         Default: None. Temperature of the spin bath in Kelvins. If specified, Levitt-Di Bari
         thermalization of the relaxation superoperator is performed automatically.
@@ -698,7 +693,7 @@ def relaxation(spin_system: SpinSystem,
     intrs = interactions(spin_system, intrs)
     
     # Calculate R using Redfield theory
-    sop_R = sop_R_redfield(spin_system, sop_H, intrs, tau_c)
+    sop_R = sop_R_redfield(spin_system, sop_H, intrs)
 
     # Process SR2K if enabled
     if include_sr2k:
