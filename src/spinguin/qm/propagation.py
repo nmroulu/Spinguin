@@ -18,7 +18,7 @@ import warnings
 from scipy.sparse import csc_array
 from spinguin.utils.la import expm, expm_custom_dot
 from spinguin.qm.hamiltonian import hamiltonian_zeeman
-from spinguin.qm.operators import superoperator, sop_prod
+from spinguin.qm.superoperators import superoperator, sop_prod
 from spinguin.config import Config
 
 def propagator(L: csc_array,

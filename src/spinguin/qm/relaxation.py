@@ -19,7 +19,7 @@ import numpy as np
 import scipy.constants as const
 from scipy.sparse import csc_array, eye_array, lil_array
 from scipy.special import eval_legendre
-from spinguin.qm import operators
+from spinguin.qm.superoperators import sop_T_coupled, sop_prod
 from spinguin.utils.la import increase_sparsity, principal_axis_system, cartesian_tensor_to_spherical_tensor,\
                          angle_between_vectors, norm_1, auxiliary_matrix_expm, expm
 from spinguin.system.basis import idx_to_lq, lq_to_idx, parse_operator_string, state_idx
@@ -337,18 +337,18 @@ def sop_T(spin_system: SpinSystem, l: int, q: int, interaction_type: str, spin_1
 
     # Single-spin linear interaction
     if interaction_type == "CSA":
-        sop = operators.sop_T_coupled(spin_system, l, q, spin_1)
+        sop = sop_T_coupled(spin_system, l, q, spin_1)
 
     # Single-spin quadratic interaction
     elif interaction_type == "Q":
         op_def = np.zeros(size, dtype=int)
         op_def[spin_1] = lq_to_idx(l, q)
         op_def = tuple(op_def)
-        sop = operators.sop_prod(spin_system, op_def, 'comm')
+        sop = sop_prod(spin_system, op_def, 'comm')
 
     # Two-spin bilinear interaction
     elif interaction_type == "DD":
-        sop = operators.sop_T_coupled(spin_system, l, q, spin_1, spin_2)
+        sop = sop_T_coupled(spin_system, l, q, spin_1, spin_2)
 
     # Raise an error for invalid interaction types
     else:

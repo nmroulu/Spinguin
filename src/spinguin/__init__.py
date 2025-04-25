@@ -9,6 +9,7 @@ from spinguin.qm.operators import *
 from spinguin.qm.propagation import *
 from spinguin.qm.relaxation import *
 from spinguin.qm.states import *
+from spinguin.qm.superoperators import *
 
 # system module
 from spinguin.system.basis import *

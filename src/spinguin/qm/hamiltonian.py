@@ -16,7 +16,7 @@ import numpy as np
 import time
 from scipy.sparse import csc_array
 from spinguin.utils.la import increase_sparsity
-from spinguin.qm.operators import sop_prod
+from spinguin.qm.superoperators import sop_prod
 from spinguin.config import Config
 
 def hamiltonian_zeeman(spin_system: SpinSystem, side: str = 'comm', include_shifts: bool=True) -> csc_array:
