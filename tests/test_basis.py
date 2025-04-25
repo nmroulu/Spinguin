@@ -2,9 +2,9 @@ import unittest
 import numpy as np
 import math
 import copy
-from spinguin._spin_system import SpinSystem
-from spinguin._basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, transform_to_truncated_basis, truncate_basis_by_coherence, parse_operator_string
-from spinguin._operators import superoperator
+from spinguin.system.spin_system import SpinSystem
+from spinguin.system.basis import idx_to_lq, lq_to_idx, coherence_order, state_idx, transform_to_truncated_basis, truncate_basis_by_coherence, parse_operator_string
+from spinguin.qm.operators import superoperator
 
 class TestBasis(unittest.TestCase):
 

@@ -10,9 +10,9 @@ from __future__ import annotations
 import numpy as np
 import hashlib
 from pickle import dumps
-from spinguin._nmr_isotopes import ISOTOPES
-from spinguin._data_io import read_array, read_tensors, read_xyz
-from spinguin._basis import Basis
+from spinguin.utils.nmr_isotopes import ISOTOPES
+from spinguin.utils.data_io import read_array, read_tensors, read_xyz
+from spinguin.system.basis import Basis
 
 class SpinSystem:
 

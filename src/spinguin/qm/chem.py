@@ -8,14 +8,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin.system.spin_system import SpinSystem
 
 # Imports
 import numpy as np
 from scipy.sparse import lil_array, eye_array, csc_array
 from functools import lru_cache
 from typing import Tuple
-from spinguin._basis import state_idx
+from spinguin.system.basis import state_idx
 
 @lru_cache(maxsize=16)
 def dissociate_index_map(spin_system_A: SpinSystem,

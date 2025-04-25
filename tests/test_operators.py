@@ -2,10 +2,10 @@ import unittest
 import numpy as np
 import math
 from scipy.sparse import lil_array
-from spinguin._spin_system import SpinSystem
-from spinguin._la import comm, cartesian_tensor_to_spherical_tensor
-from spinguin._basis import idx_to_lq, parse_operator_string, truncate_basis_by_coherence
-from spinguin._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, \
+from spinguin.system.spin_system import SpinSystem
+from spinguin.utils.la import comm, cartesian_tensor_to_spherical_tensor
+from spinguin.system.basis import idx_to_lq, parse_operator_string, truncate_basis_by_coherence
+from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, \
     sop_prod, operator, superoperator, op_T_coupled, sop_T_coupled, structure_coefficients
 
 class TestOperators(unittest.TestCase):

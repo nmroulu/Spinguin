@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-from spinguin._spin_system import SpinSystem
-from spinguin import _operators
-from spinguin._states import *
+from spinguin.system.spin_system import SpinSystem
+from spinguin.qm import operators
+from spinguin.qm.states import *
 import scipy.constants as const
 
 class TestStates(unittest.TestCase):
@@ -13,8 +13,8 @@ class TestStates(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Create Zeeman operators
-        E = _operators.op_E(1/2)
-        Iz = _operators.op_Sz(1/2)
+        E = operators.op_E(1/2)
+        Iz = operators.op_Sz(1/2)
 
         # Create Zeeman alpha states
         alpha1_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(Iz, E)
@@ -38,8 +38,8 @@ class TestStates(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Create Zeeman operators
-        E = _operators.op_E(1/2)
-        Iz = _operators.op_Sz(1/2)
+        E = operators.op_E(1/2)
+        Iz = operators.op_Sz(1/2)
 
         # Create Zeeman beta states
         beta1_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(Iz, E)
@@ -63,10 +63,10 @@ class TestStates(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Create Zeeman operators
-        E = _operators.op_E(1/2)
-        Iz = _operators.op_Sz(1/2)
-        Ip = _operators.op_Sp(1/2)
-        Im = _operators.op_Sm(1/2)
+        E = operators.op_E(1/2)
+        Iz = operators.op_Sz(1/2)
+        Ip = operators.op_Sp(1/2)
+        Im = operators.op_Sm(1/2)
 
         # Create the singlet state and compare
         singlet_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - 1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
@@ -81,10 +81,10 @@ class TestStates(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Create Zeeman operators
-        E = _operators.op_E(1/2)
-        Iz = _operators.op_Sz(1/2)
-        Ip = _operators.op_Sp(1/2)
-        Im = _operators.op_Sm(1/2)
+        E = operators.op_E(1/2)
+        Iz = operators.op_Sz(1/2)
+        Ip = operators.op_Sp(1/2)
+        Im = operators.op_Sm(1/2)
 
         # Create the triplet-zero state and compare
         triplet_zero_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + 1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
@@ -99,8 +99,8 @@ class TestStates(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Create Zeeman operators
-        E = _operators.op_E(1/2)
-        Iz = _operators.op_Sz(1/2)
+        E = operators.op_E(1/2)
+        Iz = operators.op_Sz(1/2)
 
         # Create the triplet-plus state and compare
         triplet_plus_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + 1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
@@ -115,8 +115,8 @@ class TestStates(unittest.TestCase):
         spin_system = SpinSystem(isotopes)
 
         # Create Zeeman operators
-        E = _operators.op_E(1/2)
-        Iz = _operators.op_Sz(1/2)
+        E = operators.op_E(1/2)
+        Iz = operators.op_Sz(1/2)
 
         # Create the triplet-minus state and compare
         triplet_minus_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - 1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
@@ -137,11 +137,11 @@ class TestStates(unittest.TestCase):
         # Get the Zeeman eigenbasis operators
         opers = {}
         for spin in spins:
-            opers[('x', spin)] = _operators.op_Sx(spin)
-            opers[('y', spin)] = _operators.op_Sy(spin)
-            opers[('z', spin)] = _operators.op_Sz(spin)
-            opers[('+', spin)] = _operators.op_Sp(spin)
-            opers[('-', spin)] = _operators.op_Sm(spin)
+            opers[('x', spin)] = operators.op_Sx(spin)
+            opers[('y', spin)] = operators.op_Sy(spin)
+            opers[('z', spin)] = operators.op_Sz(spin)
+            opers[('+', spin)] = operators.op_Sp(spin)
+            opers[('-', spin)] = operators.op_Sm(spin)
 
         # Try all possible state combinations
         for i in test_states:
@@ -167,7 +167,7 @@ class TestStates(unittest.TestCase):
         # Create the unit state in the Zeeman eigenbasis
         unit_zeeman = 1
         for spin in spins:
-            unit_zeeman = np.kron(unit_zeeman, _operators.op_E(spin))
+            unit_zeeman = np.kron(unit_zeeman, operators.op_E(spin))
 
         # Create the non-normalized unit state in the spherical tensor basis
         unit_sparse = unit_state(spin_system, sparse=True, normalized=False)
@@ -200,11 +200,11 @@ class TestStates(unittest.TestCase):
         # Get the Zeeman eigenbasis operators
         opers = {}
         for spin in spins:
-            opers[('x', spin)] = _operators.op_Sx(spin)
-            opers[('y', spin)] = _operators.op_Sy(spin)
-            opers[('z', spin)] = _operators.op_Sz(spin)
-            opers[('+', spin)] = _operators.op_Sp(spin)
-            opers[('-', spin)] = _operators.op_Sm(spin)
+            opers[('x', spin)] = operators.op_Sx(spin)
+            opers[('y', spin)] = operators.op_Sy(spin)
+            opers[('z', spin)] = operators.op_Sz(spin)
+            opers[('+', spin)] = operators.op_Sp(spin)
+            opers[('-', spin)] = operators.op_Sm(spin)
 
         # Try all possible state combinations
         for i in test_states:

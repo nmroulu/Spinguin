@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin.system.spin_system import SpinSystem
 
 # Imports
 import numpy as np
@@ -20,7 +20,7 @@ import math
 import re
 from itertools import product, combinations
 from scipy.sparse import csc_array
-from spinguin import _la
+from spinguin.utils import la
 from typing import Iterator, Tuple
 
 class Basis:
@@ -279,7 +279,7 @@ def transform_to_truncated_basis(index_map: list, *objs: csc_array | np.ndarray)
     for obj in objs:
 
         # Process state vectors
-        if _la.isvector(obj):
+        if la.isvector(obj):
             transformed_objs.append(obj[index_map])
 
         # Process superoperators

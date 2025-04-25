@@ -1,11 +1,12 @@
 import unittest
 import numpy as np
-from spinguin._spin_system import SpinSystem
-from spinguin import _hamiltonian, _propagation, _relaxation, _states
-from spinguin._nmr_isotopes import ISOTOPES
-from spinguin._basis import truncate_basis_by_coherence, transform_to_truncated_basis
-from spinguin._liouvillian import liouvillian
-from spinguin._settings import Settings
+from spinguin.qm import hamiltonian, propagation, states
+from spinguin.system.spin_system import SpinSystem
+from spinguin.qm import relaxation
+from spinguin.utils.nmr_isotopes import ISOTOPES
+from spinguin.system.basis import truncate_basis_by_coherence, transform_to_truncated_basis
+from spinguin.qm.liouvillian import liouvillian
+from spinguin.config import Settings
 
 class TestRelaxation(unittest.TestCase):
 
@@ -27,9 +28,9 @@ class TestRelaxation(unittest.TestCase):
         r_13C_15N = 0.147e-9
 
         # Calculate DD constants and convert to Hz
-        dd_13C_13C = -_relaxation.dd_constant(y_13C, y_13C) / r_13C_13C**3 / (2 * np.pi)
-        dd_13C_1H = -_relaxation.dd_constant(y_13C, y_1H) / r_13C_1H**3 / (2 * np.pi)
-        dd_13C_15N = _relaxation.dd_constant(y_13C, y_15N) / r_13C_15N**3 / (2 * np.pi)
+        dd_13C_13C = -relaxation.dd_constant(y_13C, y_13C) / r_13C_13C**3 / (2 * np.pi)
+        dd_13C_1H = -relaxation.dd_constant(y_13C, y_1H) / r_13C_1H**3 / (2 * np.pi)
+        dd_13C_15N = relaxation.dd_constant(y_13C, y_15N) / r_13C_15N**3 / (2 * np.pi)
 
         # Compare with tabulated values (in Hz)
         self.assertTrue(np.allclose(2.12e3, dd_13C_13C, rtol=0.01))
@@ -86,15 +87,15 @@ class TestRelaxation(unittest.TestCase):
         nsteps = 50000  # Number of simulation steps
 
         # Get the Hamiltonian and relaxation superoperator
-        H = _hamiltonian.hamiltonian(spin_system)
-        R = _relaxation.relaxation(spin_system, H)
+        H = hamiltonian.hamiltonian(spin_system)
+        R = relaxation.relaxation(spin_system, H)
         L = liouvillian(H, R)
 
         # Create the thermal equilibrium state
-        rho = _states.equilibrium_state(spin_system)
+        rho = states.equilibrium_state(spin_system)
 
         # Apply a 180-degree pulse
-        pul_180 = _propagation.pulse(spin_system, "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)", angle=180)
+        pul_180 = propagation.pulse(spin_system, "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)", angle=180)
         rho = pul_180 @ rho
 
         # Switch to the zero-quantum (ZQ) subspace
@@ -102,11 +103,11 @@ class TestRelaxation(unittest.TestCase):
         L, rho = transform_to_truncated_basis(ZQ_map, L, rho)
 
         # Get the propagator
-        P = _propagation.propagator(L, time_step)
+        P = propagation.propagator(L, time_step)
         
         # Simulate the evolution of the spin system
         for _ in range(nsteps):
             rho = P @ rho  # Propagate the density matrix
 
         # Verify that the final state matches the thermal equilibrium state
-        self.assertTrue(np.allclose(rho, _states.equilibrium_state(spin_system)))
+        self.assertTrue(np.allclose(rho, states.equilibrium_state(spin_system)))

@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-from spinguin._spin_system import SpinSystem
-from spinguin._states import state
-from spinguin._propagation import pulse
+from spinguin.system.spin_system import SpinSystem
+from spinguin.qm.states import state
+from spinguin.qm.propagation import pulse
 
 class TestPropagation(unittest.TestCase):
     """

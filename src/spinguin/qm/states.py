@@ -9,17 +9,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin.system.spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import scipy.constants as const
 from scipy.sparse import lil_array, csc_array, issparse
-from spinguin._la import expm
-from spinguin._operators import op_prod
-from spinguin._hamiltonian import hamiltonian
-from spinguin._basis import parse_operator_string, state_idx
-from spinguin._settings import Settings
+from spinguin.utils.la import expm
+from spinguin.qm.operators import op_prod
+from spinguin.qm.hamiltonian import hamiltonian
+from spinguin.system.basis import parse_operator_string, state_idx
+from spinguin.config import Config
 from typing import Union
 from functools import lru_cache
 
@@ -223,7 +223,7 @@ def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> Union[np
     H = hamiltonian(spin_system, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(-const.hbar / (const.k * Settings.temperature) * H, Settings.ZERO_EQUILIBRIUM, disable_output=True)
+    P = expm(-const.hbar / (const.k * Config.temperature) * H, Config.ZERO_EQUILIBRIUM, disable_output=True)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)

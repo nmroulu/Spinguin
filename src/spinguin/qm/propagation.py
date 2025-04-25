@@ -9,17 +9,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin.system.spin_system import SpinSystem
 
 # Imports
 import time
 import numpy as np
 import warnings
 from scipy.sparse import csc_array
-from spinguin._la import expm, expm_custom_dot
-from spinguin._hamiltonian import hamiltonian_zeeman
-from spinguin._operators import superoperator, sop_prod
-from spinguin._settings import Settings
+from spinguin.utils.la import expm, expm_custom_dot
+from spinguin.qm.hamiltonian import hamiltonian_zeeman
+from spinguin.qm.operators import superoperator, sop_prod
+from spinguin.config import Config
 
 def propagator(L: csc_array,
                t: float,
@@ -61,16 +61,16 @@ def propagator(L: csc_array,
 
     # Compute the matrix exponential
     if custom_dot:
-        expm_Lt = expm_custom_dot(L * t, Settings.ZERO_PROPAGATOR)
+        expm_Lt = expm_custom_dot(L * t, Config.ZERO_PROPAGATOR)
     else:
-        expm_Lt = expm(L * t, Settings.ZERO_PROPAGATOR)
+        expm_Lt = expm(L * t, Config.ZERO_PROPAGATOR)
 
     # Calculate the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
     print(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
-    if density > Settings.DENSITY_THRESHOLD:
+    if density > Config.DENSITY_THRESHOLD:
         print("Density exceeds threshold. Converting to NumPy array.")
         expm_Lt = expm_Lt.toarray()
 
@@ -83,9 +83,9 @@ def propagator(L: csc_array,
         H0 = hamiltonian_zeeman(spin_system, include_shifts=False)
 
         if custom_dot:
-            expm_H0t = expm_custom_dot(1j * H0 * t, Settings.ZERO_PROPAGATOR, disable_output=True)
+            expm_H0t = expm_custom_dot(1j * H0 * t, Config.ZERO_PROPAGATOR, disable_output=True)
         else:
-            expm_H0t = expm(1j * H0 * t, Settings.ZERO_PROPAGATOR, disable_output=True)
+            expm_H0t = expm(1j * H0 * t, Config.ZERO_PROPAGATOR, disable_output=True)
 
         expm_Lt = expm_H0t @ expm_Lt
         print("Rotating frame transformation applied.")
@@ -135,7 +135,7 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float) -> csc_array:
     angle = angle / 180 * np.pi
 
     # Construct the pulse propagator
-    pul = expm(-1j * angle * op, Settings.ZERO_PULSE, disable_output=True)
+    pul = expm(-1j * angle * op, Config.ZERO_PULSE, disable_output=True)
 
     print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 

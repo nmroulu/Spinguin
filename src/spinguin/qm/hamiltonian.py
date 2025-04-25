@@ -9,15 +9,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin.system.spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import time
 from scipy.sparse import csc_array
-from spinguin._la import increase_sparsity
-from spinguin._operators import sop_prod
-from spinguin._settings import Settings
+from spinguin.utils.la import increase_sparsity
+from spinguin.qm.operators import sop_prod
+from spinguin.config import Config
 
 def hamiltonian_zeeman(spin_system: SpinSystem, side: str = 'comm', include_shifts: bool=True) -> csc_array:
     """
@@ -58,9 +58,9 @@ def hamiltonian_zeeman(spin_system: SpinSystem, side: str = 'comm', include_shif
 
         # Compute the Zeeman interaction for the current spin
         if include_shifts:
-            sop_Hz = sop_Hz - gammas[n] * Settings.magnetic_field * (1 + chemical_shifts[n] * 1e-6) * sop_prod(spin_system, op_def, side)
+            sop_Hz = sop_Hz - gammas[n] * Config.magnetic_field * (1 + chemical_shifts[n] * 1e-6) * sop_prod(spin_system, op_def, side)
         else:
-            sop_Hz = sop_Hz - gammas[n] * Settings.magnetic_field * sop_prod(spin_system, op_def, side)
+            sop_Hz = sop_Hz - gammas[n] * Config.magnetic_field * sop_prod(spin_system, op_def, side)
 
     return sop_Hz
 
@@ -149,7 +149,7 @@ def hamiltonian(spin_system: SpinSystem, side: str = 'comm', disable_outputs: bo
     sop_H = sop_Hz + sop_Hj
 
     # Remove small values to enhance sparsity
-    increase_sparsity(sop_H, Settings.ZERO_HAMILTONIAN)
+    increase_sparsity(sop_H, Config.ZERO_HAMILTONIAN)
 
     if not disable_outputs:
         print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit

@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin.system.spin_system import SpinSystem
 
 # Imports
 import time
@@ -19,12 +19,12 @@ import numpy as np
 import scipy.constants as const
 from scipy.sparse import csc_array, eye_array, lil_array
 from scipy.special import eval_legendre
-from spinguin import _operators
-from spinguin._la import increase_sparsity, principal_axis_system, cartesian_tensor_to_spherical_tensor,\
+from spinguin.qm import operators
+from spinguin.utils.la import increase_sparsity, principal_axis_system, cartesian_tensor_to_spherical_tensor,\
                          angle_between_vectors, norm_1, auxiliary_matrix_expm, expm
-from spinguin._basis import idx_to_lq, lq_to_idx, parse_operator_string, state_idx
-from spinguin._hamiltonian import hamiltonian
-from spinguin._settings import Settings
+from spinguin.system.basis import idx_to_lq, lq_to_idx, parse_operator_string, state_idx
+from spinguin.qm.hamiltonian import hamiltonian
+from spinguin.config import Config
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -292,14 +292,14 @@ def interactions(spin_system: SpinSystem, intrs: dict) -> dict:
             # Process single-spin interactions
             if interaction in ["CSA", "Q"]:
                 for spin_1 in range(size):
-                    if norm_1(tensors[spin_1], ord='row') > Settings.ZERO_INTERACTION:
+                    if norm_1(tensors[spin_1], ord='row') > Config.ZERO_INTERACTION:
                         interactions[rank].append((interaction, spin_1, None, tensors[spin_1]))
 
             # Process two-spin interactions
             if interaction == "DD":
                 for spin_1 in range(size):
                     for spin_2 in range(size):
-                        if norm_1(tensors[spin_1, spin_2], ord='row') > Settings.ZERO_INTERACTION:
+                        if norm_1(tensors[spin_1, spin_2], ord='row') > Config.ZERO_INTERACTION:
                             interactions[rank].append((interaction, spin_1, spin_2, tensors[spin_1, spin_2]))
 
     return interactions
@@ -337,18 +337,18 @@ def sop_T(spin_system: SpinSystem, l: int, q: int, interaction_type: str, spin_1
 
     # Single-spin linear interaction
     if interaction_type == "CSA":
-        sop = _operators.sop_T_coupled(spin_system, l, q, spin_1)
+        sop = operators.sop_T_coupled(spin_system, l, q, spin_1)
 
     # Single-spin quadratic interaction
     elif interaction_type == "Q":
         op_def = np.zeros(size, dtype=int)
         op_def[spin_1] = lq_to_idx(l, q)
         op_def = tuple(op_def)
-        sop = _operators.sop_prod(spin_system, op_def, 'comm')
+        sop = operators.sop_prod(spin_system, op_def, 'comm')
 
     # Two-spin bilinear interaction
     elif interaction_type == "DD":
-        sop = _operators.sop_T_coupled(spin_system, l, q, spin_1, spin_2)
+        sop = operators.sop_T_coupled(spin_system, l, q, spin_1, spin_2)
 
     # Raise an error for invalid interaction types
     else:
@@ -395,7 +395,7 @@ def sop_R_redfield(spin_system: SpinSystem,
     sop_R = csc_array((dim, dim), dtype=complex)
 
     # Define the integration limit for the auxiliary matrix method
-    t_max = np.log(1 / Settings.RELATIVE_ERROR) * tau_c
+    t_max = np.log(1 / Config.RELATIVE_ERROR) * tau_c
 
     # Diagonal matrices of correlation times
     tau_c_diagonal_l1 = 1 / tau_c_l(tau_c, 1) * eye_array(sop_H.shape[0], format='csc')
@@ -436,9 +436,9 @@ def sop_R_redfield(spin_system: SpinSystem,
 
                 # Calculate the Redfield integral using the auxiliary matrix method
                 if l == 1:
-                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, Settings.ZERO_AUX)
+                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, Config.ZERO_AUX)
                 elif l == 2:
-                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, Settings.ZERO_AUX)
+                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, Config.ZERO_AUX)
 
                 # Extract top left and top right blocks
                 top_left = sop_T_right[:dim, :dim]
@@ -669,7 +669,7 @@ def relaxation(spin_system: SpinSystem,
 
     # Process nuclear shielding
     if spin_system.shielding is not None:
-        sh_tensors = shielding_intr_tensors(spin_system, Settings.magnetic_field)
+        sh_tensors = shielding_intr_tensors(spin_system, Config.magnetic_field)
         if antisymmetric:
             sh_ranks = [1, 2]
         else:
@@ -690,17 +690,17 @@ def relaxation(spin_system: SpinSystem,
 
     # Process SR2K if enabled
     if include_sr2k:
-        sop_R = sr2k(spin_system, sop_R, Settings.magnetic_field)
+        sop_R = sr2k(spin_system, sop_R, Config.magnetic_field)
 
     # Return only real values if requested
     if real_only:
         sop_R = sop_R.real
 
     # Remove small elements from the relaxation superoperator
-    increase_sparsity(sop_R, Settings.ZERO_RELAXATION)
+    increase_sparsity(sop_R, Config.ZERO_RELAXATION)
 
     # Apply thermalization, if temperature is defined
-    if Settings.temperature is not None:
+    if Config.temperature is not None:
         sop_R = ldb_thermalization(spin_system, sop_R)
 
     print(f'Relaxation superoperator constructed in {time.time() - time_start:.4f} seconds.')
@@ -729,7 +729,7 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array) -> csc_array:
     H = hamiltonian(spin_system, 'left', disable_outputs=True)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(const.hbar / (const.k * Settings.temperature) * H, Settings.ZERO_THERMALIZATION, disable_output=True)
+    P = expm(const.hbar / (const.k * Config.temperature) * H, Config.ZERO_THERMALIZATION, disable_output=True)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P

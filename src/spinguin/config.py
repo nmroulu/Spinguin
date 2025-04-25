@@ -1,4 +1,4 @@
-class Settings():
+class Config():
     """
     Contains global settings for the spin dynamics simulations.
 
