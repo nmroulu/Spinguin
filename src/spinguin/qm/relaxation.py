@@ -628,10 +628,7 @@ def sr2k(spin_system: SpinSystem, sop_R: csc_array, B: float) -> csc_array:
     return sop_R
 
 def relaxation(spin_system: SpinSystem, 
-               sop_H: csc_array,
-               include_sr2k: bool = False,
-               real_only: bool = True,
-               antisymmetric: bool = False) -> csc_array:
+               sop_H: csc_array) -> csc_array:
     """
     Calculates the relaxation superoperator.
 
@@ -641,13 +638,6 @@ def relaxation(spin_system: SpinSystem,
         The spin system object containing information about the spins.
     sop_H : csc_array
         Hamiltonian superoperator (coherent part).
-    include_sr2k : bool
-        Default: False. Whether to include scalar relaxation of the second kind (SR2K).
-        Applies only for spin systems with quadrupolar nuclei.
-    real_only : bool
-        Default: True. Whether to return only the real component (dynamic frequency shift excluded).
-    antisymmetric : bool
-        Default: False. Whether to include rank-1 components for CSA interactions.
 
     Returns
     -------
@@ -670,7 +660,7 @@ def relaxation(spin_system: SpinSystem,
     # Process nuclear shielding
     if spin_system.shielding is not None:
         sh_tensors = shielding_intr_tensors(spin_system, Config.magnetic_field)
-        if antisymmetric:
+        if Config.relaxation_antisymmetric:
             sh_ranks = [1, 2]
         else:
             sh_ranks = [2]
@@ -689,11 +679,11 @@ def relaxation(spin_system: SpinSystem,
     sop_R = sop_R_redfield(spin_system, sop_H, intrs)
 
     # Process SR2K if enabled
-    if include_sr2k:
+    if Config.sr2k:
         sop_R = sr2k(spin_system, sop_R, Config.magnetic_field)
 
-    # Return only real values if requested
-    if real_only:
+    # Return only real values if the dynamic frequency shift is not included
+    if not Config.dynamic_frequency_shift:
         sop_R = sop_R.real
 
     # Remove small elements from the relaxation superoperator

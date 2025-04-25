@@ -8,6 +8,16 @@ class Config():
         External magnetic field in the simulations in the units of T.
     temperature : float, default=None
         Temperature of the spin bath in the units of K.
+    sr2k : bool, default=False
+        Specifies whether scalar relaxation of the second kind is taken into account.
+        Applies only for spin systems with quadrupolar nuclei.
+    dynamic_frequency_shift : bool, default=False
+        Determines whether the imaginary part of the relaxation superoperator, which causes
+        the dynamic frequency shift, is kept in the calculation. These are usually very small
+        and can be ignored.
+    relaxation_antisymmetric : bool, default=False
+        Specifies whether the rank-1 components of the CSA are included in the computation
+        of relaxation superoperator. These are usually very small and can be ignored.
     ZERO_HAMILTONIAN : float
         Hamiltonian is calculated as a sparse matrix. Matrix elements below this threshold
         will be set to zero after constructing the total Hamiltonian.
@@ -33,14 +43,14 @@ class Config():
         done using scaling and squaring method together with Taylor series. This value is used
         to estimate the convergence of the Taylor series and to increase the sparsity within the
         squaring step.
-    ZERO_THERMALIZATION
+    ZERO_THERMALIZATION : float
         Thermalization is done using the Levitt-di Bari method, which involves a matrix exponential.
         This is done using the scaling and squaring method together with Taylor series. This value
         is used to estimate the convergence of the Taylor series and to increase the sparsity within
         the squaring step.
 
         NOTE: Consider tightening this threshold when using very low magnetic fields.
-    ZERO_EQUILIBRIUM
+    ZERO_EQUILIBRIUM : float
         Constructing the equilibrium state involves a matrix exponential, which is performed using
         the scaling and squaring method together with Taylor series. This value is used to estimate the
         convergence of the Taylor series and to increase the sparsity withing the squaring step.
@@ -55,6 +65,9 @@ class Config():
     # Simulation settings
     magnetic_field: float=None
     temperature: float=None
+    sr2k: bool=False
+    dynamic_frequency_shift: bool=False
+    relaxation_antisymmetric: bool=False
 
     # Numerical settings
     ZERO_HAMILTONIAN = 1e-12
