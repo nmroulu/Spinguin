@@ -19,7 +19,6 @@ from itertools import product
 from spinguin.utils import la
 from spinguin.system.basis import idx_to_lq, parse_operator_string
 from scipy.sparse import csc_array, eye_array
-from typing import Union
 
 def op_E(S: float) -> np.ndarray:
     """

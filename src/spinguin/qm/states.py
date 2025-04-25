@@ -20,10 +20,9 @@ from spinguin.qm.operators import op_prod
 from spinguin.qm.hamiltonian import hamiltonian
 from spinguin.system.basis import parse_operator_string, state_idx
 from spinguin.config import Config
-from typing import Union
 from functools import lru_cache
 
-def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=True) -> Union[np.ndarray, csc_array]:
+def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=True) -> np.ndarray | csc_array:
     """
     Returns a unit state vector. This is equivalent to the density matrix, which has
     ones on the diagonal. Because the basis set is normalized, the coefficient of the
@@ -70,7 +69,7 @@ def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=Tru
     return rho
 
 @lru_cache(maxsize=128)
-def state(spin_system: SpinSystem, operator: str, sparse: bool=False) -> Union[np.ndarray, csc_array]:
+def state(spin_system: SpinSystem, operator: str, sparse: bool=False) -> np.ndarray | csc_array:
     """
     Generates a state vector from the given operator string. The output of the state
     function corresponds to a density matrix, which is expressed as a linear combination
@@ -152,7 +151,7 @@ def state(spin_system: SpinSystem, operator: str, sparse: bool=False) -> Union[n
 
     return rho
 
-def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) -> np.ndarray:
+def rho_to_zeeman(spin_system: SpinSystem, rho: np.ndarray | csc_array) -> np.ndarray:
     """
     Takes the state vector defined in the normalized spherical tensor basis
     and converts it into the Zeeman eigenbasis. Useful for error checking.
@@ -199,7 +198,7 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array]) ->
     
     return rho_zeeman
 
-def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Returns the state vector corresponding to thermal equilibrium.
 
@@ -234,7 +233,7 @@ def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> Union[np
 
     return rho_eq
 
-def alpha_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def alpha_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Generates the alpha state for a given spin-1/2 nucleus. Unit state is assigned to the
     other spins.
@@ -267,7 +266,7 @@ def alpha_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> Un
 
     return rho
 
-def beta_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def beta_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Generates the beta state for a given spin-1/2 nucleus. Unit state is assigned to the
     other spins.
@@ -300,7 +299,7 @@ def beta_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> Uni
 
     return rho
 
-def singlet_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def singlet_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Generates the singlet state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
@@ -337,7 +336,7 @@ def singlet_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: b
 
     return rho
 
-def triplet_zero_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def triplet_zero_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Generates the triplet zero state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
@@ -374,7 +373,7 @@ def triplet_zero_state(spin_system: SpinSystem, index_1: int, index_2: int, spar
 
     return rho
 
-def triplet_plus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def triplet_plus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Generates the triplet plus state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
@@ -411,7 +410,7 @@ def triplet_plus_state(spin_system: SpinSystem, index_1: int, index_2: int, spar
 
     return rho
 
-def triplet_minus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> Union[np.ndarray, csc_array]:
+def triplet_minus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
     """
     Generates the triplet minus state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
@@ -448,7 +447,7 @@ def triplet_minus_state(spin_system: SpinSystem, index_1: int, index_2: int, spa
 
     return rho
 
-def measure(spin_system: SpinSystem, rho: Union[np.ndarray, csc_array], operator: str) -> complex:
+def measure(spin_system: SpinSystem, rho: np.ndarray | csc_array, operator: str) -> complex:
     """
     Computes the expectation value of the specified operator for a given state vector.
     Assumes that the state vector `rho` represents a trace-normalized density matrix.
