@@ -2,7 +2,7 @@
 operators.py
 
 This module provides functions for calculating quantum mechanical spin operators.
-It includes functions for single-spin operators as well as many-spin superoperators.
+It includes functions for single-spin operators as well as many-spin operators.
 """
 
 # For referencing the SpinSystem class
@@ -14,13 +14,12 @@ if TYPE_CHECKING:
 
 # Imports
 import numpy as np
+import scipy.sparse as sp
 from functools import lru_cache
-from itertools import product
 from spinguin.utils import la
 from spinguin.system.basis import idx_to_lq, parse_operator_string
-from scipy.sparse import csc_array, eye_array
 
-def op_E(S: float) -> np.ndarray:
+def op_E(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the unit operator for a given spin quantum number `S`.
 
@@ -28,19 +27,23 @@ def op_E(S: float) -> np.ndarray:
     ----------
     S : float
         Spin quantum number.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    E : numpy.ndarray
-        NumPy array representing the unit operator.
+    E : ndarray or csc_array
+        An array representing the unit operator.
     """
     # Generate a unit operator of the correct dimension
     dim = int(2 * S + 1)
-    E = np.eye(dim)
+    E = sp.eye_array(dim, format="csc")
+    if not sparse:
+        E = E.toarray()
 
     return E
 
-def op_Sx(S: float) -> np.ndarray:
+def op_Sx(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the spin operator Sx for a given spin quantum number `S`.
 
@@ -48,18 +51,20 @@ def op_Sx(S: float) -> np.ndarray:
     ----------
     S : float
         Spin quantum number.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    Sx : numpy.ndarray
-        NumPy array representing the x-component spin operator.
+    Sx : ndarray or csc_array
+        An array representing the x-component spin operator.
     """
     # Calculate Sx using the raising and lowering operators
-    Sx = 1 / 2 * (op_Sp(S) + op_Sm(S))
+    Sx = 1 / 2 * (op_Sp(S, sparse) + op_Sm(S, sparse))
 
     return Sx
 
-def op_Sy(S: float) -> np.ndarray:
+def op_Sy(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the spin operator Sy for a given spin quantum number `S`.
 
@@ -67,18 +72,20 @@ def op_Sy(S: float) -> np.ndarray:
     ----------
     S : float
         Spin quantum number.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    Sy : numpy.ndarray
-        NumPy array representing the y-component spin operator.
+    Sy : ndarray or csc_array
+        An array representing the y-component spin operator.
     """
     # Calculate Sy using the raising and lowering operators
-    Sy = 1 / (2j) * (op_Sp(S) - op_Sm(S))
+    Sy = 1 / (2j) * (op_Sp(S, sparse) - op_Sm(S, sparse))
 
     return Sy
 
-def op_Sz(S: float) -> np.ndarray:
+def op_Sz(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the spin operator Sz for a given spin quantum number `S`.
 
@@ -86,25 +93,33 @@ def op_Sz(S: float) -> np.ndarray:
     ----------
     S : float
         Spin quantum number.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    Sz : numpy.ndarray
-        NumPy array representing the z-component spin operator.
+    Sz : ndarray or csc_array
+        An array representing the z-component spin operator.
     """
     # Get the possible spin magnetic quantum numbers (from largest to smallest)
     m = -np.arange(-S, S + 1)
 
     # Initialize the operator
-    Sz = np.zeros((len(m), len(m)), dtype=complex)
+    Sz = sp.lil_array((len(m), len(m)), dtype=complex)
+    if not sparse:
+        Sz = Sz.toarray()
 
     # Populate the diagonal elements
     for i in range(len(m)):
-        Sz[i, i] = m[i]  
+        Sz[i, i] = m[i]
+
+    # Convert to CSC if sparse
+    if sparse:
+        Sz = Sz.tocsc()
 
     return Sz
 
-def op_Sp(S: float) -> np.ndarray:
+def op_Sp(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the spin raising operator for a given spin quantum number `S`.
 
@@ -112,25 +127,33 @@ def op_Sp(S: float) -> np.ndarray:
     ----------
     S : float
         Spin quantum number.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    Sp : numpy.ndarray
-        NumPy array representing the raising operator.
+    Sp : ndarray or csc_array
+        An array representing the raising operator.
     """
     # Get the possible spin magnetic quantum numbers
     m = np.arange(-S, S + 1)
 
     # Initialize the operator
-    Sp = np.zeros((len(m), len(m)), dtype=complex)
+    Sp = sp.lil_array((len(m), len(m)), dtype=complex)
+    if not sparse:
+        Sp = Sp.toarray()
 
     # Populate the off-diagonal elements
     for i in range(len(m) - 1):
         Sp[i, i + 1] = np.sqrt(S * (S + 1) - m[i] * (m[i] + 1))
 
+    # Convert to CSC if sparse
+    if sparse:
+        Sp = Sp.tocsc()
+
     return Sp
 
-def op_Sm(S: float) -> np.ndarray:
+def op_Sm(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the spin lowering operator for a given spin quantum number `S`.
 
@@ -138,26 +161,33 @@ def op_Sm(S: float) -> np.ndarray:
     ----------
     S : float
         Spin quantum number.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    Sm : numpy.ndarray
-        NumPy array representing the lowering operator.
+    Sm : ndarray or csc_array
+        An array representing the lowering operator.
     """
     # Get the possible spin magnetic quantum numbers
     m = np.arange(-S, S + 1)
 
     # Initialize the operator
-    Sm = np.zeros((len(m), len(m)), dtype=complex)
+    Sm = sp.lil_array((len(m), len(m)), dtype=complex)
+    if not sparse:
+        Sm = Sm.toarray()
 
     # Populate the off-diagonal elements
     for i in range(1, len(m)):
         Sm[i, i - 1] = np.sqrt(S * (S + 1) - m[i] * (m[i] - 1))
 
+    # Convert to CSC if sparse
+    if sparse:
+        Sm = Sm.tocsc()
+
     return Sm
 
-@lru_cache(maxsize=1024)
-def op_T(S: float, l: int, q: int) -> np.ndarray:
+def op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the numerical spherical tensor operator for a given spin quantum number `S`, 
     rank `l`, and projection `q`. The operator is obtained by sequential lowering of the 
@@ -175,26 +205,40 @@ def op_T(S: float, l: int, q: int) -> np.ndarray:
         Operator rank.
     q : int
         Operator projection.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
-    T : numpy.ndarray
-        NumPy array representing the spherical tensor operator.
+    T : ndarray or csc_array
+        An array representing the spherical tensor operator.
     """
-    # Calculate the operator with maximum projection q = l
-    T = (-1)**l * 2**(-l / 2) * np.linalg.matrix_power(op_Sp(S), l)
+    @lru_cache(maxsize=1024)
+    def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray:
 
-    # Perform the necessary number of lowerings
-    for i in range(l - q):
-        # Get the current q
-        q = l - i
+        # Calculate the operator with maximum projection q = l
+        if sparse:
+            T = (-1)**l * 2**(-l / 2) * sp.linalg.matrix_power(op_Sp(S, sparse), l)
+        else:
+            T = (-1)**l * 2**(-l / 2) * np.linalg.matrix_power(op_Sp(S, sparse), l)
 
-        # Perform the lowering
-        T = la.comm(op_Sm(S), T) / np.sqrt(l * (l + 1) - q * (q - 1))
+        # Perform the necessary number of lowerings
+        for i in range(l - q):
+
+            # Get the current q
+            q = l - i
+
+            # Perform the lowering
+            T = la.comm(op_Sm(S, sparse), T) / np.sqrt(l * (l + 1) - q * (q - 1))
+
+        return T
+
+    # Ensure a separate copy is returned
+    T = _op_T(S, l, q, sparse).copy()
 
     return T
 
-def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float) -> np.ndarray:
+def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Computes the coupled irreducible spherical tensor of rank `l` and projection `q`
     from two irreducible spherical tensors of ranks `l1` and `l2`.
@@ -213,27 +257,34 @@ def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float) -> np.n
         Rank of the second operator to be coupled.
     s2 : float
         Spin quantum number of the second spin.
+    sparse: bool, default=True
+        Specifies whether to return the operator as sparse or dense array.
     
     Returns
     -------
-    T : numpy.ndarray
+    T : ndarray or csc_array
         Coupled spherical tensor operator of rank `l` and projection `q`.
     """
 
     # Initialize the operator
     dim = int((2 * s1 + 1) * (2 * s2 + 1))
-    T = np.zeros((dim, dim), dtype=complex)
+    T = sp.csc_array((dim, dim), dtype=complex)
+    if not sparse:
+        T = T.toarray()
 
     # Iterate over the projections
     for q1 in range(-l1, l1 + 1):
         for q2 in range(-l2, l2 + 1):
 
             # Analogously to the coupling of angular momenta
-            T += la.CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1), op_T(s2, l2, q2))
+            if sparse:
+                T += la.CG_coeff(l1, q1, l2, q2, l, q) * sp.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
+            else:
+                T += la.CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
 
     return T
 
-def op_prod(op_def: tuple, spins: tuple, include_unit: bool=True) -> np.ndarray:
+def op_prod(op_def: tuple, spins: tuple, include_unit: bool=True, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a product operator defined by `op_def` in the Zeeman eigenbasis.
 
@@ -247,15 +298,19 @@ def op_prod(op_def: tuple, spins: tuple, include_unit: bool=True) -> np.ndarray:
         Spin quantum numbers. Must match the length of `op_def`.
     include_unit : bool
         Specifies whether unit operators are included in the product operator.
+    sparse : bool
+        Specifies whether the operator is returned as sparse or dense array.
 
     Returns
     -------
-    op : numpy.ndarray
+    op : ndarray or csc_array
         Product operator in the Zeeman eigenbasis.
     """
 
     # Initialize the product operator
-    op = 1
+    op = sp.csc_array([[1]])
+    if not sparse:
+        op = op.toarray()
 
     # Iterate through the operator definition
     for spin, oper in zip(spins, op_def):
@@ -267,11 +322,14 @@ def op_prod(op_def: tuple, spins: tuple, include_unit: bool=True) -> np.ndarray:
             l, q = idx_to_lq(oper)
 
             # Add to the product operator
-            op = np.kron(op, op_T(spin, l, q))
+            if sparse:
+                op = sp.kron(op, op_T(spin, l, q, sparse))
+            else:
+                op = np.kron(op, op_T(spin, l, q, sparse))
 
     return op
 
-def operator(spin_system: SpinSystem, operator: str) -> np.ndarray:
+def operator(spin_system: SpinSystem, operator: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates an operator for the `spin_system` in Hilbert space from the user-specified `operators` string.
 
@@ -282,30 +340,39 @@ def operator(spin_system: SpinSystem, operator: str) -> np.ndarray:
     operator : str
         Defines the operator to be generated. The operator string must follow the rules below:
 
-        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
-        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
-        - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
-        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
-        - The unit operator is not typed. Example: I(z,1) will generate E*I_z in case of a two-spin system. 
-        - Whitespace will be ignored in the input.
+        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+    
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
+    sparse : bool, default=True
+        Specifies whether to construct the operator as a sparse or dense array.
 
     Returns
     -------
-    op : numpy.ndarray
-        The requested operator.
+    op : ndarray or csc_array
+        An array representing the requested operator.
     """
 
     # Get the dimension of the operator
     dim = np.prod(spin_system.mults)
 
     # Initialize the operator
-    op = np.zeros((dim, dim), dtype=complex)
+    op = sp.csc_array((dim, dim), dtype=complex)
+    if not sparse:
+        op = op.toarray()
 
     # Get the operator definitions and coefficients
-    op_defs, coeffs = parse_operator_string(spin_system, operator)
+    op_defs, coeffs = parse_operator_string(operator, spin_system.size)
 
     # Construct the operator
     for op_def, coeff in zip(op_defs, coeffs):
-        op = op + coeff * op_prod(op_def, spin_system.spins)
+        op = op + coeff * op_prod(op_def, spin_system.spins, include_unit=True, sparse=sparse)
 
     return op
