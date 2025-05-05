@@ -7,6 +7,7 @@ Provides various linear algebra tools required for spin dynamics simulations.
 # Imports
 import math
 import numpy as np
+from numpy.typing import ArrayLike
 from scipy.sparse import eye_array, csc_array, block_array, issparse
 from scipy.io import mmwrite, mmread
 from scipy.signal import find_peaks
@@ -829,3 +830,29 @@ def frequency_to_chemical_shift(frequency: float | np.ndarray,
         Converted chemical shift value (or array of values).
     """
     return (frequency - reference_frequency) / spectrometer_frequency * 1e6
+
+def arraylike_to_tuple(A: ArrayLike) -> tuple:
+    """
+    Converts a 1-dimensional `ArrayLike` object into a Python tuple.
+
+    Parameters
+    ----------
+    A : ArrayLike
+        An object that can be converted into NumPy array.
+
+    Returns
+    -------
+    A : tuple
+        The original object represented as Python tuple.
+    """
+
+    # Convert to tuple
+    A = np.asarray(A)
+    if A.ndim == 0:
+        A = tuple([A.item()])
+    elif A.ndim == 1:
+        A = tuple(A)
+    else:
+        raise ValueError(f"Cannot convert {A.ndim}-dimensional array into tuple.")
+    
+    return A
