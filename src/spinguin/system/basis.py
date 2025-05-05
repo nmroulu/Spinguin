@@ -21,7 +21,7 @@ import re
 from itertools import product, combinations
 from scipy.sparse import csc_array
 from spinguin.utils import la
-from typing import Iterator, Tuple
+from typing import Iterator
 
 class Basis:
     """
@@ -52,6 +52,10 @@ class Basis:
 
         # Create the basis
         self.make_basis(spin_system)
+
+    def __getitem__(self, key):
+        """Make it possible to access the basis array directly."""
+        return self.arr[key]
 
     @property
     def dim(self) -> int:
@@ -168,88 +172,82 @@ class Basis:
 
         return basis
     
-def state_idx(spin_system: SpinSystem, op_def: tuple) -> int:
-    """
-    Finds the index corresponding to the given operator definition.
+    def truncate_by_coherence(self, coherence_orders: list) -> list:
+        """
+        Truncates the basis set by retaining only the product operators that correspond to
+        coherence orders specified in the `coherence_orders` list.
 
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        The spin system containing the basis.
-    op_def : tuple
-        Tuple of integers that describes the operator of interest.
+        The function generates an index map from the original basis to the truncated basis.
+        This map can be used to transform superoperators or state vectors to the new basis.
 
-    Returns
-    -------
-    idx : int
-        Index of the given state in the basis set.
-    """
+        Parameters
+        ----------
+        coherence_orders : list
+            List of coherence orders to be retained in the basis.
 
-    # Get the index
-    idx = spin_system.basis.dict[op_def]
+        Returns
+        -------
+        index_map : list
+            List that contains an index map from the original basis to the truncated basis.
+        """
 
-    return idx
+        print(f"Truncating the basis set. The following coherence orders are retained: {coherence_orders}")
+        time_start = time.time()
 
-def truncate_basis_by_coherence(spin_system: SpinSystem, coherence_orders: list) -> list:
-    """
-    Truncates the basis set of the `SpinSystem` object by retaining only the product operators
-    in the basis that correspond to coherence orders specified in the `coherence_orders` list.
-    The function generates also an index map from the original basis to the truncated basis.
-    This map can be used to transform superoperators or state vectors to the new basis by
-    using the `project_to_truncated_basis()` function.
+        # Create an empty dictionary for the new basis
+        basis_dict = {}
 
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        The spin system whose basis set will be truncated.
-    coherence_orders : list
-        List of coherence orders to be retained in the basis.
+        # Create an empty list for the mapping from old to new basis
+        index_map = []
 
-    Returns
-    -------
-    index_map : list
-        List that contains an index map from the original basis to the truncated basis.
+        # Iterate over the basis
+        i = 0
+        for state, idx in self.dict.items():
 
-    TODO: Funktion ja input parametrien nimeäminen? Onko Pertulla ideoita?
-    """
+            # Check if coherence order is in the list
+            if coherence_order(state) in coherence_orders:
 
-    print(f"Truncating the basis set. The following coherence orders are retained: {coherence_orders}")
-    time_start = time.time()
+                # Assign state to the truncated basis and increment index
+                basis_dict[state] = i
+                i += 1
 
-    # Create an empty dictionary for the new basis
-    basis_dict = {}
+                # Assign index to the index map
+                index_map.append(idx)
 
-    # Create an empty list for the mapping from old to new basis
-    index_map = []
+        # Convert basis to NumPy array
+        basis = np.array(list(basis_dict.keys()))
 
-    # Iterate over the basis
-    i = 0
-    for state, idx in spin_system.basis.dict.items():
+        # Save the basis
+        self.arr = basis
+        self.dict = basis_dict
 
-        # Check if coherence order is in the list
-        if coherence_order(state) in coherence_orders:
+        print("Truncated basis created.")
+        print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+        print()
 
-            # Assign state to the truncated basis and increment index
-            basis_dict[state] = i
-            i += 1
+        return index_map
+    
+    def state_idx(self, op_def: tuple) -> int:
+        """
+        Finds the index corresponding to the given operator definition.
 
-            # Assign index to the index map
-            index_map.append(idx)
+        Parameters
+        ----------
+        op_def : tuple
+            Tuple of integers that describes the operator of interest.
 
-    # Convert basis to NumPy array
-    basis = np.array(list(basis_dict.keys()))
+        Returns
+        -------
+        idx : int
+            Index of the given state in the basis set.
+        """
 
-    # Save the basis
-    spin_system.basis.arr = basis
-    spin_system.basis.dict = basis_dict
+        # Get the index
+        idx = self.dict[op_def]
 
-    print("Truncated basis created.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+        return idx
 
-    return index_map
-
-def transform_to_truncated_basis(index_map: list, *objs: csc_array | np.ndarray) -> csc_array | np.ndarray | Tuple[csc_array, ...] | Tuple[np.ndarray, ...]:
+def transform_to_truncated_basis(index_map: list, *objs: csc_array | np.ndarray) -> csc_array | np.ndarray | tuple[csc_array, ...] | tuple[np.ndarray, ...]:
     """
     Transforms superoperators or state vectors to a truncated basis using the `index_map`, which
     is obtained from `truncate_basis_by_coherence()` function. Multiple objects can be transformed
@@ -319,7 +317,7 @@ def lq_to_idx(l: int, q: int) -> int:
 
     return idx
 
-def idx_to_lq(idx: int) -> Tuple[int, int]:
+def idx_to_lq(idx: int) -> tuple[int, int]:
     """
     Converts the given operator index to rank l and projection q.
 
@@ -369,7 +367,7 @@ def coherence_order(op_def: tuple) -> int:
 
     return order
 
-def parse_operator_string(spin_system: SpinSystem, operator: str):
+def parse_operator_string(operator: str, nspins: int):
     """
     Parses operator strings and returns their definitions in the basis set as well as their corresponding coefficients.
     The operator string must follow the rules below:
@@ -378,16 +376,20 @@ def parse_operator_string(spin_system: SpinSystem, operator: str):
     - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
     - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
     - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
-    - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
+    - Unit operators are ignored in the input. Interpretation of these two is identical: "E * I(z,1)", "I(z,1)"
+    
+    Special case: An empty `operator` string is considered as unit operator.
 
     Whitespace will be ignored in the input.
 
+    NOTE: Indexing starts from 0!
+
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the operator is going to be generated.
     operator : str
         String that defines the operator to be generated.
+    nspins : int
+        Number of spins in the system.
 
     Returns
     -------
@@ -405,14 +407,33 @@ def parse_operator_string(spin_system: SpinSystem, operator: str):
     # Remove spaces from the user input
     operator = "".join(operator.split())
 
+    # Handle special case for unit operator
+    if operator == "":
+        op_def = tuple(0 for _ in range(nspins))
+        coeff = tuple(1 for _ in range(nspins))
+        op_defs.append(op_def)
+        coeffs.append(coeff)
+        return op_defs, coeffs
+
     # Split the user input into separate product operators
-    prod_ops = re.split(r'(?<=\))\+', operator)
+    prod_ops = []
+    inside_parantheses = False
+    start = 0
+    for i, char in enumerate(operator):
+        if char == '(':
+            inside_parantheses = True
+        elif char == ')':
+            inside_parantheses = False
+        elif char == '+' and not inside_parantheses:
+            prod_ops.append(operator[start:i])
+            start = i + 1
+    prod_ops.append(operator[start:])
 
     # Process each product operator separately
     for prod_op in prod_ops:
 
         # Start from a unit operator
-        op = np.array(['E' for _ in range(spin_system.size)], dtype='<U5')
+        op = np.array(['E' for _ in range(nspins)], dtype='<U5')
 
         # Separate the terms in the product operator
         op_terms = prod_op.split('*')
@@ -420,17 +441,20 @@ def parse_operator_string(spin_system: SpinSystem, operator: str):
         # Process each term separately
         for op_term in op_terms:
 
-            # Obtain the component and index
-            component_and_index = re.search(r'\(([^)]*)\)', op_term).group(1).split(',')
+            # Handle unit operators (by default exist in the operator)
+            if op_term[0] == 'E':
+                pass
 
             # Handle Cartesian and ladder operators
-            if op_term[0] == 'I':
+            elif op_term[0] == 'I':
+                component_and_index = re.search(r'\(([^)]*)\)', op_term).group(1).split(',')
                 component = component_and_index[0]
                 index = int(component_and_index[1])
                 op[index] = f"I_{component}"
 
             # Handle spherical tensor operators
             elif op_term[0] == 'T':
+                component_and_index = re.search(r'\(([^)]*)\)', op_term).group(1).split(',')
                 l = component_and_index[0]
                 q = component_and_index[1]
                 index = int(component_and_index[2])
