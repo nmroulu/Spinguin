@@ -372,11 +372,11 @@ def parse_operator_string(operator: str, nspins: int):
     Parses operator strings and returns their definitions in the basis set as well as their corresponding coefficients.
     The operator string must follow the rules below:
 
-    - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
-    - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
-    - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
-    - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
-    - Unit operators are ignored in the input. Interpretation of these two is identical: "E * I(z,1)", "I(z,1)"
+    - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+    - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+    - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+    - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
+    - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
     
     Special case: An empty `operator` string is considered as unit operator.
 
