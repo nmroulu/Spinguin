@@ -1,12 +1,10 @@
 import unittest
 import numpy as np
 import math
-from scipy.sparse import lil_array
 from spinguin.system.spin_system import SpinSystem
-from spinguin.utils.la import comm, cartesian_tensor_to_spherical_tensor
-from spinguin.system.basis import idx_to_lq, parse_operator_string, truncate_basis_by_coherence
-from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, \
-    sop_prod, operator, superoperator, op_T_coupled, sop_T_coupled, structure_coefficients
+from spinguin.utils.la import comm
+from spinguin.system.basis import idx_to_lq
+from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, operator, op_T_coupled
 
 class TestOperators(unittest.TestCase):
 
@@ -91,27 +89,43 @@ class TestOperators(unittest.TestCase):
 
         # Compare values
         for spin, op in E.items():
-            self.assertTrue(np.allclose(op_E(spin), op))
+            self.assertTrue(np.allclose(op_E(spin, sparse=False), op))
+            self.assertTrue(np.allclose(op_E(spin, sparse=True).toarray(), op))
         for spin, op in Sx.items():
-            self.assertTrue(np.allclose(op_Sx(spin), op))
+            self.assertTrue(np.allclose(op_Sx(spin, sparse=False), op))
+            self.assertTrue(np.allclose(op_Sx(spin, sparse=True).toarray(), op))
         for spin, op in Sy.items():
-            self.assertTrue(np.allclose(op_Sy(spin), op))
+            self.assertTrue(np.allclose(op_Sy(spin, sparse=False), op))
+            self.assertTrue(np.allclose(op_Sy(spin, sparse=True).toarray(), op))
         for spin, op in Sz.items():
-            self.assertTrue(np.allclose(op_Sz(spin), op))
+            self.assertTrue(np.allclose(op_Sz(spin, sparse=False), op))
+            self.assertTrue(np.allclose(op_Sz(spin, sparse=True).toarray(), op))
         for spin, op in Sp.items():
-            self.assertTrue(np.allclose(op_Sp(spin), op))
+            self.assertTrue(np.allclose(op_Sp(spin, sparse=False), op))
+            self.assertTrue(np.allclose(op_Sp(spin, sparse=True).toarray(), op))
         for spin, op in Sm.items():
-            self.assertTrue(np.allclose(op_Sm(spin), op))
+            self.assertTrue(np.allclose(op_Sm(spin, sparse=False), op))
+            self.assertTrue(np.allclose(op_Sm(spin, sparse=True).toarray(), op))
 
-        # Test the commutation relations
+        # Test the commutation relations and confirm that sparse and dense give same result
         spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
         for spin in spins:
-            self.assertTrue(np.allclose(comm(op_E(spin), op_E(spin)), 0))
-            self.assertTrue(np.allclose(comm(op_Sx(spin), op_Sy(spin)), 1j*op_Sz(spin)))
-            self.assertTrue(np.allclose(comm(op_Sy(spin), op_Sz(spin)), 1j*op_Sx(spin)))
-            self.assertTrue(np.allclose(comm(op_Sz(spin), op_Sx(spin)), 1j*op_Sy(spin)))
-            self.assertTrue(np.allclose(comm(op_Sp(spin), op_Sz(spin)), -op_Sp(spin)))
-            self.assertTrue(np.allclose(comm(op_Sm(spin), op_Sz(spin)), op_Sm(spin)))
+
+            # Confirm that sparse and dense give same result
+            self.assertTrue(np.allclose(op_E(spin, sparse=False), op_E(spin, sparse=True).toarray()))
+            self.assertTrue(np.allclose(op_Sx(spin, sparse=False), op_Sx(spin, sparse=True).toarray()))
+            self.assertTrue(np.allclose(op_Sy(spin, sparse=False), op_Sy(spin, sparse=True).toarray()))
+            self.assertTrue(np.allclose(op_Sz(spin, sparse=False), op_Sz(spin, sparse=True).toarray()))
+            self.assertTrue(np.allclose(op_Sp(spin, sparse=False), op_Sp(spin, sparse=True).toarray()))
+            self.assertTrue(np.allclose(op_Sm(spin, sparse=False), op_Sm(spin, sparse=True).toarray()))
+
+            # Test commutation relations
+            self.assertTrue(np.allclose(comm(op_E(spin, sparse=False), op_E(spin, sparse=False)), 0))
+            self.assertTrue(np.allclose(comm(op_Sx(spin, sparse=False), op_Sy(spin, sparse=False)), 1j*op_Sz(spin, sparse=False)))
+            self.assertTrue(np.allclose(comm(op_Sy(spin, sparse=False), op_Sz(spin, sparse=False)), 1j*op_Sx(spin, sparse=False)))
+            self.assertTrue(np.allclose(comm(op_Sz(spin, sparse=False), op_Sx(spin, sparse=False)), 1j*op_Sy(spin, sparse=False)))
+            self.assertTrue(np.allclose(comm(op_Sp(spin, sparse=False), op_Sz(spin, sparse=False)), -op_Sp(spin, sparse=False)))
+            self.assertTrue(np.allclose(comm(op_Sm(spin, sparse=False), op_Sz(spin, sparse=False)), op_Sm(spin, sparse=False)))
 
     def test_op_T(self):
         """
@@ -121,325 +135,206 @@ class TestOperators(unittest.TestCase):
         # Test for various spin quantum numbers
         spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
         for spin in spins:
+
+            # Go through all the possible ranks and projections
             for l in range(0, int(2*spin+1)):
                 for q in range(-l, l+1):
-                    self.assertTrue(np.allclose(comm(op_Sz(spin), op_T(spin, l, q)), q*op_T(spin, l, q)))
-                    self.assertTrue(np.allclose(comm(op_Sx(spin)@op_Sx(spin) + \
-                                                     op_Sy(spin)@op_Sy(spin) + \
-                                                     op_Sz(spin)@op_Sz(spin), op_T(spin, l, q)), 0))
+
+                    # Check that sparse and dense representations give same result
+                    self.assertTrue(np.allclose(op_T(spin, l, q, sparse=False), op_T(spin, l, q, sparse=True).toarray()))
+
+                    # Check the commutation relations using dense arrays
+                    self.assertTrue(np.allclose(comm(op_Sz(spin, sparse=False), op_T(spin, l, q, sparse=False)),
+                                                q*op_T(spin, l, q, sparse=False)))
+                    self.assertTrue(np.allclose(comm(op_Sx(spin, sparse=False)@op_Sx(spin, sparse=False) + \
+                                                     op_Sy(spin, sparse=False)@op_Sy(spin, sparse=False) + \
+                                                     op_Sz(spin, sparse=False)@op_Sz(spin, sparse=False),
+                                                     op_T(spin, l, q, sparse=False)), 0))
                     if not q == -l:
-                        self.assertTrue(np.allclose(comm(op_Sm(spin), op_T(spin, l, q)), math.sqrt(l*(l+1) - q*(q-1)) * op_T(spin, l, q-1)))
+                        self.assertTrue(np.allclose(comm(op_Sm(spin, sparse=False), op_T(spin, l, q, sparse=False)),
+                                                    math.sqrt(l*(l+1) - q*(q-1)) * op_T(spin, l, q-1, sparse=False)))
                     if not q == l:
-                        self.assertTrue(np.allclose(comm(op_Sp(spin), op_T(spin, l, q)), math.sqrt(l*(l+1) - q*(q+1)) * op_T(spin, l, q+1)))
+                        self.assertTrue(np.allclose(comm(op_Sp(spin, sparse=False), op_T(spin, l, q, sparse=False)),
+                                                    math.sqrt(l*(l+1) - q*(q+1)) * op_T(spin, l, q+1, sparse=False)))
 
-    def test_op_P(self):
+    def test_op_prod(self):
         """
-        Test the construction of product operators for a spin system.
-        """
-
-        # Create a test spin system
-        isotopes = np.array(['1H', '14N', '23Na'])
-        spin_system = SpinSystem(isotopes)
-        spins = spin_system.spins
-
-        # States to test
-        states = ['x', 'y', 'z', '+', '-']
-
-        # Get the Zeeman eigenbasis operators
-        opers = {}
-        for spin in spins:
-            opers[('x', spin)] = op_Sx(spin)
-            opers[('y', spin)] = op_Sy(spin)
-            opers[('z', spin)] = op_Sz(spin)
-            opers[('+', spin)] = op_Sp(spin)
-            opers[('-', spin)] = op_Sm(spin)
-
-        # Try all possible state combinations
-        for i in states:
-            for j in states:
-                for k in states:
-
-                    # Create the operators with unit included and compare
-                    op_defs, coeffs = parse_operator_string(spin_system, f"I({i},0)*I({j},1)*I({k},2)")
-                    oper1 = 0
-                    for op_def, coeff in zip(op_defs, coeffs):
-                        oper1 += coeff * op_prod(op_def, spins, include_unit=True)
-                    oper2 = np.kron(opers[(i, spins[0])], np.kron(opers[(j, spins[1])], opers[(k, spins[2])]))
-                    self.assertTrue(np.allclose(oper1, oper2))
-
-                    # Create the operators without unit included and compare
-                    op_defs, coeffs = parse_operator_string(spin_system, f"I({i},0)*I({j},1)*I({k},2)")
-                    oper1 = 0
-                    for op_def, coeff in zip(op_defs, coeffs):
-                        oper1 += coeff * op_prod(op_def, spins, include_unit=False)
-                    oper2 = 1
-                    if i != 'E':
-                        oper2 = np.kron(oper2, opers[(i, spins[0])])
-                    if j != 'E':
-                        oper2 = np.kron(oper2, opers[(j, spins[1])])
-                    if k != 'E':
-                        oper2 = np.kron(oper2, opers[(k, spins[2])])
-                    self.assertTrue(np.allclose(oper1, oper2))
-
-    def test_structure_coefficients(self):
-        """
-        Test the structure coefficients for a spin system.
+        Test the construction of product operators for different spin quantum numbers.
         """
 
         # Create a test spin system
-        isotopes = np.array(['1H', '1H'])
-        spin_system = SpinSystem(isotopes)
-        basis = spin_system.basis.arr
-        dim = spin_system.basis.dim
-        spins = spin_system.spins
+        spins = (1/2, 1, 3/2)
+        nspins = len(spins)
 
-        # Define the operator to be constructed
-        op_def_i = (1, 3)
+        # # Get the Zeeman eigenbasis operators
+        # opers = {}
+        # for spin in spins:
+        #     opers[('E', spin)] = op_E(spin)
+        #     opers[('x', spin)] = op_Sx(spin)
+        #     opers[('y', spin)] = op_Sy(spin)
+        #     opers[('z', spin)] = op_Sz(spin)
+        #     opers[('+', spin)] = op_Sp(spin)
+        #     opers[('-', spin)] = op_Sm(spin)
 
-        # Initialize empty arrays for the left and right superoperators
-        sop_L = np.zeros((dim, dim), dtype=complex)
-        sop_R = np.zeros((dim, dim), dtype=complex)
+        # Try all possible product operator combinations
+        for i in range(int(2*spins[0]+1)):
+            l_i, q_i = idx_to_lq(i)
+            op_i = op_T(spins[0], l_i, q_i, sparse=False)
 
-        # Construct the operator
-        op_i = 1
-        for n in range(len(op_def_i)):
-            l_i, q_i = idx_to_lq(op_def_i[n])
-            op_i = np.kron(op_i, op_T(spins[n], l_i, q_i))
+            for j in range(int(2*spins[1]+1)):
+                l_j, q_j = idx_to_lq(j)
+                op_j = op_T(spins[1], l_j, q_j, sparse=False)
 
-        # Loop over the bras
-        for j in range(dim):
+                for k in range(int(2*spins[2]+1)):
+                    l_k, q_k = idx_to_lq(k)
+                    op_k = op_T(spins[2], l_k, q_k, sparse=False)
 
-            # Construct the operator bra
-            op_def_j = basis[j]
-            op_j = 1
-            for n in range(len(op_def_j)):
-                l_j, q_j = idx_to_lq(op_def_j[n])
-                op_j = np.kron(op_j, op_T(spins[n], l_j, q_j))
+                    # Perform the comparison WITH unit operators included
 
-            # Loop over the kets
-            for k in range(dim):
+                    # Create the operator using inbuilt function 
+                    op_def = (i, j, k)
+                    oper_sparse = op_prod(op_def, spins, include_unit=True, sparse=True)
+                    oper_dense = op_prod(op_def, spins, include_unit=True, sparse=False)
 
-                # Construct the operator ket
-                op_def_k = basis[k]
-                op_k = 1
-                for n in range(len(op_def_k)):
-                    l_k, q_k = idx_to_lq(op_def_k[n])
-                    op_k = np.kron(op_k, op_T(spins[n], l_k, q_k))
+                    # Create the reference operator manually
+                    oper_ref = np.kron(op_i, np.kron(op_j, op_k))
 
-                # Calculate the elements
-                norm = np.sqrt((op_j.conj().T @ op_j).trace() * (op_k.conj().T @ op_k).trace())
-                sop_L[j, k] = (op_j.conj().T @ op_i @ op_k).trace() / norm
-                sop_R[j, k] = (op_j.conj().T @ op_k @ op_i).trace() / norm
+                    # Compare
+                    self.assertTrue(np.allclose(oper_sparse.toarray(), oper_ref))
+                    self.assertTrue(np.allclose(oper_dense, oper_ref))
 
-        self.assertTrue(np.allclose(sop_L, sop_prod(spin_system, op_def_i, "left").toarray()))
-        self.assertTrue(np.allclose(sop_R, sop_prod(spin_system, op_def_i, "right").toarray()))
-    
-    def test_sop_prod(self):
-        """
-        Test the superoperator construction for various spin systems.
-        """
+                    # Perform the comparison WITHOUT unit operators included
 
-        # Define test spin systems
-        systems = []
+                    # Create the operator using inbuilt function
+                    oper_sparse = op_prod(op_def, spins, include_unit=False, sparse=True)
+                    oper_dense = op_prod(op_def, spins, include_unit=False, sparse=False)
+                
+                    # Create the reference operator manually
+                    oper_ref = np.array([[1]])
+                    if i != 0:
+                        oper_ref = np.kron(oper_ref, op_i)
+                    if j != 0:
+                        oper_ref = np.kron(oper_ref, op_j)
+                    if k != 0:
+                        oper_ref = np.kron(oper_ref, op_k)
 
-        # Assign isotopes
-        systems.append(np.array(['1H']))
-        systems.append(np.array(['1H', '14N']))
+                    # Compare
+                    self.assertTrue(np.allclose(oper_sparse.toarray(), oper_ref))
+                    self.assertTrue(np.allclose(oper_dense, oper_ref))
 
-        # Test all systems
-        for isotopes in systems:
-
-            # Test all possible spin orders
-            for max_so in range(1, isotopes.size + 1):
-
-                # Initialize the spin system
-                spin_system = SpinSystem(isotopes, max_spin_order=max_so)
-
-                # Test all possible operators
-                for op in spin_system.basis.arr:
-
-                    # Convert to tuple
-                    op = tuple(op)
-
-                    # Test left, right, and commutation superoperators against the "idiot-proof" function
-                    self.assertTrue(np.allclose(sop_prod(spin_system, op, "left").toarray(), 
-                                                sop_prod_ref(spin_system, op, "left").toarray()))
-                    self.assertTrue(np.allclose(sop_prod(spin_system, op, "right").toarray(), 
-                                                sop_prod_ref(spin_system, op, "right").toarray()))
-                    self.assertTrue(np.allclose(sop_prod(spin_system, op, "comm").toarray(), 
-                                                sop_prod_ref(spin_system, op, "comm").toarray()))
-
-    def test_sop_prod_cache(self):
-        """
-        Test caching behavior of the sop_P function when the basis changes.
-        """
-
-        # Example system
-        isotopes = np.array(['1H', '1H', '1H'])
-        spin_system = SpinSystem(isotopes)
-
-        # Create an operator, change the basis, and create an operator again
-        op_def = (2, 0, 0)
-        Iz = sop_prod(spin_system, op_def, side='comm')
-        truncate_basis_by_coherence(spin_system, [0])
-        Iz_ZQ = sop_prod(spin_system, op_def, side='comm')
-
-        # Resulting shapes should be different
-        self.assertNotEqual(Iz.shape, Iz_ZQ.shape)
-
-    def test_superoperator(self):
-        """
-        Test the superoperator function against sop_P for consistency.
-        """
-
-        # Example system
-        isotopes = np.array(['1H', '1H'])
-        spin_system = SpinSystem(isotopes)
-
-        # Test the superoperator function against sop_P
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0)", "left").toarray(), sop_prod(spin_system, (2, 0), "left").toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0)", "right").toarray(), sop_prod(spin_system, (2, 0), "right").toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0)", "comm").toarray(), sop_prod(spin_system, (2, 0), "comm").toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0) + I(z,1)", "comm").toarray(),
-                                    (sop_prod(spin_system, (2, 0), "comm") + sop_prod(spin_system, (0, 2), "comm")).toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(+,0) * I(-,1)", "comm").toarray(),
-                                    -2 * sop_prod(spin_system, (1, 3), "comm").toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(x,0) + I(x,1)", "comm").toarray(),
-                                    + (-1 / np.sqrt(2) * sop_prod(spin_system, (1, 0), "comm") + 1 / np.sqrt(2) * sop_prod(spin_system, (3, 0), "comm")).toarray()
-                                    + (-1 / np.sqrt(2) * sop_prod(spin_system, (0, 1), "comm") + 1 / np.sqrt(2) * sop_prod(spin_system, (0, 3), "comm")).toarray()))
-        
     def test_op_T_coupled(self):
         """
         Test the coupled spherical tensor operators for two spins.
         """
 
+        # Test with different spin quantum numbers
         spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
-
-        # Test with all possible spin quantum numbers
         for s1 in spins:
             for s2 in spins:
 
                 # Get the two-spin operators
-                SxIx = np.kron(op_Sx(s1), op_Sx(s2))
-                SxIy = np.kron(op_Sx(s1), op_Sy(s2))
-                SxIz = np.kron(op_Sx(s1), op_Sz(s2))
-                SyIx = np.kron(op_Sy(s1), op_Sx(s2))
-                SyIy = np.kron(op_Sy(s1), op_Sy(s2))
-                SyIz = np.kron(op_Sy(s1), op_Sz(s2))
-                SzIx = np.kron(op_Sz(s1), op_Sx(s2))
-                SzIy = np.kron(op_Sz(s1), op_Sy(s2))
-                SzIz = np.kron(op_Sz(s1), op_Sz(s2))
+                SxIx = np.kron(op_Sx(s1, sparse=False), op_Sx(s2, sparse=False))
+                SxIy = np.kron(op_Sx(s1, sparse=False), op_Sy(s2, sparse=False))
+                SxIz = np.kron(op_Sx(s1, sparse=False), op_Sz(s2, sparse=False))
+                SyIx = np.kron(op_Sy(s1, sparse=False), op_Sx(s2, sparse=False))
+                SyIy = np.kron(op_Sy(s1, sparse=False), op_Sy(s2, sparse=False))
+                SyIz = np.kron(op_Sy(s1, sparse=False), op_Sz(s2, sparse=False))
+                SzIx = np.kron(op_Sz(s1, sparse=False), op_Sx(s2, sparse=False))
+                SzIy = np.kron(op_Sz(s1, sparse=False), op_Sy(s2, sparse=False))
+                SzIz = np.kron(op_Sz(s1, sparse=False), op_Sz(s2, sparse=False))
 
                 # Test relations given in Eq. 254-262, Man: Cartesian and Spherical Tensors in NMR Hamiltonians
-                self.assertTrue(np.allclose(op_T_coupled(0, 0, 1, s1, 1, s2), -1 / np.sqrt(3) * (SxIx + SyIy + SzIz)))
-                self.assertTrue(np.allclose(op_T_coupled(1, 1, 1, s1, 1, s2), 1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz))))
-                self.assertTrue(np.allclose(op_T_coupled(1, 0, 1, s1, 1, s2), 1j / np.sqrt(2) * (SxIy - SyIx)))
-                self.assertTrue(np.allclose(op_T_coupled(1, -1, 1, s1, 1, s2), 1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz))))
-                self.assertTrue(np.allclose(op_T_coupled(2, 2, 1, s1, 1, s2), 1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx))))
-                self.assertTrue(np.allclose(op_T_coupled(2, 1, 1, s1, 1, s2), -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy))))
-                self.assertTrue(np.allclose(op_T_coupled(2, 0, 1, s1, 1, s2), 1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy)))
-                self.assertTrue(np.allclose(op_T_coupled(2, -1, 1, s1, 1, s2), 1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy))))
-                self.assertTrue(np.allclose(op_T_coupled(2, -2, 1, s1, 1, s2), 1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))))
-
-    def test_sop_T_coupled(self):
-        """
-        Test creating the Hamiltonian term using "Cartesian" superoperators and the
-        coupled spherical tensor superoperator.
-        """
-
-        # Example system
-        isotopes = np.array(['1H', '1H'])
-        spin_system = SpinSystem(isotopes)
-
-        # Get the dimension of the basis
-        dim = spin_system.basis.dim
-
-        # Make a random Cartesian interaction tensor
-        A = np.random.rand(3, 3)
-
-        # Cartesian spin operators
-        I = np.array(['x', 'y', 'z'])
-        
-        # Perform the dot product manually
-        left = np.zeros((dim, dim), dtype=complex)
-        for i in range(A.shape[0]):
-            for s in range(A.shape[1]):
-                left += A[i, s] * superoperator(spin_system, f"I({I[i]},0) * I({I[s]},1)", 'comm').toarray()
-
-        # Convert A to spherical tensors
-        A = cartesian_tensor_to_spherical_tensor(A)
-
-        # Use spherical tensors
-        right = np.zeros((dim, dim), dtype=complex)
-        for l in range(0, 3):
-            for q in range(-l, l + 1):
-                right += (-1)**(q) * A[(l, q)] * sop_T_coupled(spin_system, l, -q, 0, 1).toarray()
-
-        # Both conventions should give the same result
-        self.assertTrue(np.allclose(left, right))
+                # Using dense arrays
+                self.assertTrue(np.allclose(op_T_coupled(0, 0, 1, s1, 1, s2, sparse=False),
+                                            -1 / np.sqrt(3) * (SxIx + SyIy + SzIz)))
+                self.assertTrue(np.allclose(op_T_coupled(1, 1, 1, s1, 1, s2, sparse=False),
+                                            1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz))))
+                self.assertTrue(np.allclose(op_T_coupled(1, 0, 1, s1, 1, s2, sparse=False),
+                                            1j / np.sqrt(2) * (SxIy - SyIx)))
+                self.assertTrue(np.allclose(op_T_coupled(1, -1, 1, s1, 1, s2, sparse=False),
+                                            1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz))))
+                self.assertTrue(np.allclose(op_T_coupled(2, 2, 1, s1, 1, s2, sparse=False),
+                                            1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx))))
+                self.assertTrue(np.allclose(op_T_coupled(2, 1, 1, s1, 1, s2, sparse=False),
+                                            -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy))))
+                self.assertTrue(np.allclose(op_T_coupled(2, 0, 1, s1, 1, s2, sparse=False),
+                                            1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy)))
+                self.assertTrue(np.allclose(op_T_coupled(2, -1, 1, s1, 1, s2, sparse=False),
+                                            1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy))))
+                self.assertTrue(np.allclose(op_T_coupled(2, -2, 1, s1, 1, s2, sparse=False),
+                                            1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))))
+                
+                # Test the same relations using sparse arrays
+                self.assertTrue(np.allclose(op_T_coupled(0, 0, 1, s1, 1, s2, sparse=True).toarray(),
+                                            -1 / np.sqrt(3) * (SxIx + SyIy + SzIz)))
+                self.assertTrue(np.allclose(op_T_coupled(1, 1, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz))))
+                self.assertTrue(np.allclose(op_T_coupled(1, 0, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1j / np.sqrt(2) * (SxIy - SyIx)))
+                self.assertTrue(np.allclose(op_T_coupled(1, -1, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz))))
+                self.assertTrue(np.allclose(op_T_coupled(2, 2, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx))))
+                self.assertTrue(np.allclose(op_T_coupled(2, 1, 1, s1, 1, s2, sparse=True).toarray(),
+                                            -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy))))
+                self.assertTrue(np.allclose(op_T_coupled(2, 0, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy)))
+                self.assertTrue(np.allclose(op_T_coupled(2, -1, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy))))
+                self.assertTrue(np.allclose(op_T_coupled(2, -2, 1, s1, 1, s2, sparse=True).toarray(),
+                                            1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))))
 
     def test_operator(self):
         """
         A test for creating the Hilbert-space operators using the operators string.
         """
-        
-        # Test system
-        isotopes = np.array(['1H', '1H'])
+
+        # Create a test spin system
+        isotopes = np.array(["1H", "14N", "23Na"])
         spin_system = SpinSystem(isotopes)
 
         # Operators to test
-        op2 = "I(z,0)"
-        op3 = "I(z,0) * I(y,1)"
-        op4 = "I(-,0) + I(-,1)"
+        test_opers = ['E', 'x', 'y', 'z', '+', '-']
 
-        # Create reference operators
-        op2_ref = np.kron(op_Sz(1/2), op_E(1/2))
-        op3_ref = np.kron(op_Sz(1/2), op_Sy(1/2))
-        op4_ref = np.kron(op_Sm(1/2), op_E(1/2)) + np.kron(op_E(1/2), op_Sm(1/2))
+        # Get the Zeeman eigenbasis operators
+        opers = {}
+        for spin in spin_system.spins:
+            opers[('E', spin)] = op_E(spin, sparse=False)
+            opers[('x', spin)] = op_Sx(spin, sparse=False)
+            opers[('y', spin)] = op_Sy(spin, sparse=False)
+            opers[('z', spin)] = op_Sz(spin, sparse=False)
+            opers[('+', spin)] = op_Sp(spin, sparse=False)
+            opers[('-', spin)] = op_Sm(spin, sparse=False)
 
-        # Compare with the function
-        self.assertTrue(np.allclose(op2_ref, operator(spin_system, op2)))
-        self.assertTrue(np.allclose(op3_ref, operator(spin_system, op3)))
-        self.assertTrue(np.allclose(op4_ref, operator(spin_system, op4)))
-                    
-def sop_prod_ref(spin_system: SpinSystem, op_def: tuple, side: str):
-    """
-    A reference method for calculating the superoperator. Used for testing purposes.
-    """
+        # Try all possible product operator combinations
+        for i in test_opers:
+            if i == "E":
+                op_i = "E"
+            else:
+                op_i = f"I({i}, 0)"
 
-    # If commutation superoperator, calculate left and right superoperators and return their difference
-    if side == 'comm':
-        sop = sop_prod_ref(spin_system, op_def, 'left') \
-            - sop_prod_ref(spin_system, op_def, 'right')
-        return sop
-    
-    # Initialize the superoperator
-    sop = lil_array((spin_system.basis.dim, spin_system.basis.dim), dtype=complex)
+            for j in test_opers:
+                if j == "E":
+                    op_j = "E"
+                else:
+                    op_j = f"I({j}, 1)"
 
-    # Loop over each matrix row j
-    for j in range(spin_system.basis.dim):
+                for k in test_opers:
+                    if k == "E":
+                        op_k = "E"
+                    else:
+                        op_k = f"I({k}, 2)"
 
-        # Loop over each matrix column k
-        for k in range(spin_system.basis.dim):
+                    # Create the operator using inbuilt function
+                    op_string = f"{op_i} * {op_j} * {op_k}"
+                    oper_sparse = operator(spin_system, op_string, sparse=True)
+                    oper_dense = operator(spin_system, op_string, sparse=False)
 
-            # Initialize the matrix element
-            sop_jk = 1
+                    # Create the reference operator
+                    oper_ref = np.kron(opers[(i, spin_system.spins[0])],
+                                       np.kron(opers[(j, spin_system.spins[1])],
+                                               opers[(k, spin_system.spins[2])]))
 
-            # Loop over the spin system
-            for n in range(spin_system.size):
-
-                # Get the single-spin operator indices
-                i_ind = op_def[n]
-                j_ind = spin_system.basis.arr[j, n]
-                k_ind = spin_system.basis.arr[k, n]
-
-                # Get the structure coefficients for the current spin
-                c = structure_coefficients(spin_system.spins[n], side)
-
-                # Add to the product
-                sop_jk = sop_jk * c[i_ind, j_ind, k_ind]
-
-            # Add to the superoperator
-            sop[j, k] = sop_jk
-
-    return sop
+                    # Compare
+                    self.assertTrue(np.allclose(oper_sparse.toarray(), oper_ref))
+                    self.assertTrue(np.allclose(oper_dense, oper_ref))
