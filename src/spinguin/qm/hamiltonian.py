@@ -114,7 +114,7 @@ def hamiltonian_J_coupling(spin_system: SpinSystem, side: str = 'comm') -> csc_a
 
     return sop_Hj
 
-def hamiltonian(spin_system: SpinSystem, side: str = 'comm', disable_outputs: bool = False) -> csc_array:
+def hamiltonian(spin_system: SpinSystem, side: str = 'comm') -> csc_array:
     """
     Computes the coherent part of the Hamiltonian superoperator, including the Zeeman
     interaction and J-couplings.
@@ -128,8 +128,6 @@ def hamiltonian(spin_system: SpinSystem, side: str = 'comm', disable_outputs: bo
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
-    disable_outputs : bool
-        Disables printing to the console. Default: False.
 
     Returns
     -------
@@ -138,8 +136,7 @@ def hamiltonian(spin_system: SpinSystem, side: str = 'comm', disable_outputs: bo
     """
 
     time_start = time.time()
-    if not disable_outputs:
-        print("Constructing Hamiltonian...")
+    print("Constructing Hamiltonian...")
 
     # Compute the Zeeman and J-coupling Hamiltonians
     sop_Hz = hamiltonian_zeeman(spin_system, side)
@@ -151,8 +148,7 @@ def hamiltonian(spin_system: SpinSystem, side: str = 'comm', disable_outputs: bo
     # Remove small values to enhance sparsity
     increase_sparsity(sop_H, Config.ZERO_HAMILTONIAN)
 
-    if not disable_outputs:
-        print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
-        print()
+    print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.') # NOTE: Perttu's edit
+    print()
 
     return sop_H

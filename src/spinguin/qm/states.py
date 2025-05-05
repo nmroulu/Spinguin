@@ -20,6 +20,7 @@ from spinguin.qm.operators import op_prod
 from spinguin.qm.hamiltonian import hamiltonian
 from spinguin.system.basis import parse_operator_string, state_idx
 from spinguin.config import Config
+from spinguin.utils.hide_prints import HidePrints
 from functools import lru_cache
 
 def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=True) -> np.ndarray | csc_array:
@@ -219,10 +220,12 @@ def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> np.ndarr
     mults = spin_system.mults
 
     # Build the left Hamiltonian superoperator
-    H = hamiltonian(spin_system, 'left', disable_outputs=True)
+    with HidePrints():
+        H = hamiltonian(spin_system, 'left')
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(-const.hbar / (const.k * Config.temperature) * H, Config.ZERO_EQUILIBRIUM, disable_output=True)
+    with HidePrints():
+        P = expm(-const.hbar / (const.k * Config.temperature) * H, Config.ZERO_EQUILIBRIUM)
 
     # Obtain the thermal equilibrium by propagating the unit state
     unit = unit_state(spin_system, sparse=sparse, normalized=False)

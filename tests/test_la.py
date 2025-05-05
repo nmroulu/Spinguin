@@ -65,13 +65,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                       [7, 8, 9]])
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(la.expm(A, 1e-32, disable_output=True), expm(A)))
+        self.assertTrue(np.allclose(la.expm(A, 1e-32), expm(A)))
 
         # Perform the same test with a SciPy sparse array
         A = csc_array(A)
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(la.expm(A, 1e-32, disable_output=True).toarray(), expm(A).toarray()))
+        self.assertTrue(np.allclose(la.expm(A, 1e-32).toarray(), expm(A).toarray()))
 
     def test_expm_custom_dot(self):
 
@@ -81,7 +81,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                        [7, 8, 9]])
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(la.expm_custom_dot(A, 1e-32, disable_output=True).toarray(), expm(A).toarray()))
+        self.assertTrue(np.allclose(la.expm_custom_dot(A, 1e-32).toarray(), expm(A).toarray()))
 
     def test_increase_sparsity(self):
 
@@ -168,13 +168,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         bot_r1 = expm_aux[A.shape[0]:, A.shape[1]:].toarray()
 
         # Compute the components manually
-        top_l2 = la.expm(A*T, zero_value=1e-18, disable_output=True).toarray()
+        top_l2 = la.expm(A*T, zero_value=1e-18).toarray()
         top_r2 = csc_array(A.shape, dtype=complex)
         for t in np.linspace(0, T, 1000):
-            top_r2 += la.expm(-A*t, zero_value=1e-18, disable_output=True) @ B @ la.expm(C*t, zero_value=1e-18, disable_output=True) * (1/1000)
-        top_r2 = (la.expm(A*T, zero_value=1e-18, disable_output=True) @ top_r2).toarray()
+            top_r2 += la.expm(-A*t, zero_value=1e-18) @ B @ la.expm(C*t, zero_value=1e-18) * (1/1000)
+        top_r2 = (la.expm(A*T, zero_value=1e-18) @ top_r2).toarray()
         bot_l2 = np.zeros_like(bot_l1)
-        bot_r2 = la.expm(C*T, zero_value=1e-18, disable_output=True).toarray()
+        bot_r2 = la.expm(C*T, zero_value=1e-18).toarray()
 
         # Verify the components
         self.assertTrue(np.allclose(top_l1, top_l2))

@@ -25,6 +25,7 @@ from spinguin.utils.la import increase_sparsity, principal_axis_system, cartesia
 from spinguin.system.basis import idx_to_lq, lq_to_idx, parse_operator_string, state_idx
 from spinguin.qm.hamiltonian import hamiltonian
 from spinguin.config import Config
+from spinguin.utils.hide_prints import HidePrints
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -716,10 +717,11 @@ def ldb_thermalization(spin_system: SpinSystem, R: csc_array) -> csc_array:
     """
 
     # Build the left Zeeman Hamiltonian
-    H = hamiltonian(spin_system, 'left', disable_outputs=True)
+    with HidePrints():
+        H = hamiltonian(spin_system, 'left')
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(const.hbar / (const.k * Config.temperature) * H, Config.ZERO_THERMALIZATION, disable_output=True)
+    P = expm(const.hbar / (const.k * Config.temperature) * H, Config.ZERO_THERMALIZATION)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P

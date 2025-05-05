@@ -20,6 +20,7 @@ from spinguin.utils.la import expm, expm_custom_dot
 from spinguin.qm.hamiltonian import hamiltonian_zeeman
 from spinguin.qm.superoperators import superoperator, sop_prod
 from spinguin.config import Config
+from spinguin.utils.hide_prints import HidePrints
 
 def propagator(L: csc_array,
                t: float,
@@ -82,10 +83,11 @@ def propagator(L: csc_array,
         print("Applying rotating frame transformation...")
         H0 = hamiltonian_zeeman(spin_system, include_shifts=False)
 
-        if custom_dot:
-            expm_H0t = expm_custom_dot(1j * H0 * t, Config.ZERO_PROPAGATOR, disable_output=True)
-        else:
-            expm_H0t = expm(1j * H0 * t, Config.ZERO_PROPAGATOR, disable_output=True)
+        with HidePrints():
+            if custom_dot:
+                expm_H0t = expm_custom_dot(1j * H0 * t, Config.ZERO_PROPAGATOR)
+            else:
+                expm_H0t = expm(1j * H0 * t, Config.ZERO_PROPAGATOR)
 
         expm_Lt = expm_H0t @ expm_Lt
         print("Rotating frame transformation applied.")
@@ -135,7 +137,8 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float) -> csc_array:
     angle = angle / 180 * np.pi
 
     # Construct the pulse propagator
-    pul = expm(-1j * angle * op, Config.ZERO_PULSE, disable_output=True)
+    with HidePrints():
+        pul = expm(-1j * angle * op, Config.ZERO_PULSE)
 
     print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 
