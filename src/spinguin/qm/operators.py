@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 # Imports
 import numpy as np
 import scipy.sparse as sp
-from numpy.typing import ArrayLike
 from functools import lru_cache
 from spinguin.utils import la
 from spinguin.system.basis import idx_to_lq, parse_operator_string
@@ -285,17 +284,17 @@ def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float, sparse:
 
     return T
 
-def op_prod(op_def: ArrayLike, spins: ArrayLike, include_unit: bool=True, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a product operator defined by `op_def` in the Zeeman eigenbasis.
 
     Parameters
     ----------
-    op_def : ArrayLike
+    op_def : ndarray
         Specifies the product operator to be generated. For example,
         input (0, 2, 0, 1) will generate E*T_10*E*T_11. The indices are
         given by N = l^2 + l - q, where l is the rank and q is the projection.
-    spins : ArrayLike
+    spins : ndarray
         Spin quantum numbers. Must match the length of `op_def`.
     include_unit : bool
         Specifies whether unit operators are included in the product operator.

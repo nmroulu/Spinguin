@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 # Imports
 import numpy as np
 import scipy.sparse as sp
-from numpy.typing import ArrayLike
 from functools import lru_cache
 from itertools import product
 from spinguin.utils import la
@@ -112,7 +111,7 @@ def sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
 
     return unit
 
-def sop_prod(op_def: ArrayLike, basis: Basis, spins: ArrayLike, side: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def sop_prod(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a product superoperator corresponding to the product operator
     defined by `op_def`.
@@ -121,14 +120,14 @@ def sop_prod(op_def: ArrayLike, basis: Basis, spins: ArrayLike, side: str, spars
 
     Parameters
     ----------
-    op_def : ArrayLike
+    op_def : ndarray
         Specifies the product operator to be generated. For example,
         input `(0, 2, 0, 1)` will generate `E*T_10*E*T_11`. The indices are
         given by `N = l^2 + l - q`, where `l` is the rank and `q` is the projection.
     basis : Basis
         Basis set consisting of Kronecker products of single-spin irreducible
         spherical tensors, described by tuples of integers.
-    spins : ArrayLike
+    spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin system.
     side : str
         Specifies the type of superoperator:
@@ -229,15 +228,15 @@ def sop_prod(op_def: ArrayLike, basis: Basis, spins: ArrayLike, side: str, spars
         return sop
     
     # Ensure that input type is tuple for hashing
-    op_def = la.arraylike_to_tuple(op_def)
-    spins = la.arraylike_to_tuple(spins)
+    op_def = tuple(op_def)
+    spins = tuple(spins)
     
     # Ensure a different instance is returned
     sop = _sop_prod(op_def, basis, spins, side, sparse).copy()
 
     return sop
 
-def sop_prod_ref(op_def: ArrayLike, basis: Basis, spins: ArrayLike, side: str) -> np.ndarray:
+def sop_prod_ref(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str) -> np.ndarray:
     """
     A reference method for calculating the superoperator.
     
@@ -246,14 +245,14 @@ def sop_prod_ref(op_def: ArrayLike, basis: Basis, spins: ArrayLike, side: str) -
 
     Parameters
     ----------
-    op_def : ArrayLike
+    op_def : ndarray
         Specifies the product operator to be generated. For example,
         input `(0, 2, 0, 1)` will generate `E*T_10*E*T_11`. The indices are
         given by `N = l^2 + l - q`, where `l` is the rank and `q` is the projection.
     basis : Basis
         Basis set consisting of Kronecker products of single-spin irreducible
         spherical tensors, described by tuples of integers.
-    spins : ArrayLike
+    spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin system.
     side : str
         Specifies the type of superoperator:
@@ -351,7 +350,7 @@ def superoperator(spin_system: SpinSystem, operator: str, side: str='comm', spar
 
     return sop
 
-def sop_T_coupled(basis: Basis, spins: ArrayLike, l: int, q: int, spin_1: int, spin_2: int=None, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, spin_2: int=None, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Computes the product superoperator corresponding to the coupled spherical tensor
     operator of rank `l` and projection `q`, derived from two spherical tensor operators of rank 1.
@@ -363,7 +362,7 @@ def sop_T_coupled(basis: Basis, spins: ArrayLike, l: int, q: int, spin_1: int, s
     basis : Basis
         Basis set consisting of Kronecker products of single-spin irreducible
         spherical tensors, described by tuples of integers.
-    spins : ArrayLike
+    spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin system.
     l : int
         Rank of the coupled operator.
@@ -422,8 +421,8 @@ def sop_T_coupled(basis: Basis, spins: ArrayLike, l: int, q: int, spin_1: int, s
 
         return sop
     
-    # Ensure that ArrayLike objects are hashable
-    spins = la.arraylike_to_tuple(spins)
+    # Convert to tuple to make hashing possible
+    spins = tuple(spins)
     
     # Ensure a different instance is returned
     sop = _sop_T_coupled(basis, spins, l, q, spin_1, spin_2, sparse).copy()
