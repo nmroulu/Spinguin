@@ -374,7 +374,7 @@ def operator(spin_system: SpinSystem, operator: str, sparse: bool=True) -> np.nd
         op = op.toarray()
 
     # Get the operator definitions and coefficients
-    op_defs, coeffs = parse_operator_string(operator, spin_system.size)
+    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
 
     # Construct the operator
     for op_def, coeff in zip(op_defs, coeffs):

@@ -89,11 +89,11 @@ class Basis:
         """
 
         # Extract the necessary information from the spin system
-        size = spin_system.size
+        nspins = spin_system.nspins
         max_spin_order = spin_system.max_spin_order
 
         # Get all possible subsystems of the specified maximum spin order
-        indices = [i for i in range(size)]
+        indices = [i for i in range(nspins)]
         subsystems = combinations(indices, max_spin_order)
 
         # Create an empty dictionary for the basis set
@@ -148,14 +148,14 @@ class Basis:
         """
 
         # Extract the necessary information from the spin system
-        size = spin_system.size
+        nspins = spin_system.nspins
         mults = spin_system.mults
 
         # Define all possible spin operators for each spin
         operators = []
 
         # Loop through every spin in the full system
-        for spin in range(size):
+        for spin in range(nspins):
 
             # Add spin if it exists in the subsystem
             if spin in subsystem:

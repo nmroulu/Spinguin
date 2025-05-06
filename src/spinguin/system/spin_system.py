@@ -126,7 +126,7 @@ class SpinSystem:
         if isinstance(chemical_shifts, str):
             self.chemical_shifts = read_array(chemical_shifts, data_type=float)
         elif chemical_shifts is None:
-            self.chemical_shifts = np.zeros(self.size, dtype=float)
+            self.chemical_shifts = np.zeros(self.nspins, dtype=float)
         else:
             try:
                 self.chemical_shifts = arraylike_to_array(chemical_shifts)
@@ -137,7 +137,7 @@ class SpinSystem:
         if isinstance(J_couplings, str):
             self.J_couplings = read_array(J_couplings, data_type=float)
         elif J_couplings is None:
-            self.J_couplings = np.zeros((self.size, self.size), dtype=float)
+            self.J_couplings = np.zeros((self.nspins, self.nspins), dtype=float)
         else:
             try:
                 self.J_couplings = arraylike_to_array(J_couplings)
@@ -192,7 +192,7 @@ class SpinSystem:
             else:
                 self.max_spin_order = max_spin_order
         elif max_spin_order is None:
-            self.max_spin_order = self.size
+            self.max_spin_order = self.nspins
 
         # Check for consistent sizes in the arrays
         if self.chemical_shifts.size != self.isotopes.size:
@@ -210,7 +210,7 @@ class SpinSystem:
         self.basis = Basis(self)
 
     @property
-    def size(self) -> int:
+    def nspins(self) -> int:
         """Returns the number of spins in the spin system."""
         return len(self.isotopes)
     

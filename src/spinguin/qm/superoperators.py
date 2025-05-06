@@ -343,7 +343,7 @@ def superoperator(spin_system: SpinSystem, operator: str, side: str='comm', spar
         sop = sop.toarray()
 
     # Get the operator definitions and coefficients
-    op_defs, coeffs = parse_operator_string(operator, spin_system.size)
+    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
 
     # Add to the operator
     for op_def, coeff in zip(op_defs, coeffs):
