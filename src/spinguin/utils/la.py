@@ -453,7 +453,11 @@ def find_common_rows(A: np.ndarray, B: np.ndarray) -> Tuple[list, list]:
 
     return A_ind, B_ind
 
-def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, zero_value: float) -> csc_array:   
+def auxiliary_matrix_expm(A: np.ndarray | csc_array,
+                          B: np.ndarray | csc_array,
+                          C: np.ndarray | csc_array,
+                          t: float,
+                          zero_value: float) -> csc_array:   
     """
     Computes the matrix exponential of an auxiliary matrix. This is used to 
     calculate the Redfield integral.
@@ -462,11 +466,11 @@ def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, ze
     
     Parameters
     ----------
-    A : csc_array
+    A : ndarray or csc_array
         Top-left block of the auxiliary matrix.
-    B : csc_array
+    B : ndarray or csc_array
         Top-right block of the auxiliary matrix.
-    C : csc_array
+    C : ndarray or csc_array
         Bottom-right block of the auxiliary matrix.
     t : float
         Integration time.
@@ -477,14 +481,27 @@ def auxiliary_matrix_expm(A: csc_array, B: csc_array, C: csc_array, t: float, ze
     
     Returns
     -------
-    expm_aux : csc_array
-        Matrix exponential of the auxiliary matrix.
+    expm_aux : ndarray or csc_array
+        Matrix exponential of the auxiliary matrix. The output is sparse or dense
+        matching the sparsity of the input.
     """
 
+    # Ensure that the input arrays are all either sparse or dense
+    if not (issparse(A) == issparse(B) == issparse(C)):
+        raise ValueError(f"All arrays A, B and C must be of same type.")
+
+    # Are we using sparse?
+    sparse = issparse(A)
+
     # Construct the auxiliary matrix
-    empty_array = csc_array(A.shape)
-    aux = block_array([[A, B],
-                       [empty_array, C]], format='csc')
+    if sparse:
+        empty_array = csc_array(A.shape)
+        aux = block_array([[A, B],
+                        [empty_array, C]], format='csc')
+    else:
+        empty_array = np.zeros(A.shape)
+        aux = np.block([[A, B],
+                        [empty_array, C]])
 
     # Compute the matrix exponential of the auxiliary matrix
     with HidePrints():

@@ -146,42 +146,62 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
     def test_auxiliary_matrix_expm(self):
 
-        # Create the auxiliary matrix components
-        A = csc_array([[1, 2, 3],
-                       [4, 5, 6],
-                       [7, 8, 9]]) * 1e-3
-        B = csc_array([[4, 5, 6],
-                       [7, 8, 9],
-                       [1, 2, 3]]) * 1e-3
-        C = csc_array([[7, 8, 9],
-                       [1, 2, 3],
-                       [4, 5, 6]]) * 1e-3
+        # Create the auxiliary matrix components in sparse format
+        A_sp = csc_array([[1, 2, 3],
+                          [4, 5, 6],
+                          [7, 8, 9]]) * 1e-3
+        B_sp = csc_array([[4, 5, 6],
+                          [7, 8, 9],
+                          [1, 2, 3]]) * 1e-3
+        C_sp = csc_array([[7, 8, 9],
+                          [1, 2, 3],
+                          [4, 5, 6]]) * 1e-3
+        
+        # Get same components in dense format
+        A_dn = A_sp.toarray()
+        B_dn = B_sp.toarray()
+        C_dn = C_sp.toarray()
+
+        # Set integration time
         T = 1
         
         # Compute the auxiliary matrix exponential
-        expm_aux = la.auxiliary_matrix_expm(A, B, C, T, zero_value=1e-18)
+        expm_aux_sp = la.auxiliary_matrix_expm(A_sp, B_sp, C_sp, T, zero_value=1e-18)
+        expm_aux_dn = la.auxiliary_matrix_expm(A_dn, B_dn, C_dn, T, zero_value=1e-18)
 
-        # Extract the components
-        top_l1 = expm_aux[:A.shape[0], :A.shape[1]].toarray()
-        top_r1 = expm_aux[:A.shape[0], A.shape[1]:].toarray()
-        bot_l1 = expm_aux[A.shape[0]:, :A.shape[1]].toarray()
-        bot_r1 = expm_aux[A.shape[0]:, A.shape[1]:].toarray()
+        # Extract the sparse components
+        top_l_sp = expm_aux_sp[:A_sp.shape[0], :A_sp.shape[1]]
+        top_r_sp = expm_aux_sp[:A_sp.shape[0], A_sp.shape[1]:]
+        bot_l_sp = expm_aux_sp[A_sp.shape[0]:, :A_sp.shape[1]]
+        bot_r_sp = expm_aux_sp[A_sp.shape[0]:, A_sp.shape[1]:]
 
-        # Compute the components manually
+        # Extract the dense components
+        top_l_dn = expm_aux_dn[:A_dn.shape[0], :A_dn.shape[1]]
+        top_r_dn = expm_aux_dn[:A_dn.shape[0], A_dn.shape[1]:]
+        bot_l_dn = expm_aux_dn[A_dn.shape[0]:, :A_dn.shape[1]]
+        bot_r_dn = expm_aux_dn[A_dn.shape[0]:, A_dn.shape[1]:]
+
+        # Compute the components manually for reference
         with HidePrints():
-            top_l2 = la.expm(A*T, zero_value=1e-18).toarray()
-            top_r2 = csc_array(A.shape, dtype=complex)
+            top_l_ref = la.expm(A_dn*T, zero_value=1e-18)
+            top_r_ref = np.zeros(A_dn.shape, dtype=complex)
             for t in np.linspace(0, T, 1000):
-                top_r2 += la.expm(-A*t, zero_value=1e-18) @ B @ la.expm(C*t, zero_value=1e-18) * (1/1000)
-            top_r2 = (la.expm(A*T, zero_value=1e-18) @ top_r2).toarray()
-            bot_l2 = np.zeros_like(bot_l1)
-            bot_r2 = la.expm(C*T, zero_value=1e-18).toarray()
+                top_r_ref += la.expm(-A_dn*t, zero_value=1e-18) @ B_dn @ la.expm(C_dn*t, zero_value=1e-18) * (1/1000)
+            top_r_ref = (la.expm(A_dn*T, zero_value=1e-18) @ top_r_ref)
+            bot_l_ref = np.zeros_like(bot_l_dn)
+            bot_r_ref = la.expm(C_dn*T, zero_value=1e-18)
 
-        # Verify the components
-        self.assertTrue(np.allclose(top_l1, top_l2))
-        self.assertTrue(np.allclose(top_r1, top_r2))
-        self.assertTrue(np.allclose(bot_l1, bot_l2))
-        self.assertTrue(np.allclose(bot_r1, bot_r2))
+        # Verify the sparse components
+        self.assertTrue(np.allclose(top_l_sp.toarray(), top_l_ref))
+        self.assertTrue(np.allclose(top_r_sp.toarray(), top_r_ref))
+        self.assertTrue(np.allclose(bot_l_sp.toarray(), bot_l_ref))
+        self.assertTrue(np.allclose(bot_r_sp.toarray(), bot_r_ref))
+
+        # Verify the dense components
+        self.assertTrue(np.allclose(top_l_dn, top_l_ref))
+        self.assertTrue(np.allclose(top_r_dn, top_r_ref))
+        self.assertTrue(np.allclose(bot_l_dn, bot_l_ref))
+        self.assertTrue(np.allclose(bot_r_dn, bot_r_ref))
 
     def test_angle_between_vectors(self):
 
