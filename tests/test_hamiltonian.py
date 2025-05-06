@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import os
 from spinguin.system.spin_system import SpinSystem
-from spinguin.qm.hamiltonian import hamiltonian
+from spinguin.qm.hamiltonian import sop_H_coherent
 from scipy.sparse import load_npz
 
 class TestHamiltonian(unittest.TestCase):
@@ -19,13 +19,13 @@ class TestHamiltonian(unittest.TestCase):
         B = 7e-3 # 7 mT
 
         # Define isotopes
-        isotopes_c = np.array(['1H', '1H', '1H', '1H', '1H', '1H', '1H', '14N'])
+        isotopes = np.array(['1H', '1H', '1H', '1H', '1H', '1H', '1H', '14N'])
 
         # Define chemical shifts (in ppm)
-        chemical_shifts_c = np.array([-22.7, -22.7, 8.34, 8.34, 7.12, 7.12, 7.77, 43.60])
+        chemical_shifts = np.array([-22.7, -22.7, 8.34, 8.34, 7.12, 7.12, 7.77, 43.60])
 
         # Define scalar couplings (in Hz)
-        J_couplings_c = np.array([\
+        J_couplings = np.array([\
             [ 0,     0,      0,      0,      0,      0,      0,     0],
             [-6.53,  0,      0,      0,      0,      0,      0,     0],
             [ 0.00,  1.66,   0,      0,      0,      0,      0,     0],
@@ -40,14 +40,22 @@ class TestHamiltonian(unittest.TestCase):
         max_so = 3  
 
         # Initialize the spin system
-        spin_system_c = SpinSystem(isotopes_c, chemical_shifts_c, J_couplings_c, max_spin_order=max_so)
+        spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings, max_spin_order=max_so)
 
         # Load the previously calculated Hamiltonian for comparison
         test_dir = os.path.dirname(__file__)
-        H_c_previous = load_npz(os.path.join(test_dir, 'test_data', 'hamiltonian.npz'))
+        H_previous = load_npz(os.path.join(test_dir, 'test_data', 'hamiltonian.npz'))
 
-        # Generate the Hamiltonian
-        H_c = hamiltonian(spin_system_c, B, side='comm', sparse=True)
+        # Generate the Hamiltonian using sparse and dense format
+        H = sop_H_coherent(spin_system.basis,
+                           spin_system.gammas,
+                           spin_system.spins,
+                           spin_system.chemical_shifts,
+                           spin_system.J_couplings,
+                           B,
+                           "comm",
+                           sparse=True,
+                           zero_value=1e-12)
 
         # Assert that the generated Hamiltonian matches the reference
-        self.assertTrue(np.allclose(H_c_previous.toarray(), H_c.toarray()))
+        self.assertTrue(np.allclose(H.toarray(), H_previous.toarray()))

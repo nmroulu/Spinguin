@@ -190,23 +190,45 @@ def sop_H_J(basis: Basis,
 
     return sop_Hj
 
-def hamiltonian(spin_system: SpinSystem,
-                B: float,
-                side: Literal["comm", "left", "right"] = "comm",
-                sparse: bool=True) -> np.ndarray | csc_array:
+def sop_H_coherent(basis: Basis,
+                   gammas: np.ndarray,
+                   spins: np.ndarray,
+                   chemical_shifts: np.ndarray,
+                   J_couplings: np.ndarray,
+                   B: float,
+                   side: Literal["comm", "left", "right"] = "comm",
+                   sparse: bool=True,
+                   zero_value: float=1e-12) -> np.ndarray | csc_array:
     """
     Computes the coherent part of the Hamiltonian superoperator, including the Zeeman
     interaction and J-couplings.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system object containing information about the spins.
+    basis : Basis
+        Basis set that consists of products of irreducible spherical tensors defined
+        by tuples of integers.
+    gammas : ndarray
+        A 1-dimensional array containing the gyromagnetic ratios of each spin in the
+        units of rad/s/T
+    spins : ndarray
+        A 1-dimensional array containing the spin quantum numbers of each spin.
+    chemical_shifts : ndarray
+        A 1-dimensional array containing the chemical shifts of each spin in the units
+        of ppm.
+    B : float
+        External magnetic field in the units of T.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
+    sparse : bool, default=True
+        Specifies whether to construct the Hamiltonian as sparse or dense array.
+    zero_value : float, default=1e-12
+        Smaller values than this threshold are made equal to zero after calculating the
+        Hamiltonian. When using sparse arrays, larger values decrease the memory requirement
+        at the cost of accuracy.
 
     Returns
     -------
@@ -218,18 +240,15 @@ def hamiltonian(spin_system: SpinSystem,
     print("Constructing Hamiltonian...")
 
     # Compute the Zeeman and J-coupling Hamiltonians
-    sop_Hz = sop_H_Z(spin_system.basis, spin_system.gammas, spin_system.spins,
-                     B, side, sparse)
-    sop_Hcs = sop_H_CS(spin_system.basis, spin_system.gammas, spin_system.spins,
-                       spin_system.chemical_shifts, B, side, sparse)
-    sop_Hj = sop_H_J(spin_system.basis, spin_system.spins, spin_system.J_couplings,
-                     side, sparse)
+    sop_Hz = sop_H_Z(basis, gammas, spins, B, side, sparse)
+    sop_Hcs = sop_H_CS(basis, gammas, spins, chemical_shifts, B, side, sparse)
+    sop_Hj = sop_H_J(basis, spins, J_couplings, side, sparse)
 
     # Combine the terms
     sop_H = sop_Hz + sop_Hcs + sop_Hj
 
     # Remove small values to enhance sparsity
-    increase_sparsity(sop_H, Config.ZERO_HAMILTONIAN)
+    increase_sparsity(sop_H, zero_value)
 
     print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.')
     print()
