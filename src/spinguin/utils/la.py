@@ -856,3 +856,25 @@ def arraylike_to_tuple(A: ArrayLike) -> tuple:
         raise ValueError(f"Cannot convert {A.ndim}-dimensional array into tuple.")
     
     return A
+
+def arraylike_to_array(A: ArrayLike) -> np.ndarray:
+    """
+    Converts an `ArrayLike` object into a NumPy array while ensuring
+    that at least one dimension is created.
+
+    Parameters
+    ----------
+    A : ArrayLike
+        An object that can be converted into NumPy array.
+
+    Returns
+    -------
+    A : ndarray
+        The original object converted into a NumPy array.
+    """
+
+    # Convert to NumPy array and ensure at least one dimension
+    A = np.asarray(A)
+    A = np.atleast_1d(A)
+
+    return A
