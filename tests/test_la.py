@@ -1,11 +1,11 @@
 import unittest
 from spinguin.utils import la
+from spinguin.utils.hide_prints import HidePrints
+from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_T_coupled
 import numpy as np
 from scipy.sparse.linalg import expm
 from scipy.sparse import csc_array, random_array
 import math
-
-from spinguin.qm import operators
 
 class TestLinearAlgebraMethods(unittest.TestCase):
 
@@ -168,13 +168,14 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         bot_r1 = expm_aux[A.shape[0]:, A.shape[1]:].toarray()
 
         # Compute the components manually
-        top_l2 = la.expm(A*T, zero_value=1e-18).toarray()
-        top_r2 = csc_array(A.shape, dtype=complex)
-        for t in np.linspace(0, T, 1000):
-            top_r2 += la.expm(-A*t, zero_value=1e-18) @ B @ la.expm(C*t, zero_value=1e-18) * (1/1000)
-        top_r2 = (la.expm(A*T, zero_value=1e-18) @ top_r2).toarray()
-        bot_l2 = np.zeros_like(bot_l1)
-        bot_r2 = la.expm(C*T, zero_value=1e-18).toarray()
+        with HidePrints():
+            top_l2 = la.expm(A*T, zero_value=1e-18).toarray()
+            top_r2 = csc_array(A.shape, dtype=complex)
+            for t in np.linspace(0, T, 1000):
+                top_r2 += la.expm(-A*t, zero_value=1e-18) @ B @ la.expm(C*t, zero_value=1e-18) * (1/1000)
+            top_r2 = (la.expm(A*T, zero_value=1e-18) @ top_r2).toarray()
+            bot_l2 = np.zeros_like(bot_l1)
+            bot_r2 = la.expm(C*T, zero_value=1e-18).toarray()
 
         # Verify the components
         self.assertTrue(np.allclose(top_l1, top_l2))
@@ -247,17 +248,17 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         A = np.random.rand(3, 3)
 
         # Single-spin unit operator
-        E = operators.op_E(1/2)
+        E = op_E(1/2, sparse=False)
 
         # Spin operators for I
-        Ix = np.kron(operators.op_Sx(1/2), E)
-        Iy = np.kron(operators.op_Sy(1/2), E)
-        Iz = np.kron(operators.op_Sz(1/2), E)
+        Ix = np.kron(op_Sx(1/2, sparse=False), E)
+        Iy = np.kron(op_Sy(1/2, sparse=False), E)
+        Iz = np.kron(op_Sz(1/2, sparse=False), E)
 
         # Spin operators for S
-        Sx = np.kron(E, operators.op_Sx(1/2))
-        Sy = np.kron(E, operators.op_Sy(1/2))
-        Sz = np.kron(E, operators.op_Sz(1/2))
+        Sx = np.kron(E, op_Sx(1/2, sparse=False))
+        Sy = np.kron(E, op_Sy(1/2, sparse=False))
+        Sz = np.kron(E, op_Sz(1/2, sparse=False))
 
         # Construct the Cartesian spin vectors
         I = np.array([[Ix, Iy, Iz]], dtype=complex)
@@ -278,7 +279,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         right = np.zeros_like(Ix)
         for l in range(0, 3):
             for q in range(-l, l+1):
-                right += (-1)**(q) * A[(l, q)] * operators.op_T_coupled(l, -q, 1, 1/2, 1, 1/2)
+                right += (-1)**(q) * A[(l, q)] * op_T_coupled(l, -q, 1, 1/2, 1, 1/2)
 
         # Both conventions should give the same result
         self.assertTrue(np.allclose(left, right))
