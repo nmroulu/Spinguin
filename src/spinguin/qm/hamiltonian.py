@@ -9,22 +9,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from spinguin.system.spin_system import SpinSystem
     from spinguin.system.basis import Basis
 
 # Imports
 import numpy as np
 import time
-from numpy.typing import ArrayLike
 from typing import Literal
 from scipy.sparse import csc_array
 from spinguin.utils.la import increase_sparsity
 from spinguin.qm.superoperators import sop_prod
-from spinguin.config import Config
 
 def sop_H_Z(basis: Basis,
-            gammas: ArrayLike,
-            spins: ArrayLike,
+            gammas: np.ndarray,
+            spins: np.ndarray,
             B: float,
             side: Literal["comm", "left", "right"] = "comm",
             sparse: bool=True) -> np.ndarray | csc_array:
@@ -36,10 +33,10 @@ def sop_H_Z(basis: Basis,
     basis : Basis
         Basis set that consists of products of irreducible spherical tensors defined
         by tuples of integers.
-    gammas : ArrayLike
+    gammas : ndarray
         A 1-dimensional array containing the gyromagnetic ratios of each spin in the
         units of rad/s/T
-    spins : ArrayLike
+    spins : ndarray
         A 1-dimensional array containing the spin quantum numbers of each spin.
     B : float
         External magnetic field in the units of T.
@@ -75,9 +72,9 @@ def sop_H_Z(basis: Basis,
     return sop_Hz
 
 def sop_H_CS(basis: Basis,
-             gammas: ArrayLike,
-             spins: ArrayLike,
-             chemical_shifts: ArrayLike,
+             gammas: np.ndarray,
+             spins: np.ndarray,
+             chemical_shifts: np.ndarray,
              B: float,
              side: Literal["comm", "left", "right"] = "comm",
              sparse: bool=True) -> np.ndarray | csc_array:
@@ -89,12 +86,12 @@ def sop_H_CS(basis: Basis,
     basis : Basis
         Basis set that consists of products of irreducible spherical tensors defined
         by tuples of integers.
-    gammas : ArrayLike
+    gammas : ndarray
         A 1-dimensional array containing the gyromagnetic ratios of each spin in the
         units of rad/s/T
-    spins : ArrayLike
+    spins : ndarray
         A 1-dimensional array containing the spin quantum numbers of each spin.
-    chemical_shifts : ArrayLike
+    chemical_shifts : ndarray
         A 1-dimensional array containing the chemical shifts of each spin in the units
         of ppm.
     B : float
@@ -131,8 +128,8 @@ def sop_H_CS(basis: Basis,
     return sop_Hcs
 
 def sop_H_J(basis: Basis,
-            spins: ArrayLike,
-            J_couplings: ArrayLike,
+            spins: np.ndarray,
+            J_couplings: np.ndarray,
             side: Literal["comm", "left", "right"] = "comm",
             sparse: bool=True) -> np.ndarray | csc_array:
     """
@@ -143,9 +140,9 @@ def sop_H_J(basis: Basis,
     basis : Basis
         Basis set that consists of products of irreducible spherical tensors defined
         by tuples of integers.
-    spins : ArrayLike
+    spins : ndarray
         A 1-dimensional array containing the spin quantum numbers of each spin.
-    J_couplings : ArrayLike
+    J_couplings : ndarray
         A 2-dimensional array containing the scalar J-couplings between each spin in
         the units of Hz. Only the bottom triangle is considered.
     side : {'comm', 'left', 'right'}
