@@ -22,7 +22,7 @@ class HidePrints:
         self.stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
 
-    def __exit__(self):
+    def __exit__(self, *_):
 
         # Restore the original stdout
         sys.stdout.close()
