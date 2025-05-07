@@ -291,8 +291,8 @@ def parse_operator_string(operator: str, nspins: int):
 
     # Handle special case for unit operator
     if operator == "":
-        op_def = tuple(0 for _ in range(nspins))
-        coeff = tuple(1 for _ in range(nspins))
+        op_def = np.array([0 for _ in range(nspins)])
+        coeff = 1
         op_defs.append(op_def)
         coeffs.append(coeff)
         return op_defs, coeffs
@@ -315,7 +315,7 @@ def parse_operator_string(operator: str, nspins: int):
     for prod_op in prod_ops:
 
         # Start from a unit operator
-        op = np.array(['E' for _ in range(nspins)], dtype='<U5')
+        op = np.array(['E' for _ in range(nspins)], dtype='<U10')
 
         # Separate the terms in the product operator
         op_terms = prod_op.split('*')
