@@ -1,10 +1,9 @@
 import unittest
 import numpy as np
 import math
-from spinguin.system.spin_system import SpinSystem
 from spinguin.utils.la import comm
 from spinguin.system.basis import idx_to_lq
-from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, operator, op_T_coupled
+from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, op_from_string, op_T_coupled
 
 class TestOperators(unittest.TestCase):
 
@@ -284,21 +283,20 @@ class TestOperators(unittest.TestCase):
                 self.assertTrue(np.allclose(op_T_coupled(2, -2, 1, s1, 1, s2, sparse=True).toarray(),
                                             1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))))
 
-    def test_operator(self):
+    def test_op_from_string(self):
         """
         A test for creating the Hilbert-space operators using the operators string.
         """
 
         # Create a test spin system
-        isotopes = np.array(["1H", "14N", "23Na"])
-        spin_system = SpinSystem(isotopes)
+        spins = np.array([1/2, 1, 3/2])
 
         # Operators to test
         test_opers = ['E', 'x', 'y', 'z', '+', '-']
 
         # Get the Zeeman eigenbasis operators
         opers = {}
-        for spin in spin_system.spins:
+        for spin in spins:
             opers[('E', spin)] = op_E(spin, sparse=False)
             opers[('x', spin)] = op_Sx(spin, sparse=False)
             opers[('y', spin)] = op_Sy(spin, sparse=False)
@@ -327,13 +325,13 @@ class TestOperators(unittest.TestCase):
 
                     # Create the operator using inbuilt function
                     op_string = f"{op_i} * {op_j} * {op_k}"
-                    oper_sparse = operator(spin_system, op_string, sparse=True)
-                    oper_dense = operator(spin_system, op_string, sparse=False)
+                    oper_sparse = op_from_string(spins, op_string, sparse=True)
+                    oper_dense = op_from_string(spins, op_string, sparse=False)
 
                     # Create the reference operator
-                    oper_ref = np.kron(opers[(i, spin_system.spins[0])],
-                                       np.kron(opers[(j, spin_system.spins[1])],
-                                               opers[(k, spin_system.spins[2])]))
+                    oper_ref = np.kron(opers[(i, spins[0])],
+                                       np.kron(opers[(j, spins[1])],
+                                               opers[(k, spins[2])]))
 
                     # Compare
                     self.assertTrue(np.allclose(oper_sparse.toarray(), oper_ref))

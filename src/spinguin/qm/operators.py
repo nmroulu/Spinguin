@@ -5,13 +5,6 @@ This module provides functions for calculating quantum mechanical spin operators
 It includes functions for single-spin operators as well as many-spin operators.
 """
 
-# For referencing the SpinSystem class
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from spinguin.system.spin_system import SpinSystem
-
 # Imports
 import numpy as np
 import scipy.sparse as sp
@@ -333,14 +326,14 @@ def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, spar
 
     return op
 
-def operator(spin_system: SpinSystem, operator: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def op_from_string(spins: np.ndarray, operator: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates an operator for the `spin_system` in Hilbert space from the user-specified `operators` string.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the operator is generated.
+    spins : ndarray
+        A one-dimensional array containing the spin quantum numbers of the spin system.
     operator : str
         Defines the operator to be generated. The operator string must follow the rules below:
 
@@ -364,19 +357,21 @@ def operator(spin_system: SpinSystem, operator: str, sparse: bool=True) -> np.nd
         An array representing the requested operator.
     """
 
-    # Get the dimension of the operator
-    dim = np.prod(spin_system.mults)
+    # Extract information from the spins
+    nspins = spins.shape[0]
+    dim = int(np.prod(2*spins + 1))
 
     # Initialize the operator
-    op = sp.csc_array((dim, dim), dtype=complex)
+    if sparse:
+        op = sp.csc_array((dim, dim), dtype=complex)
     if not sparse:
-        op = op.toarray()
+        op = np.zeros((dim, dim), dtype=complex)
 
     # Get the operator definitions and coefficients
-    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
+    op_defs, coeffs = parse_operator_string(operator, nspins)
 
     # Construct the operator
     for op_def, coeff in zip(op_defs, coeffs):
-        op = op + coeff * op_prod(op_def, spin_system.spins, include_unit=True, sparse=sparse)
+        op = op + coeff * op_prod(op_def, spins, include_unit=True, sparse=sparse)
 
     return op
