@@ -224,13 +224,13 @@ def idx_to_lq(idx: int) -> tuple[int, int]:
     
     return l, q
 
-def coherence_order(op_def: tuple) -> int:
+def coherence_order(op_def: np.ndarray) -> int:
     """
     Determines the coherence order of a given operator defined by `op_def`.
 
     Parameters
     ----------
-    op_def : tuple
+    op_def : ndarray
         Contains the indices that describe the product operator.
 
     Returns
