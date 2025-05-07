@@ -1,9 +1,10 @@
 import unittest
 import numpy as np
 import scipy.sparse as sp
-from spinguin.system.spin_system import SpinSystem
+# from spinguin.system.spin_system import SpinSystem
 from spinguin.qm.operators import op_prod
-from spinguin.qm.superoperators import sop_prod, sop_prod_ref, superoperator, sop_T_coupled
+from spinguin.qm.basis import make_basis, truncate_basis_by_coherence
+from spinguin.qm.superoperators import sop_prod, sop_prod_ref, sop_from_string, sop_T_coupled
 from spinguin.utils.la import cartesian_tensor_to_spherical_tensor
 
 class TestSuperoperators(unittest.TestCase):
@@ -14,36 +15,38 @@ class TestSuperoperators(unittest.TestCase):
         """
 
         # Create a test spin system
-        isotopes = np.array(['1H', '14N'])
-        spin_system = SpinSystem(isotopes)
+        spins = np.array([1/2, 1])
+        nspins = spins.shape[0]
+        basis = make_basis(spins, nspins)
+        dim = basis.shape[0]
 
         # Test all product operators from the basis set
-        for i in range(int(2*spin_system.spins[0]+1)):
-            for j in range(int(2*spin_system.spins[1]+1)):
+        for i in range(int(2*spins[0]+1)):
+            for j in range(int(2*spins[1]+1)):
 
                 # Set current operator definition
-                op_def_i = (i, j)
+                op_def_i = np.array([i, j])
 
                 # Build left and right superoperator manually
-                sop_L_ref = np.zeros((spin_system.basis.dim, spin_system.basis.dim), dtype=complex)
-                sop_R_ref = np.zeros((spin_system.basis.dim, spin_system.basis.dim), dtype=complex)
+                sop_L_ref = np.zeros((dim, dim), dtype=complex)
+                sop_R_ref = np.zeros((dim, dim), dtype=complex)
 
                 # Construct the operator
-                op_i = op_prod(op_def_i, spin_system.spins, include_unit=True, sparse=False)
+                op_i = op_prod(op_def_i, spins, include_unit=True, sparse=False)
 
                 # Loop over the operator bras
-                for j in range(spin_system.basis.dim):
+                for j in range(dim):
 
                     # Construct the operator bra
-                    op_def_j = spin_system.basis[j]
-                    op_j = op_prod(op_def_j, spin_system.spins, include_unit=True, sparse=False)
+                    op_def_j = basis[j]
+                    op_j = op_prod(op_def_j, spins, include_unit=True, sparse=False)
 
                     # Loop over the kets
-                    for k in range(spin_system.basis.dim):
+                    for k in range(dim):
 
                         # Construct the operator ket
-                        op_def_k = spin_system.basis[k]
-                        op_k = op_prod(op_def_k, spin_system.spins, include_unit=True, sparse=False)
+                        op_def_k = basis[k]
+                        op_k = op_prod(op_def_k, spins, include_unit=True, sparse=False)
 
                         # Calculate the elements
                         norm = np.sqrt((op_j.conj().T @ op_j).trace() * (op_k.conj().T @ op_k).trace())
@@ -52,10 +55,10 @@ class TestSuperoperators(unittest.TestCase):
 
                 # Build left and right superoperators using inbuilt function
                 # that uses the structure coefficients
-                sop_L_dense = sop_prod(op_def_i, spin_system.basis, spin_system.spins, "left", sparse=False)
-                sop_R_dense = sop_prod(op_def_i, spin_system.basis, spin_system.spins, "right", sparse=False)
-                sop_L_sparse = sop_prod(op_def_i, spin_system.basis, spin_system.spins, "left", sparse=True)
-                sop_R_sparse = sop_prod(op_def_i, spin_system.basis, spin_system.spins, "right", sparse=True)
+                sop_L_dense = sop_prod(op_def_i, basis, spins, "left", sparse=False)
+                sop_R_dense = sop_prod(op_def_i, basis, spins, "right", sparse=False)
+                sop_L_sparse = sop_prod(op_def_i, basis, spins, "left", sparse=True)
+                sop_R_sparse = sop_prod(op_def_i, basis, spins, "right", sparse=True)
 
                 # Compare
                 self.assertTrue(np.allclose(sop_L_dense, sop_L_ref))
@@ -69,36 +72,35 @@ class TestSuperoperators(unittest.TestCase):
         """
 
         # Define test spin systems
-        systems = []
-
-        # Assign isotopes
-        systems.append(np.array(['1H']))
-        systems.append(np.array(['1H', '14N']))
+        test_systems = [
+            np.array([1/2]),
+            np.array([1/2, 1])
+        ]
 
         # Test all systems
-        for isotopes in systems:
+        for spins in test_systems:
 
             # Test all possible spin orders
-            for max_so in range(1, isotopes.size + 1):
+            for max_so in range(1, spins.shape[0] + 1):
 
-                # Initialize the spin system
-                spin_system = SpinSystem(isotopes, max_spin_order=max_so)
+                # Create a basis set
+                basis = make_basis(spins, max_so)
 
                 # Test all possible operators
-                for op in spin_system.basis.arr:
+                for op in basis:
 
                     # Create reference superoperators using an "idiot-proof" function
-                    sop_L_ref = sop_prod_ref(op, spin_system.basis, spin_system.spins, 'left')
-                    sop_R_ref = sop_prod_ref(op, spin_system.basis, spin_system.spins, 'right')
-                    sop_comm_ref = sop_prod_ref(op, spin_system.basis, spin_system.spins, 'comm')
+                    sop_L_ref = sop_prod_ref(op, basis, spins, 'left')
+                    sop_R_ref = sop_prod_ref(op, basis, spins, 'right')
+                    sop_comm_ref = sop_prod_ref(op, basis, spins, 'comm')
 
                     # Create superoperators using the inbuilt function
-                    sop_L_sparse = sop_prod(op, spin_system.basis, spin_system.spins, 'left', sparse=True)
-                    sop_L_dense = sop_prod(op, spin_system.basis, spin_system.spins, 'left', sparse=False)
-                    sop_R_sparse = sop_prod(op, spin_system.basis, spin_system.spins, 'right', sparse=True)
-                    sop_R_dense = sop_prod(op, spin_system.basis, spin_system.spins, 'right', sparse=False)
-                    sop_comm_sparse = sop_prod(op, spin_system.basis, spin_system.spins, 'comm', sparse=True)
-                    sop_comm_dense = sop_prod(op, spin_system.basis, spin_system.spins, 'comm', sparse=False)
+                    sop_L_sparse = sop_prod(op, basis, spins, 'left', sparse=True)
+                    sop_L_dense = sop_prod(op, basis, spins, 'left', sparse=False)
+                    sop_R_sparse = sop_prod(op, basis, spins, 'right', sparse=True)
+                    sop_R_dense = sop_prod(op, basis, spins, 'right', sparse=False)
+                    sop_comm_sparse = sop_prod(op, basis, spins, 'comm', sparse=True)
+                    sop_comm_dense = sop_prod(op, basis, spins, 'comm', sparse=False)
 
                     # Compare
                     self.assertTrue(np.allclose(sop_L_sparse.toarray(), sop_L_ref))
@@ -114,44 +116,49 @@ class TestSuperoperators(unittest.TestCase):
         """
 
         # Example system
-        isotopes = np.array(['1H', '1H', '1H'])
-        spin_system = SpinSystem(isotopes)
+        spins = np.array([1/2, 1/2, 1/2])
+        
+        # Define an operator to be created
+        op_def = np.array([2, 0, 0])
 
-        # Create an operator, change the basis, and create an operator again
-        op_def = (2, 0, 0)
-        Iz = sop_prod(op_def, spin_system.basis, spin_system.spins, side='comm', sparse=False)
-        spin_system.basis.truncate_by_coherence([0])
-        Iz_ZQ = sop_prod(op_def, spin_system.basis, spin_system.spins, side='comm', sparse=False)
+        # Create the operator in original basis
+        basis = make_basis(spins, spins.shape[0])
+        Iz = sop_prod(op_def, basis, spins, side='comm', sparse=False)
+
+        # Truncate the basis and create the operator again
+        ZQ_basis, _ = truncate_basis_by_coherence(basis, coherence_orders=[0])
+        Iz_ZQ = sop_prod(op_def, ZQ_basis, spins, side='comm', sparse=False)
 
         # Resulting shapes should be different
         self.assertNotEqual(Iz.shape, Iz_ZQ.shape)
 
-    def test_superoperator(self):
+    def test_sop_from_string(self):
         """
-        Test the superoperator function against a few hard-coded cases.
+        Test creating the superoperator from a string against a few hard-coded cases.
         """
 
         # Example system
-        isotopes = np.array(['1H', '1H'])
-        spin_system = SpinSystem(isotopes)
+        spins = np.array([1/2, 1/2])
+        nspins = spins.shape[0]
+        basis = make_basis(spins, max_spin_order=nspins)
 
-        # Test the superoperator function
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0)", "left", sparse=True).toarray(),
-                                    sop_prod((2, 0), spin_system.basis, spin_system.spins, "left", sparse=True).toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0)", "right", sparse=False),
-                                    sop_prod((2, 0), spin_system.basis, spin_system.spins, "right", sparse=False)))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0)", "comm", sparse=True).toarray(),
-                                    sop_prod((2, 0), spin_system.basis, spin_system.spins, "comm", sparse=True).toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(z,0) + I(z,1)", "comm", sparse=True).toarray(),
-                                    (sop_prod((2, 0), spin_system.basis, spin_system.spins, "comm", sparse=True) \
-                                     + sop_prod((0, 2), spin_system.basis, spin_system.spins, "comm", sparse=True)).toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(+,0) * I(-,1)", "comm", sparse=True).toarray(),
-                                    -2 * sop_prod((1, 3), spin_system.basis, spin_system.spins, "comm", sparse=True).toarray()))
-        self.assertTrue(np.allclose(superoperator(spin_system, "I(x,0) + I(x,1)", "comm", sparse=True).toarray(), (
-                                    - 1 / np.sqrt(2) * sop_prod((1, 0), spin_system.basis, spin_system.spins, "comm", sparse=True) \
-                                    + 1 / np.sqrt(2) * sop_prod((3, 0), spin_system.basis, spin_system.spins, "comm", sparse=True) \
-                                    - 1 / np.sqrt(2) * sop_prod((0, 1), spin_system.basis, spin_system.spins, "comm", sparse=True) \
-                                    + 1 / np.sqrt(2) * sop_prod((0, 3), spin_system.basis, spin_system.spins, "comm", sparse=True)
+        # Test the sop_from_string function
+        self.assertTrue(np.allclose(sop_from_string("I(z,0)",  basis, spins, "left", sparse=True).toarray(),
+                                    sop_prod(np.array([2, 0]), basis, spins, "left", sparse=True).toarray()))
+        self.assertTrue(np.allclose(sop_from_string("I(z,0)", basis, spins, "right", sparse=False),
+                                    sop_prod(np.array([2, 0]), basis, spins, "right", sparse=False)))
+        self.assertTrue(np.allclose(sop_from_string("I(z,0)", basis, spins, "comm", sparse=True).toarray(),
+                                    sop_prod(np.array([2, 0]), basis, spins, "comm", sparse=True).toarray()))
+        self.assertTrue(np.allclose(sop_from_string("I(z,0) + I(z,1)", basis, spins, "comm", sparse=True).toarray(),
+                                    (sop_prod(np.array([2, 0]), basis, spins, "comm", sparse=True) \
+                                     + sop_prod(np.array([0, 2]), basis, spins, "comm", sparse=True)).toarray()))
+        self.assertTrue(np.allclose(sop_from_string("I(+,0) * I(-,1)", basis, spins, "comm", sparse=True).toarray(),
+                                    -2 * sop_prod(np.array([1, 3]), basis, spins, "comm", sparse=True).toarray()))
+        self.assertTrue(np.allclose(sop_from_string("I(x,0) + I(x,1)", basis, spins, "comm", sparse=True).toarray(), (
+                                    - 1 / np.sqrt(2) * sop_prod(np.array([1, 0]), basis, spins, "comm", sparse=True) \
+                                    + 1 / np.sqrt(2) * sop_prod(np.array([3, 0]), basis, spins, "comm", sparse=True) \
+                                    - 1 / np.sqrt(2) * sop_prod(np.array([0, 1]), basis, spins, "comm", sparse=True) \
+                                    + 1 / np.sqrt(2) * sop_prod(np.array([0, 3]), basis, spins, "comm", sparse=True)
                                     ).toarray()))
         
     def test_sop_T_coupled(self):
@@ -161,8 +168,9 @@ class TestSuperoperators(unittest.TestCase):
         """
 
         # Example system
-        isotopes = np.array(['1H', '1H'])
-        spin_system = SpinSystem(isotopes)
+        spins = np.array([1/2, 1/2])
+        basis = make_basis(spins, max_spin_order=spins.shape[0])
+        dim = basis.shape[0]
 
         # Make a random Cartesian interaction tensor
         A = np.random.rand(3, 3)
@@ -171,21 +179,21 @@ class TestSuperoperators(unittest.TestCase):
         I = np.array(['x', 'y', 'z'])
         
         # Perform the dot product manually
-        left = np.zeros((spin_system.basis.dim, spin_system.basis.dim), dtype=complex)
+        left = np.zeros((dim, dim), dtype=complex)
         for i in range(A.shape[0]):
             for s in range(A.shape[1]):
-                left += A[i, s] * superoperator(spin_system, f"I({I[i]},0) * I({I[s]},1)", 'comm', sparse=False)
+                left += A[i, s] * sop_from_string(f"I({I[i]},0) * I({I[s]},1)", basis, spins, 'comm', sparse=False)
 
         # Convert A to spherical tensors
         A = cartesian_tensor_to_spherical_tensor(A)
 
         # Use spherical tensors
-        right_dense = np.zeros((spin_system.basis.dim, spin_system.basis.dim), dtype=complex)
-        right_sparse = sp.csc_array((spin_system.basis.dim, spin_system.basis.dim), dtype=complex)
+        right_dense = np.zeros((dim, dim), dtype=complex)
+        right_sparse = sp.csc_array((dim, dim), dtype=complex)
         for l in range(0, 3):
             for q in range(-l, l + 1):
-                right_dense += (-1)**(q) * A[(l, q)] * sop_T_coupled(spin_system.basis, spin_system.spins, l, -q, 0, 1, sparse=False)
-                right_sparse += (-1)**(q) * A[(l, q)] * sop_T_coupled(spin_system.basis, spin_system.spins, l, -q, 0, 1, sparse=True)
+                right_dense += (-1)**(q) * A[(l, q)] * sop_T_coupled(basis, spins, l, -q, 0, 1, sparse=False)
+                right_sparse += (-1)**(q) * A[(l, q)] * sop_T_coupled(basis, spins, l, -q, 0, 1, sparse=True)
 
         # Both conventions should give the same result
         self.assertTrue(np.allclose(left, right_dense))

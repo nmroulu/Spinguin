@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import math
 from spinguin.utils.la import comm
-from spinguin.system.basis import idx_to_lq
+from spinguin.qm.basis import idx_to_lq
 from spinguin.qm.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, op_T, op_prod, op_from_string, op_T_coupled
 
 class TestOperators(unittest.TestCase):
@@ -162,18 +162,7 @@ class TestOperators(unittest.TestCase):
         """
 
         # Create a test spin system
-        spins = (1/2, 1, 3/2)
-        nspins = len(spins)
-
-        # # Get the Zeeman eigenbasis operators
-        # opers = {}
-        # for spin in spins:
-        #     opers[('E', spin)] = op_E(spin)
-        #     opers[('x', spin)] = op_Sx(spin)
-        #     opers[('y', spin)] = op_Sy(spin)
-        #     opers[('z', spin)] = op_Sz(spin)
-        #     opers[('+', spin)] = op_Sp(spin)
-        #     opers[('-', spin)] = op_Sm(spin)
+        spins = np.array([1/2, 1, 3/2])
 
         # Try all possible product operator combinations
         for i in range(int(2*spins[0]+1)):
@@ -191,7 +180,7 @@ class TestOperators(unittest.TestCase):
                     # Perform the comparison WITH unit operators included
 
                     # Create the operator using inbuilt function 
-                    op_def = (i, j, k)
+                    op_def = np.array([i, j, k])
                     oper_sparse = op_prod(op_def, spins, include_unit=True, sparse=True)
                     oper_dense = op_prod(op_def, spins, include_unit=True, sparse=False)
 

@@ -5,21 +5,13 @@ This module provides functions for calculating Liouville-space superoperators
 either in full or truncated basis set.
 """
 
-# For referencing the SpinSystem/Basis classes
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from spinguin.system.spin_system import SpinSystem
-    from spinguin.system.basis import Basis
-
 # Imports
 import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
 from itertools import product
 from spinguin.utils import la
-from spinguin.system.basis import idx_to_lq, parse_operator_string
+from spinguin.qm.basis import idx_to_lq, parse_operator_string
 from spinguin.qm.operators import op_T
 
 @lru_cache(maxsize=16)
@@ -111,7 +103,7 @@ def sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
 
     return unit
 
-def sop_prod(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def sop_prod(op_def: np.ndarray, basis: np.ndarray, spins: np.ndarray, side: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a product superoperator corresponding to the product operator
     defined by `op_def`.
@@ -124,9 +116,9 @@ def sop_prod(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str, spa
         Specifies the product operator to be generated. For example,
         input `(0, 2, 0, 1)` will generate `E*T_10*E*T_11`. The indices are
         given by `N = l^2 + l - q`, where `l` is the rank and `q` is the projection.
-    basis : Basis
-        Basis set consisting of Kronecker products of single-spin irreducible
-        spherical tensors, described by tuples of integers.
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent a
+        Kronecker product of single-spin irreducible spherical tensors.
     spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin system.
     side : str
@@ -144,20 +136,32 @@ def sop_prod(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str, spa
     """
 
     @lru_cache(maxsize=4096)
-    def _sop_prod(op_def: tuple, basis: Basis, spins: tuple, side: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
+    def _sop_prod(op_def_bytes: bytes,
+                  basis_bytes: bytes,
+                  spins_bytes: bytes,
+                  side: str,
+                  sparse: bool=True) -> np.ndarray | sp.csc_array:
 
         # If commutation superoperator, calculate left and right superoperators and return their difference
         if side == 'comm':
-            sop = _sop_prod(op_def, basis, spins, 'left', sparse) \
-                - _sop_prod(op_def, basis, spins, 'right', sparse)
+            sop = _sop_prod(op_def_bytes, basis_bytes, spins_bytes, 'left', sparse) \
+                - _sop_prod(op_def_bytes, basis_bytes, spins_bytes, 'right', sparse)
             return sop
+        
+        # Obtain the hashed elements
+        op_def = np.frombuffer(op_def_bytes, dtype=int)
+        basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, op_def.shape[0])
+        spins = np.frombuffer(spins_bytes, dtype=float)
+
+        # Obtain the basis dimension
+        dim = basis.shape[0]
 
         # Find indices of the spins participating in the operator
         idx_spins = np.nonzero(op_def)[0]
 
         # Return the unit operator if no spins participate in the operator
         if len(idx_spins) == 0:
-            sop = sop_E(basis.dim, sparse)
+            sop = sop_E(dim, sparse)
             return sop
 
         # Initialize lists for storing non-zero structure coefficients and their indices
@@ -221,22 +225,23 @@ def sop_prod(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str, spa
         sop_vals = np.concatenate(sop_vals, dtype=complex)
 
         # Construct the superoperator
-        sop = sp.csc_array((sop_vals, (sop_j, sop_k)), shape=(basis.dim, basis.dim))
+        sop = sp.csc_array((sop_vals, (sop_j, sop_k)), shape=(dim, dim))
         if not sparse:
             sop = sop.toarray()
 
         return sop
     
-    # Ensure that input type is tuple for hashing
-    op_def = tuple(op_def)
-    spins = tuple(spins)
+    # Convert types suitable for hashing
+    op_def_bytes = op_def.tobytes()
+    basis_bytes = basis.tobytes()
+    spins_bytes = spins.tobytes()
     
     # Ensure a different instance is returned
-    sop = _sop_prod(op_def, basis, spins, side, sparse).copy()
+    sop = _sop_prod(op_def_bytes, basis_bytes, spins_bytes, side, sparse).copy()
 
     return sop
 
-def sop_prod_ref(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str) -> np.ndarray:
+def sop_prod_ref(op_def: np.ndarray, basis: np.ndarray, spins: np.ndarray, side: str) -> np.ndarray:
     """
     A reference method for calculating the superoperator.
     
@@ -249,9 +254,9 @@ def sop_prod_ref(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str)
         Specifies the product operator to be generated. For example,
         input `(0, 2, 0, 1)` will generate `E*T_10*E*T_11`. The indices are
         given by `N = l^2 + l - q`, where `l` is the rank and `q` is the projection.
-    basis : Basis
-        Basis set consisting of Kronecker products of single-spin irreducible
-        spherical tensors, described by tuples of integers.
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent a
+        Kronecker product of single-spin irreducible spherical tensors.
     spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin system.
     side : str
@@ -261,30 +266,30 @@ def sop_prod_ref(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str)
         - 'right' -- right superoperator
     """
 
-    # Convert input to NumPy
-    op_def = np.asarray(op_def)
-    spins = np.asarray(spins)
-
     # If commutation superoperator, calculate left and right superoperators and return their difference
     if side == 'comm':
         sop = sop_prod_ref(op_def, basis, spins, 'left') \
             - sop_prod_ref(op_def, basis, spins, 'right')
         return sop
     
+    # Obtain the basis dimension and number of spins
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
+    
     # Initialize the superoperator
-    sop = np.zeros((basis.dim, basis.dim), dtype=complex)
+    sop = np.zeros((dim, dim), dtype=complex)
 
     # Loop over each matrix row j
-    for j in range(basis.dim):
+    for j in range(dim):
 
         # Loop over each matrix column k
-        for k in range(basis.dim):
+        for k in range(dim):
 
             # Initialize the matrix element
             sop_jk = 1
 
             # Loop over the spins
-            for n in range(basis.nspins):
+            for n in range(nspins):
 
                 # Get the single-spin operator indices
                 i_ind = op_def[n]
@@ -302,23 +307,31 @@ def sop_prod_ref(op_def: np.ndarray, basis: Basis, spins: np.ndarray, side: str)
 
     return sop
 
-def superoperator(spin_system: SpinSystem, operator: str, side: str='comm', sparse: bool=True) -> np.ndarray | sp.csc_array:
+def sop_from_string(operator: str, basis: np.ndarray, spins: np.ndarray, side: str='comm', sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a superoperator from the user-specified `operators` string.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the superoperator is generated.
     operator : str
         Defines the operator to be generated. The operator string must follow the rules below:
 
-        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
-        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
-        - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
-        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
-        - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
-        - Whitespace will be ignored in the input.
+        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+        
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent a
+        Kronecker product of single-spin irreducible spherical tensors.
+    spins : ndarray
+        A sequence of floats describing the spin quantum numbers of the spin system.
     side : str
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
@@ -333,24 +346,32 @@ def superoperator(spin_system: SpinSystem, operator: str, side: str='comm', spar
         The requested superoperator.
     """
 
-    # Extract necessary information from the spin system
-    dim = spin_system.basis.dim
+    # Obtain basis dimension and number of spins
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
 
     # Initialize the superoperator
-    sop = sp.csc_array((dim, dim), dtype=complex)
-    if not sparse:
-        sop = sop.toarray()
+    if sparse:
+        sop = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        sop = np.zeros((dim, dim), dtype=complex)
 
     # Get the operator definitions and coefficients
-    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
+    op_defs, coeffs = parse_operator_string(operator, nspins)
 
     # Add to the operator
     for op_def, coeff in zip(op_defs, coeffs):
-        sop = sop + coeff * sop_prod(op_def, spin_system.basis, spin_system.spins, side, sparse)
+        sop = sop + coeff * sop_prod(op_def, basis, spins, side, sparse)
 
     return sop
 
-def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, spin_2: int=None, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def sop_T_coupled(basis: np.ndarray,
+                  spins: np.ndarray,
+                  l: int,
+                  q: int,
+                  spin_1: int,
+                  spin_2: int=None,
+                  sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Computes the product superoperator corresponding to the coupled spherical tensor
     operator of rank `l` and projection `q`, derived from two spherical tensor operators of rank 1.
@@ -359,9 +380,9 @@ def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, 
 
     Parameters
     ----------
-    basis : Basis
-        Basis set consisting of Kronecker products of single-spin irreducible
-        spherical tensors, described by tuples of integers.
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent a
+        Kronecker product of single-spin irreducible spherical tensors.
     spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin system.
     l : int
@@ -370,7 +391,7 @@ def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, 
         Projection of the coupled operator.
     spin_1 : int
         Index of the first spin.
-    spin_2 : int, optional
+    spin_2 : int, default=None
         Index of the second spin. Leave empty for linear single-spin interactions (e.g., shielding).
     sparse: bool, default=True
         Specifies whether to return the operator as sparse or dense array.
@@ -382,12 +403,21 @@ def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, 
     """
 
     @lru_cache(maxsize=4096)
-    def _sop_T_coupled(basis: Basis, spins: tuple, l: int, q: int, spin_1: int, spin_2: int=None, sparse: bool=True) -> np.ndarray | sp.csc_array:
+    def _sop_T_coupled(basis_bytes: bytes, spins_bytes: bytes, l: int, q: int, spin_1: int, spin_2: int=None, sparse: bool=True) -> np.ndarray | sp.csc_array:
+
+        # Obtain the hashed elements
+        spins = np.frombuffer(spins_bytes, dtype=float)
+        basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0])
+
+        # Obtain the basis dimension and number of spins
+        dim = basis.shape[0]
+        nspins = spins.shape[0]
         
         # Initialize the operator
-        sop = sp.csc_array((basis.dim, basis.dim), dtype=complex)
+        if sparse:
+            sop = sp.csc_array((dim, dim), dtype=complex)
         if not sparse:
-            sop = sop.toarray()
+            sop = np.zeros((dim, dim), dtype=complex)
 
         # Handle two-spin bilinear interactions
         if isinstance(spin_2, int):
@@ -397,10 +427,9 @@ def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, 
                 for q2 in range(-1, 2):
 
                     # Get the product operator definition corresponding to the coupled operator
-                    op_def = np.zeros(basis.nspins, dtype=int)
+                    op_def = np.zeros(nspins, dtype=int)
                     op_def[spin_1] = 2 - q1
                     op_def[spin_2] = 2 - q2
-                    op_def = tuple(op_def)
 
                     # Use the coupling of angular momenta equation
                     sop += la.CG_coeff(1, q1, 1, q2, l, q) * sop_prod(op_def, basis, spins, 'comm', sparse)
@@ -414,17 +443,17 @@ def sop_T_coupled(basis: Basis, spins: np.ndarray, l: int, q: int, spin_1: int, 
                 # Get the product operator definition corresponding to the coupled operator
                 op_def = np.zeros(nspins, dtype=int)
                 op_def[spin_1] = 2 - q1
-                op_def = tuple(op_def)
 
                 # Use the coupling of angular momenta equation
                 sop += la.CG_coeff(1, q1, 1, 1, l, q) * sop_prod(op_def, basis, spins, 'comm', sparse)
 
         return sop
     
-    # Convert to tuple to make hashing possible
-    spins = tuple(spins)
+    # Convert to bytes to make hashing possible
+    basis_bytes = basis.tobytes()
+    spins_bytes = spins.tobytes()
     
     # Ensure a different instance is returned
-    sop = _sop_T_coupled(basis, spins, l, q, spin_1, spin_2, sparse).copy()
+    sop = _sop_T_coupled(basis_bytes, spins_bytes, l, q, spin_1, spin_2, sparse).copy()
 
     return sop
