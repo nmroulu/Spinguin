@@ -404,3 +404,40 @@ def parse_operator_string(operator: str, nspins: int):
         coeffs.extend(coeffs_curr)
 
     return op_defs, coeffs
+
+def state_idx(basis: np.ndarray, op_def: np.ndarray) -> int:
+    """
+    Finds the index corresponding to the given operator definition.
+
+    Parameters
+    ----------
+    basis : ndarray
+        Two dimensional array containing the basis set that consists of rows of integers
+        defining the products of irreducible spherical tensors.
+    op_def : ndarray
+        A one-dimensional array of integers that describes the operator of interest.
+
+    Returns
+    -------
+    idx : int
+        Index of the given state in the basis set.
+    """
+
+    # Check that the dimensions match
+    if not basis.shape[1] == op_def.shape[0]:
+        raise ValueError(f"Cannot find the index of state, as the dimensions do not match. \
+                         'basis': {basis.shape[1]}, 'op_def': {op_def.shape[0]}")
+
+    # Search for the state
+    is_equal = np.all(basis == op_def, axis=1)
+    idx = np.where(is_equal)[0]
+
+    # Confirm that exactly one state was found
+    if idx.shape[0] == 1:
+        idx = idx[0]
+    elif idx.shape[0] == 0:
+        raise ValueError(f"Could not find the index of state: {op_def}.")
+    else:
+        raise ValueError(f"Multiple states in the basis match with the requested state: {op_def}")
+    
+    return idx
