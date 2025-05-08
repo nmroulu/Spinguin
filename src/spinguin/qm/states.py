@@ -4,26 +4,18 @@ states.py
 This module provides functions for creating state vectors.
 """
 
-# For referencing the SpinSystem class
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from spinguin.system.spin_system import SpinSystem
-
 # Imports
 import numpy as np
+import scipy.sparse as sp
 import scipy.constants as const
-from scipy.sparse import lil_array, csc_array, issparse
+import time
 from spinguin.utils.la import expm
 from spinguin.qm.operators import op_prod
-from spinguin.qm.hamiltonian import hamiltonian
-from spinguin.system.basis import parse_operator_string, state_idx
-from spinguin.config import Config
+from spinguin.qm.basis import parse_operator_string, state_idx
 from spinguin.utils.hide_prints import HidePrints
 from functools import lru_cache
 
-def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=True) -> np.ndarray | csc_array:
+def unit_state(basis: np.ndarray, spins: np.ndarray, sparse: bool=False, normalized: bool=True) -> np.ndarray | sp.csc_array:
     """
     Returns a unit state vector. This is equivalent to the density matrix, which has
     ones on the diagonal. Because the basis set is normalized, the coefficient of the
@@ -31,27 +23,35 @@ def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=Tru
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the unit state vector is generated.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
-    normalized : bool
-        Default: True. If set to True, the function will return a state vector that
-        represents the trace-normalized density matrix. If False, returns a state vector
-        that corresponds to the identity operator.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
+    normalized : bool, default=True
+        If set to True, the function will return a state vector that represents the
+        trace-normalized density matrix. If False, returns a state vector that
+        corresponds to the identity operator.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the unit state.
     """
 
-    # Extract necessary information from the spin system
-    dim = spin_system.basis.dim
-    mults = spin_system.mults
+    # Obtain the basis dimension
+    dim = basis.shape[0]
+
+    # Acquire the spin multiplicities
+    mults = np.array([int(2 * S + 1) for S in spins], dtype=int)
 
     # Initialize the state vector
-    rho = lil_array((dim, 1), dtype=complex)
+    if sparse:
+        rho = sp.lil_array((dim, 1), dtype=complex)
+    else:
+        rho = np.zeros((dim, 1), dtype=complex)
 
     # Assign unit state coefficient
     if normalized:
@@ -63,60 +63,31 @@ def unit_state(spin_system: SpinSystem, sparse: bool=False, normalized: bool=Tru
     if sparse:
         rho = rho.tocsc()
 
-    # Convert to NumPy if requesting dense
-    else:
-        rho = rho.toarray()
-
     return rho
 
 @lru_cache(maxsize=128)
-def state(spin_system: SpinSystem, operator: str, sparse: bool=False) -> np.ndarray | csc_array:
-    """
-    Generates a state vector from the given operator string. The output of the state
-    function corresponds to a density matrix, which is expressed as a linear combination
-    of the basis set operators. The output of this function is a column vector, which
-    contains the coefficients.
-    
-    Normalization:
-    The basis set operators are constructed from products of single-spin spherical tensor
-    operators and they are normalized. Therefore, requesting a state that corresponds
-    to any operator O will result in a coefficient of norm(O) for the state.
+def _state_from_string(basis_bytes: bytes, spins_bytes: bytes, operator: str, sparse: bool=False) -> np.ndarray | sp.csc_array:
 
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        The spin system for which the state vector is generated.
-    operator : str
-        Defines the state to be generated. The operator string must follow the rules below:
+    # Obtain the hashed elements
+    spins = np.frombuffer(spins_bytes, dtype=float)
+    basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0]) 
 
-        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
-        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
-        - Product operators have `*` in between the single-spin operators: I(z,0) * I(z,1)
-        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
-        - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
-        - Whitespace will be ignored in the input.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
-
-    Returns
-    -------
-    rho : numpy.ndarray or csc_array
-        State vector corresponding to the requested state.
-    """
-
-    # Extract the necessary information from the spin system
-    dim = spin_system.basis.dim
-    mults = spin_system.mults
-    spins = spin_system.spins
+    # Obtain the basis dimension, number of spins and spin multiplicities
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
+    mults = (2*spins + 1).astype(int)
 
     # Initialize the state vector
-    rho = lil_array((dim, 1), dtype=complex)
+    if sparse:
+        rho = sp.lil_array((dim, 1), dtype=complex)
+    else:
+        rho = np.array((dim, 1), dtype=complex)
 
     # Get the operator definition and coefficients
-    op_defs, coeffs = parse_operator_string(spin_system, operator)
+    op_defs, coeffs = parse_operator_string(operator, nspins)
 
     # Get the state indices
-    idxs = [state_idx(spin_system, op_def) for op_def in op_defs]
+    idxs = [state_idx(basis, op_def) for op_def in op_defs]
 
     # Assign the state
     for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
@@ -146,40 +117,95 @@ def state(spin_system: SpinSystem, operator: str, sparse: bool=False) -> np.ndar
     if sparse:
         rho = rho.tocsc()
 
-    # Convert to NumPy if requesting dense
-    else:
-        rho = rho.toarray()
+    return rho
+
+def state_from_string(basis: np.ndarray, spins: np.ndarray, operator: str, sparse: bool=False) -> np.ndarray | sp.csc_array:
+    """
+    Generates a state vector from the given operator string. The output of the state
+    function corresponds to a density matrix, which is expressed as a linear combination
+    of the basis set operators. The output of this function is a column vector, which
+    contains the coefficients.
+    
+    Normalization:
+    The basis set operators are constructed from products of single-spin spherical tensor
+    operators and they are normalized. Therefore, requesting a state that corresponds
+    to any operator `O` will result in a coefficient of `norm(O)` for the state.
+
+    NOTE: This function is sometimes called often and is cached for high performance.
+
+    Parameters
+    ----------
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
+    operator : str
+        Defines the state to be generated. The operator string must follow the rules below:
+
+        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+        
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the requested state.
+    """
+    
+    # Convert types suitable for hashing
+    basis_bytes = basis.tobytes()
+    spins_bytes = spins.tobytes()
+
+    # Ensure that a different instance is returned
+    rho = _state_from_string(basis_bytes, spins_bytes, operator, sparse).copy()
 
     return rho
 
-def rho_to_zeeman(spin_system: SpinSystem, rho: np.ndarray | csc_array) -> np.ndarray:
+def rho_to_zeeman(basis: np.ndarray, spins: np.ndarray, rho: np.ndarray | sp.csc_array, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Takes the state vector defined in the normalized spherical tensor basis
     and converts it into the Zeeman eigenbasis. Useful for error checking.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the conversion is performed.
-    rho : numpy.ndarray or csc_array
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
+    rho : ndarray or csc_array
         State vector defined in the normalized spherical tensor basis.
+    sparse : bool, default=True
+        Specifies whether to return the density matrix as sparse or dense array.
 
     Returns
     -------
-    rho_zeeman : numpy.ndarray
+    rho_zeeman : ndarray or csc_array
         Spin density matrix defined in the Zeeman eigenbasis.
     """
 
-    # Extract the necessary information from the spin system
-    mults = spin_system.mults
-    basis = spin_system.basis.arr
-    spins = spin_system.spins
+    # Obtain the spin multiplicities
+    mults = (2*spins + 1).astype(int)
 
-    # Get the density matrix size
-    size = np.prod(mults)
+    # Get the dimension of density matrix
+    dim = np.prod(mults)
 
     # Initialize the spin density matrix
-    rho_zeeman = np.zeros((size, size), dtype=complex)
+    if sparse:
+        rho_zeeman = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        rho_zeeman = np.zeros((dim, dim), dtype=complex)
     
     # Obtain indices of the non-zero coefficients from the state vector
     idx_nonzero = rho.nonzero()[0]
@@ -199,36 +225,48 @@ def rho_to_zeeman(spin_system: SpinSystem, rho: np.ndarray | csc_array) -> np.nd
     
     return rho_zeeman
 
-def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> np.ndarray | csc_array:
+def equilibrium_state(basis: np.ndarray,
+                      spins: np.ndarray,
+                      H_left: np.ndarray | sp.csc_array,
+                      T : float,
+                      sparse: bool = False,
+                      zero_value: float=1e-18) -> np.ndarray | sp.csc_array:
     """
     Returns the state vector corresponding to thermal equilibrium.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the thermal equilibrium state is generated.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
+    H_left : ndarray
+        Left-side coherent Hamiltonian superoperator.
+    T : float
+        Temperature of the spin bath in Kelvin.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
+    zero_value : float, default=1e-18
+        This threshold value is used to estimate the convergence of Taylor series
+        in matrix exponential, and to eliminate value smaller than this threshold
+        while squaring the matrix during the matrix exponential.
 
     Returns
     -------
-    rho_eq : numpy.ndarray or csc_array
+    rho_eq : ndarray or csc_array
         Thermal equilibrium state vector.
     """
 
     # Extract the necessary information from the spin system
-    mults = spin_system.mults
-
-    # Build the left Hamiltonian superoperator
-    with HidePrints():
-        H = hamiltonian(spin_system, 'left')
+    mults = (2*spins + 1).astype(int)
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
     with HidePrints():
-        P = expm(-const.hbar / (const.k * Config.temperature) * H, Config.ZERO_EQUILIBRIUM)
+        P = expm(-const.hbar / (const.k * T) * H_left, zero_value)
 
     # Obtain the thermal equilibrium by propagating the unit state
-    unit = unit_state(spin_system, sparse=sparse, normalized=False)
+    unit = unit_state(basis, spins, sparse=sparse, normalized=False)
     rho_eq = P @ unit
 
     # Normalize such that the trace of the corresponding density matrix is one
@@ -236,244 +274,267 @@ def equilibrium_state(spin_system: SpinSystem, sparse: bool = False) -> np.ndarr
 
     return rho_eq
 
-def alpha_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> np.ndarray | csc_array:
+def alpha_state(basis: np.ndarray, spins: np.ndarray, index: int, sparse: bool = False) -> np.ndarray | sp.csc_array:
     """
     Generates the alpha state for a given spin-1/2 nucleus. Unit state is assigned to the
     other spins.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the alpha state is generated.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
     index : int
         Index of the spin that has the alpha state.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the alpha state of the given spin index.
     """
 
-    # Obtain the necessary information from the spin system
-    mults = spin_system.mults
+    # Calculate the dimension of the full Liouville space
+    mults = (2*spins+1).astype(int)
     dim = np.prod(mults)
 
     # Get states
-    E = unit_state(spin_system, sparse=sparse, normalized=False)
-    I_z = state(spin_system, f"I(z, {index})", sparse=sparse)
+    E = unit_state(basis, spins, sparse=sparse, normalized=False)
+    I_z = state_from_string(basis, spins, f"I(z, {index})", sparse=sparse)
 
     # Make the alpha state
     rho = 1 / dim * E + 2 / dim * I_z
 
     return rho
 
-def beta_state(spin_system: SpinSystem, index: int, sparse: bool = False) -> np.ndarray | csc_array:
+def beta_state(basis: np.ndarray, spins: np.ndarray, index: int, sparse: bool = False) -> np.ndarray | sp.csc_array:
     """
     Generates the beta state for a given spin-1/2 nucleus. Unit state is assigned to the
     other spins.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the beta state is generated.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
     index : int
         Index of the spin that has the beta state.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the beta state of the given spin index.
     """
 
-    # Obtain the necessary information from the spin system
-    mults = spin_system.mults
+    # Calculate the dimension of the full Liouville space
+    mults = (2*spins+1).astype(int)
     dim = np.prod(mults)
 
     # Get states
-    E = unit_state(spin_system, sparse=sparse, normalized=False)
-    I_z = state(spin_system, f"I(z, {index})", sparse=sparse)
+    E = unit_state(basis, spins, sparse=sparse, normalized=False)
+    I_z = state_from_string(basis, spins, f"I(z, {index})", sparse=sparse)
 
     # Make the beta state
     rho = 1 / dim * E - 2 / dim * I_z
 
     return rho
 
-def singlet_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
+def singlet_state(basis: np.ndarray, spins: np.ndarray, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | sp.csc_array:
     """
     Generates the singlet state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the singlet state is generated.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
     index_1 : int
         Index of the first spin in the singlet state.
     index_2 : int
         Index of the second spin in the singlet state.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the singlet state.
     """
 
-    # Obtain the necessary information from the spin system
-    mults = spin_system.mults
+    # Calculate the dimension of the full Liouville space
+    mults = (2*spins+1).astype(int)
     dim = np.prod(mults)
 
     # Get states
-    E = unit_state(spin_system, sparse=sparse, normalized=False)
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
-    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
-    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
+    E = unit_state(basis, spins, sparse=sparse, normalized=False)
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    IpIm = state_from_string(basis, spins, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
+    ImIp = state_from_string(basis, spins, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
 
     # Make the singlet
     rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
 
     return rho
 
-def triplet_zero_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
+def triplet_zero_state(basis: np.ndarray, spins: np.ndarray, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet zero state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the triplet zero state is generated.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
     index_1 : int
         Index of the first spin in the triplet zero state.
     index_2 : int
         Index of the second spin in the triplet zero state.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the triplet zero state.
     """
 
-    # Obtain the necessary information from the spin system
-    mults = spin_system.mults
+    # Calculate the dimension of the full Liouville space
+    mults = (2*spins+1).astype(int)
     dim = np.prod(mults)
 
     # Get states
-    E = unit_state(spin_system, sparse=sparse, normalized=False)
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
-    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
-    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
+    E = unit_state(basis, spins, sparse=sparse, normalized=False)
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    IpIm = state_from_string(basis, spins, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
+    ImIp = state_from_string(basis, spins, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
 
     # Make the triplet zero
     rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
 
     return rho
 
-def triplet_plus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
+def triplet_plus_state(basis: np.ndarray, spins: np.ndarray, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet plus state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the triplet plus state is generated.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
     index_1 : int
         Index of the first spin in the triplet plus state.
     index_2 : int
         Index of the second spin in the triplet plus state.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the triplet plus state.
     """
 
-    # Obtain the necessary information from the spin system
-    mults = spin_system.mults
+    # Calculate the dimension of the full Liouville space
+    mults = (2*spins+1).astype(int)
     dim = np.prod(mults)
 
     # Get states
-    E = unit_state(spin_system, sparse=sparse, normalized=False)
-    IzE = state(spin_system, f"I(z, {index_1})", sparse=sparse)
-    EIz = state(spin_system, f"I(z, {index_2})", sparse=sparse)
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    E = unit_state(basis, spins, sparse=sparse, normalized=False)
+    IzE = state_from_string(basis, spins, f"I(z, {index_1})", sparse=sparse)
+    EIz = state_from_string(basis, spins, f"I(z, {index_2})", sparse=sparse)
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
 
     # Make the triplet plus
     rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
-def triplet_minus_state(spin_system: SpinSystem, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | csc_array:
+def triplet_minus_state(basis: np.ndarray, spins: np.ndarray, index_1: int, index_2: int, sparse: bool = False) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet minus state between two spin-1/2 nuclei. Unit state is assigned to the
     other spins.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the triplet minus state is generated.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
     index_1 : int
         Index of the first spin in the triplet minus state.
     index_2 : int
         Index of the second spin in the triplet minus state.
-    sparse : bool
-        If False (default), returns a NumPy array. If True, returns a SciPy csc_array.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
-    rho : numpy.ndarray or csc_array
+    rho : ndarray or csc_array
         State vector corresponding to the triplet minus state.
     """
 
-    # Obtain the necessary information from the spin system
-    mults = spin_system.mults
+    # Calculate the dimension of the full Liouville space
+    mults = (2*spins+1).astype(int)
     dim = np.prod(mults)
 
     # Get states
-    E = unit_state(spin_system, sparse=sparse, normalized=False)
-    IzE = state(spin_system, f"I(z, {index_1})", sparse=sparse)
-    EIz = state(spin_system, f"I(z, {index_2})", sparse=sparse)
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    E = unit_state(basis, spins, sparse=sparse, normalized=False)
+    IzE = state_from_string(basis, spins, f"I(z, {index_1})", sparse=sparse)
+    EIz = state_from_string(basis, spins, f"I(z, {index_2})", sparse=sparse)
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
 
     # Make the triplet minus
     rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
-def measure(spin_system: SpinSystem, rho: np.ndarray | csc_array, operator: str) -> complex:
+def measure(basis: np.ndarray, spins: np.ndarray, rho: np.ndarray | sp.csc_array, operator: str) -> complex:
     """
     Computes the expectation value of the specified operator for a given state vector.
     Assumes that the state vector `rho` represents a trace-normalized density matrix.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system for which the measurement is performed.
-    rho : numpy.ndarray or csc_array
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
+    rho : ndarray or csc_array
         State vector that describes the density matrix.
     operators : str or tuple
         Defines the operator whose expectation value is to be measured.
-        Can be either a string or a tuple of strings.
-        - str :
-            Generates an "operator" for each spin specified in `indices`, measures the
-            expectation value for each of them, and returns the sum of the expectation
-            values.
-            For example: 'I_z'
-        - tuple :
-            Generates a "product operator" and measures its expectation value. Each spin
-            that participates in the product operator is defined in `indices`. Must match
-            the length of `indices`.
-            For example: ('I_z', 'I_z')
+        The operator string must follow the rules below:
+
+        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+        
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
 
     Returns
     -------
@@ -482,9 +543,40 @@ def measure(spin_system: SpinSystem, rho: np.ndarray | csc_array, operator: str)
     """
 
     # Get the "operator" to be measured
-    oper = state(spin_system, operator, sparse=issparse(rho))
+    oper = state_from_string(basis, spins, operator, sparse=sp.issparse(rho))
 
     # Perform the measurement
     ex = (oper.conj().T @ rho).trace()
 
     return ex
+
+def state_to_truncated_basis(index_map: list, rho: np.ndarray | sp.csc_array) -> np.ndarray | sp.csc_array:
+    """
+    Transforms a state vector to a truncated basis using the `index_map`,
+    which contains indices that determine the elements that are retained
+    after the transformation.
+
+    Parameters
+    ----------
+    index_map : list
+        Index mapping from the original basis to the truncated basis.
+    rho : ndarray or csc_array
+        State vector to be transformed.
+
+    Returns
+    -------
+    rho_transformed : ndarray or csc_array
+        State vector transformed into the truncated basis.
+    """
+
+    print("Transforming the state vector into the truncated basis.")
+    time_start = time.time()
+
+    # Perform the transformation to truncated basis
+    rho_transformed = rho[index_map]
+
+    print("Transformation completed.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+    print()
+
+    return rho_transformed
