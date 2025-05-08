@@ -4,13 +4,6 @@ hamiltonian.py
 This module provides functions for calculating Hamiltonian superoperators.
 """
 
-# For referencing the SpinSystem class
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from spinguin.system.basis import Basis
-
 # Imports
 import numpy as np
 import time
@@ -19,7 +12,7 @@ from scipy.sparse import csc_array
 from spinguin.utils.la import increase_sparsity
 from spinguin.qm.superoperators import sop_prod
 
-def sop_H_Z(basis: Basis,
+def sop_H_Z(basis: np.ndarray,
             gammas: np.ndarray,
             spins: np.ndarray,
             B: float,
@@ -30,9 +23,9 @@ def sop_H_Z(basis: Basis,
 
     Parameters
     ----------
-    basis : Basis
-        Basis set that consists of products of irreducible spherical tensors defined
-        by tuples of integers.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
     gammas : ndarray
         A 1-dimensional array containing the gyromagnetic ratios of each spin in the
         units of rad/s/T
@@ -54,24 +47,28 @@ def sop_H_Z(basis: Basis,
         The Hamiltonian superoperator for the Zeeman interaction.
     """
 
+    # Obtain the basis set dimension and number of spins
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
+
     # Initialize the Hamiltonian
     if sparse:
-        sop_Hz = csc_array((basis.dim, basis.dim), dtype=complex)
+        sop_Hz = csc_array((dim, dim), dtype=complex)
     else:
-        sop_Hz = np.zeros((basis.dim, basis.dim), dtype=complex)
+        sop_Hz = np.zeros((dim, dim), dtype=complex)
 
     # Iterate over each spin
-    for n in range(basis.nspins):
+    for n in range(nspins):
 
         # Define the operator for the Z term of the nth spin
-        op_def = tuple(2 if i == n else 0 for i in range(basis.nspins))
+        op_def = np.array([2 if i == n else 0 for i in range(nspins)])
 
         # Compute the Zeeman interaction for the current spin
         sop_Hz = sop_Hz - gammas[n] * B * sop_prod(op_def, basis, spins, side, sparse)
 
     return sop_Hz
 
-def sop_H_CS(basis: Basis,
+def sop_H_CS(basis: np.ndarray,
              gammas: np.ndarray,
              spins: np.ndarray,
              chemical_shifts: np.ndarray,
@@ -83,9 +80,9 @@ def sop_H_CS(basis: Basis,
 
     Parameters
     ----------
-    basis : Basis
-        Basis set that consists of products of irreducible spherical tensors defined
-        by tuples of integers.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
     gammas : ndarray
         A 1-dimensional array containing the gyromagnetic ratios of each spin in the
         units of rad/s/T
@@ -110,24 +107,28 @@ def sop_H_CS(basis: Basis,
         The Hamiltonian superoperator for the chemical shift.
     """
 
+    # Obtain the basis set dimension and number of spins
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
+
     # Initialize the Hamiltonian
     if sparse:
-        sop_Hcs = csc_array((basis.dim, basis.dim), dtype=complex)
+        sop_Hcs = csc_array((dim, dim), dtype=complex)
     else:
-        sop_Hcs = np.zeros((basis.dim, basis.dim), dtype=complex)
+        sop_Hcs = np.zeros((dim, dim), dtype=complex)
 
     # Iterate over each spin
-    for n in range(basis.nspins):
+    for n in range(nspins):
 
         # Define the operator for the Z term of the nth spin
-        op_def = tuple(2 if i == n else 0 for i in range(basis.nspins))
+        op_def = np.array([2 if i == n else 0 for i in range(nspins)])
 
         # Compute the contribution from chemical shift for the current spin
         sop_Hcs = sop_Hcs - gammas[n] * B * chemical_shifts[n] * 1e-6 * sop_prod(op_def, basis, spins, side, sparse)
 
     return sop_Hcs
 
-def sop_H_J(basis: Basis,
+def sop_H_J(basis: np.ndarray,
             spins: np.ndarray,
             J_couplings: np.ndarray,
             side: Literal["comm", "left", "right"] = "comm",
@@ -137,9 +138,9 @@ def sop_H_J(basis: Basis,
 
     Parameters
     ----------
-    basis : Basis
-        Basis set that consists of products of irreducible spherical tensors defined
-        by tuples of integers.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
     spins : ndarray
         A 1-dimensional array containing the spin quantum numbers of each spin.
     J_couplings : ndarray
@@ -159,25 +160,29 @@ def sop_H_J(basis: Basis,
         The J-coupling Hamiltonian superoperator.
     """
 
+    # Obtain the basis set dimension and number of spins
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
+
     # Initialize the Hamiltonian
     if sparse:
-        sop_Hj = csc_array((basis.dim, basis.dim), dtype=complex)
+        sop_Hj = csc_array((dim, dim), dtype=complex)
     else:
-        sop_Hj = np.zeros((basis.dim, basis.dim), dtype=complex)
+        sop_Hj = np.zeros((dim, dim), dtype=complex)
     
     # Loop over all spin pairs
-    for n in range(basis.nspins):
-        for k in range(basis.nspins):
+    for n in range(nspins):
+        for k in range(nspins):
 
             # Process only the lower triangular part of the J-coupling matrix
             if n > k:
                 
                 # Define the operator for the zz-term
-                op_def_00 = tuple(2 if i == n or i == k else 0 for i in range(basis.nspins))
+                op_def_00 = np.array([2 if i == n or i == k else 0 for i in range(nspins)])
 
                 # Define the operators for flip-flop terms
-                op_def_p1m1 = tuple(1 if i == n else 3 if i == k else 0 for i in range(basis.nspins))
-                op_def_m1p1 = tuple(3 if i == n else 1 if i == k else 0 for i in range(basis.nspins))
+                op_def_p1m1 = np.array([1 if i == n else 3 if i == k else 0 for i in range(nspins)])
+                op_def_m1p1 = np.array([3 if i == n else 1 if i == k else 0 for i in range(nspins)])
 
                 # Compute the J-coupling term
                 sop_Hj += 2 * np.pi * J_couplings[n][k] * (
@@ -187,7 +192,7 @@ def sop_H_J(basis: Basis,
 
     return sop_Hj
 
-def sop_H_coherent(basis: Basis,
+def sop_H_coherent(basis: np.ndarray,
                    gammas: np.ndarray,
                    spins: np.ndarray,
                    chemical_shifts: np.ndarray,
@@ -202,9 +207,9 @@ def sop_H_coherent(basis: Basis,
 
     Parameters
     ----------
-    basis : Basis
-        Basis set that consists of products of irreducible spherical tensors defined
-        by tuples of integers.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
     gammas : ndarray
         A 1-dimensional array containing the gyromagnetic ratios of each spin in the
         units of rad/s/T

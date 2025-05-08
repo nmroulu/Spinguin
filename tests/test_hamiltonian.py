@@ -1,8 +1,9 @@
 import unittest
 import numpy as np
 import os
-from spinguin.system.spin_system import SpinSystem
 from spinguin.qm.hamiltonian import sop_H_coherent
+from spinguin.utils.nmr_isotopes import ISOTOPES
+from spinguin.qm.basis import make_basis
 from scipy.sparse import load_npz
 
 class TestHamiltonian(unittest.TestCase):
@@ -14,12 +15,16 @@ class TestHamiltonian(unittest.TestCase):
         """
         Test the Hamiltonian generation against a previously calculated result.
         """
+        
+        # Make the spin system
+        spins = np.array([1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1])
+        max_spin_order = 3
+        basis = make_basis(spins, max_spin_order)
 
-        # Simulation settings
-        B = 7e-3 # 7 mT
-
-        # Define isotopes
-        isotopes = np.array(['1H', '1H', '1H', '1H', '1H', '1H', '1H', '14N'])
+        # Get the gyromagnetic ratios (in rad/s/T)
+        y_1H = 2*np.pi * ISOTOPES['1H'][1] * 1e6
+        y_14N = 2*np.pi * ISOTOPES['14N'][1] * 1e6
+        gammas = np.array([y_1H, y_1H, y_1H, y_1H, y_1H, y_1H, y_1H, y_14N])
 
         # Define chemical shifts (in ppm)
         chemical_shifts = np.array([-22.7, -22.7, 8.34, 8.34, 7.12, 7.12, 7.77, 43.60])
@@ -36,26 +41,23 @@ class TestHamiltonian(unittest.TestCase):
             [-0.30,  15.91,  4.47,   0.04,   1.79,   0,     -0.46,  0]
         ])
 
-        # Maximum spin order
-        max_so = 3  
-
-        # Initialize the spin system
-        spin_system = SpinSystem(isotopes, chemical_shifts, J_couplings, max_spin_order=max_so)
+        # Set the magnetic field (7 mT)
+        B = 7e-3
+        
+        # Generate the Hamiltonian using sparse format
+        H = sop_H_coherent(basis,
+                           gammas,
+                           spins,
+                           chemical_shifts,
+                           J_couplings,
+                           B,
+                           side="comm",
+                           sparse=True,
+                           zero_value=1e-12)
 
         # Load the previously calculated Hamiltonian for comparison
         test_dir = os.path.dirname(__file__)
         H_previous = load_npz(os.path.join(test_dir, 'test_data', 'hamiltonian.npz'))
-
-        # Generate the Hamiltonian using sparse and dense format
-        H = sop_H_coherent(spin_system.basis,
-                           spin_system.gammas,
-                           spin_system.spins,
-                           spin_system.chemical_shifts,
-                           spin_system.J_couplings,
-                           B,
-                           "comm",
-                           sparse=True,
-                           zero_value=1e-12)
 
         # Assert that the generated Hamiltonian matches the reference
         self.assertTrue(np.allclose(H.toarray(), H_previous.toarray()))
