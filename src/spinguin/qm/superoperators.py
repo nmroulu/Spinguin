@@ -8,6 +8,7 @@ either in full or truncated basis set.
 # Imports
 import numpy as np
 import scipy.sparse as sp
+import time
 from functools import lru_cache
 from itertools import product
 from spinguin.utils import la
@@ -457,3 +458,34 @@ def sop_T_coupled(basis: np.ndarray,
     sop = _sop_T_coupled(basis_bytes, spins_bytes, l, q, spin_1, spin_2, sparse).copy()
 
     return sop
+
+def sop_to_truncated_basis(index_map: list, sop: np.ndarray | sp.csc_array) -> np.ndarray | sp.csc_array:
+    """
+    Transforms a superoperator to a truncated basis using the `index_map`,
+    which contains indices that determine the elements that are retained
+    after the transformation.
+
+    Parameters
+    ----------
+    index_map : list
+        Index mapping from the original basis to the truncated basis.
+    sop : ndarray or csc_array
+        Superoperators to be transformed.
+
+    Returns
+    -------
+    sop_transformed : ndarray or csc_array
+        Superoperator transformed into the truncated basis.
+    """
+
+    print("Transforming the superoperator into the truncated basis.")
+    time_start = time.time()
+
+    # Perform the transformation to truncated basis
+    sop_transformed = sop[np.ix_(index_map, index_map)]
+
+    print("Transformation completed.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+    print()
+
+    return sop_transformed

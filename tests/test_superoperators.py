@@ -1,10 +1,9 @@
 import unittest
 import numpy as np
 import scipy.sparse as sp
-# from spinguin.system.spin_system import SpinSystem
 from spinguin.qm.operators import op_prod
 from spinguin.qm.basis import make_basis, truncate_basis_by_coherence
-from spinguin.qm.superoperators import sop_prod, sop_prod_ref, sop_from_string, sop_T_coupled
+from spinguin.qm.superoperators import sop_prod, sop_prod_ref, sop_from_string, sop_T_coupled, sop_to_truncated_basis
 from spinguin.utils.la import cartesian_tensor_to_spherical_tensor
 
 class TestSuperoperators(unittest.TestCase):
@@ -198,3 +197,51 @@ class TestSuperoperators(unittest.TestCase):
         # Both conventions should give the same result
         self.assertTrue(np.allclose(left, right_dense))
         self.assertTrue(np.allclose(left, right_sparse.toarray()))
+
+    def test_sop_to_truncated_basis(self):
+        """
+        Test the transformation of superoperators to truncated basis.
+        """
+        # Example system
+        spins = np.array([1/2, 1/2, 1/2, 1/2, 1])
+        max_spin_order = 4
+        basis = make_basis(spins, max_spin_order)
+
+        # Make a truncated basis containing only coherence orders of -2, 0, and 1
+        coherence_orders = [-2, 0, 1]
+        basis_truncated, index_map = truncate_basis_by_coherence(basis, coherence_orders)
+
+        # Operators to test
+        operators = ['E', 'x', 'y', 'z', '+', '-']
+
+        # Try all possible combinations
+        for i in operators:
+            if i == "E":
+                op_i = "E"
+            else:
+                op_i = f"I({i}, 0)"
+
+            for j in operators:
+                if j == "E":
+                    op_j = "E"
+                else:
+                    op_j = f"I({j}, 1)"
+
+                for k in operators:
+                    if k == "E":
+                        op_k = "E"
+                    else:
+                        op_k = f"I({k}, 2)"
+
+                    # Create the operator string
+                    op_string = f"{op_i} * {op_j} * {op_k}"
+
+                    # Create the superoperators in original and transform to truncated basis
+                    sop = sop_from_string(op_string, basis, spins, side="comm", sparse=True)
+                    sop = sop_to_truncated_basis(index_map, sop)
+
+                    # Create the superoperator directly to the truncated basis for reference
+                    sop_ref = sop_from_string(op_string, basis_truncated, spins, side="comm", sparse=True)
+
+                    # Compare
+                    self.assertTrue(np.allclose(sop.toarray(), sop_ref.toarray()))
