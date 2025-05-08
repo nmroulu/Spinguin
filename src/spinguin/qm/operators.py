@@ -180,6 +180,26 @@ def op_Sm(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
 
     return Sm
 
+@lru_cache(maxsize=1024)
+def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray:
+
+    # Calculate the operator with maximum projection q = l
+    if sparse:
+        T = (-1)**l * 2**(-l / 2) * sp.linalg.matrix_power(op_Sp(S, sparse), l)
+    else:
+        T = (-1)**l * 2**(-l / 2) * np.linalg.matrix_power(op_Sp(S, sparse), l)
+
+    # Perform the necessary number of lowerings
+    for i in range(l - q):
+
+        # Get the current q
+        q = l - i
+
+        # Perform the lowering
+        T = la.comm(op_Sm(S, sparse), T) / np.sqrt(l * (l + 1) - q * (q - 1))
+
+    return T
+
 def op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates the numerical spherical tensor operator for a given spin quantum number `S`, 
@@ -206,25 +226,6 @@ def op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_arr
     T : ndarray or csc_array
         An array representing the spherical tensor operator.
     """
-    @lru_cache(maxsize=1024)
-    def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray:
-
-        # Calculate the operator with maximum projection q = l
-        if sparse:
-            T = (-1)**l * 2**(-l / 2) * sp.linalg.matrix_power(op_Sp(S, sparse), l)
-        else:
-            T = (-1)**l * 2**(-l / 2) * np.linalg.matrix_power(op_Sp(S, sparse), l)
-
-        # Perform the necessary number of lowerings
-        for i in range(l - q):
-
-            # Get the current q
-            q = l - i
-
-            # Perform the lowering
-            T = la.comm(op_Sm(S, sparse), T) / np.sqrt(l * (l + 1) - q * (q - 1))
-
-        return T
 
     # Ensure a separate copy is returned
     T = _op_T(S, l, q, sparse).copy()
