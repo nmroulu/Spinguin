@@ -81,7 +81,7 @@ def _state_from_string(basis_bytes: bytes, spins_bytes: bytes, operator: str, sp
     if sparse:
         rho = sp.lil_array((dim, 1), dtype=complex)
     else:
-        rho = np.array((dim, 1), dtype=complex)
+        rho = np.zeros((dim, 1), dtype=complex)
 
     # Get the operator definition and coefficients
     op_defs, coeffs = parse_operator_string(operator, nspins)
@@ -98,7 +98,8 @@ def _state_from_string(basis_bytes: bytes, spins_bytes: bytes, operator: str, sp
 
         # Calculate the norm of the active operator part if there are active spins
         if len(idx_active) != 0:
-            op_norm = np.linalg.norm(op_prod(op_def, spins, include_unit=False), ord='fro')
+            # TODO: Benchmark sparse vs dense implementation
+            op_norm = np.linalg.norm(op_prod(op_def, spins, include_unit=False, sparse=False), ord='fro')
 
         # Otherwise set it to one
         else:
@@ -172,7 +173,7 @@ def state_from_string(basis: np.ndarray, spins: np.ndarray, operator: str, spars
 
     return rho
 
-def rho_to_zeeman(basis: np.ndarray, spins: np.ndarray, rho: np.ndarray | sp.csc_array, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def state_to_zeeman(basis: np.ndarray, spins: np.ndarray, rho: np.ndarray | sp.csc_array, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Takes the state vector defined in the normalized spherical tensor basis
     and converts it into the Zeeman eigenbasis. Useful for error checking.
@@ -217,8 +218,11 @@ def rho_to_zeeman(basis: np.ndarray, spins: np.ndarray, rho: np.ndarray | sp.csc
         op_def = basis[idx]
 
         # Get the normalized product operator in the Zeeman eigenbasis with normalization
-        oper = op_prod(op_def, spins, include_unit=True)
-        oper = oper / np.linalg.norm(oper, ord='fro')
+        oper = op_prod(op_def, spins, include_unit=True, sparse=sparse)
+        if sparse:
+            oper = oper / sp.linalg.norm(oper, ord='fro')
+        else:
+            oper = oper / np.linalg.norm(oper, ord='fro')
         
         # Add to the total density matrix
         rho_zeeman += rho[idx, 0] * oper
