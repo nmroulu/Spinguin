@@ -45,19 +45,40 @@ class TestHamiltonian(unittest.TestCase):
         B = 7e-3
         
         # Generate the Hamiltonian using sparse format
-        H = sop_H_coherent(basis,
-                           gammas,
-                           spins,
-                           chemical_shifts,
-                           J_couplings,
-                           B,
-                           side="comm",
-                           sparse=True,
-                           zero_value=1e-12)
+        H_comm = sop_H_coherent(basis,
+                                gammas,
+                                spins,
+                                chemical_shifts,
+                                J_couplings,
+                                B,
+                                side="comm",
+                                sparse=True,
+                                zero_value=1e-12)
+        H_left = sop_H_coherent(basis,
+                                gammas,
+                                spins,
+                                chemical_shifts,
+                                J_couplings,
+                                B,
+                                side="left",
+                                sparse=True,
+                                zero_value=1e-12)
+        H_right = sop_H_coherent(basis,
+                                 gammas,
+                                 spins,
+                                 chemical_shifts,
+                                 J_couplings,
+                                 B,
+                                 side="right",
+                                 sparse=True,
+                                 zero_value=1e-12)
 
         # Load the previously calculated Hamiltonian for comparison
         test_dir = os.path.dirname(__file__)
         H_previous = load_npz(os.path.join(test_dir, 'test_data', 'hamiltonian.npz'))
 
         # Assert that the generated Hamiltonian matches the reference
-        self.assertTrue(np.allclose(H.toarray(), H_previous.toarray()))
+        self.assertTrue(np.allclose(H_comm.toarray(), H_previous.toarray()))
+
+        # Assert that the commutation superoperator can be constructed from left and right
+        self.assertTrue(np.allclose((H_left - H_right).toarray(), H_comm.toarray()))
