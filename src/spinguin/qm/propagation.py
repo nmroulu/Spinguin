@@ -4,32 +4,24 @@ propagation.py
 This module is responsible for calculating time propagators.
 """
 
-# For referencing the SpinSystem class
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from spinguin.system.spin_system import SpinSystem
-
 # Imports
 import time
 import numpy as np
+import scipy.sparse as sp
 import warnings
-from scipy.sparse import csc_array
 from spinguin.utils.la import expm, expm_custom_dot
-from spinguin.qm.hamiltonian import hamiltonian_zeeman
-from spinguin.qm.superoperators import superoperator, sop_prod
-from spinguin.config import Config
+from spinguin.qm.superoperators import sop_from_string
 from spinguin.utils.hide_prints import HidePrints
 
-def propagator(L: csc_array,
-               t: float,
-               rotating_frame: bool = False,
-               spin_system: SpinSystem = None,
-               B: float = None,
-               custom_dot: bool = False) -> csc_array | np.ndarray:
+def sop_propagator(L: sp.csc_array,
+                   t: float,
+                   custom_dot: bool=False,
+                   zero_value: float=1e-18,
+                   density_threshold: float=0.5) -> sp.csc_array | np.ndarray:
     """
-    Constructs the time propagator, with an optional transformation to the rotating frame.
+    Constructs the time propagator.
+
+    TODO: Handle dense array when custom_dot is requested?
 
     Parameters
     ----------
@@ -37,23 +29,24 @@ def propagator(L: csc_array,
         Liouvillian superoperator, L = -iH - R + K.
     t : float
         Time step of the simulation in seconds.
-    rotating_frame : bool, optional
-        Default: False. If True, transforms the propagator to the rotating frame
-        with respect to the bare-nucleus Zeeman Hamiltonian.
-    spin_system : SpinSystem, optional
-        Required if rotating_frame is True. The spin system object containing
-        information about the spins.
-    B : float, optional
-        Required if rotating_frame is True. Magnetic field strength in Tesla (T).
-    custom_dot : bool, optional
-        Default: False. If False, dot products in the matrix exponentials are computed
-        using the default SciPy implementation. If True, the custom implementation is used,
-        which removes small values during computation. The custom implementation is
-        parallelized using OpenMP.
+    custom_dot : bool, default=False
+        If False, dot products in the matrix exponentials are computed using the default
+        SciPy implementation. If True, the custom Cython implementation is used, which
+        removes small values during computation. The custom implementation is more memory-
+        friendly, but slower when using a single CPU core. The custom implementation is
+        parallelized using OpenMP and becomes faster than SciPy at ~ 4 cores.
+    zero_value : float, default=1e-18
+        Calculating the propagator involves a matrix exponential, which is calculated using
+        the scaling and squaring method together with Taylor series. This threshold is used
+        to estimate the convergence of the Taylor series and to eliminate small values
+        during the squaring step.
+    density_threshold : float, default=0.5
+        Sparse matrix is returned if the density is less than this threshold. Otherwise
+        dense matrix is returned.
 
     Returns
     -------
-    exp_Lt : csc_array or numpy.ndarray
+    expm_Lt : csc_array or ndarray
         Time propagator exp[L*t], optionally transformed to the rotating frame.
     """
 
@@ -62,64 +55,121 @@ def propagator(L: csc_array,
 
     # Compute the matrix exponential
     if custom_dot:
-        expm_Lt = expm_custom_dot(L * t, Config.ZERO_PROPAGATOR)
+        expm_Lt = expm_custom_dot(L * t, zero_value)
     else:
-        expm_Lt = expm(L * t, Config.ZERO_PROPAGATOR)
+        expm_Lt = expm(L * t, zero_value)
 
     # Calculate the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
     print(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
-    if density > Config.DENSITY_THRESHOLD:
+    if density > density_threshold:
         print("Density exceeds threshold. Converting to NumPy array.")
         expm_Lt = expm_Lt.toarray()
-
-    # Apply rotating frame transformation if requested
-    if rotating_frame:
-        if spin_system is None or B is None:
-            raise ValueError("spin_system and B must be provided when rotating_frame is True.")
-        
-        print("Applying rotating frame transformation...")
-        H0 = hamiltonian_zeeman(spin_system, include_shifts=False)
-
-        with HidePrints():
-            if custom_dot:
-                expm_H0t = expm_custom_dot(1j * H0 * t, Config.ZERO_PROPAGATOR)
-            else:
-                expm_H0t = expm(1j * H0 * t, Config.ZERO_PROPAGATOR)
-
-        expm_Lt = expm_H0t @ expm_Lt
-        print("Rotating frame transformation applied.")
 
     print(f'Propagator constructed in {time.time() - time_start:.4f} seconds.')
     print()
 
     return expm_Lt
 
-def pulse(spin_system: SpinSystem, operator: str, angle: float) -> csc_array:
+def propagator_to_rotframe(sop_P: np.ndarray | sp.csc_array,
+                           sop_H0: np.ndarray | sp.csc_array,
+                           t: float,
+                           zero_value: float=1e-18,
+                           custom_dot: bool=False) -> np.ndarray | sp.csc_array:
+    """
+    Transforms the time propagator to the rotating frame.
+
+    TODO: Handle dense array when custom_dot is requested?
+
+    Parameters
+    ----------
+    sop_P : ndarray or csc_array
+        Time propagator.
+    sop_H0 : ndarray or csc_array
+        Hamiltonian superoperator representing the interaction used
+        to define the rotating frame transformation.
+    t : float
+        Time step of the simulation in seconds.
+    zero_value : float, default=1e-18
+        Calculating the rotating frame transformation involves a matrix exponential, which
+        is calculated using the scaling and squaring method together with Taylor series.
+        This threshold is used to estimate the convergence of the Taylor series and to
+        eliminate small values during the squaring step.
+    custom_dot : bool, default=False
+        If False, dot products in the matrix exponentials are computed using the default
+        SciPy implementation. If True, the custom Cython implementation is used, which
+        removes small values during computation. The custom implementation is more memory-
+        friendly, but slower when using a single CPU core. The custom implementation is
+        parallelized using OpenMP and becomes faster than SciPy at ~ 4 cores.
+
+    Returns
+    -------
+    sop_P : ndarray or csc_array
+        The time propagator transformed into the rotating frame.
+    """
+
+    print("Applying rotating frame transformation...")
+    time_start = time.time()
+
+    # Acquire matrix exponential from the Hamiltonian
+    with HidePrints():
+        if custom_dot:
+            expm_H0t = expm_custom_dot(1j * sop_H0 * t, zero_value)
+        else:
+            expm_H0t = expm(1j * sop_H0 * t, zero_value)
+
+    # Convert the time propagator to rotating frame
+    sop_P = expm_H0t @ sop_P
+
+    print(f'Rotating frame transformation applied in {time.time() - time_start:.4f} seconds.')
+    print()
+
+def sop_pulse(basis: np.ndarray,
+              spins: np.ndarray,
+              operator: str,
+              angle: float,
+              sparse: bool=True,
+              zero_value: float=1e-18) -> np.ndarray | sp.csc_array:
     """
     Generates a superoperator corresponding to the pulse described
     by the given operator and angle.
 
     Parameters
     ----------
-    spin_system : SpinSystem
-        The spin system on which the pulse is applied.
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences of
+        integers describing the Kronecker products of irreducible spherical tensors.
+    spins : ndarray
+        A 1-dimensional array containing the spin quantum numbers of each spin.
     operator : str
         Defines the operator to be generated. The operator string must follow the rules below:
 
-        - Cartesian and ladder operators: I(component,index). Example: I(x,4) --> Creates x-operator for spin at index 4.
-        - Spherical tensor operators: T(l,q,index). Example: T(1,-1,3) --> Creates operator with l=1, q=-1 for spin at index 3.
-        - Sums of operators have `+` in between the operators: I(x,0) + I(x,1)
-        - The unit operator is not typed. Example: I(z,2) will generate E*I_z in case of a two-spin system. 
-        - Whitespace will be ignored in the input.
+        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+        
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
     angle : float
         Pulse angle in degrees.
+    sparse : bool, default=True
+        Specifies whether to construct the pulse superoperator as sparse or dense array.
+    zero_value : float, default=1e-18
+        Calculating the pulse superoperator involves a matrix exponential, which is
+        calculated using the scaling and squaring method together with Taylor series.
+        This threshold is used to estimate the convergence of the Taylor series and to
+        eliminate small values during the squaring step.
 
     Returns
     -------
-    pul : csc_array
+    pul : ndarray or csc_array
         Superoperator corresponding to the applied pulse.
     """
 
@@ -131,72 +181,15 @@ def pulse(spin_system: SpinSystem, operator: str, angle: float) -> csc_array:
         warnings.warn("Applying a pulse using a product operator does not have a well-defined angle.")
 
     # Generate the operator
-    op = superoperator(spin_system, operator)
+    op = sop_from_string(operator, basis, spins, side="comm", sparse=sparse)
 
     # Convert the angle to radians
     angle = angle / 180 * np.pi
 
     # Construct the pulse propagator
     with HidePrints():
-        pul = expm(-1j * angle * op, Config.ZERO_PULSE)
+        pul = expm(-1j * angle * op, zero_value)
 
     print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 
     return pul
-
-def spectrum_timestep(spin_system: SpinSystem,
-                      B: float,
-                      safety_factor: float = 1.2,
-                      rotating_frame: bool = False,
-                      return_bandwidth: bool = False) -> float | tuple[float, float]:
-    """
-    Computes the time step for a spectrum simulation based on the resonance frequencies
-    of the spins and the spectrometer frequency. Optionally includes the bare-nucleus
-    Zeeman frequencies if not in the rotating frame. Optionally returns the bandwidth as well.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        The spin system object containing information about the spins.
-    B : float
-        Magnetic field strength in Tesla (T).
-    safety_factor : float, optional
-        Default: 1.2. A factor to scale the bandwidth for safety.
-    rotating_frame : bool, optional
-        Default: False. If True, uses the resonance frequencies in the rotating frame.
-        If False, includes the bare-nucleus Zeeman frequencies.
-    return_bandwidth : bool, optional
-        Default: False. If True, also returns the bandwidth in rad/s.
-
-    Returns
-    -------
-    float or tuple[float, float]
-        The time step in seconds. If return_bandwidth is True, also returns the bandwidth in rad/s.
-    """
-    # Extract relevant parameters from the spin system
-    cs = spin_system.chemical_shifts
-    ys = spin_system.gammas
-
-    if rotating_frame:
-        # Compute the resonance frequencies with respect to the spectrometer frequency
-        resonance_frequencies = [(-ys[i] * B * cs[i] * 1e-6) for i in range(spin_system.size)]
-    else:
-        # Include bare-nucleus Zeeman frequencies
-        resonance_frequencies = [(-ys[i] * B * (1 + cs[i] * 1e-6)) for i in range(spin_system.size)]
-
-    # Get the most negative and most positive resonance frequencies
-    min_freq = min(resonance_frequencies)
-    max_freq = max(resonance_frequencies)
-
-    # Calculate the bandwidth
-    bandwidth = abs(max_freq - min_freq)
-
-    # Apply the safety factor
-    bandwidth *= safety_factor
-
-    # Calculate the time step (Nyquist criterion)
-    time_step = 1 / (4 * bandwidth)
-
-    if return_bandwidth:
-        return time_step, bandwidth
-    return time_step
