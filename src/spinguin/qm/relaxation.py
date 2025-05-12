@@ -551,11 +551,11 @@ def sop_R_redfield(basis: np.ndarray,
                     sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, aux_zero)
 
                 # Extract top left and top right blocks
-                top_left = sop_T_right[:dim, :dim]
-                top_right = sop_T_right[:dim, dim:]
+                top_l = sop_T_right[:dim, :dim]
+                top_r = sop_T_right[:dim, dim:]
 
                 # Compute the relaxation superoperator term
-                sop_T_right = top_left.conj().T @ top_right
+                sop_T_right = top_l.conj().T @ top_r
 
                 # Initialize the left operator
                 if sparse:
