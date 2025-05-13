@@ -11,12 +11,13 @@ import scipy.sparse as sp
 import time
 from functools import lru_cache
 from itertools import product
+from typing import Literal
 from spinguin.utils import la
 from spinguin.qm.basis import idx_to_lq, parse_operator_string
 from spinguin.qm.operators import op_T
 
 @lru_cache(maxsize=16)
-def structure_coefficients(spin: float, side: str) -> np.ndarray:
+def structure_coefficients(spin: float, side: Literal["left", "right"]) -> np.ndarray:
     """
     Computes the (normalized) structure coefficients of the operator algebra
     for a single spin. These coefficients are used in constructing product
@@ -32,13 +33,12 @@ def structure_coefficients(spin: float, side: str) -> np.ndarray:
     ----------
     spin : float
         Spin quantum number.
-    side : str
-        Specifies the side of the multiplication. Can be either 'left' or
-        'right'.
+    side : {'left', 'right'}
+        Specifies the side of the multiplication.
     
     Returns
     -------
-    c : numpy.ndarray
+    c : ndarray
         A 3-dimensional array containing all the structure coefficients.
     """
 
@@ -100,18 +100,19 @@ def sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
 
     # Create the unit operator
-    unit = sp.eye_array(dim, format='csc')
-    if not sparse:
-        unit = unit.toarray()
+    if sparse:
+        unit = sp.eye_array(dim, format='csc')
+    else:
+        unit = np.eye(dim)
 
     return unit
 
 @lru_cache(maxsize=4096)
 def _sop_prod(op_def_bytes: bytes,
-                basis_bytes: bytes,
-                spins_bytes: bytes,
-                side: str,
-                sparse: bool=True) -> np.ndarray | sp.csc_array:
+              basis_bytes: bytes,
+              spins_bytes: bytes,
+              side: Literal["comm", "left", "right"],
+              sparse: bool=True) -> np.ndarray | sp.csc_array:
 
     # If commutation superoperator, calculate left and right superoperators and
     # return their difference
@@ -211,7 +212,7 @@ def _sop_prod(op_def_bytes: bytes,
 def sop_prod(op_def: np.ndarray,
              basis: np.ndarray,
              spins: np.ndarray,
-             side: str,
+             side: Literal["comm", "left", "right"],
              sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a product superoperator corresponding to the product operator
@@ -223,16 +224,16 @@ def sop_prod(op_def: np.ndarray,
     ----------
     op_def : ndarray
         Specifies the product operator to be generated. For example,
-        input `(0, 2, 0, 1)` will generate `E*T_10*E*T_11`. The indices are
-        given by `N = l^2 + l - q`, where `l` is the rank and `q` is the
-        projection.
+        input `np.array([0, 2, 0, 1])` will generate `E*T_10*E*T_11`. The
+        indices are given by `N = l^2 + l - q`, where `l` is the rank and `q` is
+        the projection.
     basis : ndarray
         A two-dimensional array where each row contains integers that represent
         a Kronecker product of single-spin irreducible spherical tensors.
     spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin
         system.
-    side : str
+    side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator
         - 'left' -- left superoperator
@@ -259,7 +260,7 @@ def sop_prod(op_def: np.ndarray,
 def sop_prod_ref(op_def: np.ndarray,
                  basis: np.ndarray,
                  spins: np.ndarray,
-                 side: str) -> np.ndarray:
+                 side: Literal["comm", "left", "right"]) -> np.ndarray:
     """
     A reference method for calculating the superoperator.
     
@@ -280,11 +281,16 @@ def sop_prod_ref(op_def: np.ndarray,
     spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin
         system.
-    side : str
+    side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator
         - 'left' -- left superoperator
         - 'right' -- right superoperator
+
+    Returns
+    -------
+    sop : ndarray
+        Superoperator defined by `op_def`.
     """
 
     # If commutation superoperator, calculate left and right superoperators and
@@ -332,7 +338,7 @@ def sop_prod_ref(op_def: np.ndarray,
 def sop_from_string(operator: str,
                     basis: np.ndarray,
                     spins: np.ndarray,
-                    side: str='comm',
+                    side: Literal["comm", "left", "right"],
                     sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a superoperator from the user-specified `operators` string.
@@ -365,9 +371,9 @@ def sop_from_string(operator: str,
     spins : ndarray
         A sequence of floats describing the spin quantum numbers of the spin
         system.
-    side : str
+    side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
-        - 'comm' -- commutation superoperator (default)
+        - 'comm' -- commutation superoperator
         - 'left' -- left superoperator
         - 'right' -- right superoperator
     sparse: bool, default=True
