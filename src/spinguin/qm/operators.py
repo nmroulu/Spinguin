@@ -1,15 +1,16 @@
 """
 operators.py
 
-This module provides functions for calculating quantum mechanical spin operators.
-It includes functions for single-spin operators as well as many-spin operators.
+This module provides functions for calculating quantum mechanical spin operators
+in Hilbert space. It includes functions for single-spin operators as well as
+many-spin product operators.
 """
 
 # Imports
 import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
-from spinguin.utils import la
+from spinguin.utils.la import comm, CG_coeff
 from spinguin.qm.basis import idx_to_lq, parse_operator_string
 
 def op_E(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
@@ -30,9 +31,10 @@ def op_E(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     # Generate a unit operator of the correct dimension
     dim = int(2 * S + 1)
-    E = sp.eye_array(dim, format="csc")
-    if not sparse:
-        E = E.toarray()
+    if sparse:
+        E = sp.eye_array(dim, format="csc", dtype=int)
+    else:
+        E = np.eye(dim, dtype=int)
 
     return E
 
@@ -98,9 +100,10 @@ def op_Sz(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     m = -np.arange(-S, S + 1)
 
     # Initialize the operator
-    Sz = sp.lil_array((len(m), len(m)), dtype=complex)
-    if not sparse:
-        Sz = Sz.toarray()
+    if sparse:
+        Sz = sp.lil_array((len(m), len(m)), dtype=float)
+    else:
+        Sz = np.zeros((len(m), len(m)), dtype=float)
 
     # Populate the diagonal elements
     for i in range(len(m)):
@@ -132,9 +135,10 @@ def op_Sp(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     m = np.arange(-S, S + 1)
 
     # Initialize the operator
-    Sp = sp.lil_array((len(m), len(m)), dtype=complex)
-    if not sparse:
-        Sp = Sp.toarray()
+    if sparse:
+        Sp = sp.lil_array((len(m), len(m)), dtype=float)
+    else:
+        Sp = np.zeros((len(m), len(m)), dtype=float)
 
     # Populate the off-diagonal elements
     for i in range(len(m) - 1):
@@ -166,9 +170,10 @@ def op_Sm(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     m = np.arange(-S, S + 1)
 
     # Initialize the operator
-    Sm = sp.lil_array((len(m), len(m)), dtype=complex)
-    if not sparse:
-        Sm = Sm.toarray()
+    if sparse:
+        Sm = sp.lil_array((len(m), len(m)), dtype=complex)
+    else:
+        Sm = np.zeros((len(m), len(m)), dtype=complex)
 
     # Populate the off-diagonal elements
     for i in range(1, len(m)):
@@ -181,7 +186,7 @@ def op_Sm(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     return Sm
 
 @lru_cache(maxsize=1024)
-def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray:
+def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
 
     # Calculate the operator with maximum projection q = l
     if sparse:
@@ -196,7 +201,7 @@ def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray:
         q = l - i
 
         # Perform the lowering
-        T = la.comm(op_Sm(S, sparse), T) / np.sqrt(l * (l + 1) - q * (q - 1))
+        T = comm(op_Sm(S, sparse), T) / np.sqrt(l * (l + 1) - q * (q - 1))
 
     return T
 
@@ -259,12 +264,12 @@ def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float, sparse:
     T : ndarray or csc_array
         Coupled spherical tensor operator of rank `l` and projection `q`.
     """
-
     # Initialize the operator
     dim = int((2 * s1 + 1) * (2 * s2 + 1))
-    T = sp.csc_array((dim, dim), dtype=complex)
-    if not sparse:
-        T = T.toarray()
+    if sparse:
+        T = sp.csc_array((dim, dim), dtype=float)
+    else:
+        T = np.zeros((dim, dim), dtype=float)
 
     # Iterate over the projections
     for q1 in range(-l1, l1 + 1):
@@ -272,9 +277,9 @@ def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float, sparse:
 
             # Analogously to the coupling of angular momenta
             if sparse:
-                T += la.CG_coeff(l1, q1, l2, q2, l, q) * sp.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
+                T = T + CG_coeff(l1, q1, l2, q2, l, q) * sp.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse), format="csc")
             else:
-                T += la.CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
+                T = T + CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
 
     return T
 
@@ -285,14 +290,14 @@ def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, spar
     Parameters
     ----------
     op_def : ndarray
-        Specifies the product operator to be generated. For example,
-        input (0, 2, 0, 1) will generate E*T_10*E*T_11. The indices are
-        given by N = l^2 + l - q, where l is the rank and q is the projection.
+        Specifies the product operator to be generated. For example, input
+        `np.array([0, 2, 0, 1])` will generate `E*T_10*E*T_11`. The indices are
+        given by `N = l^2 + l - q`, where `l` is the rank and `q` is the projection.
     spins : ndarray
         Spin quantum numbers. Must match the length of `op_def`.
-    include_unit : bool
+    include_unit : bool, default=True
         Specifies whether unit operators are included in the product operator.
-    sparse : bool
+    sparse : bool, default=True
         Specifies whether the operator is returned as sparse or dense array.
 
     Returns
@@ -306,9 +311,10 @@ def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, spar
     spins = np.asarray(spins)
 
     # Initialize the product operator
-    op = sp.csc_array([[1]])
-    if not sparse:
-        op = op.toarray()
+    if sparse:
+        op = sp.csc_array([[1]], dtype=float)
+    else:
+        op = np.array([[1]], dtype=float)
 
     # Iterate through the operator definition
     for spin, oper in zip(spins, op_def):
@@ -321,7 +327,7 @@ def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, spar
 
             # Add to the product operator
             if sparse:
-                op = sp.kron(op, op_T(spin, l, q, sparse))
+                op = sp.kron(op, op_T(spin, l, q, sparse), format="csc")
             else:
                 op = np.kron(op, op_T(spin, l, q, sparse))
 
@@ -364,9 +370,9 @@ def op_from_string(spins: np.ndarray, operator: str, sparse: bool=True) -> np.nd
 
     # Initialize the operator
     if sparse:
-        op = sp.csc_array((dim, dim), dtype=complex)
+        op = sp.csc_array((dim, dim), dtype=float)
     if not sparse:
-        op = np.zeros((dim, dim), dtype=complex)
+        op = np.zeros((dim, dim), dtype=float)
 
     # Get the operator definitions and coefficients
     op_defs, coeffs = parse_operator_string(operator, nspins)
