@@ -177,7 +177,7 @@ def _sop_prod(op_def_bytes: bytes,
         k_op = np.where(np.all(basis[:, idx_spins] == op_defs_k[m], axis=1))[0]
 
         # Continue only if the basis contains such operator definitions
-        if j_op.shape[0] != 0 or k_op.shape[0] != 0:
+        if j_op.shape[0] != 0 and k_op.shape[0] != 0:
 
             # Obtain the full operator definitions from the basis
             op_def_j = basis[j_op, :]
