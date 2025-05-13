@@ -207,11 +207,12 @@ def _op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_ar
 
 def op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
-    Generates the numerical spherical tensor operator for a given spin quantum number `S`, 
-    rank `l`, and projection `q`. The operator is obtained by sequential lowering of the 
-    maximum projection operator.
+    Generates the numerical spherical tensor operator for a given spin quantum
+    number `S`, rank `l`, and projection `q`. The operator is obtained by
+    sequential lowering of the maximum projection operator.
 
-    Source: Kuprov (2023) - Spin: From Basic Symmetries to Quantum Optimal Control, page 94.
+    Source: Kuprov (2023) - Spin: From Basic Symmetries to Quantum Optimal
+    Control, page 94.
 
     This function is called frequently and is cached for high performance.
 
@@ -237,10 +238,13 @@ def op_T(S: float, l: int, q: int, sparse: bool=True) -> np.ndarray | sp.csc_arr
 
     return T
 
-def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def op_T_coupled(l: int,  q: int,
+                 l1: int, s1: float,
+                 l2: int, s2: float,
+                 sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
-    Computes the coupled irreducible spherical tensor of rank `l` and projection `q`
-    from two irreducible spherical tensors of ranks `l1` and `l2`.
+    Computes the coupled irreducible spherical tensor of rank `l` and projection
+    `q` from two irreducible spherical tensors of ranks `l1` and `l2`.
 
     Parameters
     ----------
@@ -277,13 +281,20 @@ def op_T_coupled(l: int, q: int, l1: int, s1: float, l2: int, s2: float, sparse:
 
             # Analogously to the coupling of angular momenta
             if sparse:
-                T = T + CG_coeff(l1, q1, l2, q2, l, q) * sp.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse), format="csc")
+                T = T + CG_coeff(l1, q1, l2, q2, l, q) * sp.kron(
+                    op_T(s1, l1, q1, sparse),
+                    op_T(s2, l2, q2, sparse),
+                    format="csc")
             else:
-                T = T + CG_coeff(l1, q1, l2, q2, l, q) * np.kron(op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
+                T = T + CG_coeff(l1, q1, l2, q2, l, q) * np.kron(
+                    op_T(s1, l1, q1, sparse), op_T(s2, l2, q2, sparse))
 
     return T
 
-def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def op_prod(op_def: np.ndarray,
+            spins: np.ndarray,
+            include_unit: bool=True,
+            sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Generates a product operator defined by `op_def` in the Zeeman eigenbasis.
 
@@ -292,7 +303,8 @@ def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, spar
     op_def : ndarray
         Specifies the product operator to be generated. For example, input
         `np.array([0, 2, 0, 1])` will generate `E*T_10*E*T_11`. The indices are
-        given by `N = l^2 + l - q`, where `l` is the rank and `q` is the projection.
+        given by `N = l^2 + l - q`, where `l` is the rank and `q` is the
+        projection.
     spins : ndarray
         Spin quantum numbers. Must match the length of `op_def`.
     include_unit : bool, default=True
@@ -333,22 +345,32 @@ def op_prod(op_def: np.ndarray, spins: np.ndarray, include_unit: bool=True, spar
 
     return op
 
-def op_from_string(spins: np.ndarray, operator: str, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def op_from_string(spins: np.ndarray,
+                   operator: str,
+                   sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
-    Generates an operator for the `spin_system` in Hilbert space from the user-specified `operators` string.
+    Generates an operator for the `spin_system` in Hilbert space from the user-
+    specified `operators` string.
 
     Parameters
     ----------
     spins : ndarray
-        A one-dimensional array containing the spin quantum numbers of the spin system.
+        A one-dimensional array containing the spin quantum numbers of the spin
+        system.
     operator : str
-        Defines the operator to be generated. The operator string must follow the rules below:
+        Defines the operator to be generated. The operator string must follow
+        the rules below:
 
-        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
-        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
-        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Cartesian and ladder operators: `I(component,index)`.
+          Example: `I(x,4)` --> Creates x-operator for spin at index 4.
+        - Spherical tensor operators: `T(l,q,index)`.
+          Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin
+          at index 3.
+        - Product operators have `*` in between the single-spin operators:
+          `I(z,0) * I(z,1)`
         - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+        - Unit operators are ignored in the input. Interpretation of these two
+          is identical: `E * I(z,1)`, `I(z,1)`
     
         Special case: An empty `operator` string is considered as unit operator.
 
