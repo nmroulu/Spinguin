@@ -414,42 +414,42 @@ def comm(A: csc_array | np.ndarray, B: csc_array | np.ndarray) -> csc_array | np
 
     return C
 
-def find_common_rows(A: np.ndarray, B: np.ndarray) -> Tuple[list, list]:
+def find_common_rows(A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Identifies the indices of common rows between two arrays, `A` and `B`.
     Each row must appear only once in the arrays.
 
     Parameters
     ----------
-    A : numpy.ndarray
+    A : ndarray
         First array to compare.
-    B : numpy.ndarray
+    B : ndarray
         Second array to compare.
 
     Returns
     -------
-    A_ind : list
+    A_ind : ndarray
         Indices of the common rows in array `A`.
-    B_ind : list
+    B_ind : ndarray
         Indices of the common rows in array `B`.
     """
 
-    # Create a dictionary of the rows of B
-    B_dict = {tuple(row): idx for idx, row in enumerate(B)}
+    # Handle special case where both arrays are empty
+    if A.shape[1] == 0 and B.shape[1] == 0:
+        A_ind = np.array([0])
+        B_ind = np.array([0])
+        return A_ind, B_ind
+    
+    # Convert the arrays to contiguous
+    A = np.ascontiguousarray(A)
+    B = np.ascontiguousarray(B)
 
-    # Initialize lists for the indices
-    A_ind = []
-    B_ind = []
+    # Convert to 1D array of tuples
+    A = A.view([('', A.dtype)] * A.shape[1])
+    B = B.view([('', B.dtype)] * B.shape[1])
 
-    # Iterate over rows of A
-    for idx_A, row in enumerate(A):
-
-        # Check if the row of A exists in B
-        if tuple(row) in B_dict:
-
-            # Append the indices
-            A_ind.append(idx_A)
-            B_ind.append(B_dict[tuple(row)])
+    # Find the common indices
+    _, A_ind, B_ind = np.intersect1d(A, B, assume_unique=True, return_indices=True)
 
     return A_ind, B_ind
 
