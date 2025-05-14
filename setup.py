@@ -1,5 +1,6 @@
 """
-This script is required for compiling the sparse_dot() Cython function.
+This script is required for compiling the sparse_dot() and intersect_indices()
+Cython functions.
 """
 
 from setuptools import Extension, setup
@@ -16,8 +17,15 @@ elif sys.platform == "linux":
 
 ext_modules = [
     Extension(
-        "spinguin.sparse_dot",
-        ["src/spinguin/sparse_dot.pyx"],
+        "spinguin.utils.sparse_dot",
+        ["src/spinguin/utils/sparse_dot.pyx"],
+        extra_compile_args=extra_compile_args,
+        extra_link_args=extra_link_args,
+        language='c++'
+    ),
+    Extension(
+        "spinguin.utils.intersect_indices",
+        ["src/spinguin/utils/intersect_indices.pyx"],
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
         language='c++'
@@ -25,5 +33,5 @@ ext_modules = [
 ]
 
 setup(
-    ext_modules=cythonize(ext_modules)
+    ext_modules=cythonize(ext_modules, annotate=True)
 )

@@ -10,12 +10,11 @@ import numpy as np
 from numpy.typing import ArrayLike
 from scipy.sparse import eye_array, csc_array, block_array, issparse
 from scipy.io import mmwrite, mmread
-from scipy.signal import find_peaks
 from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
-from typing import Tuple
 from spinguin.utils.sparse_dot import sparse_dot as spdotcy
+from spinguin.utils.intersect_indices import intersect_indices
 from spinguin.utils.hide_prints import HidePrints
 
 def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
@@ -417,7 +416,8 @@ def comm(A: csc_array | np.ndarray, B: csc_array | np.ndarray) -> csc_array | np
 def find_common_rows(A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Identifies the indices of common rows between two arrays, `A` and `B`.
-    Each row must appear only once in the arrays.
+    Each row must appear only once in the arrays and they must be sorted
+    in lexicographical order. Data type must be np.longlong.
 
     Parameters
     ----------
@@ -440,16 +440,15 @@ def find_common_rows(A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarr
         B_ind = np.array([0])
         return A_ind, B_ind
     
-    # Convert the arrays to contiguous
-    A = np.ascontiguousarray(A)
-    B = np.ascontiguousarray(B)
-
-    # Convert to 1D array of tuples
-    A = A.view([('', A.dtype)] * A.shape[1])
-    B = B.view([('', B.dtype)] * B.shape[1])
+    # Get the row length
+    row_length = A.shape[1]
+    
+    # Convert the arrays to 1D
+    A = A.ravel()
+    B = B.ravel()
 
     # Find the common indices
-    _, A_ind, B_ind = np.intersect1d(A, B, assume_unique=True, return_indices=True)
+    A_ind, B_ind = intersect_indices(A, B, row_length)
 
     return A_ind, B_ind
 
@@ -534,7 +533,7 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
 
     return theta
 
-def decompose_matrix(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def decompose_matrix(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Decomposes a matrix into three components:
         - Isotropic part.
@@ -563,7 +562,7 @@ def decompose_matrix(matrix: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.nda
     
     return isotropic, antisymmetric, symmetric_traceless
 
-def principal_axis_system(tensor: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def principal_axis_system(tensor: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Determines the principal axis system (PAS) of a Cartesian tensor
     and transforms the tensor into the PAS.
@@ -747,7 +746,7 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
 
     return C
 
-def fourier_transform(signal: np.ndarray, dt: float, normalize: bool = True) -> Tuple[np.ndarray, np.ndarray]:
+def fourier_transform(signal: np.ndarray, dt: float, normalize: bool = True) -> tuple[np.ndarray, np.ndarray]:
     """
     Computes the Fourier transform of a given time-domain signal and returns 
     the corresponding frequency-domain representation. The Fourier transform 
@@ -785,7 +784,7 @@ def fourier_transform(signal: np.ndarray, dt: float, normalize: bool = True) -> 
 
     return freqs, fft_signal
 
-def spectrum(signal: np.ndarray, dt: float, normalize: bool = True, part: str = "real") -> Tuple[np.ndarray, np.ndarray]:
+def spectrum(signal: np.ndarray, dt: float, normalize: bool = True, part: str = "real") -> tuple[np.ndarray, np.ndarray]:
     """
     A wrapper function for the Fourier transform. Computes the Fourier transform
     and returns the frequency and spectrum (either the real or imaginary part of 
