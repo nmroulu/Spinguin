@@ -132,6 +132,9 @@ def _sop_prod(op_def_bytes: bytes,
     # Find indices of the spins participating in the operator
     idx_spins = np.nonzero(op_def)[0]
 
+    # Obtain the basis with only participating spins
+    sub_basis = basis[:, idx_spins]
+
     # Return the unit operator if no spins participate in the operator
     if len(idx_spins) == 0:
         sop = sop_E(dim, sparse)
@@ -173,8 +176,8 @@ def _sop_prod(op_def_bytes: bytes,
 
         # Get the indices of the basis set operator definitions that contain the
         # current operator definitions
-        j_op = np.where(np.all(basis[:, idx_spins] == op_defs_j[m], axis=1))[0]
-        k_op = np.where(np.all(basis[:, idx_spins] == op_defs_k[m], axis=1))[0]
+        j_op = np.where(np.all(sub_basis == op_defs_j[m], axis=1))[0]
+        k_op = np.where(np.all(sub_basis == op_defs_k[m], axis=1))[0]
 
         # Continue only if the basis contains such operator definitions
         if j_op.shape[0] != 0 and k_op.shape[0] != 0:
