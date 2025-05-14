@@ -126,6 +126,8 @@ def propagator_to_rotframe(sop_P: np.ndarray | sp.csc_array,
     print(f'Rotating frame transformation applied in {time.time() - time_start:.4f} seconds.')
     print()
 
+    return sop_P
+
 def sop_pulse(basis: np.ndarray,
               spins: np.ndarray,
               operator: str,
