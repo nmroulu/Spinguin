@@ -596,9 +596,9 @@ def sop_R_redfield(basis: np.ndarray,
 
     return sop_R
 
-def sop_R_phenomenological(basis: np.ndarray, T1: np.ndarray, T2: np.ndarray, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def sop_R_phenomenological(basis: np.ndarray, R1: np.ndarray, R2: np.ndarray, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
-    Constructs the relaxation superoperator from given `T1` and `T2` values
+    Constructs the relaxation superoperator from given `R1` and `R2` values
     for each spin.
 
     Parameters
@@ -606,12 +606,12 @@ def sop_R_phenomenological(basis: np.ndarray, T1: np.ndarray, T2: np.ndarray, sp
     basis : ndarray
         A 2-dimensional array containing the basis set that consists sequences of
         integers describing the Kronecker products of irreducible spherical tensors.
-    T1 : ndarray
-        A one dimensional array containing the longitudinal relaxation time constants
-        in seconds for each spin. For example: `np.array([1.0, 2.0, 2.5])`
-    T2 : ndarray
-        A one dimensional array containing the transverse relaxation time constants
-        in seconds for each spin. For example: `np.array([0.5, 1.0, 1.2])`
+    R1 : ndarray
+        A one dimensional array containing the longitudinal relaxation rates
+        in 1/s for each spin. For example: `np.array([1.0, 2.0, 2.5])`
+    R2 : ndarray
+        A one dimensional array containing the transverse relaxation rates
+        in 1/s for each spin. For example: `np.array([2.0, 4.0, 5.0])`
     sparse : bool, default=True
         Specifies whether to construct the relaxation superoperator as sparse or dense
         array.
@@ -630,10 +630,6 @@ def sop_R_phenomenological(basis: np.ndarray, T1: np.ndarray, T2: np.ndarray, sp
         sop_R = sp.lil_array((dim, dim))
     else:
         sop_R = np.zeros((dim, dim))
-
-    # Get the relaxation rates
-    R1 = 1/T1
-    R2 = 1/T2
 
     # Loop over the basis set
     for idx, state in enumerate(basis):
@@ -778,14 +774,10 @@ def sop_R_sr2k(basis: np.ndarray,
                 # Calculate the relaxation rates
                 R1[target] += ((J**2) * S * (S + 1)) / 3 * (2 * T2) / (1 + (omega_target - omega_quad)**2 * T2**2)
                 R2[target] += ((J**2) * S * (S + 1)) / 3 * (T1 + (T2 / (1 + (omega_target - omega_quad)**2 * T2**2)))
-    
-    # Convert relaxation rates to time constants
-    T1 = 1/R1
-    T2 = 1/R2
 
     # Get relaxation superoperator corresponding to SR2K
     with HidePrints():
-        sop_R = sop_R_phenomenological(basis, T1, T2, sparse)
+        sop_R = sop_R_phenomenological(basis, R1, R2, sparse)
 
     print(f'SR2K superoperator constructed in {time.time() - time_start:.4f} seconds.')
     print()
