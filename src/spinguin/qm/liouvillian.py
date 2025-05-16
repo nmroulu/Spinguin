@@ -1,23 +1,26 @@
 # Imports
-from scipy.sparse import csc_array
+import numpy as np
+import scipy.sparse as sp
 
-def liouvillian(H: csc_array = None, R: csc_array = None, K: csc_array = None) -> csc_array:
+def sop_L(H: np.ndarray | sp.csc_array = None,
+          R: np.ndarray | sp.csc_array = None,
+          K: np.ndarray | sp.csc_array = None) -> np.ndarray | sp.csc_array:
     """
-    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation superoperator,
-    and exchange superoperator.
+    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation
+    superoperator, and exchange superoperator.
 
     Parameters
     ----------
-    H : csc_array
+    H : ndarray or csc_array
         Hamiltonian superoperator.
-    R : csc_array
+    R : ndarray or csc_array
         Relaxation superoperator
-    K : csc_array
+    K : ndarray or csc_array
         Exchange superoperator.
 
     Returns
     -------
-    L : csc_array
+    L : ndarray or csc_array
         Liouvillian superoperator.
     """
 
