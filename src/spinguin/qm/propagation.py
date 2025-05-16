@@ -146,13 +146,25 @@ def sop_pulse(basis: np.ndarray,
     spins : ndarray
         A 1-dimensional array containing the spin quantum numbers of each spin.
     operator : str
-        Defines the operator to be generated. The operator string must follow the rules below:
+        Defines the operator to be generated. The operator string must follow
+        the rules below:
 
-        - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
-        - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
-        - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+        - Cartesian and ladder operators: `I(component,index)` or `I(component)`.
+          Examples:
+
+            - `I(x,4)` --> Creates x-operator for spin at index 4.
+            - `I(x)`--> Creates x-operator for all spins.
+
+        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+
+            - `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+            - `T(1, -1) --> Creates operator with `l=1`, `q=-1` for all spins.
+            
+        - Product operators have `*` in between the single-spin operators:
+          `I(z,0) * I(z,1)`
         - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+        - Unit operators are ignored in the input. Interpretation of these two is
+          identical: `E * I(z,1)`, `I(z,1)`
         
         Special case: An empty `operator` string is considered as unit operator.
 

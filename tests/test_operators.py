@@ -325,3 +325,23 @@ class TestOperators(unittest.TestCase):
                     # Compare
                     self.assertTrue(np.allclose(oper_sparse.toarray(), oper_ref))
                     self.assertTrue(np.allclose(oper_dense, oper_ref))
+
+        # Test creating a sum operator for all spins using input type I(x)
+        for oper in test_opers:
+            if oper != "E":      
+
+                op_string = f"I({oper})"
+                op_string_ref = f"I({oper},0) + I({oper},1) + I({oper},2)"
+
+                oper = op_from_string(spins, op_string, sparse=False)
+                oper_ref = op_from_string(spins, op_string_ref, sparse=False)
+
+        # Test creating a sum operator for all spins using input type T(l,q)
+        for l in range(0, 2):
+            for q in range(-l, l+1):
+
+                op_string = f"T({l},{q},0)"
+                op_string_ref = f"T({l},{q},0) + T({l},{q},1) + T({l},{q},2)"
+
+                oper = op_from_string(spins, op_string, sparse=False)
+                oper_ref = op_from_string(spins, op_string_ref, sparse=False)

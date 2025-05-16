@@ -251,14 +251,22 @@ def coherence_order(op_def: np.ndarray) -> int:
 
 def parse_operator_string(operator: str, nspins: int):
     """
-    Parses operator strings and returns their definitions in the basis set as well as their corresponding coefficients.
-    The operator string must follow the rules below:
+    Parses operator strings and returns their definitions in the basis set as
+    well as their corresponding coefficients. The operator string must follow
+    the rules below:
 
-    - Cartesian and ladder operators: `I(component,index)`. Example: `I(x,4)` --> Creates x-operator for spin at index 4.
-    - Spherical tensor operators: `T(l,q,index)`. Example: `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
-    - Product operators have `*` in between the single-spin operators: `I(z,0) * I(z,1)`
+    - Cartesian and ladder operators: `I(component,index)` or `I(component)`.
+      Examples:
+        - `I(x,4)` --> Creates x-operator for spin at index 4.
+        - `I(x)`--> Creates x-operator for all spins.
+    - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+        - `T(1,-1,3)` --> Creates operator with `l=1`, `q=-1` for spin at index 3.
+        - `T(1, -1) --> Creates operator with `l=1`, `q=-1` for all spins.
+    - Product operators have `*` in between the single-spin operators:
+      `I(z,0) * I(z,1)`
     - Sums of operators have `+` in between the operators: `I(x,0) + I(x,1)`
-    - Unit operators are ignored in the input. Interpretation of these two is identical: `E * I(z,1)`, `I(z,1)`
+    - Unit operators are ignored in the input. Interpretation of these two is
+      identical: `E * I(z,1)`, `I(z,1)`
     
     Special case: An empty `operator` string is considered as unit operator.
 
@@ -276,20 +284,20 @@ def parse_operator_string(operator: str, nspins: int):
     Returns
     -------
     op_defs : list of ndarray
-        A list that contains arrays, which describe the requested operator with integers.
-        Example: [[2, 0, 1]] --> T_1_0 * E * T_1_1
+        A list that contains arrays, which describe the requested operator with
+        integers. Example: `[[2, 0, 1]]` --> `T_1_0 * E * T_1_1`
     coeffs : list of floats
         Coefficients that account for the different norms of operator relations.
     """
 
-    # Create empty lists of lists to hold the operator definitions and the coefficients
+    # Create empty lists to hold the operator definitions and the coefficients
     op_defs = []
     coeffs = []
 
     # Remove spaces from the user input
     operator = "".join(operator.split())
 
-    # Handle special case for unit operator
+    # Create unit operator if input string is empty
     if operator == "":
         op_def = np.array([0 for _ in range(nspins)])
         coeff = 1
@@ -297,7 +305,7 @@ def parse_operator_string(operator: str, nspins: int):
         coeffs.append(coeff)
         return op_defs, coeffs
 
-    # Split the user input into separate product operators
+    # Split the user input sum '+' into separate product operators
     prod_ops = []
     inside_parantheses = False
     start = 0
@@ -311,6 +319,46 @@ def parse_operator_string(operator: str, nspins: int):
             start = i + 1
     prod_ops.append(operator[start:])
 
+    # Replace inputs of kind I(z) --> Sum operator for all spins
+    prod_ops_copy = []
+    for prod_op in prod_ops:
+        if '*' not in prod_op:
+
+            # For unit operators, do nothing
+            if prod_op[0] == 'E':
+                prod_ops_copy.append(prod_op)
+
+            # Handle Cartesian and ladder operators
+            elif prod_op[0] == 'I':
+                component = re.search(r'\(([^)]*)\)', prod_op).group(1).split(',')
+                if len(component) == 1:
+                    component = component[0]
+                    for index in range(nspins):
+                        prod_ops_copy.append(f"I({component},{index})")
+                else:
+                    prod_ops_copy.append(prod_op)
+
+            # Handle spherical tensor operators
+            elif prod_op[0] == 'T':
+                component = re.search(r'\(([^)]*)\)', prod_op).group(1).split(',')
+                if len(component) == 2:
+                    l = component[0]
+                    q = component[1]
+                    for index in range(nspins):
+                        prod_ops_copy.append(f"T({l},{q},{index})")
+                else:
+                    prod_ops_copy.append(prod_op)
+
+            # Otherwise an unsupported operator
+            else:
+                raise ValueError(f"Cannot parse the following invalid operator: {op_term}")
+
+        # Keep operator as is, if the input contains '*'
+        else:
+            prod_ops_copy.append(prod_op)
+
+    prod_ops = prod_ops_copy
+                
     # Process each product operator separately
     for prod_op in prod_ops:
 
