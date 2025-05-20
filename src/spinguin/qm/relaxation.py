@@ -164,6 +164,9 @@ def dd_coupling_tensors(xyz: np.ndarray, gammas: np.ndarray) -> np.ndarray:
     # Deduce the number of spins in the system
     nspins = gammas.shape[0]
 
+    # Convert the molecular coordinates to SI units
+    xyz *= 1e-10
+
     # Get the connector and distance arrays
     connectors = xyz[:, np.newaxis] - xyz
     distances = np.linalg.norm(connectors, axis=2)
@@ -178,7 +181,7 @@ def dd_coupling_tensors(xyz: np.ndarray, gammas: np.ndarray) -> np.ndarray:
             # Only the lower triangular part is computed
             if i > j:
                 rr = np.outer(connectors[i, j], connectors[i, j])
-                dd_tensors[i, j] = 1e30 * dd_constant(gammas[i], gammas[j]) * (3 * rr - distances[i, j]**2 * np.eye(3)) / distances[i, j]**5
+                dd_tensors[i, j] = dd_constant(gammas[i], gammas[j]) * (3 * rr - distances[i, j]**2 * np.eye(3)) / distances[i, j]**5
 
     return dd_tensors
 
@@ -503,21 +506,20 @@ def sop_R_redfield(basis: np.ndarray,
     # Define the integration limit for the auxiliary matrix method
     t_max = np.log(1 / relative_error) * tau_c
 
-    # Diagonal matrices of correlation times
-    if sparse:
-        tau_c_diagonal_l1 = 1 / tau_c_l(tau_c, 1) * sp.eye_array(sop_H.shape[0], format='csc')
-        tau_c_diagonal_l2 = 1 / tau_c_l(tau_c, 2) * sp.eye_array(sop_H.shape[0], format='csc')
-    else:
-        tau_c_diagonal_l1 = 1 / tau_c_l(tau_c, 1) * np.eye(sop_H.shape[0])
-        tau_c_diagonal_l2 = 1 / tau_c_l(tau_c, 2) * np.eye(sop_H.shape[0])
-
-    # Auxiliary matrix arrays
+    # Top left array of auxiliary matrix
     top_left = 1j * sop_H
-    bottom_right_l1 = 1j * sop_H - tau_c_diagonal_l1
-    bottom_right_l2 = 1j * sop_H - tau_c_diagonal_l2
 
     # Iterate over the ranks
     for l in [1, 2]:
+
+        # Diagonal matrix of correlation time
+        if sparse:
+            tau_c_diagonal_l = 1 / tau_c_l(tau_c, l) * sp.eye_array(sop_H.shape[0], format='csc')
+        else:
+            tau_c_diagonal_l = 1 / tau_c_l(tau_c, l) * np.eye(sop_H.shape[0])
+
+        # Bottom right array of auxiliary matrix
+        bottom_right = 1j * sop_H - tau_c_diagonal_l
 
         # Iterate over the projections (negative q values are handled by spherical tensor properties)
         for q in range(0, l + 1):
@@ -534,9 +536,7 @@ def sop_R_redfield(basis: np.ndarray,
                 tensor_right = interaction_right[3]
 
                 # Show current status
-                if spin_right1 is None:
-                    print(f"{type_right} for spin {spin_right2}")
-                elif spin_right2 is None:
+                if spin_right2 is None:
                     print(f"{type_right} for spin {spin_right1}")
                 else:
                     print(f"{type_right} for spins {spin_right1}-{spin_right2}")
@@ -545,10 +545,7 @@ def sop_R_redfield(basis: np.ndarray,
                 sop_T_right = get_sop_T(basis, spins, l, q, type_right, spin_right1, spin_right2, sparse)
 
                 # Calculate the Redfield integral using the auxiliary matrix method
-                if l == 1:
-                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l1, t_max, aux_zero)
-                elif l == 2:
-                    sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right_l2, t_max, aux_zero)
+                sop_T_right = auxiliary_matrix_expm(top_left, sop_T_right, bottom_right, t_max, aux_zero)
 
                 # Extract top left and top right blocks
                 top_l = sop_T_right[:dim, :dim]
