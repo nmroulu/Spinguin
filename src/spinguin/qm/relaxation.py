@@ -619,6 +619,9 @@ def sop_R_phenomenological(basis: np.ndarray, R1: np.ndarray, R2: np.ndarray, sp
         Relaxation superoperator.
     """
 
+    time_start = time.time()
+    print('Constructing the phenomenological relaxation superoperator...')
+
     # Obtain the basis dimension
     dim = basis.shape[0]
 
@@ -661,6 +664,10 @@ def sop_R_phenomenological(basis: np.ndarray, R1: np.ndarray, R2: np.ndarray, sp
     # Convert to CSC array if using sparse
     if sparse:
         sop_R = sop_R.tocsc()
+
+    print("Phenomenological relaxation superoperator constructed in "
+          f"{time.time() - time_start:.4f} seconds.")
+    print()
 
     return sop_R
 
