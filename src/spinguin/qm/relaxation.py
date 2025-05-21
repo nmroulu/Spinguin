@@ -165,7 +165,7 @@ def dd_coupling_tensors(xyz: np.ndarray, gammas: np.ndarray) -> np.ndarray:
     nspins = gammas.shape[0]
 
     # Convert the molecular coordinates to SI units
-    xyz *= 1e-10
+    xyz = xyz * 1e-10
 
     # Get the connector and distance arrays
     connectors = xyz[:, np.newaxis] - xyz
