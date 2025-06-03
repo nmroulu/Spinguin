@@ -17,15 +17,15 @@ elif sys.platform == "linux":
 
 ext_modules = [
     Extension(
-        "spinguin.utils.sparse_dot",
-        ["src/spinguin/utils/sparse_dot.pyx"],
+        "spinguin.core.sparse_dot",
+        ["src/spinguin/core/sparse_dot.pyx"],
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
         language='c++'
     ),
     Extension(
-        "spinguin.utils.intersect_indices",
-        ["src/spinguin/utils/intersect_indices.pyx"],
+        "spinguin.core.intersect_indices",
+        ["src/spinguin/core/intersect_indices.pyx"],
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
         language='c++'

@@ -1,6 +1,6 @@
 # Imports
 import numpy as np
-from spinguin.utils.nmr_isotopes import ISOTOPES
+from spinguin.core.nmr_isotopes import ISOTOPES
 from spinguin.qm.hamiltonian import sop_H_coherent
 from spinguin.qm.relaxation import sop_R_redfield
 from spinguin.qm.basis import make_basis
