@@ -5,8 +5,8 @@ A test that constructs a superoperator for a large spin system.
 # Imports
 import numpy as np
 from time import perf_counter
-from spinguin.qm.basis import make_basis
-from spinguin.qm.superoperators import sop_prod
+from spinguin.core.basis import make_basis
+from spinguin.core.superoperators import sop_prod
 
 print("Test started.")
 
@@ -21,9 +21,6 @@ basis = make_basis(spins, max_so)
 # Create test superoperator
 op_def = np.zeros(nspins, dtype=int)
 op_def[0] = 2
-# op_def[2] = 3
-# op_def[4] = 1
-# op_def[6] = 2
 ts = perf_counter()
 sop_prod(op_def, basis, spins, "left", sparse=True)
 te = perf_counter()
