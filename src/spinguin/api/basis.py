@@ -109,7 +109,7 @@ class Basis:
         )
 
         # Update the basis
-        self.basis = truncated_basis
+        self._basis = truncated_basis
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
