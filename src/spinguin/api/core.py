@@ -11,7 +11,7 @@ import scipy.sparse as sp
 from typing import Literal
 from spinguin.core.operators import op_from_string
 from spinguin.core.superoperators import sop_from_string
-from spinguin.core.hamiltonian import sop_H_coherent, sop_H_CS, sop_H_J, sop_H_Z
+from spinguin.core.hamiltonian import sop_H as csop_H
 from spinguin.core.relaxation import sop_R_phenomenological, sop_R_redfield, \
     sop_R_sr2k, ldb_thermalization
 from spinguin.core import states, propagation, specutils
@@ -174,12 +174,13 @@ def superoperator(spin_system: SpinSystem,
         
     return sop
 
-INTERACTIONS = ["zeeman", "chemical_shift", "J_coupling"]
-def hamiltonian(spin_system: SpinSystem,
-                interactions: list[Literal[
-                    "zeeman", "chemical_shift", "J_coupling"]] = INTERACTIONS,
-                side: Literal["comm", "left", "right"] = "comm"
-                ) -> np.ndarray | sp.csc_array:
+INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
+INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
+def hamiltonian(
+        spin_system: SpinSystem,
+        interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
+        side: Literal["comm", "left", "right"] = "comm"
+) -> np.ndarray | sp.csc_array:
     """
     Creates the requested Hamiltonian superoperator for the spin system.
 
@@ -188,7 +189,10 @@ def hamiltonian(spin_system: SpinSystem,
     spin_system : SpinSystem
         Spin system for which the Hamiltonian is going to be generated.
     interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
-        Specifies which interactions are taken into account.
+        Specifies which interactions are taken into account. The options are:
+        - 'zeeman' -- Zeeman interaction
+        - 'chemical_shift' -- Isotropic chemical shift
+        - 'J_coupling' -- Scalar J-coupling
     side : {'comm', 'left', 'right'}
         The type of superoperator:
         - 'comm' -- commutation superoperator (default)
@@ -201,65 +205,31 @@ def hamiltonian(spin_system: SpinSystem,
         Hamiltonian superoperator.
     """
         
-    # Check that basis has been set
+    # Check that the required attributes have been set
     if spin_system.basis.basis is None:
         raise ValueError("Please build basis before constructing " 
                          "the Hamiltonian.")
-    
-    # Initialize the Hamiltonian
-    dim = spin_system.basis.dim
-    if config.sparse_hamiltonian:
-        H = sp.csc_array((dim, dim), dtype=complex)
-    else:
-        H = np.zeros((dim, dim), dtype=complex)
-
-    # Go through the requested interactions
-    for interaction in interactions:
-
-        if interaction == "zeeman":
-
-            # Check that the required attributes have been set
-            if parameters.magnetic_field is None:
-                raise ValueError("Please set the magnetic field before "
-                                 "constructing the Zeeman Hamiltonian.")
-
-            # Construct the Hamiltonian
-            H += sop_H_Z(basis = spin_system.basis.basis,
-                         gammas = spin_system.gammas,
-                         spins = spin_system.spins,
-                         B = parameters.magnetic_field,
-                         side = side,
-                         sparse = config.sparse_hamiltonian)
-            
-        elif interaction == "chemical_shift":
-
-            # Check that the required attributes have been set
-            if parameters.magnetic_field is None:
-                raise ValueError("Please set the magnetic field before "
-                                 "constructing the chemical shift "
-                                 "Hamiltonian.")
-            
-            # Construct the Hamiltonian
-            H += sop_H_CS(basis = spin_system.basis.basis,
-                          gammas = spin_system.gammas,
-                          spins = spin_system.spins,
-                          chemical_shifts = spin_system.chemical_shifts,
-                          B = parameters.magnetic_field,
-                          side = side,
-                          sparse = config.sparse_hamiltonian)
-            
-        elif interaction == "J_coupling":   
-
-            # Construct the Hamiltonian
-            H += sop_H_J(basis = spin_system.basis.basis,
-                         spins = spin_system.spins,
-                         J_couplings = spin_system.J_couplings,
-                         side = side,
-                         sparse = config.sparse_hamiltonian)
-            
-        else:
-            raise ValueError(f"Unknown interaction type: {interaction}. " 
-                             f"The available options are: {INTERACTIONS}.")
+    if "zeeman" in interactions:
+        if parameters.magnetic_field is None:
+            raise ValueError("Please set the magnetic field before "
+                             "constructing the Zeeman Hamiltonian.")
+    if "chemical_shift" in interactions:
+        if parameters.magnetic_field is None:
+            raise ValueError("Please set the magnetic field before "
+                             "constructing the chemical shift Hamiltonian.")
+        
+    H = csop_H(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        gammas = spin_system.gammas,
+        B = parameters.magnetic_field,
+        chemical_shifts = spin_system.chemical_shifts,
+        J_couplings = spin_system.J_couplings,
+        interactions = interactions,
+        side = side,
+        sparse = config.sparse_hamiltonian,
+        zero_value = config.zero_hamiltonian
+    )
 
     return H
 
@@ -280,23 +250,41 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     """
     # Check that the required attributes have been set
     if spin_system.relaxation.theory is None:
-        raise ValueError("Please set the relaxation theory before "
+        raise ValueError("Please specify relaxation theory before "
                          "constructing the relaxation superoperator.")
     if spin_system.basis.basis is None:
         raise ValueError("Please build basis before constructing the "
                          "relaxation superoperator.")
-
-    # Make phenomenological relaxation superoperator
     if spin_system.relaxation.theory == "phenomenological":
-
         if spin_system.relaxation.T1 is None:
             raise ValueError("Please set T1 times before constructing the "
                              "relaxation superoperator.")
         if spin_system.relaxation.T2 is None:
             raise ValueError("Please set T2 times before constructing the "
                              "relaxation superoperator.")
+    elif spin_system.relaxation.theory == "redfield":
+        if spin_system.relaxation.tau_c is None:
+            raise ValueError("Please set the correlation time before "
+                             "constructing the Redfield relaxation "
+                             "superoperator.")
+        if parameters.magnetic_field is None:
+            raise ValueError("Please set the magnetic field before "
+                             "constructing the Redfield relaxation "
+                             "superoperator.")
+    if spin_system.relaxation.sr2k:
+        if parameters.magnetic_field is None:
+            raise ValueError("Please set the magnetic field before "
+                             "applying scalar relaxation of the second kind.")
+    if spin_system.relaxation.thermalization:
+        if parameters.magnetic_field is None:
+            raise ValueError("Please set the magnetic field when applying "
+                             "thermalization.")
+        if parameters.temperature is None:
+            raise ValueError("Please define temperature when applying "
+                             "thermalization.")
 
-        # Build the phenomenological relaxation superoperator
+    # Make phenomenological relaxation superoperator
+    if spin_system.relaxation.theory == "phenomenological":
         R = sop_R_phenomenological(
             basis = spin_system.basis.basis,
             R1 = spin_system.relaxation.R1,
@@ -306,19 +294,10 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     # Make relaxation superoperator using Redfield theory
     elif spin_system.relaxation.theory == "redfield":
         
-        if spin_system.relaxation.tau_c is None:
-            raise ValueError("Please set the correlation time before "
-                             "constructing the Redfield relaxation "
-                             "superoperator.")
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field before "
-                             "constructing the Redfield relaxation "
-                             "superoperator.")
-        
         # Build the coherent hamiltonian
         with HidePrints():
             H = hamiltonian(spin_system=spin_system,
-                            interactions=INTERACTIONS,
+                            interactions=INTERACTIONDEFAULT,
                             side="comm")
 
         # Build the Redfield relaxation superoperator
@@ -345,35 +324,27 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     
     # Apply scalar relaxation of the second kind if requested
     if spin_system.relaxation.sr2k:
-        R = R + sop_R_sr2k(basis = spin_system.basis.basis,
-                            spins = spin_system.spins,
-                            gammas = spin_system.gammas,
-                            chemical_shifts = spin_system.chemical_shifts,
-                            J_couplings = spin_system.J_couplings,
-                            sop_R = R,
-                            B = parameters.magnetic_field,
-                            sparse = config.sparse_relaxation)
+        R += sop_R_sr2k(
+            basis = spin_system.basis.basis,
+            spins = spin_system.spins,
+            gammas = spin_system.gammas,
+            chemical_shifts = spin_system.chemical_shifts,
+            J_couplings = spin_system.J_couplings,
+            sop_R = R,
+            B = parameters.magnetic_field,
+            sparse = config.sparse_relaxation
+        )
         
     # Apply thermalization if requested
     if spin_system.relaxation.thermalization:
-
-        # Check that the required attributes have been set
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field when applying "
-                             "thermalization.")
         
         # Build the left Hamiltonian superopertor
         with HidePrints():
-            H_left = sop_H_coherent(
-                basis = spin_system.basis.basis,
-                gammas = spin_system.gammas,
-                spins = spin_system.spins,
-                chemical_shifts = spin_system.chemical_shifts,
-                J_couplings = spin_system.J_couplings,
-                B = parameters.magnetic_field,
-                side = "left",
-                sparse = config.sparse_hamiltonian,
-                zero_value = config.zero_hamiltonian)
+            H_left = hamiltonian(
+                spin_system = spin_system,
+                interactions = INTERACTIONDEFAULT,
+                side = "left"
+            )
             
         # Perform the thermalization
         R = ldb_thermalization(
@@ -412,16 +383,11 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     # Build the left Hamiltonian superoperator
     with HidePrints():
-        H_left = sop_H_coherent(
-            basis = spin_system.basis.basis,
-            gammas = spin_system.gammas,
-            spins = spin_system.spins,
-            chemical_shifts = spin_system.chemical_shifts,
-            J_couplings = spin_system.J_couplings,
-            B = parameters.magnetic_field,
-            side = "left",
-            sparse = config.sparse_hamiltonian,
-            zero_value = config.zero_hamiltonian)
+        H_left = hamiltonian(
+            spin_system = spin_system,
+            interactions = INTERACTIONDEFAULT,
+            side = "left"
+        )
 
     # Build the equilibrium state
     rho = states.equilibrium_state(
@@ -553,28 +519,24 @@ def propagator_to_rotframe(spin_system: SpinSystem,
     """
     TODO
     """
-    # Construct Hamiltonian that specifies the interaction frame
-    Hz = sop_H_Z(basis = spin_system.basis.basis,
-                 gammas = spin_system.gammas,
-                 spins = spin_system.spins,
-                 B = parameters.magnetic_field,
-                 side = "comm",
-                 sparse = config.sparse_hamiltonian)
-    
+    # Obtain an array of center frequencies for each spin
     center = np.zeros(spin_system.nspins)
     for spin in range(spin_system.nspins):
         if spin_system.isotopes[spin] in center_frequencies:
             center[spin] = center_frequencies[spin_system.isotopes[spin]]
 
-    Hcenter = sop_H_CS(basis = spin_system.basis.basis,
-                       gammas = spin_system.gammas,
-                       spins = spin_system.spins,
-                       chemical_shifts = center,
-                       B = parameters.magnetic_field,
-                       side = "comm",
-                       sparse = config.sparse_hamiltonian)
-    
-    H_frame = Hz + Hcenter
+    # Construct Hamiltonian that specifies the interaction frame
+    H_frame = csop_H(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        gammas = spin_system.gammas,
+        B = parameters.magnetic_field,
+        chemical_shifts = center,
+        interactions = ["zeeman", "chemical_shift"],
+        side = "comm",
+        sparse = config.sparse_hamiltonian,
+        zero_value = config.zero_hamiltonian
+    )
 
     # Convert the propagator to rotating frame
     P = propagation.propagator_to_rotframe(
@@ -715,7 +677,7 @@ def spectrum(signal: np.ndarray,
 
 def resonance_frequency(isotope: str,
                         delta: float = 0,
-                        units: Literal["Hz", "rad/s"] = "Hz") -> float:
+                        unit: Literal["Hz", "rad/s"] = "Hz") -> float:
     """
     Computes the resonance frequency of a nucleus at specified magnetic field
     and chemical shift.
@@ -739,7 +701,7 @@ def resonance_frequency(isotope: str,
         isotope = isotope,
         B = parameters.magnetic_field,
         delta = delta,
-        units = units
+        unit = unit
     )
 
     return omega
