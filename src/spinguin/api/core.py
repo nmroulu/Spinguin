@@ -736,3 +736,148 @@ def frequency_to_chemical_shift(frequency: float | np.ndarray,
         spectrometer_frequency = spectrometer_frequency
     )
     return chemical_shift
+
+def pulse_and_acquire(
+        spin_system: SpinSystem
+) -> np.ndarray:
+    """
+    Simple pulse-and-acquire experiment.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system to which the pulse-and-acquire experiment is performed.
+
+    Returns
+    -------
+    fid : ndarray
+        Free induction decay signal.
+    """
+    # Obtain the Liouvillian
+    H = hamiltonian(spin_system)
+    R = relaxation(spin_system)
+    L = liouvillian(H, R)
+
+    # Obtain the equilibrium state
+    rho = equilibrium_state(spin_system)
+
+    # Find indices of the isotopes to be measured
+    indices = np.where(spin_system.isotopes == parameters.isotope[0])[0]
+
+    # Apply 180-degree pulse
+    op_pulse = "+".join(f"I(y,{i})" for i in indices)
+    Px = pulse(spin_system, op_pulse, parameters.angle[0])
+    rho = Px @ rho
+
+    # Construct the time propagator
+    dt = parameters.dwell_time[0]
+    P = propagator(L, dt)
+    P = propagator_to_rotframe(
+        spin_system = spin_system,
+        P = P,
+        t = parameters.dwell_time[0],
+        center_frequencies = parameters.center_frequency)
+
+    # Initialize an array for storing results
+    npoints = parameters.npoints[0]
+    fid = np.zeros(npoints, dtype=complex)
+
+    # Perform the time evolution
+    op_measure = "+".join(f"I(-,{i})" for i in indices)
+    for step in range(npoints):
+        fid[step] = measure(spin_system, rho, op_measure)
+        rho = P @ rho
+    
+    return fid
+
+def inversion_recovery(
+        spin_system: SpinSystem) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Performs the inversion-recovery experiment. The experiment differs slightly
+    from the actual inversion-recovery experiments performed on spectrometers.
+    In this experiment, the inversion is performed only once, and the
+    magnetization is detected at each step during the recovery.
+
+    This experiment requires the following spin system properties to be defined:
+    - basis : must be built
+    - relaxation.theory
+    - relaxation.thermalization : must be True
+
+    This experiment requires the following parameters to be defined:
+    - magnetic_field : magnetic field of the spectrometer in Tesla
+    - temperature : temperature of the sample in Kelvin
+    - isotope : nucleus to-be-measured
+    - dwell_time : time step in the simulation in seconds
+    - npoints : number of time steps
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system to which the inversion-recovery experiment is performed.
+
+    Returns
+    -------
+    magnetizations : ndarray
+        Two-dimensional array of size (nspins, npoints) containing the
+        observed z-magnetizations for each spin at various times.
+    """
+    # Check that the required attributes have been set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before using "
+                         "inversion recovery.")
+    if spin_system.relaxation.theory is None:
+        raise ValueError("Please set the relaxation theory before using "
+                         "inversion recovery.")
+    if spin_system.relaxation.thermalization is False:
+        raise ValueError("Please set thermalization to True before using "
+                         "inversion recovery.")
+    if parameters.magnetic_field is None:
+        raise ValueError("Please set the magnetic field before using "
+                         "inversion recovery.")
+    if parameters.temperature is None:
+        raise ValueError("Please set the temperature before using "
+                         "inversion recovery.")
+    if parameters.isotope is None:
+        raise ValueError("Please define isotope when using inversion recovery.")
+    if parameters.dwell_time is None:
+        raise ValueError("Please define dwell time when using inversion "
+                         "recovery.")
+    if parameters.npoints is None:
+        raise ValueError("Please define number of points when using "
+                         "inversion recovery.")
+    
+    # Obtain the Liouvillian
+    H = hamiltonian(spin_system)
+    R = relaxation(spin_system)
+    L = liouvillian(H, R)
+
+    # Obtain the equilibrium state
+    rho = equilibrium_state(spin_system)
+
+    # Find indices of the isotopes to be measured
+    indices = np.where(spin_system.isotopes == parameters.isotope[0])[0]
+    nspins = indices.shape[0]
+
+    # Apply 180-degree pulse
+    operator = "+".join(f"I(x,{i})" for i in indices)
+    P180 = pulse(spin_system, operator, 180)
+    rho = P180 @ rho
+
+    # Change to ZQ-basis to speed up the calculations
+    L, rho = spin_system.basis.truncate_by_coherence([0], L, rho)
+
+    # Construct the time propagator
+    dt = parameters.dwell_time[0]
+    P = propagator(L, dt)
+
+    # Initialize an array for storing results
+    npoints = parameters.npoints[0]
+    magnetizations = np.zeros((nspins, npoints), dtype=complex)
+
+    # Perform the time evolution
+    for step in range(npoints):
+        for i, idx in enumerate(indices):
+            magnetizations[i, step] = measure(spin_system, rho, f"I(z,{idx})")
+        rho = P @ rho
+
+    return magnetizations
