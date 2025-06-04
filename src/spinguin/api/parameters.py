@@ -46,6 +46,7 @@ class Parameters:
     _spectral_width: np.ndarray = None
     _isotope: np.ndarray = None
     _npoints: np.ndarray = None
+    _angle: np.ndarray = None
     
     def __init__(self):
         print("Global simulation parameters have been initialized to the "
@@ -168,6 +169,10 @@ class Parameters:
         """
         # Set the isotope
         self._isotope = arraylike_to_array(isotope)
+        print("Isotope has been set to:")
+        for dim, iso in enumerate(self.isotope):
+            print(f"Dimension {dim+1}: {iso}")
+        print()
 
     @property
     def npoints(self) -> np.ndarray:
@@ -183,8 +188,26 @@ class Parameters:
         # Set the number of points
         self._npoints = arraylike_to_array(npoints)
         print("Number of points has been set to:")
-        for dim, np in enumerate(self.npoints):
-            print(f"Dimension {dim+1}: {np}")
+        for dim, npo in enumerate(self.npoints):
+            print(f"Dimension {dim+1}: {npo}")
+        print()
+
+    @property
+    def angle(self) -> np.ndarray:
+        return self._angle
+    
+    @angle.setter
+    def angle(self, angle: float | list | tuple | np.ndarray):
+        """
+        Defines the angle of the magnetic field with respect to the sample.
+        If a pulse sequence requires more than one angle to be defined, an
+        array that specifies the angles must be given.
+        """
+        # Set the angle
+        self._angle = arraylike_to_array(angle)
+        print("Angle has been set to:")
+        for num, ang in enumerate(self.angle):
+            print(f"Angle {num+1}: {ang} degrees")
         print()
 
 # Instantiate the Parameters object
