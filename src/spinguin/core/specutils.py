@@ -9,12 +9,12 @@ NMR and signal processing.
 # Imports
 import numpy as np
 from typing import Literal
-from spinguin.core.nmr_isotopes import ISOTOPES
+from spinguin.core.nmr_isotopes import gamma
 
 def resonance_frequency(isotope: str,
                         B: float,
                         delta: float = 0,
-                        units: Literal["Hz", "rad/s"] = "Hz") -> float:
+                        unit: Literal["Hz", "rad/s"] = "Hz") -> float:
     """
     Computes the resonance frequency of a nucleus at specified magnetic field
     and chemical shift.
@@ -27,7 +27,7 @@ def resonance_frequency(isotope: str,
         Magnetic field strength in the units of T.
     delta : float, default=0
         Chemical shift in ppm.
-    units :{'Hz', 'rad/s'}
+    unit :{'Hz', 'rad/s'}
         Specifies in which units the frequency is returned.
 
     Returns
@@ -36,11 +36,7 @@ def resonance_frequency(isotope: str,
         Resonance frequency of the given nucleus.
     """
     # Calculate the resonance frequency
-    if units == "Hz":
-        gamma = ISOTOPES[isotope][1] * 1e6
-    elif units == "rad/s":
-        gamma = ISOTOPES[isotope][1] * 1e6 * 2*np.pi
-    omega = - gamma * B * (1 + delta*1e-6)
+    omega = - gamma(isotope, unit) * B * (1 + delta*1e-6)
 
     return omega
 
@@ -176,8 +172,7 @@ def spectral_width_to_dwell_time(spectral_width: float,
         Dwell time in seconds.
     """
     # Calculate the spectral width in Hz
-    gamma = ISOTOPES[isotope][1]
-    spectral_width = spectral_width * gamma * B
+    spectral_width = spectral_width * 1e-6 * gamma(isotope, "Hz") * B
 
     # Obtain the dwell time
     dwell_time = 1/spectral_width
