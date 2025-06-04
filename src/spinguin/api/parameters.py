@@ -44,7 +44,8 @@ class Parameters:
     _center_frequency: dict = None
     _dwell_time: np.ndarray = None
     _spectral_width: np.ndarray = None
-    _npoints: int = None
+    _isotope: np.ndarray = None
+    _npoints: np.ndarray = None
     
     def __init__(self):
         print("Global simulation parameters have been initialized to the "
@@ -119,11 +120,13 @@ class Parameters:
 
         print("Dwell time has been set to:")
         for dim, dt in enumerate(self.dwell_time):
-            print(f"Dimension {dim}: {dt} s")
+            print(f"Dimension {dim+1}: {dt} s")
+        print()
 
         print("Corresponding spectral widths are:")
         for dim, sw in enumerate(self.spectral_width):
-            print(f"Dimension {dim}: {sw} Hz")
+            print(f"Dimension {dim+1}: {sw} Hz")
+        print()
 
     @property
     def spectral_width(self) -> np.ndarray:
@@ -144,23 +147,45 @@ class Parameters:
 
         print("Spectral width has been set to:")
         for dim, sw in enumerate(self.spectral_width):
-            print(f"Dimension {dim}: {sw} Hz")
+            print(f"Dimension {dim+1}: {sw} Hz")
+        print()
 
         print("Corresponding dwell times are:")
         for dim, dt in enumerate(self.dwell_time):
-            print(f"Dimension {dim}: {dt} s")
+            print(f"Dimension {dim+1}: {dt} s")
+        print()
 
     @property
-    def npoints(self) -> int:
+    def isotope(self) -> np.ndarray:
+        return self._isotope
+    
+    @isotope.setter
+    def isotope(self, isotope: str | list | tuple | np.ndarray):
+        """
+        Defines the isotope to be measured. If multiple dimensions are used, an
+        array must be specified where the latest element corresponds to the
+        direct dimension.
+        """
+        # Set the isotope
+        self._isotope = arraylike_to_array(isotope)
+
+    @property
+    def npoints(self) -> np.ndarray:
         return self._npoints
     
     @npoints.setter
-    def npoints(self, npoints: int):
+    def npoints(self, npoints: int | list | tuple | np.ndarray):
         """
-        Defines the number of points to acquire in the FID.
+        Defines the number of points to acquire in the FID. If multiple
+        dimensions are used, an array must be specified where the latest
+        element corresponds to the direct dimension.
         """
-        self._npoints = npoints
-        print(f"Number of points to acquire set to: {self.npoints}\n")
+        # Set the number of points
+        self._npoints = arraylike_to_array(npoints)
+        print("Number of points has been set to:")
+        for dim, np in enumerate(self.npoints):
+            print(f"Dimension {dim+1}: {np}")
+        print()
 
 # Instantiate the Parameters object
 parameters = Parameters()
