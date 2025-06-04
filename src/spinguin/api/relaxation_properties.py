@@ -9,7 +9,7 @@ relaxation theory settings.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from spinguin.system.spin_system import SpinSystem
+    from spinguin.api.spin_system import SpinSystem
 
 # Imports
 import numpy as np
