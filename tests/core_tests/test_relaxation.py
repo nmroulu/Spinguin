@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.sparse as sp
 import os
-from spinguin.core.hamiltonian import sop_H_coherent
+from spinguin.core.hamiltonian import sop_H
 from spinguin.core.relaxation import sop_R_redfield, sop_R_sr2k, \
     ldb_thermalization, dd_constant, sop_R_phenomenological
 from spinguin.core.propagation import sop_pulse, sop_propagator
@@ -115,8 +115,18 @@ class TestRelaxation(unittest.TestCase):
         nsteps = 50000      # Number of simulation steps
 
         # Get the Hamiltonian
-        H = sop_H_coherent(basis, gammas, spins, chemical_shifts, J_couplings,
-                           B, side="comm", sparse=True, zero_value=1e-12)
+        H = sop_H(
+            basis = basis,
+            gammas = gammas,
+            spins = spins,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            B = B,
+            side = "comm",
+            sparse = True,
+            zero_value = 1e-12,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"]
+        )
         
         # Get the relaxation superoperator components
         R_redfield = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad,
@@ -130,9 +140,18 @@ class TestRelaxation(unittest.TestCase):
 
         # Build the total relaxation superoperator and thermalize
         R = R_redfield + R_sr2k
-        H_left = sop_H_coherent(basis, gammas, spins, chemical_shifts,
-                                J_couplings, B, side="left", sparse=True,
-                                zero_value=1e-12)
+        H_left = sop_H(
+            basis = basis,
+            gammas = gammas,
+            spins = spins,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            B = B,
+            side = "left",
+            sparse = True,
+            zero_value = 1e-12,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"]
+        )
         R = ldb_thermalization(R, H_left, T, zero_value=1e-18)
         
         # Construct the total Liouvillian
@@ -163,9 +182,18 @@ class TestRelaxation(unittest.TestCase):
             rho = P @ rho
 
         # Create an equilibrium state in the ZQ basis for reference
-        H_left_ZQ = sop_H_coherent(ZQ_basis, gammas, spins, chemical_shifts,
-                                   J_couplings, B, side="left", sparse=True,
-                                   zero_value=1e-12)
+        H_left_ZQ = sop_H(
+            basis = ZQ_basis,
+            gammas = gammas,
+            spins = spins,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            B = B,
+            side = "left",
+            sparse = True,
+            zero_value = 1e-12,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"]
+        )
         rho_ref = equilibrium_state(ZQ_basis, spins, H_left_ZQ, T, sparse=False,
                                     zero_value=1e-18)
 
@@ -238,8 +266,18 @@ class TestRelaxation(unittest.TestCase):
         B = 1
 
         # Get the Hamiltonian
-        H = sop_H_coherent(basis, gammas, spins, chemical_shifts, J_couplings,
-                           B, side="comm", sparse=True, zero_value=1e-12)
+        H = sop_H(
+            basis = basis,
+            gammas = gammas,
+            spins = spins,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            B = B,
+            side = "comm",
+            sparse = True,
+            zero_value = 1e-12,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"]
+        )
         
         # Get the Redfield relaxation superoperator
         R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,

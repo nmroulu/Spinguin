@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import os
 from scipy.sparse import load_npz
-from spinguin.core.hamiltonian import sop_H_coherent
+from spinguin.core.hamiltonian import sop_H
 from spinguin.core.nmr_isotopes import ISOTOPES
 from spinguin.core.basis import make_basis
 
@@ -46,46 +46,58 @@ class TestHamiltonian(unittest.TestCase):
         B = 7e-3
         
         # Generate the Hamiltonian
-        H_comm = sop_H_coherent(basis,
-                                gammas,
-                                spins,
-                                chemical_shifts,
-                                J_couplings,
-                                B,
-                                side="comm",
-                                sparse=True,
-                                zero_value=1e-12)
+        H_comm = sop_H(
+            basis = basis,
+            spins = spins,
+            gammas = gammas,
+            B = B,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"],
+            side = "comm",
+            sparse = True,
+            zero_value = 1e-12
+        )
         
         # Generate the same Hamiltonian again (check for cache errors etc.)
-        H_comm = sop_H_coherent(basis,
-                                gammas,
-                                spins,
-                                chemical_shifts,
-                                J_couplings,
-                                B,
-                                side="comm",
-                                sparse=True,
-                                zero_value=1e-12)
+        H_comm = sop_H(
+            basis = basis,
+            spins = spins,
+            gammas = gammas,
+            B = B,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"],
+            side = "comm",
+            sparse = True,
+            zero_value = 1e-12
+        )
 
         # Build left and right separately
-        H_left = sop_H_coherent(basis,
-                                gammas,
-                                spins,
-                                chemical_shifts,
-                                J_couplings,
-                                B,
-                                side="left",
-                                sparse=True,
-                                zero_value=1e-12)
-        H_right = sop_H_coherent(basis,
-                                 gammas,
-                                 spins,
-                                 chemical_shifts,
-                                 J_couplings,
-                                 B,
-                                 side="right",
-                                 sparse=True,
-                                 zero_value=1e-12)
+        H_left = sop_H(
+            basis = basis,
+            spins = spins,
+            gammas = gammas,
+            B = B,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"],
+            side = "left",
+            sparse = True,
+            zero_value = 1e-12
+        )
+        H_right = sop_H(
+            basis = basis,
+            spins = spins,
+            gammas = gammas,
+            B = B,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"],
+            side = "right",
+            sparse = True,
+            zero_value = 1e-12
+        )
 
         # Load the previously calculated Hamiltonian for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))

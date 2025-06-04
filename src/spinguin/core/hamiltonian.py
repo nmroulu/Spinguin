@@ -202,15 +202,20 @@ def sop_H_J(basis: np.ndarray,
 
     return sop_Hj
 
-def sop_H_coherent(basis: np.ndarray,
-                   gammas: np.ndarray,
-                   spins: np.ndarray,
-                   chemical_shifts: np.ndarray,
-                   J_couplings: np.ndarray,
-                   B: float,
-                   side: Literal["comm", "left", "right"] = "comm",
-                   sparse: bool=True,
-                   zero_value: float=1e-12) -> np.ndarray | csc_array:
+INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
+INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
+def sop_H(
+        basis: np.ndarray,
+        spins: np.ndarray,
+        gammas: np.ndarray = None,
+        B: float = None,
+        chemical_shifts: np.ndarray = None,
+        J_couplings: np.ndarray = None,
+        interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
+        side: Literal["comm", "left", "right"] = "comm",
+        sparse: bool=True,
+        zero_value: float=1e-12
+) -> np.ndarray | csc_array:
     """
     Computes the coherent part of the Hamiltonian superoperator, including the
     Zeeman interaction and J-couplings.
@@ -221,16 +226,24 @@ def sop_H_coherent(basis: np.ndarray,
         A 2-dimensional array containing the basis set that consists sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
+    spins : ndarray
+        A 1-dimensional array containing the spin quantum numbers of each spin.
     gammas : ndarray
         A 1-dimensional array containing the gyromagnetic ratios of each spin in
         the units of rad/s/T.
-    spins : ndarray
-        A 1-dimensional array containing the spin quantum numbers of each spin.
+    B : float
+        External magnetic field in the units of T.
     chemical_shifts : ndarray
         A 1-dimensional array containing the chemical shifts of each spin in the
         units of ppm.
-    B : float
-        External magnetic field in the units of T.
+    J_couplings : ndarray
+        A 2-dimensional array containing the scalar J-couplings between each
+        spin in the units of Hz. Only the bottom triangle is considered.
+    interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
+        Specifies which interactions are taken into account. The options are:
+        - 'zeeman' -- Zeeman interaction
+        - 'chemical_shift' -- Isotropic chemical shift
+        - 'J_coupling' -- Scalar J-coupling
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
@@ -252,13 +265,37 @@ def sop_H_coherent(basis: np.ndarray,
     time_start = time.time()
     print("Constructing Hamiltonian...")
 
-    # Compute the Zeeman and J-coupling Hamiltonians
-    sop_Hz = sop_H_Z(basis, gammas, spins, B, side, sparse)
-    sop_Hcs = sop_H_CS(basis, gammas, spins, chemical_shifts, B, side, sparse)
-    sop_Hj = sop_H_J(basis, spins, J_couplings, side, sparse)
+    # Check that each item in the interactions list is unique
+    if not len(set(interactions)) == len(interactions):
+        raise ValueError("Cannot compute Hamiltonian, as duplicate "
+                         "interactions were specified.")
+    
+    # Check that at least one interaction has been specified
+    if len(interactions) == 0:
+        raise ValueError("Cannot compute Hamiltonian, as no interactions were "
+                         "specified.")
 
-    # Combine the terms
-    sop_H = sop_Hz + sop_Hcs + sop_Hj
+    # Obtain the basis set dimension
+    dim = basis.shape[0]
+
+    # Initialize the Hamiltonian
+    if sparse:
+        sop_H = csc_array((dim, dim), dtype=complex)
+    else:
+        sop_H = np.zeros((dim, dim), dtype=complex)
+
+    # Compute the Zeeman and J-coupling Hamiltonians
+    for interaction in interactions:
+        if interaction == "zeeman":
+            sop_H += sop_H_Z(basis, gammas, spins, B, side, sparse)
+        elif interaction == "chemical_shift":
+            sop_H += sop_H_CS(basis, gammas, spins, chemical_shifts, B, side, 
+                              sparse)
+        elif interaction == "J_coupling":
+            sop_H += sop_H_J(basis, spins, J_couplings, side, sparse)
+        else:
+            raise ValueError(f"Unsupported interaction type: {interaction}. "
+                             f"The possible options are: {INTERACTIONDEFAULT}.")
 
     # Remove small values to enhance sparsity
     increase_sparsity(sop_H, zero_value)
