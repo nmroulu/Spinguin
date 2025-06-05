@@ -680,30 +680,44 @@ def spectrum(signal: np.ndarray,
 
     return freqs, spectrum
 
-def resonance_frequency(isotope: str,
-                        delta: float = 0,
-                        unit: Literal["Hz", "rad/s"] = "Hz") -> float:
+def spectrometer_frequency(
+        unit: Literal["Hz", "rad/s"] = "Hz",
+        center: bool=False
+) -> float:
     """
-    Computes the resonance frequency of a nucleus at specified magnetic field
-    and chemical shift.
+    Computes the spectrometer frequency.
 
     Parameters
     ----------
-    isotope : str
-        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio.
-    delta : float, default=0
-        Chemical shift in ppm.
-    units :{'Hz', 'rad/s'}
+    unit : {'Hz', 'rad/s'}
         Specifies in which units the frequency is returned.
-
+    center : bool, default=False
+        Specifies whether to return the base spectrometer frequency (False) or
+        the user-specified center frequency (True).
+    
     Returns
     -------
     omega : float
-        Resonance frequency of the given nucleus.
+        Spectrometer frequency in the requested units.
+
+    Notes
+    -----
+    Required global parameters:
+    - parameters.isotope
+    - parameters.magnetic_field
+    
+    If `center = True`, the following is required:
+    - parameters.center_frequency
     """
-    # Calculate the resonance frequency
+    # Obtain the offset
+    if center:
+        delta = parameters.center_frequency[parameters.isotope[-1]]
+    else:
+        delta = 0
+
+    # Get the resonance frequency
     omega = specutils.resonance_frequency(
-        isotope = isotope,
+        isotope = parameters.isotope[-1],
         B = parameters.magnetic_field,
         delta = delta,
         unit = unit
