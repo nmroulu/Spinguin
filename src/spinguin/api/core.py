@@ -881,3 +881,21 @@ def inversion_recovery(
         rho = P @ rho
 
     return magnetizations
+
+def time_axis():
+    """
+    Generates the time axis for an FID signal.
+
+    Notes
+    -----
+    Required global parameters:
+    - parameters.npoints
+    - parameters.dwell_time
+    """
+    # Obtain the time array
+    start = 0
+    stop = parameters.npoints[-1] * parameters.dwell_time[-1]
+    num = parameters.npoints[-1]
+    t_axis = np.linspace(start, stop, num, endpoint=False)
+
+    return t_axis
