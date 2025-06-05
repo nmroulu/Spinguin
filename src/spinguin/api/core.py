@@ -608,8 +608,7 @@ def measure(spin_system: SpinSystem,
 
     return ex
 
-def spectral_width_to_dwell_time(spectral_width: float,
-                                 isotope: str) -> float:
+def spectral_width_to_dwell_time(spectral_width: float) -> float:
     """
     Calculates the dwell time (in seconds) from the spectral width given in ppm.
 
@@ -617,19 +616,21 @@ def spectral_width_to_dwell_time(spectral_width: float,
     ----------
     spectral_width : float
         Spectral width in ppm.
-    isotope : str
-        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
-        required for the conversion.
 
     Returns
     -------
     dwell_time : float
         Dwell time in seconds.
+
+    Notes
+    -----
+    Required global parameters:
+    - parameters.isotope
     """
     # Obtain the dwell time
     dwell_time = specutils.spectral_width_to_dwell_time(
         spectral_width = spectral_width,
-        isotope = isotope,
+        isotope = parameters.isotope[-1],
         B = parameters.magnetic_field
     )
 
