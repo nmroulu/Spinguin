@@ -706,34 +706,43 @@ def resonance_frequency(isotope: str,
 
     return omega
 
-def frequency_to_chemical_shift(frequency: float | np.ndarray, 
-                                reference_frequency: float,
-                                spectrometer_frequency: float
-                                ) -> float | np.ndarray:
+def frequency_to_chemical_shift(
+        frequency: float | np.ndarray) -> float | np.ndarray:
     """
     Converts a frequency (or an array of frequencies, e.g., a frequency axis) to
-    a chemical shift value based on the reference frequency and the spectrometer
-    frequency.
+    a chemical shift value.
 
     Parameters
     ----------
     frequency : float or ndarray
         Frequency (or array of frequencies) to convert [in Hz].
-    reference_frequency : float
-        Reference frequency for the conversion [in Hz].
-    spectrometer_frequency : float
-        Spectrometer frequency for the conversion [in Hz].
 
     Returns
     -------
     chemical_shift : float or ndarray
         Converted chemical shift value (or array of values).
+
+    Notes
+    -----
+    Required global parameters:
+    - parameters.isotope
+    - parameters.magnetic_field
+    - parameters.center_frequency
     """
+    # Obtain the rotating frame frequency
+    freq_rotframe = spectrometer_frequency("Hz", True)
+
+    # Add back the rotating frame frequency
+    frequency = frequency + freq_rotframe
+
+    # Obtain the base spectrometer frequency (reference frequency)
+    freq_spectrometer = spectrometer_frequency("Hz", False)
+
     # Obtain the chemical shift
     chemical_shift = specutils.frequency_to_chemical_shift(
         frequency = frequency,
-        reference_frequency = reference_frequency,
-        spectrometer_frequency = spectrometer_frequency
+        reference_frequency = freq_spectrometer,
+        spectrometer_frequency = freq_spectrometer
     )
     return chemical_shift
 
