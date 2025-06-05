@@ -636,7 +636,6 @@ def spectral_width_to_dwell_time(spectral_width: float,
     return dwell_time
 
 def spectrum(signal: np.ndarray,
-             dt: float,
              normalize: bool = True,
              part: Literal["real", "imag"] = "real"
              ) -> tuple[np.ndarray, np.ndarray]:
@@ -664,11 +663,16 @@ def spectrum(signal: np.ndarray,
     spectrum : ndarray
         Specified part (real or imaginary) of the Fourier-transformed signal 
         in the frequency domain.
+
+    Notes
+    -----
+    Required global parameters:
+    - parameters.dwell_time
     """
     # Compute the Fourier transform
     freqs, spectrum = specutils.spectrum(
         signal = signal,
-        dt = dt,
+        dt = parameters.dwell_time[-1],
         normalize = normalize,
         part = part
     )
