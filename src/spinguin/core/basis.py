@@ -258,6 +258,25 @@ def coherence_order(op_def: np.ndarray) -> int:
 
     return order
 
+def spin_order(op_def: np.ndarray) -> int:
+    """
+    Finds out the spin order of a given operator defined by `op_def`.
+
+    Parameters
+    ----------
+    op_def : ndarray
+        Contains the indices that describe the product operator.
+
+    Returns
+    -------
+    order : int
+        Spin order of the operator
+    """
+    # Spin order is equal to the number of non-zeros
+    order = np.count_nonzero(op_def)
+
+    return order
+
 def parse_operator_string(operator: str, nspins: int):
     """
     Parses operator strings and returns their definitions in the basis set as
