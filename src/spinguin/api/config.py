@@ -77,30 +77,6 @@ class Config:
     _zero_pulse: float = 1e-18
     _zero_relaxation: float = 1e-12
     _zero_thermalization: float = 1e-18
-    
-    def __init__(self):
-        print("Settings for the Spinguin package has been set to the "
-              "following defaults:")
-        print(f"custom_dot: {self.custom_dot}")
-
-        print(f"propagator_density: {self.propagator_density}")
-        print(f"sparse_hamiltonian: {self.sparse_hamiltonian}")
-        print(f"sparse_operator: {self.sparse_operator}")
-        print(f"sparse_pulse: {self.sparse_pulse}")
-        print(f"sparse_relaxation: {self.sparse_relaxation}")
-        print(f"sparse_state: {self.sparse_state}")
-        print(f"sparse_superoperator: {self.sparse_superoperator}")
-        
-        print(f"zero_aux: {self.zero_aux}")
-        print(f"zero_equilibrium: {self.zero_equilibrium}")
-        print(f"zero_hamiltonian: {self.zero_hamiltonian}")
-        print(f"zero_interaction: {self.zero_interaction}")
-        print(f"zero_propagator: {self.zero_propagator}")
-        print(f"zero_pulse: {self.zero_pulse}")
-        print(f"zero_relaxation: {self.zero_relaxation}")
-        print(f"zero_thermalization: {self.zero_thermalization}")
-        
-        print()
 
     @property
     def custom_dot(self) -> bool:
