@@ -441,12 +441,16 @@ def find_common_rows(A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarr
         B_ind = np.array([0])
         return A_ind, B_ind
     
-    # Get the row length
-    row_length = A.shape[1]
+    # Get the row length ensuring the correct data type
+    row_length = np.longlong(A.shape[1])
     
     # Convert the arrays to 1D
     A = A.ravel()
     B = B.ravel()
+
+    # Ensure that the data types are correct
+    A = A.astype(np.longlong)
+    B = B.astype(np.longlong)
 
     # Find the common indices
     A_ind, B_ind = intersect_indices(A, B, row_length)
