@@ -72,8 +72,8 @@ class Basis:
         # If maximum spin order is not specified, raise a warning and set it
         # equal to the number of spins
         if self.max_spin_order is None:
-            warnings.warn("Maximum spin order not specified.\
-                          Defaulting to the number of spins.")
+            warnings.warn("Maximum spin order not specified. "
+                          "Defaulting to the number of spins.")
             self.max_spin_order = self._spin_system.nspins
 
         # Build the basis
