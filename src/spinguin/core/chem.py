@@ -448,8 +448,7 @@ def associate(basis_A: np.ndarray,
 
 @lru_cache(maxsize=16)
 def _permutation_matrix(basis_bytes: bytes,
-                           spin_map_bytes: bytes,
-                           sparse: bool=True) -> np.ndarray | sp.csc_array:
+                        spin_map_bytes: bytes) -> sp.csc_array:
     
     # Convert bytes back to arrays
     spin_map = np.frombuffer(spin_map_bytes, dtype=int)
@@ -478,23 +477,18 @@ def _permutation_matrix(basis_bytes: bytes,
         indices[idx] = idx_permuted
 
     # Initialize the permutation matrix
-    if sparse:
-        perm = sp.eye_array(dim, dtype=int, format='lil')
-    else:
-        perm = np.eye(dim, dtype=int)
+    perm = sp.eye_array(dim, dtype=int, format='lil')
 
     # Re-order the rows
     perm = perm[indices]
 
-    # Convert to CSC if using sparse
-    if sparse:
-        perm = perm.tocsc()
+    # Convert to CSC
+    perm = perm.tocsc()
 
-    return perm 
+    return perm
 
 def permutation_matrix(basis: np.ndarray,
-                       spin_map: np.ndarray,
-                       sparse: bool=True) -> np.ndarray | sp.csc_array:
+                       spin_map: np.ndarray) -> sp.csc_array:
     """
     Creates a permutation matrix to reorder the spins in the system.
 
@@ -514,13 +508,10 @@ def permutation_matrix(basis: np.ndarray,
         tensors.
     spin_map : ndarray
         Indices of the spins in the spin system after permutation.
-    sparse : bool, default=True
-        Determines whether to return the permutation matrix as sparse
-        or dense format.
 
     Returns
     -------
-    perm : ndarray or csc_array
+    perm : csc_array
         The permutation matrix.
     """
     # Convert the arrays to bytes for hashing
@@ -528,14 +519,13 @@ def permutation_matrix(basis: np.ndarray,
     spin_map_bytes = spin_map.tobytes()
 
     # Ensure that a separate copy is returned
-    perm = _permutation_matrix(basis_bytes, spin_map_bytes, sparse).copy()
+    perm = _permutation_matrix(basis_bytes, spin_map_bytes).copy()
 
     return perm
 
 def permute_spins(basis: np.ndarray,
                   rho: np.ndarray | sp.csc_array,
-                  spin_map: np.ndarray,
-                  sparse: bool=True) -> np.ndarray | sp.csc_array:
+                  spin_map: np.ndarray) -> np.ndarray | sp.csc_array:
     """
     Permutes the state vector of a spin system to correspond to a reordering
     of the spins in the system. 
@@ -568,7 +558,7 @@ def permute_spins(basis: np.ndarray,
         Permuted state vector of the spin system.
     """
     # Get the permutation matrix
-    perm = permutation_matrix(basis, spin_map, sparse)
+    perm = permutation_matrix(basis, spin_map)
 
     # Apply the permutation to the density vector
     rho = perm @ rho
