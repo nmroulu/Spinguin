@@ -70,6 +70,115 @@ def unit_state(basis: np.ndarray,
 
     return rho
 
+@lru_cache(maxsize=8192)
+def _state_from_op_def(
+    basis_bytes : bytes,
+    spins_bytes : bytes,
+    op_def_bytes : bytes,
+    sparse: bool=False
+) -> np.ndarray | sp.csc_array:
+    
+    # Obtain the hashed elements
+    spins = np.frombuffer(spins_bytes, dtype=float)
+    basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0])
+    op_def = np.frombuffer(op_def_bytes, dtype=int)
+
+    # Obtain the basis dimension, number of spins and spin multiplicities
+    dim = basis.shape[0]
+    nspins = spins.shape[0]
+    mults = (2*spins + 1).astype(int)
+
+    # Initialize the state vector
+    if sparse:
+        rho = sp.lil_array((dim, 1), dtype=complex)
+    else:
+        rho = np.zeros((dim, 1), dtype=complex)
+
+    # Get the state index
+    idx = state_idx(basis, op_def)
+
+    # Find indices of the active and inactive spins
+    idx_active = np.where(np.array(op_def) != 0)[0]
+    idx_inactive = np.where(np.array(op_def) == 0)[0]
+
+    # Calculate the norm of the active operator part if there are active
+    # spins
+    if len(idx_active) != 0:
+        # TODO: Benchmark sparse vs dense implementation
+        op_norm = np.linalg.norm(
+            op_prod(op_def, spins, include_unit=False, sparse=False),
+            ord='fro')
+
+    # Otherwise set it to one
+    else:
+        op_norm = 1
+    
+    # Calculate the norm of the unit operator part
+    unit_norm = np.sqrt(np.prod(mults[idx_inactive]))
+
+    # Total norm of the operator
+    norm = op_norm * unit_norm
+
+    # Set the properly normalized coefficient
+    rho[idx, 0] = norm
+
+    # Convert to csc_array if requesting sparse
+    if sparse:
+        rho = rho.tocsc()
+
+    return rho
+
+def state_from_op_def(
+        basis : np.ndarray,
+        spins : np.ndarray,
+        op_def : np.ndarray,
+        sparse : bool=False
+) -> np.ndarray | sp.csc_array:
+    """
+    Generates a state vector from the given operator definition. The output of
+    the state function corresponds to a density matrix, which is expressed as a
+    linear combination of the basis set operators. The output of this function
+    is a column vector, which contains the coefficients.
+    
+    Normalization:
+    The basis set operators are constructed from products of single-spin
+    spherical tensor operators and they are normalized. Therefore, requesting a
+    state that corresponds to any operator `O` will result in a coefficient of
+    `norm(O)` for the state.
+
+    NOTE: This function is sometimes called often and is cached for high
+    performance.
+
+    Parameters
+    ----------
+    basis : ndarray
+        A 2-dimensional array containing the basis set that consists sequences
+        of integers describing the Kronecker products of irreducible spherical
+        tensors.
+    spins : ndarray
+        A 1-dimensional array specifying the spin quantum numbers of the system.
+    op_def : ndarray
+        An array of integers that specify the product operator.
+    sparse : bool, default=False
+        If False, returns a NumPy array. If True, returns a SciPy csc_array.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the requested state.
+    """
+
+    # Convert types suitable for hashing
+    basis_bytes = basis.tobytes()
+    spins_bytes = spins.tobytes()
+    op_def_bytes = op_def.tobytes()
+
+    # Ensure that a different instance is returned
+    rho = _state_from_op_def(basis_bytes, spins_bytes, op_def_bytes,
+                             sparse).copy()
+
+    return rho
+
 @lru_cache(maxsize=128)
 def _state_from_string(basis_bytes: bytes,
                        spins_bytes: bytes,
