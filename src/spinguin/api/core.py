@@ -9,21 +9,42 @@ of the Spinguin package.
 import numpy as np
 import scipy.sparse as sp
 from typing import Literal
-from spinguin.core.operators import op_from_string
-from spinguin.core.superoperators import sop_from_string
-from spinguin.core.hamiltonian import sop_H as csop_H
-from spinguin.core.relaxation import sop_R_phenomenological, sop_R_redfield, \
-    sop_R_sr2k, ldb_thermalization
-from spinguin.core import states, propagation, specutils
-from spinguin.core.liouvillian import sop_L
-from spinguin.api.parameters import parameters
+
 from spinguin.api.config import config
+from spinguin.api.parameters import parameters
 from spinguin.api.spin_system import SpinSystem
-from spinguin.core.hide_prints import HidePrints
+
 from spinguin.core.chem import (
     dissociate as _dissociate,
     associate as _associate,
     permute_spins as _permute_spins
+)
+from spinguin.core.hamiltonian import sop_H as _sop_H
+from spinguin.core.hide_prints import HidePrints
+from spinguin.core.liouvillian import sop_L as _sop_L
+from spinguin.core.operators import op_from_string as _op_from_string
+from spinguin.core.propagation import (
+    propagator_to_rotframe as _propagator_to_rotframe,
+    sop_propagator as _sop_propagator,
+    sop_pulse as _sop_pulse
+)
+from spinguin.core.relaxation import (
+    sop_R_phenomenological as _sop_R_phenomenological,
+    sop_R_redfield as _sop_R_redfield,
+    sop_R_sr2k as _sop_R_sr2k,
+    ldb_thermalization as _ldb_thermalization
+)
+from spinguin.core.specutils import (
+    frequency_to_chemical_shift as _frequency_to_chemical_shift,
+    resonance_frequency as _resonance_frequency,
+    spectral_width_to_dwell_time as _spectral_width_to_dwell_time,
+    spectrum as _spectrum
+)
+from spinguin.core.superoperators import sop_from_string as _sop_from_string
+from spinguin.core.states import (
+    equilibrium_state as _equilibrium_state,
+    measure as _measure,
+    singlet_state as _singlet_state
 )
 
 def spin_system(isotopes: list | tuple | np.ndarray | str) -> SpinSystem:
@@ -105,9 +126,11 @@ def operator(spin_system: SpinSystem,
         An array representing the requested operator.
     """
     # Construct the operator
-    op = op_from_string(spins = spin_system.spins,
-                        operator = operator,
-                        sparse = config.sparse_operator)
+    op = _op_from_string(
+        spins = spin_system.spins,
+        operator = operator,
+        sparse = config.sparse_operator
+    )
     
     return op
 
@@ -171,11 +194,13 @@ def superoperator(spin_system: SpinSystem,
                          "superoperators.")
         
     # Construct the superoperator
-    sop = sop_from_string(operator = operator,
-                          basis = spin_system.basis.basis,
-                          spins = spin_system.spins,
-                          side = side,
-                          sparse = config.sparse_superoperator)
+    sop = _sop_from_string(
+        operator = operator,
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        side = side,
+        sparse = config.sparse_superoperator
+    )
         
     return sop
 
@@ -223,7 +248,7 @@ def hamiltonian(
             raise ValueError("Please set the magnetic field before "
                              "constructing the chemical shift Hamiltonian.")
         
-    H = csop_H(
+    H = _sop_H(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         gammas = spin_system.gammas,
@@ -290,7 +315,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     # Make phenomenological relaxation superoperator
     if spin_system.relaxation.theory == "phenomenological":
-        R = sop_R_phenomenological(
+        R = _sop_R_phenomenological(
             basis = spin_system.basis.basis,
             R1 = spin_system.relaxation.R1,
             R2 = spin_system.relaxation.R2,
@@ -306,7 +331,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
                             side="comm")
 
         # Build the Redfield relaxation superoperator
-        R = sop_R_redfield(
+        R = _sop_R_redfield(
             basis = spin_system.basis.basis,
             sop_H = H,
             tau_c = spin_system.relaxation.tau_c,
@@ -329,7 +354,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     
     # Apply scalar relaxation of the second kind if requested
     if spin_system.relaxation.sr2k:
-        R += sop_R_sr2k(
+        R += _sop_R_sr2k(
             basis = spin_system.basis.basis,
             spins = spin_system.spins,
             gammas = spin_system.gammas,
@@ -352,7 +377,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             )
             
         # Perform the thermalization
-        R = ldb_thermalization(
+        R = _ldb_thermalization(
             R = R,
             H_left = H_left,
             T = parameters.temperature,
@@ -395,7 +420,7 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
         )
 
     # Build the equilibrium state
-    rho = states.equilibrium_state(
+    rho = _equilibrium_state(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         H_left = H_left,
@@ -420,7 +445,7 @@ def singlet_state(
                          "singlet state.")
 
     # Build the singlet state
-    rho = states.singlet_state(
+    rho = _singlet_state(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index_1 = index_1,
@@ -485,7 +510,7 @@ def pulse(spin_system: SpinSystem,
                          "superoperators.")
 
     # Construct the pulse superoperator
-    P = propagation.sop_pulse(
+    P = _sop_pulse(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         operator = operator,
@@ -520,7 +545,7 @@ def liouvillian(H: np.ndarray | sp.csc_array = None,
     """
 
     # Construct the Liouvillian
-    L = sop_L(H, R, K)
+    L = _sop_L(H, R, K)
 
     return L
 
@@ -530,7 +555,7 @@ def propagator(L: np.ndarray | sp.csc_array,
     TODO
     """
     # Create the propagator
-    P = propagation.sop_propagator(
+    P = _sop_propagator(
         L = L,
         t = t,
         custom_dot = config.custom_dot,
@@ -555,7 +580,7 @@ def propagator_to_rotframe(spin_system: SpinSystem,
             center[spin] = center_frequencies[spin_system.isotopes[spin]]
 
     # Construct Hamiltonian that specifies the interaction frame
-    H_frame = csop_H(
+    H_frame = _sop_H(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         gammas = spin_system.gammas,
@@ -568,7 +593,7 @@ def propagator_to_rotframe(spin_system: SpinSystem,
     )
 
     # Convert the propagator to rotating frame
-    P = propagation.propagator_to_rotframe(
+    P = _propagator_to_rotframe(
         sop_P = P,
         sop_H0 = H_frame,
         t = t,
@@ -628,7 +653,7 @@ def measure(spin_system: SpinSystem,
         Expectation value.
     """
     # Perform the measurement
-    ex = states.measure(
+    ex = _measure(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         rho = rho,
@@ -657,7 +682,7 @@ def spectral_width_to_dwell_time(spectral_width: float) -> float:
     - parameters.isotope
     """
     # Obtain the dwell time
-    dwell_time = specutils.spectral_width_to_dwell_time(
+    dwell_time = _spectral_width_to_dwell_time(
         spectral_width = spectral_width,
         isotope = parameters.isotope[-1],
         B = parameters.magnetic_field
@@ -700,7 +725,7 @@ def spectrum(signal: np.ndarray,
     - parameters.dwell_time
     """
     # Compute the Fourier transform
-    freqs, spectrum = specutils.spectrum(
+    freqs, spectrum = _spectrum(
         signal = signal,
         dt = parameters.dwell_time[-1],
         normalize = normalize,
@@ -745,7 +770,7 @@ def spectrometer_frequency(
         delta = 0
 
     # Get the resonance frequency
-    omega = specutils.resonance_frequency(
+    omega = _resonance_frequency(
         isotope = parameters.isotope[-1],
         B = parameters.magnetic_field,
         delta = delta,
@@ -787,7 +812,7 @@ def frequency_to_chemical_shift(
     freq_spectrometer = spectrometer_frequency("Hz", False)
 
     # Obtain the chemical shift
-    chemical_shift = specutils.frequency_to_chemical_shift(
+    chemical_shift = _frequency_to_chemical_shift(
         frequency = frequency,
         reference_frequency = freq_spectrometer,
         spectrometer_frequency = freq_spectrometer
