@@ -47,16 +47,6 @@ class Parameters:
     _isotope: np.ndarray = None
     _npoints: np.ndarray = None
     _angle: np.ndarray = None
-    
-    def __init__(self):
-        print("Global simulation parameters have been initialized to the "
-              "following defaults:")
-        print(f"magnetic_field: {self.magnetic_field}")
-        print(f"temperature: {self.temperature}")
-        print(f"dwell_time: {self.dwell_time}")
-        print(f"npoints: {self.npoints}")
-        print(f"center_frequency: {self.center_frequency}")
-        print()
 
     @property
     def magnetic_field(self) -> float:
