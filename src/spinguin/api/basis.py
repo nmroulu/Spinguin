@@ -130,7 +130,10 @@ class Basis:
                         sop=obj
                     ))
 
-            # Convert to tuple
-            objs_transformed = tuple(objs_transformed)
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
 
             return objs_transformed
