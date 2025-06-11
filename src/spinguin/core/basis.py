@@ -154,7 +154,7 @@ def truncate_basis_by_coherence(basis: np.ndarray,
         basis.
     """
 
-    print("Truncating the basis set. The following coherence orders are"
+    print("Truncating the basis set. The following coherence orders are "
           f"retained: {coherence_orders}")
     time_start = time.time()
 
