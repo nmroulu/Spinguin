@@ -401,6 +401,30 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     return rho
 
+def singlet_state(
+        spin_system: SpinSystem,
+        index_1 : int,
+        index_2 : int
+) -> np.ndarray | sp.csc_array:
+    """
+    TODO
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "singlet state.")
+
+    # Build the singlet state
+    rho = states.singlet_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        index_1 = index_1,
+        index_2 = index_2,
+        sparse = config.sparse_state
+    )
+
+    return rho
+
 def pulse(spin_system: SpinSystem,
           operator: str,
           angle: float) -> np.ndarray | sp.csc_array:
