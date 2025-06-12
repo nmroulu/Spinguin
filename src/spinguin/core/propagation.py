@@ -19,7 +19,7 @@ def sop_propagator(L: sp.csc_array,
                    zero_value: float=1e-18,
                    density_threshold: float=0.5) -> sp.csc_array | np.ndarray:
     """
-    Constructs the time propagator.
+    Constructs the time propagator exp(L*t).
 
     TODO: Handle dense array when custom_dot is requested?
 
@@ -48,7 +48,7 @@ def sop_propagator(L: sp.csc_array,
     Returns
     -------
     expm_Lt : csc_array or ndarray
-        Time propagator exp[L*t], optionally transformed to the rotating frame.
+        Time propagator exp(L*t).
     """
 
     print("Constructing propagator...")
