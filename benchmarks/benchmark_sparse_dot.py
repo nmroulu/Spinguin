@@ -4,9 +4,9 @@ against a custom sparse dot implementation for various matrix densities.
 """
 
 # Imports
-from scipy.sparse import random_array  # Import for generating random sparse matrices
-from spinguin import sparse_dot  # Custom sparse dot implementation
-from time import perf_counter  # For measuring execution time
+from scipy.sparse import random_array
+from spinguin.core.la import sparse_dot
+from time import perf_counter
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -41,29 +41,29 @@ for density in densities:
 
         # Measure execution time for SciPy sparse matrix multiplication
         time_start_csr_csr = perf_counter()
-        A @ A  # Perform matrix multiplication
+        A @ A
         time_end_csr_csr = perf_counter()
         result_SciPy[i] = time_end_csr_csr - time_start_csr_csr
 
         # Measure execution time for the custom sparse dot implementation
         time_start_custom = perf_counter()
-        sparse_dot(A, A)  # Perform matrix multiplication
+        sparse_dot(A, A, zero_value=1e-32)
         time_end_custom = perf_counter()
         result_custom[i] = time_end_custom - time_start_custom
 
     # Plot the benchmark results for the current density
-    plt.plot(dims, result_SciPy, label='SciPy')  # SciPy results
-    plt.plot(dims, result_custom, label='Custom')  # Custom implementation results
-    plt.title(f"Density: {density}")  # Title indicating the current density
-    plt.xlabel("Matrix Dimension")  # X-axis label
-    plt.ylabel("Time (s)")  # Y-axis label
-    plt.legend()  # Add legend to distinguish between implementations
-    plt.tight_layout()  # Adjust layout for better readability
+    plt.plot(dims, result_SciPy, label='SciPy')
+    plt.plot(dims, result_custom, label='Custom')
+    plt.title(f"Density: {density}")
+    plt.xlabel("Matrix Dimension")
+    plt.ylabel("Time (s)")
+    plt.legend()
+    plt.tight_layout()
 
     # Save the plot to the 'results' folder
-    script_path = os.path.dirname(os.path.abspath(__file__))  # Get script directory
-    folder_path = os.path.join(script_path, 'results')  # Path to 'results' folder
-    os.makedirs(folder_path, exist_ok=True)  # Create folder if it doesn't exist
-    file_path = os.path.join(folder_path, f'density_{density}.png')  # File path for plot
-    plt.savefig(file_path)  # Save the plot as a PNG file
-    plt.clf()  # Clear the figure for the next plot
+    script_path = os.path.dirname(os.path.abspath(__file__))
+    folder_path = os.path.join(script_path, 'results')
+    os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, f'density_{density}.png')
+    plt.savefig(file_path)
+    plt.clf()
