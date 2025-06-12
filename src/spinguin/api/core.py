@@ -573,7 +573,19 @@ def liouvillian(H: np.ndarray | sp.csc_array = None,
 def propagator(L: np.ndarray | sp.csc_array,
                t: float) -> np.ndarray | sp.csc_array:
     """
-    TODO
+    Constructs the time propagator exp(L*t).
+
+    Parameters
+    ----------
+    L : csc_array
+        Liouvillian superoperator, L = -iH - R + K.
+    t : float
+        Time step of the simulation in seconds.
+
+    Returns
+    -------
+    expm_Lt : csc_array or ndarray
+        Time propagator exp(L*t).
     """
     # Create the propagator
     P = _sop_propagator(
@@ -592,7 +604,24 @@ def propagator_to_rotframe(spin_system: SpinSystem,
                            center_frequencies: dict=None
                            ) -> np.ndarray | sp.csc_array:
     """
-    TODO
+    Transforms the time propagator to the rotating frame.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system whose time propagator is going to be transformed.
+    P : ndarray or csc_array
+        Time propagator in the laboratory frame.
+    t : float
+        Time step of the simulation in seconds.
+    center_frequencies : dict
+        Dictionary that describes the center frequencies for each isotope in the
+        units of ppm.
+
+    Returns
+    -------
+    sop_P : ndarray or csc_array
+        The time propagator transformed into the rotating frame.
     """
     # Obtain an array of center frequencies for each spin
     center = np.zeros(spin_system.nspins)
