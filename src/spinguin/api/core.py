@@ -42,9 +42,17 @@ from spinguin.core.specutils import (
 )
 from spinguin.core.superoperators import sop_from_string as _sop_from_string
 from spinguin.core.states import (
+    alpha_state as _alpha_state,
+    beta_state as _beta_state,
     equilibrium_state as _equilibrium_state,
     measure as _measure,
-    singlet_state as _singlet_state
+    singlet_state as _singlet_state,
+    state_from_string as _state_from_string,
+    state_to_zeeman as _state_to_zeeman,
+    triplet_minus_state as _triplet_minus_state,
+    triplet_plus_state as _triplet_plus_state,
+    triplet_zero_state as _triplet_zero_state,
+    unit_state as _unit_state
 )
 
 def spin_system(isotopes: list | tuple | np.ndarray | str) -> SpinSystem:
@@ -431,13 +439,26 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     return rho
 
-def singlet_state(
-        spin_system: SpinSystem,
-        index_1 : int,
-        index_2 : int
-) -> np.ndarray | sp.csc_array:
+def singlet_state(spin_system: SpinSystem,
+                  index_1 : int,
+                  index_2 : int) -> np.ndarray | sp.csc_array:
     """
-    TODO
+    Generates the singlet state between two spin-1/2 nuclei. Unit state is
+    assigned to the other spins.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the singlet state is created.
+    index_1 : int
+        Index of the first spin in the singlet state.
+    index_2 : int
+        Index of the second spin in the singlet state.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the singlet state.
     """
     # Check that the required attributes are set
     if spin_system.basis.basis is None:
@@ -652,6 +673,11 @@ def measure(spin_system: SpinSystem,
     ex : complex
         Expectation value.
     """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before measuring an "
+                         "expectation value of an operator.")
+    
     # Perform the measurement
     ex = _measure(
         basis = spin_system.basis.basis,
@@ -1130,6 +1156,319 @@ def permute_spins(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         rho = rho,
         spin_map = spin_map
+    )
+
+    return rho
+
+def unit_state(spin_system: SpinSystem,
+               normalized: bool=True) -> np.ndarray | sp.csc_array:
+    """
+    Returns a unit state vector, which represents the identity operator. The
+    output can be either normalised (trace equal to one) or unnormalised (raw
+    identity matrix).
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system to which the unit state is created.
+    normalized : bool, default=True
+        If set to True, the function will return a state vector that represents
+        the trace-normalized density matrix. If False, returns a state vector
+        that corresponds to the identity operator.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the unit state.
+    """
+    # Create the unit state
+    rho = _unit_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        sparse = config.sparse_state,
+        normalized = normalized
+    )
+
+    return rho
+
+def state(spin_system: SpinSystem,
+          operator: str) -> np.ndarray | sp.csc_array:
+    """
+    This function returns a column vector representing the density matrix as a
+    linear combination of spin operators. Each element of the vector corresponds
+    to the coefficient of a specific spin operator in the expansion.
+    
+    Normalization:
+    The output of this function uses a normalised basis built from normalised
+    products of single-spin spherical tensor operators. However, the
+    coefficients are scaled so that the resulting linear combination represents
+    the non-normalised version of the requested operator.
+
+    NOTE: This function is sometimes called often and is cached for high
+    performance.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system to which the state is created.
+    operator : str
+        Defines the state to be generated. The operator string must follow the
+        rules below:
+
+        - Cartesian and ladder operators: `I(component,index)` or
+          `I(component)`. Examples:
+
+            - `I(x,4)` --> Creates x-operator for spin at index 4.
+            - `I(x)`--> Creates x-operator for all spins.
+
+        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+
+            - `T(1,-1,3)` --> \
+              Creates operator with `l=1`, `q=-1` for spin at index 3.
+            - `T(1, -1)` --> \
+              Creates operator with `l=1`, `q=-1` for all spins.
+            
+        - Product operators have `*` in between the single-spin operators:
+          `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators:
+          `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these
+          two is identical: `E * I(z,1)`, `I(z,1)`
+        
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the requested state.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing a state.")
+    
+    # Build the state
+    rho = _state_from_string(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        operator = operator,
+        sparse = config.sparse_state
+    )
+
+    return rho
+
+def state_to_zeeman(
+        spin_system: SpinSystem,
+        rho: np.ndarray | sp.csc_array
+        ) -> np.ndarray | sp.csc_array:
+    """
+    Takes the state vector defined in the normalized spherical tensor basis
+    and converts it into the Zeeman eigenbasis. Useful for error checking.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system whose state vector is going to be converted into a density
+        matrix.
+    rho : ndarray or csc_array
+        State vector defined in the normalized spherical tensor basis.
+
+    Returns
+    -------
+    rho_zeeman : ndarray or csc_array
+        Spin density matrix defined in the Zeeman eigenbasis.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before converting the "
+                         "state vector into density matrix.")
+    
+    # Convert the state vector into density matrix
+    rho_zeeman = _state_to_zeeman(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        rho = rho,
+        sparse = config.sparse_state
+    )
+    
+    return rho_zeeman
+
+def alpha_state(spin_system: SpinSystem,
+                index: int) -> np.ndarray | sp.csc_array:
+    """
+    Generates the alpha state for a given spin-1/2 nucleus. Unit state is
+    assigned to the other spins.
+
+    Parameters
+    ----------
+    spin_system: SpinSystem,
+        Spin system for which the alpha state is created.
+    index : int
+        Index of the spin that has the alpha state.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the alpha state of the given spin index.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "alpha state.")
+    
+    # Create the alpha state
+    rho = _alpha_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        index = index,
+        sparse = config.sparse_state
+    )
+
+    return rho
+
+def beta_state(spin_system: SpinSystem,
+               index: int) -> np.ndarray | sp.csc_array:
+    """
+    Generates the beta state for a given spin-1/2 nucleus. Unit state is
+    assigned to the other spins.
+
+    Parameters
+    ----------
+    spin_system: SpinSystem,
+        Spin system for which the beta state is created.
+    index : int
+        Index of the spin that has the beta state.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the beta state of the given spin index.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "beta state.")
+    
+    # Create the beta state
+    rho = _beta_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        index = index,
+        sparse = config.sparse_state
+    )
+
+    return rho
+
+def triplet_zero_state(spin_system: SpinSystem,
+                       index_1: int,
+                       index_2: int) -> np.ndarray | sp.csc_array:
+    """
+    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is
+    assigned to the other spins.
+
+    Parameters
+    ----------
+    spin_system: SpinSystem
+        Spin system for which the triplet zero state is created.
+    index_1 : int
+        Index of the first spin in the triplet zero state.
+    index_2 : int
+        Index of the second spin in the triplet zero state.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the triplet zero state.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "triplet zero state.")
+    
+    # Make the triplet zero state
+    rho = _triplet_zero_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        index_1 = index_1,
+        index_2 = index_2,
+        sparse = config.sparse_state
+    )
+
+    return rho
+
+def triplet_plus_state(spin_system: SpinSystem,
+                       index_1: int,
+                       index_2: int) -> np.ndarray | sp.csc_array:
+    """
+    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is
+    assigned to the other spins.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the triplet plus state is created.
+    index_1 : int
+        Index of the first spin in the triplet plus state.
+    index_2 : int
+        Index of the second spin in the triplet plus state.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the triplet plus state.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "triplet plus state.")
+    
+    # Create the triplet plus state
+    rho = _triplet_plus_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        index_1 = index_1,
+        index_2 = index_2,
+        sparse = config.sparse_state
+    )
+
+    return rho
+
+def triplet_minus_state(spin_system: SpinSystem,
+                        index_1: int,
+                        index_2: int) -> np.ndarray | sp.csc_array:
+    """
+    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is
+    assigned to the other spins.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the triplet minus state is created.
+    index_1 : int
+        Index of the first spin in the triplet minus state.
+    index_2 : int
+        Index of the second spin in the triplet minus state.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        State vector corresponding to the triplet minus state.
+    """
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "triplet minus state.")
+    
+    # Create the triplet minus state
+    rho = _triplet_minus_state(
+        basis = spin_system.basis.basis,
+        spins = spin_system.spins,
+        index_1 = index_1,
+        index_2 = index_2,
+        sparse = config.sparse_state
     )
 
     return rho
