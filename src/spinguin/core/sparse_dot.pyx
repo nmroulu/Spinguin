@@ -12,33 +12,47 @@ cdef extern from "<complex>" nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.initializedcheck(False)
-cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indices, const long long[::1] A_indptr, const long long A_nrows,
-                 const double complex[::1] B_data, const long long[::1] B_indices, const long long[::1] B_indptr, const long long B_ncols,
+cpdef sparse_dot(const double complex[::1] A_data,
+                 const long long[::1] A_indices,
+                 const long long[::1] A_indptr,
+                 const long long A_nrows,
+                 const double complex[::1] B_data,
+                 const long long[::1] B_indices,
+                 const long long[::1] B_indptr,
+                 const long long B_ncols,
                  const double zero_value):
     """
-    Memory-efficient sparse matrix multiplication C = A*B algorithm compatible with SciPy CSC arrays.
+    Memory-efficient sparse matrix multiplication C = A*B algorithm compatible
+    with SciPy CSC arrays.
 
     Parameters
     ----------
     A_data : numpy.ndarray
-        The data array for matrix A obtained from SciPy by A.data. Data type must be np.complex128.
+        The data array for matrix A obtained from SciPy by A.data. Data type
+        must be np.complex128.
     A_indices : numpy.ndarray
-        The index array for matrix A obtained from SciPy by A.indices. Data type must be np.longlong.
+        The index array for matrix A obtained from SciPy by A.indices. Data type
+        must be np.longlong.
     A_indptr : numpy.ndarray
-        The index pointer array for matrix A obtained from SciPy by A.indptr. Data type must be np.longlong.
+        The index pointer array for matrix A obtained from SciPy by A.indptr.
+        Data type must be np.longlong.
     A_nrows : int
         The number of rows in matrix A. Data type must be np.longlong.
     B_data : numpy.ndarray
-        The data array for matrix B obtained from SciPy by B.data. Data type must be np.complex128.
+        The data array for matrix B obtained from SciPy by B.data. Data type
+        must be np.complex128.
     B_indices : numpy.ndarray
-        The index array for matrix B obtained from SciPy by B.indices. Data type must be np.longlong.
+        The index array for matrix B obtained from SciPy by B.indices. Data type
+        must be np.longlong.
     B_indptr : numpy.ndarray
-        The index pointer array for matrix B obtained from SciPy by B.indptr. Data type must be np.longlong.
+        The index pointer array for matrix B obtained from SciPy by B.indptr.
+        Data type must be np.longlong.
     B_ncols : int
         The number of columns in matrix B. Data type must be np.longlong.
     zero_value : float
-        Matrix elements with absolute values less than zero_value will be considered as zero in the returned matrix C.
-        Data type must be np.float64.
+        Matrix elements with absolute values less than zero_value will be
+        considered as zero in the returned matrix C. Data type must be
+        np.float64.
 
     Returns
     -------
@@ -49,7 +63,6 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
     C_indptr : numpy.ndarray
         The index pointer array of the resulting matrix.
     """
-
     # Obtain the number of threads to use
     cdef long long num_threads
     cdef long long thread_id
@@ -59,13 +72,16 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
     cdef long long[::1] C_indptr = np.zeros(B_ncols+1, dtype=np.longlong)
     
     # Allocate memory for storing the results of the current column
-    cdef double complex[::1] C_col_data = np.zeros((num_threads*A_nrows), dtype=np.complex128)   # Stores the data
-    cdef long long[::1] C_col_nonzero = np.zeros((num_threads*A_nrows), dtype=np.longlong)       # Tracks whether a value could be non-zero (0 = zero, 1 = non-zero)
-    cdef long long[::1] C_col_indices = np.zeros((num_threads*A_nrows), dtype=np.longlong)       # Stores the indices of non-zero values
+    cdef double complex[::1] C_col_data = \
+        np.zeros((num_threads*A_nrows), dtype=np.complex128)
+    cdef long long[::1] C_col_nonzero = \
+        -np.ones((num_threads*A_nrows), dtype=np.longlong)
 
     # Initialize loop variables and counters
     cdef long long nnz
     cdef long long C_col_nnz
+    cdef long long C_col_head
+    cdef long long C_col_head_temp
     cdef long long nnz_th
     cdef long long i
     cdef long long j
@@ -81,7 +97,8 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
     cdef double complex val_j
     cdef double complex val_k
         
-    # FIRST LOOP - TO FIND THE NUMBER OF NON-ZERO ELEMENTS AND TO CONSTRUCT THE INDEX POINTER ARRAY
+    # FIRST LOOP
+    # FIND THE NUMBER OF NON-ZERO ELEMENTS AND CONSTRUCT THE INDEX POINTER ARRAY
 
     # Iterate through the columns of matrix B
     for i in prange(B_ncols, nogil=True, schedule='static'):
@@ -94,6 +111,9 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
 
         # Counter for the non-zero values in the current column (thread-local)
         C_col_nnz = 0
+
+        # Current head of the column
+        C_col_head = -2
 
         # Obtain the starting and ending indices of the current column of B
         start_B = B_indptr[i]
@@ -119,34 +139,40 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
                 val_k = A_data[k]
 
                 # Multiply and add to the array
-                C_col_data[ind_k_thread] = C_col_data[ind_k_thread] + val_j * val_k
+                C_col_data[ind_k_thread] = \
+                    C_col_data[ind_k_thread] + val_j * val_k
                 
-                # Check if a non-zero value is found for the matrix element for the first time
-                if C_col_nonzero[ind_k_thread] == 0:
-                    C_col_indices[C_col_nnz + thread_start] = ind_k
-                    C_col_nonzero[ind_k_thread] = 1
+                # Check if a non-zero value is found for the matrix element for 
+                # the first time
+                if C_col_nonzero[ind_k_thread] == -1:
+                    C_col_nonzero[ind_k_thread] = C_col_head
+                    C_col_head = ind_k_thread
                     C_col_nnz = C_col_nnz + 1
 
-        # Counter for the number of non-zeros greater than the threshold (thread-local)
+        # Counter for the number of non-zeros greater than the threshold
         nnz_th = 0
 
-        # Once a complete column is calculated, iterate through the possible non-zero values
+        # Once a complete column is calculated, iterate through the possible
+        # non-zero values
         for k in range(C_col_nnz):
 
-            # Get the row index and the value
-            ind_k = C_col_indices[k + thread_start]
-            ind_k_thread = ind_k + thread_start
-            val_k = C_col_data[ind_k_thread]
+            # Get the value
+            val_k = C_col_data[C_col_head]
 
             # Increment the counter if the value is larger than the threshold
             if abs(val_k) > zero_value:
                 nnz_th = nnz_th + 1
 
-            # Clear the arrays
-            C_col_data[ind_k_thread] = 0
-            C_col_nonzero[ind_k_thread] = 0
+            # Get the next index
+            C_col_head_temp = C_col_head
+            C_col_head = C_col_nonzero[C_col_head]
 
-        # Append the number of non-zeros in the column to the index pointer array
+            # Clear the arrays
+            C_col_data[C_col_head_temp] = 0
+            C_col_nonzero[C_col_head_temp] = -1
+
+        # Append the number of non-zeros in the column to the index pointer
+        # array
         C_indptr[i+1] = nnz_th
 
     # Calculate the cumulative sum (the true index pointers)
@@ -174,6 +200,9 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
         # Counter for the non-zero values in the current column (thread-local)
         C_col_nnz = 0
 
+        # Current head of the column
+        C_col_head = -2
+
         # Obtain the starting and ending indices of the current column of B
         start_B = B_indptr[i]
         end_B = B_indptr[i+1]
@@ -198,34 +227,39 @@ cpdef sparse_dot(const double complex[::1] A_data, const long long[::1] A_indice
                 val_k = A_data[k]
 
                 # Multiply and add to the array
-                C_col_data[ind_k_thread] = C_col_data[ind_k_thread] + val_j * val_k
+                C_col_data[ind_k_thread] = \
+                    C_col_data[ind_k_thread] + val_j * val_k
                 
-                # Check if a non-zero value is found for the matrix element for the first time
-                if C_col_nonzero[ind_k_thread] == 0:
-                    C_col_indices[C_col_nnz + thread_start] = ind_k
-                    C_col_nonzero[ind_k_thread] = 1
+                # Check if a non-zero value is found for the matrix element for
+                # the first time
+                if C_col_nonzero[ind_k_thread] == -1:
+                    C_col_nonzero[ind_k_thread] = C_col_head
+                    C_col_head = ind_k_thread
                     C_col_nnz = C_col_nnz + 1
 
-        # Counter for the number of non-zeros greater than the threshold (thread-local)
+        # Counter for the number of non-zeros greater than the threshold
         nnz_th = C_indptr[i]
         
-        # Once a complete column is calculated, iterate through the possible non-zero values
+        # Once a complete column is calculated, iterate through the possible
+        # non-zero values
         for k in range(C_col_nnz):
 
-            # Get the row index and the value
-            ind_k = C_col_indices[k + thread_start]
-            ind_k_thread = ind_k + thread_start
-            val_k = C_col_data[ind_k_thread]
+            # Get the value
+            val_k = C_col_data[C_col_head]
 
             # Add to the array if the value is larger than the threshold
             if abs(val_k) > zero_value:
                 C_data[nnz_th] = val_k
-                C_indices[nnz_th] = ind_k
+                C_indices[nnz_th] = C_col_head - thread_start
                 nnz_th = nnz_th + 1
 
+            # Get the next index
+            C_col_head_temp = C_col_head
+            C_col_head = C_col_nonzero[C_col_head]
+
             # Clear the arrays
-            C_col_data[ind_k_thread] = 0
-            C_col_nonzero[ind_k_thread] = 0
+            C_col_data[C_col_head_temp] = 0
+            C_col_nonzero[C_col_head_temp] = -1
 
     # Convert the memoryviews back to arrays
     C_data = np.asarray(C_data)
