@@ -245,16 +245,15 @@ def state_from_string(basis: np.ndarray,
                       operator: str,
                       sparse: bool=False) -> np.ndarray | sp.csc_array:
     """
-    Generates a state vector from the given operator string. The output of the
-    state function corresponds to a density matrix, which is expressed as a
-    linear combination of the basis set operators. The output of this function
-    is a column vector, which contains the coefficients.
+    This function returns a column vector representing the density matrix as a
+    linear combination of spin operators. Each element of the vector corresponds
+    to the coefficient of a specific spin operator in the expansion.
     
     Normalization:
-    The basis set operators are constructed from products of single-spin
-    spherical tensor operators and they are normalized. Therefore, requesting a
-    state that corresponds to any operator `O` will result in a coefficient of
-    `norm(O)` for the state.
+    The output of this function uses a normalised basis built from normalised
+    products of single-spin spherical tensor operators. However, the
+    coefficients are scaled so that the resulting linear combination represents
+    the non-normalised version of the requested operator.
 
     NOTE: This function is sometimes called often and is cached for high
     performance.
