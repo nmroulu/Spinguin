@@ -11,11 +11,10 @@ class Parameters:
 
     Attributes
     ----------
-    custom_dot : bool, default=False
-        Specifies whether to use custom matrix product implementation in the
-        time propagators. This implementation is parallelized and more memory-
-        friendly than the default SciPy implementation, but suffers from worse 
-        single-core performance.
+    magnetic_field : float
+        Magnetic field of the spectrometer (in Tesla).
+    temperature : float
+        Temperature of the sample (in Kelvin).
     propagator_density : float, default=0.5
         Threshold that specifies when to use dense or sparse arrays for the
         propagators.
@@ -60,9 +59,6 @@ class Parameters:
     _magnetic_field: float = None
     _temperature: float = None
 
-    # Matrix product settings
-    _custom_dot: bool=False
-
     # Sparsity settings
     _propagator_density: float=0.5
     _sparse_hamiltonian: bool=True
@@ -105,21 +101,6 @@ class Parameters:
         """
         self._temperature = temperature
         print(f"Temperature set to: {self.temperature} K\n")
-
-    @property
-    def custom_dot(self) -> bool:
-        return self._custom_dot
-    
-    @custom_dot.setter
-    def custom_dot(self, custom_dot: bool):
-        """
-        Specifies whether to use custom matrix product implementation in the
-        time propagators. This implementation is parallelized and more memory-
-        friendly than the default SciPy implementation, but suffers from worse 
-        single-core performance.
-        """
-        self._custom_dot = custom_dot
-        print(f"Custom dot product setting set to: {self.custom_dot}\n")
 
     @property
     def sparse_operator(self) -> bool:
