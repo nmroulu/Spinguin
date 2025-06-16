@@ -716,7 +716,10 @@ def measure(spin_system: SpinSystem,
 
     return ex
 
-def spectral_width_to_dwell_time(spectral_width: float) -> float:
+def spectral_width_to_dwell_time(
+        spectral_width: float,
+        isotope: str
+) -> float:
     """
     Calculates the dwell time (in seconds) from the spectral width given in ppm.
 
@@ -724,27 +727,26 @@ def spectral_width_to_dwell_time(spectral_width: float) -> float:
     ----------
     spectral_width : float
         Spectral width in ppm.
+    isotope: str
+        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
+        required for the conversion.
 
     Returns
     -------
     dwell_time : float
         Dwell time in seconds.
-
-    Notes
-    -----
-    Required global parameters:
-    - parameters.isotope
     """
     # Obtain the dwell time
     dwell_time = _spectral_width_to_dwell_time(
         spectral_width = spectral_width,
-        isotope = parameters.isotope[-1],
+        isotope = isotope,
         B = parameters.magnetic_field
     )
 
     return dwell_time
 
 def spectrum(signal: np.ndarray,
+             dwell_time: float,
              normalize: bool = True,
              part: Literal["real", "imag"] = "real"
              ) -> tuple[np.ndarray, np.ndarray]:
@@ -757,7 +759,7 @@ def spectrum(signal: np.ndarray,
     ----------
     signal : ndarray
         Input signal in the time domain.
-    dt : float
+    dwell_time : float
         Time step between consecutive samples in the signal.
     normalize : bool, default=True
         Whether to normalize the Fourier transform.
@@ -781,27 +783,31 @@ def spectrum(signal: np.ndarray,
     # Compute the Fourier transform
     freqs, spectrum = _spectrum(
         signal = signal,
-        dt = parameters.dwell_time[-1],
+        dt = dwell_time,
         normalize = normalize,
         part = part
     )
 
     return freqs, spectrum
 
-def spectrometer_frequency(
-        unit: Literal["Hz", "rad/s"] = "Hz",
-        center: bool=False
+def resonance_frequency(
+        isotope: str,
+        offset: float = 0,
+        unit: Literal["Hz", "rad/s"] = "Hz"
 ) -> float:
     """
-    Computes the spectrometer frequency.
+    Computes the resonance frequency of the given `isotope` at the specified
+    magnetic field.
 
     Parameters
     ----------
+    isotope : str
+        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
+        required for the conversion.
+    offset : float, default=0
+        Offset in ppm.
     unit : {'Hz', 'rad/s'}
         Specifies in which units the frequency is returned.
-    center : bool, default=False
-        Specifies whether to return the base spectrometer frequency (False) or
-        the user-specified center frequency (True).
     
     Returns
     -------
@@ -811,70 +817,58 @@ def spectrometer_frequency(
     Notes
     -----
     Required global parameters:
-    - parameters.isotope
     - parameters.magnetic_field
-    
-    If `center = True`, the following is required:
-    - parameters.center_frequency
     """
-    # Obtain the offset
-    if center:
-        delta = parameters.center_frequency[parameters.isotope[-1]]
-    else:
-        delta = 0
-
     # Get the resonance frequency
     omega = _resonance_frequency(
-        isotope = parameters.isotope[-1],
+        isotope = isotope,
         B = parameters.magnetic_field,
-        delta = delta,
+        delta = offset,
         unit = unit
     )
 
     return omega
 
 def frequency_to_chemical_shift(
-        frequency: float | np.ndarray) -> float | np.ndarray:
+        frequency: float | np.ndarray, 
+        reference_frequency: float,
+        spectrometer_frequency: float
+) -> float | np.ndarray:
     """
     Converts a frequency (or an array of frequencies, e.g., a frequency axis) to
-    a chemical shift value.
+    a chemical shift value based on the reference frequency and the spectrometer
+    frequency.
 
     Parameters
     ----------
     frequency : float or ndarray
         Frequency (or array of frequencies) to convert [in Hz].
+    reference_frequency : float
+        Reference frequency for the conversion [in Hz].
+    spectrometer_frequency : float
+        Spectrometer frequency for the conversion [in Hz].
 
     Returns
     -------
     chemical_shift : float or ndarray
         Converted chemical shift value (or array of values).
-
-    Notes
-    -----
-    Required global parameters:
-    - parameters.isotope
-    - parameters.magnetic_field
-    - parameters.center_frequency
     """
-    # Obtain the rotating frame frequency
-    freq_rotframe = spectrometer_frequency("Hz", True)
-
-    # Add back the rotating frame frequency
-    frequency = frequency + freq_rotframe
-
-    # Obtain the base spectrometer frequency (reference frequency)
-    freq_spectrometer = spectrometer_frequency("Hz", False)
-
-    # Obtain the chemical shift
+    # Perform the conversion
     chemical_shift = _frequency_to_chemical_shift(
         frequency = frequency,
-        reference_frequency = freq_spectrometer,
-        spectrometer_frequency = freq_spectrometer
+        reference_frequency = reference_frequency,
+        spectrometer_frequency = spectrometer_frequency
     )
+
     return chemical_shift
 
 def pulse_and_acquire(
-        spin_system: SpinSystem
+        spin_system: SpinSystem,
+        isotope: str,
+        center_frequency: float,
+        npoints: int,
+        dwell_time: float,
+        angle: float       
 ) -> np.ndarray:
     """
     Simple pulse-and-acquire experiment.
@@ -898,24 +892,22 @@ def pulse_and_acquire(
     rho = equilibrium_state(spin_system)
 
     # Find indices of the isotopes to be measured
-    indices = np.where(spin_system.isotopes == parameters.isotope[0])[0]
+    indices = np.where(spin_system.isotopes == isotope)[0]
 
     # Apply 180-degree pulse
     op_pulse = "+".join(f"I(y,{i})" for i in indices)
-    Px = pulse(spin_system, op_pulse, parameters.angle[0])
+    Px = pulse(spin_system, op_pulse, angle)
     rho = Px @ rho
 
     # Construct the time propagator
-    dt = parameters.dwell_time[0]
-    P = propagator(L, dt)
+    P = propagator(L=L, t=dwell_time)
     P = propagator_to_rotframe(
         spin_system = spin_system,
         P = P,
-        t = parameters.dwell_time[0],
-        center_frequencies = parameters.center_frequency)
+        t = dwell_time,
+        center_frequencies = {isotope: center_frequency})
 
     # Initialize an array for storing results
-    npoints = parameters.npoints[0]
     fid = np.zeros(npoints, dtype=complex)
 
     # Perform the time evolution
