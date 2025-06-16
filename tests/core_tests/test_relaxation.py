@@ -174,7 +174,7 @@ class TestRelaxation(unittest.TestCase):
         rho = state_to_truncated_basis(ZQ_map, rho)
 
         # Get the propagator
-        P = sop_propagator(L, time_step, custom_dot=False, zero_value=1e-18,
+        P = sop_propagator(L, time_step, zero_value=1e-18,
                            density_threshold=0.5)
         
         # Simulate the evolution of the spin system
