@@ -77,26 +77,19 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         self.assertTrue(np.allclose(la.expm(A, 1e-32).toarray(),
                                     expm(A).toarray()))
 
-    def test_expm_custom_dot(self):
-
-        # Create a 3x3 array with large numbers
-        A = csc_array([[1, 2, 3],
-                       [4, 5, 6],
-                       [7, 8, 9]])
-
-        # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(la.expm_custom_dot(A, 1e-32).toarray(),
-                                    expm(A).toarray()))
-
-    def test_increase_sparsity(self):
+    def test_eliminate_small(self):
 
         # Create a test array
-        A = csc_array([[1, 2, 3],
-                       [4, 5, 6],
-                       [7, 8, 9]])
+        A_sp = csc_array([
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        ])
+        A_np = A_sp.toarray()
         
-        # Increase the sparsity of the array
-        la.increase_sparsity(A, zero_value=5)
+        # Eliminate small values from the arrays
+        la.eliminate_small(A_sp, zero_value=5)
+        la.eliminate_small(A_np, zero_value=5)
 
         # Create a comparison array
         B = np.array([[0, 0, 0],
@@ -104,8 +97,9 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                       [7, 8, 9]])
 
         # Compare and check the number of non-zeros
-        self.assertTrue(np.array_equal(A.toarray(), B))
-        self.assertEqual(A.nnz, 5)
+        self.assertTrue(np.array_equal(A_sp.toarray(), B))
+        self.assertTrue(np.array_equal(A_np, B))
+        self.assertEqual(A_sp.nnz, 5)
 
     def test_sparse_bytes(self):
 
@@ -344,7 +338,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         self.assertAlmostEqual(la.CG_coeff(1, 0, 1/2, 1/2, 1/2, 1/2),
                                -math.sqrt(1/3))
 
-    def test_sparse_dot(self):
+    def test_custom_dot(self):
 
         # Create two random arrays
         A = random_array((200, 300), density=0.2, format='csc', dtype=complex)
@@ -352,24 +346,24 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
         # Compare against SciPy
         C_SciPy = A @ B
-        C_custom = la.sparse_dot(A, B, zero_value=1e-18)
+        C_custom = la.custom_dot(A, B, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test empty @ non-empty
         A_empty = csc_array((200, 300))
         C_SciPy = A_empty @ B
-        C_custom = la.sparse_dot(A_empty, B, zero_value=1e-18)
+        C_custom = la.custom_dot(A_empty, B, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test non-empty @ empty
         B_empty = csc_array((300, 400))
         C_SciPy = A @ B_empty
-        C_custom = la.sparse_dot(A, B_empty, zero_value=1e-18)
+        C_custom = la.custom_dot(A, B_empty, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test empty @ empty
         C_SciPy = A_empty @ B_empty
-        C_custom = la.sparse_dot(A_empty, B_empty, zero_value=1e-18)
+        C_custom = la.custom_dot(A_empty, B_empty, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test with non-empty arrays where result will be empty
@@ -377,8 +371,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
             [0, 1],
             [0, 0]])
         C_SciPy = A @ A
-        C_custom = la.sparse_dot(A, A, zero_value=1e-18)
+        C_custom = la.custom_dot(A, A, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
+
+        # Test repeatedly using same array
+        A = random_array((200, 200), density=0.2, format="csc", dtype=complex)
+        for _ in range(10):
+            A = la.custom_dot(A, A, zero_value=1e-32)
 
 def spherical_tensor(l, q):
     """
