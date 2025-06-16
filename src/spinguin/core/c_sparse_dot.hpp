@@ -45,9 +45,6 @@ void c_sparse_dot_indptr(
         #pragma omp for
         for (I i = 0; i < B_ncols; i++){
 
-            // Counter for the non-zero values in the current column
-            I C_col_nnz = 0;
-
             // Current head of the column
             I C_col_head = -2;
 
@@ -80,20 +77,22 @@ void c_sparse_dot_indptr(
                     if (C_col_nonzero[ind_k] == -1){
                         C_col_nonzero[ind_k] = C_col_head;
                         C_col_head = ind_k;
-                        C_col_nnz = C_col_nnz + 1;
                     }
                 }
             }
 
+            // Counter for the number of non-zeros
+            I nnz = 0;
+
             // Once a complete column is calculated, iterate through the possible non-zero values
-            for (I k = 0; k < C_col_nnz; k++){
+            while (C_col_head != -2) {
 
                 // Get the value
                 T val_k = C_col_data[C_col_head];
 
-                // Decrement the counter if the value is smaller than the threshold
-                if (my_abs(val_k) < zero_value){
-                    C_col_nnz--;
+                // Increment the counter if the value is larger than the threshold
+                if (my_abs(val_k) > zero_value){
+                    nnz++;
                 }
 
                 // Get the next index
@@ -106,7 +105,7 @@ void c_sparse_dot_indptr(
             }
 
             // Append the number of non-zeros to the index pointer array
-            C_indptr[i+1] = C_col_nnz;
+            C_indptr[i+1] = nnz;
         }
     }    
 }
