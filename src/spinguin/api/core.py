@@ -10,7 +10,6 @@ import numpy as np
 import scipy.sparse as sp
 from typing import Literal
 
-from spinguin.api.config import config
 from spinguin.api.parameters import parameters
 from spinguin.api.spin_system import SpinSystem
 
@@ -137,7 +136,7 @@ def operator(spin_system: SpinSystem,
     op = _op_from_string(
         spins = spin_system.spins,
         operator = operator,
-        sparse = config.sparse_operator
+        sparse = parameters.sparse_operator
     )
     
     return op
@@ -207,7 +206,7 @@ def superoperator(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         side = side,
-        sparse = config.sparse_superoperator
+        sparse = parameters.sparse_superoperator
     )
         
     return sop
@@ -265,8 +264,8 @@ def hamiltonian(
         J_couplings = spin_system.J_couplings,
         interactions = interactions,
         side = side,
-        sparse = config.sparse_hamiltonian,
-        zero_value = config.zero_hamiltonian
+        sparse = parameters.sparse_hamiltonian,
+        zero_value = parameters.zero_hamiltonian
     )
 
     return H
@@ -327,7 +326,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             basis = spin_system.basis.basis,
             R1 = spin_system.relaxation.R1,
             R2 = spin_system.relaxation.R2,
-            sparse = config.sparse_relaxation)
+            sparse = parameters.sparse_relaxation)
 
     # Make relaxation superoperator using Redfield theory
     elif spin_system.relaxation.theory == "redfield":
@@ -354,10 +353,10 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             include_dynamic_frequency_shift = \
                 spin_system.relaxation.dynamic_frequency_shift,
             relative_error = spin_system.relaxation.relative_error,
-            interaction_zero = config.zero_interaction,
-            aux_zero = config.zero_aux,
-            relaxation_zero = config.zero_relaxation,
-            sparse = config.sparse_relaxation
+            interaction_zero = parameters.zero_interaction,
+            aux_zero = parameters.zero_aux,
+            relaxation_zero = parameters.zero_relaxation,
+            sparse = parameters.sparse_relaxation
         )
     
     # Apply scalar relaxation of the second kind if requested
@@ -370,7 +369,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             J_couplings = spin_system.J_couplings,
             sop_R = R,
             B = parameters.magnetic_field,
-            sparse = config.sparse_relaxation
+            sparse = parameters.sparse_relaxation
         )
         
     # Apply thermalization if requested
@@ -389,7 +388,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             R = R,
             H_left = H_left,
             T = parameters.temperature,
-            zero_value = config.zero_thermalization)
+            zero_value = parameters.zero_thermalization)
 
     return R
 
@@ -433,8 +432,8 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
         spins = spin_system.spins,
         H_left = H_left,
         T = parameters.temperature,
-        sparse = config.sparse_state,
-        zero_value = config.zero_equilibrium
+        sparse = parameters.sparse_state,
+        zero_value = parameters.zero_equilibrium
     )
 
     return rho
@@ -471,7 +470,7 @@ def singlet_state(spin_system: SpinSystem,
         spins = spin_system.spins,
         index_1 = index_1,
         index_2 = index_2,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
@@ -536,8 +535,8 @@ def pulse(spin_system: SpinSystem,
         spins = spin_system.spins,
         operator = operator,
         angle = angle,
-        sparse = config.sparse_pulse,
-        zero_value = config.zero_pulse
+        sparse = parameters.sparse_pulse,
+        zero_value = parameters.zero_pulse
     )
 
     return P
@@ -591,9 +590,9 @@ def propagator(L: np.ndarray | sp.csc_array,
     P = _sop_propagator(
         L = L,
         t = t,
-        custom_dot = config.custom_dot,
-        zero_value = config.zero_propagator,
-        density_threshold = config.propagator_density
+        custom_dot = parameters.custom_dot,
+        zero_value = parameters.zero_propagator,
+        density_threshold = parameters.propagator_density
     )
     
     return P
@@ -638,8 +637,8 @@ def propagator_to_rotframe(spin_system: SpinSystem,
         chemical_shifts = center,
         interactions = ["zeeman", "chemical_shift"],
         side = "comm",
-        sparse = config.sparse_hamiltonian,
-        zero_value = config.zero_hamiltonian
+        sparse = parameters.sparse_hamiltonian,
+        zero_value = parameters.zero_hamiltonian
     )
 
     # Convert the propagator to rotating frame
@@ -647,8 +646,8 @@ def propagator_to_rotframe(spin_system: SpinSystem,
         sop_P = P,
         sop_H0 = H_frame,
         t = t,
-        zero_value = config.zero_propagator,
-        custom_dot = config.custom_dot
+        zero_value = parameters.zero_propagator,
+        custom_dot = parameters.custom_dot
     )
     
     return P
@@ -928,7 +927,8 @@ def pulse_and_acquire(
     return fid
 
 def inversion_recovery(
-        spin_system: SpinSystem) -> tuple[np.ndarray, np.ndarray]:
+        spin_system: SpinSystem
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Performs the inversion-recovery experiment. The experiment differs slightly
     from the actual inversion-recovery experiments performed on spectrometers.
@@ -943,7 +943,7 @@ def inversion_recovery(
     This experiment requires the following parameters to be defined:
     - magnetic_field : magnetic field of the spectrometer in Tesla
     - temperature : temperature of the sample in Kelvin
-    - isotope : nucleus to-be-measured
+    - isotope : nucleus to-be-inverted & measured
     - dwell_time : time step in the simulation in seconds
     - npoints : number of time steps
 
@@ -1214,7 +1214,7 @@ def unit_state(spin_system: SpinSystem,
     rho = _unit_state(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
-        sparse = config.sparse_state,
+        sparse = parameters.sparse_state,
         normalized = normalized
     )
 
@@ -1284,7 +1284,7 @@ def state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         operator = operator,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
@@ -1320,7 +1320,7 @@ def state_to_zeeman(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         rho = rho,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
     
     return rho_zeeman
@@ -1353,7 +1353,7 @@ def alpha_state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index = index,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
@@ -1386,7 +1386,7 @@ def beta_state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index = index,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
@@ -1423,7 +1423,7 @@ def triplet_zero_state(spin_system: SpinSystem,
         spins = spin_system.spins,
         index_1 = index_1,
         index_2 = index_2,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
@@ -1460,7 +1460,7 @@ def triplet_plus_state(spin_system: SpinSystem,
         spins = spin_system.spins,
         index_1 = index_1,
         index_2 = index_2,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
@@ -1497,7 +1497,7 @@ def triplet_minus_state(spin_system: SpinSystem,
         spins = spin_system.spins,
         index_1 = index_1,
         index_2 = index_2,
-        sparse = config.sparse_state
+        sparse = parameters.sparse_state
     )
 
     return rho
