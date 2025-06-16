@@ -9,19 +9,18 @@ import time
 import numpy as np
 import scipy.sparse as sp
 import warnings
-from spinguin.core.la import expm, expm_custom_dot
+from spinguin.core.la import expm
 from spinguin.core.superoperators import sop_from_string
 from spinguin.core.hide_prints import HidePrints
 
 def sop_propagator(L: sp.csc_array,
                    t: float,
-                   custom_dot: bool=False,
                    zero_value: float=1e-18,
                    density_threshold: float=0.5) -> sp.csc_array | np.ndarray:
     """
     Constructs the time propagator exp(L*t).
 
-    TODO: Handle dense array when custom_dot is requested?
+    TODO: Handle dense arrays (custom dot works only with sparses)
 
     Parameters
     ----------
@@ -29,13 +28,6 @@ def sop_propagator(L: sp.csc_array,
         Liouvillian superoperator, L = -iH - R + K.
     t : float
         Time step of the simulation in seconds.
-    custom_dot : bool, default=False
-        If False, dot products in the matrix exponentials are computed using the
-        default SciPy implementation. If True, the custom Cython implementation
-        is used, which removes small values during computation. The custom
-        implementation is more memory-friendly, but slower when using a single
-        CPU core. The custom implementation is parallelized using OpenMP and
-        becomes faster than SciPy at ~ 4 cores.
     zero_value : float, default=1e-18
         Calculating the propagator involves a matrix exponential, which is
         calculated using the scaling and squaring method together with Taylor
@@ -55,10 +47,7 @@ def sop_propagator(L: sp.csc_array,
     time_start = time.time()
 
     # Compute the matrix exponential
-    if custom_dot:
-        expm_Lt = expm_custom_dot(L * t, zero_value)
-    else:
-        expm_Lt = expm(L * t, zero_value)
+    expm_Lt = expm(L * t, zero_value)
 
     # Calculate the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
@@ -74,15 +63,16 @@ def sop_propagator(L: sp.csc_array,
 
     return expm_Lt
 
-def propagator_to_rotframe(sop_P: np.ndarray | sp.csc_array,
-                           sop_H0: np.ndarray | sp.csc_array,
-                           t: float,
-                           zero_value: float=1e-18,
-                           custom_dot: bool=False) -> np.ndarray | sp.csc_array:
+def propagator_to_rotframe(
+        sop_P: np.ndarray | sp.csc_array,
+        sop_H0: np.ndarray | sp.csc_array,
+        t: float,
+        zero_value: float=1e-18
+) -> np.ndarray | sp.csc_array:
     """
     Transforms the time propagator to the rotating frame.
 
-    TODO: Handle dense array when custom_dot is requested?
+    TODO: Handle dense arrays (custom dot works only with sparses)
 
     Parameters
     ----------
@@ -99,13 +89,6 @@ def propagator_to_rotframe(sop_P: np.ndarray | sp.csc_array,
         together with Taylor series. This threshold is used to estimate the
         convergence of the Taylor series and to eliminate small values during
         the squaring step.
-    custom_dot : bool, default=False
-        If False, dot products in the matrix exponentials are computed using the
-        default SciPy implementation. If True, the custom Cython implementation
-        is used, which removes small values during computation. The custom
-        implementation is more memory-friendly, but slower when using a single
-        CPU core. The custom implementation is parallelized using OpenMP and
-        becomes faster than SciPy at ~ 4 cores.
 
     Returns
     -------
@@ -118,10 +101,7 @@ def propagator_to_rotframe(sop_P: np.ndarray | sp.csc_array,
 
     # Acquire matrix exponential from the Hamiltonian
     with HidePrints():
-        if custom_dot:
-            expm_H0t = expm_custom_dot(1j * sop_H0 * t, zero_value)
-        else:
-            expm_H0t = expm(1j * sop_H0 * t, zero_value)
+        expm_H0t = expm(1j * sop_H0 * t, zero_value)
 
     # Convert the time propagator to rotating frame
     sop_P = expm_H0t @ sop_P
