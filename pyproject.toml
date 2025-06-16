@@ -15,7 +15,7 @@ license = {file = "LICENSE"}
 dev = ["cython >= 3.0.11", "build", "setuptools"]
 
 [build-system]
-requires = ["setuptools", "wheel", "Cython"]
+requires = ["setuptools", "wheel", "Cython", "numpy"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

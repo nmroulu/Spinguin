@@ -355,6 +355,31 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         C_custom = la.sparse_dot(A, B, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
+        # Test empty @ non-empty
+        A_empty = csc_array((200, 300))
+        C_SciPy = A_empty @ B
+        C_custom = la.sparse_dot(A_empty, B, zero_value=1e-18)
+        self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
+
+        # Test non-empty @ empty
+        B_empty = csc_array((300, 400))
+        C_SciPy = A @ B_empty
+        C_custom = la.sparse_dot(A, B_empty, zero_value=1e-18)
+        self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
+
+        # Test empty @ empty
+        C_SciPy = A_empty @ B_empty
+        C_custom = la.sparse_dot(A_empty, B_empty, zero_value=1e-18)
+        self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
+
+        # Test with non-empty arrays where result will be empty
+        A = csc_array([
+            [0, 1],
+            [0, 0]])
+        C_SciPy = A @ A
+        C_custom = la.sparse_dot(A, A, zero_value=1e-18)
+        self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
+
 def spherical_tensor(l, q):
     """
     Helper function for tests.

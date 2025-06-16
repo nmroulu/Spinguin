@@ -6,6 +6,7 @@ Cython functions.
 from setuptools import Extension, setup
 from Cython.Build import cythonize
 import sys
+import numpy as np
 
 # Platform-specific compiler and linker settings
 if sys.platform == "win32":
@@ -19,6 +20,7 @@ ext_modules = [
     Extension(
         "spinguin.core.sparse_dot",
         ["src/spinguin/core/sparse_dot.pyx"],
+        [np.get_include()],
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
         language='c++'

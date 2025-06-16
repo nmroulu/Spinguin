@@ -13,7 +13,7 @@ from scipy.io import mmwrite, mmread
 from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
-from spinguin.core.sparse_dot import sparse_dot as spdotcy
+from spinguin.core.sparse_dot import sparse_dot as _sparse_dot
 from spinguin.core.intersect_indices import intersect_indices
 from spinguin.core.hide_prints import HidePrints
 from spinguin.core.nmr_isotopes import ISOTOPES
@@ -711,9 +711,9 @@ def CG_coeff(j1: float, m1: float, j2: float, m2: float, j3: float, m3: float) -
 def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
     """
     Custom sparse matrix multiplication, which saves memory usage by dropping
-    values smaller than `zero_value` during the calculation. Matrices `A` and `B`
-    must be SciPy CSC arrays. This function is implemented with Cython and is
-    parallelized with OpenMP.
+    values smaller than `zero_value` during the calculation. Matrices `A` and
+    `B` must be SciPy CSC arrays. This function is implemented with C++ / Cython
+    and is parallelized with OpenMP.
 
     Parameters
     ----------
@@ -722,7 +722,8 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
     B : csc_array
         Second matrix in the multiplication.
     zero_value : float
-        Threshold under which the resulting matrix elements are considered as zero.
+        Threshold under which the resulting matrix elements are considered as
+        zero.
 
     Returns
     -------
@@ -730,24 +731,8 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
         Result of matrix multiplication.
     """
 
-    # Ensure that the data types are correct
-    A.data = A.data.astype(np.complex128)
-    A.indices = A.indices.astype(np.longlong)
-    A.indptr = A.indptr.astype(np.longlong)
-    B.data = B.data.astype(np.complex128)
-    B.indices = B.indices.astype(np.longlong)
-    B.indptr = B.indptr.astype(np.longlong)
-    A_nrows = np.longlong(A.shape[0])
-    B_ncols = np.longlong(B.shape[1])
-    zero_value = np.float64(zero_value)
-
     # Perform the matrix multiplication using the compiled function
-    C_data, C_indices, C_indptr = spdotcy(A.data, A.indices, A.indptr, A_nrows,
-                                          B.data, B.indices, B.indptr, B_ncols,
-                                          zero_value)
-
-    # Construct the SciPy sparse array
-    C = csc_array((C_data, C_indices, C_indptr), shape=(A_nrows, B_ncols))
+    C = _sparse_dot(A, B, zero_value)
 
     return C
 

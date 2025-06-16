@@ -28,3 +28,6 @@
 
 # Allow .gitignore file
 !*.gitignore
+
+# Allow .hpp files
+!*.hpp

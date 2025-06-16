@@ -1,269 +1,161 @@
-# Imports
 import numpy as np
-cimport cython
-from openmp cimport omp_get_max_threads, omp_get_thread_num
-from cython.parallel import prange
+cimport numpy as np
+from scipy.sparse import csc_array
 
-# Import the absolute value function
-cdef extern from "<complex>" nogil:
-    double abs(double complex)
+# Define the C++ functions
+cdef extern from "c_sparse_dot.hpp" nogil:
+    cdef void c_sparse_dot_indptr[I, T](
+        T* A_data, I* A_indices, I* A_indptr, I A_nrows,
+        T* B_data, I* B_indices, I* B_indptr, I B_ncols,
+        I* C_indptr, np.float64_t zero_value
+    )
+    cdef void c_sparse_dot[I, T](
+        T* A_data, I* A_indices, I* A_indptr, I A_nrows,
+        T* B_data, I* B_indices, I* B_indptr, I B_ncols,
+        T* C_data, I* C_indices, I* C_indptr,
+        np.float64_t zero_value
+    )
 
-@cython.nonecheck(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.initializedcheck(False)
-cpdef sparse_dot(const double complex[::1] A_data,
-                 const long long[::1] A_indices,
-                 const long long[::1] A_indptr,
-                 const long long A_nrows,
-                 const double complex[::1] B_data,
-                 const long long[::1] B_indices,
-                 const long long[::1] B_indptr,
-                 const long long B_ncols,
-                 const double zero_value):
+# Possible types for index and pointer arrays
+ctypedef fused IType:
+    np.int32_t
+    np.int64_t
+
+# Possible types for data arrays
+ctypedef fused TType:
+    np.int32_t
+    np.int64_t
+    np.float64_t
+    np.complex128_t
+
+def cy_sparse_dot_indptr(
+    TType[::1] A_data, IType[::1] A_indices, IType[::1] A_indptr, IType A_nrows,
+    TType[::1] B_data, IType[::1] B_indices, IType[::1] B_indptr, IType B_ncols,
+    IType[::1] C_indptr, np.float64_t zero_value
+) -> None:
     """
-    Memory-efficient sparse matrix multiplication C = A*B algorithm compatible
-    with SciPy CSC arrays.
+    Cython wrapper for the C++ function that calculates the index pointer
+    array for the resulting matrix in a matrix multiplication. Modification
+    of the index pointer array happens inplace.
+    """
+    # Release the GIL and find the index pointer array
+    with nogil:
+        c_sparse_dot_indptr(
+            &A_data[0], &A_indices[0], &A_indptr[0], A_nrows,
+            &B_data[0], &B_indices[0], &B_indptr[0], B_ncols,
+            &C_indptr[0], zero_value)
+
+def cy_sparse_dot(
+    TType[::1] A_data, IType[::1] A_indices, IType[::1] A_indptr, IType A_nrows,
+    TType[::1] B_data, IType[::1] B_indices, IType[::1] B_indptr, IType B_ncols,
+    TType[::1] C_data, IType[::1] C_indices, IType[::1] C_indptr,
+    np.float64_t zero_value
+) -> None:
+    """
+    Cython wrapper for the C++ matrix multiplication function. Modification of
+    the result matrix happens inplace.
+    """
+    # Release the GIL and perform the matrix multiplication
+    with nogil:
+        c_sparse_dot(            
+            &A_data[0], &A_indices[0], &A_indptr[0], A_nrows,
+            &B_data[0], &B_indices[0], &B_indptr[0], B_ncols,
+            &C_data[0], &C_indices[0], &C_indptr[0], zero_value)
+
+def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
+    """
+    Custom matrix multiplication for SciPy CSC matrices.
 
     Parameters
     ----------
-    A_data : numpy.ndarray
-        The data array for matrix A obtained from SciPy by A.data. Data type
-        must be np.complex128.
-    A_indices : numpy.ndarray
-        The index array for matrix A obtained from SciPy by A.indices. Data type
-        must be np.longlong.
-    A_indptr : numpy.ndarray
-        The index pointer array for matrix A obtained from SciPy by A.indptr.
-        Data type must be np.longlong.
-    A_nrows : int
-        The number of rows in matrix A. Data type must be np.longlong.
-    B_data : numpy.ndarray
-        The data array for matrix B obtained from SciPy by B.data. Data type
-        must be np.complex128.
-    B_indices : numpy.ndarray
-        The index array for matrix B obtained from SciPy by B.indices. Data type
-        must be np.longlong.
-    B_indptr : numpy.ndarray
-        The index pointer array for matrix B obtained from SciPy by B.indptr.
-        Data type must be np.longlong.
-    B_ncols : int
-        The number of columns in matrix B. Data type must be np.longlong.
+    A : csc_array
+        Matrix A.
+    B : csc_array
+        Matrix B.
     zero_value : float
-        Matrix elements with absolute values less than zero_value will be
-        considered as zero in the returned matrix C. Data type must be
-        np.float64.
+        Threshold below which a number is considered zero in the result matrix.
 
     Returns
     -------
-    C_data : numpy.ndarray
-        The data array of the resulting matrix.
-    C_indices : numpy.ndarray
-        The index array of the resulting matrix.
-    C_indptr : numpy.ndarray
-        The index pointer array of the resulting matrix.
+    C : csc_array
+        Result of the matrix multiplication C = A @ B.
     """
-    # Obtain the number of threads to use
-    cdef long long num_threads
-    cdef long long thread_id
-    num_threads = omp_get_max_threads()
+    # Accept only CSC arrays
+    if not (isinstance(A, csc_array) and isinstance(B, csc_array)):
+        raise ValueError("The input arrays must be of type CSC.")
 
-    # Allocate memory for result index pointers
-    cdef long long[::1] C_indptr = np.zeros(B_ncols+1, dtype=np.longlong)
+    # Obtain the dimensions of the result matrix
+    A_nrows = A.shape[0]
+    B_ncols = B.shape[1]
+
+    # Shortcut for empty matrix
+    if A.nnz == 0 or B.nnz == 0:
+        C = csc_array((A_nrows, B_ncols))
+        return C
+
+    # Find out smallest common data types
+    dtype_AI = np.promote_types(A.indices.dtype, A.indptr.dtype)
+    dtype_BI = np.promote_types(B.indices.dtype, B.indptr.dtype)
+    dtype_I = np.promote_types(dtype_AI, dtype_BI)
+    dtype_T = np.promote_types(A.data.dtype, B.data.dtype)
+
+    # Perform type conversions
+    A_data = A.data.astype(dtype_T, copy=False)
+    A_indices = A.indices.astype(dtype_I, copy=False)
+    A_indptr = A.indptr.astype(dtype_I, copy=False)
+    B_data = B.data.astype(dtype_T, copy=False)
+    B_indices = B.indices.astype(dtype_I, copy=False)
+    B_indptr = B.indptr.astype(dtype_I, copy=False)
+
+    # Create the index pointer array for result matrix
+    C_indptr = np.zeros(B_ncols+1, dtype=dtype_I)
+
+    # Calculate the index pointer array for result matrix
+    cy_sparse_dot_indptr(
+        A_data, A_indices, A_indptr, A_nrows,
+        B_data, B_indices, B_indptr, B_ncols,
+        C_indptr, zero_value
+    )
+
+    # Obtain the true index pointer array by taking cumulative sum
+    C_indptr = np.cumsum(C_indptr)
     
-    # Allocate memory for storing the results of the current column
-    cdef double complex[::1] C_col_data = \
-        np.zeros((num_threads*A_nrows), dtype=np.complex128)
-    cdef long long[::1] C_col_nonzero = \
-        -np.ones((num_threads*A_nrows), dtype=np.longlong)
-
-    # Initialize loop variables and counters
-    cdef long long nnz
-    cdef long long C_col_nnz
-    cdef long long C_col_head
-    cdef long long C_col_head_temp
-    cdef long long nnz_th
-    cdef long long i
-    cdef long long j
-    cdef long long k
-    cdef long long start_A
-    cdef long long start_B
-    cdef long long end_A
-    cdef long long end_B
-    cdef long long ind_j
-    cdef long long ind_k
-    cdef long long ind_k_thread
-    cdef long long thread_start
-    cdef double complex val_j
-    cdef double complex val_k
-        
-    # FIRST LOOP
-    # FIND THE NUMBER OF NON-ZERO ELEMENTS AND CONSTRUCT THE INDEX POINTER ARRAY
-
-    # Iterate through the columns of matrix B
-    for i in prange(B_ncols, nogil=True, schedule='static'):
-
-        # Get the thread ID
-        thread_id = omp_get_thread_num()
-
-        # Calculate the thread starting index
-        thread_start = thread_id * A_nrows
-
-        # Counter for the non-zero values in the current column (thread-local)
-        C_col_nnz = 0
-
-        # Current head of the column
-        C_col_head = -2
-
-        # Obtain the starting and ending indices of the current column of B
-        start_B = B_indptr[i]
-        end_B = B_indptr[i+1]
-
-        # Loop through the column of B
-        for j in range(start_B, end_B):
-
-            # Get the row index and the value
-            ind_j = B_indices[j]
-            val_j = B_data[j]
-
-            # Find the column from A that the current element is multiplying
-            start_A = A_indptr[ind_j]
-            end_A = A_indptr[ind_j+1]
-
-            # Loop through the column of A
-            for k in range(start_A, end_A):
-
-                # Get the row index and the value
-                ind_k = A_indices[k]
-                ind_k_thread = ind_k + thread_start
-                val_k = A_data[k]
-
-                # Multiply and add to the array
-                C_col_data[ind_k_thread] = \
-                    C_col_data[ind_k_thread] + val_j * val_k
-                
-                # Check if a non-zero value is found for the matrix element for 
-                # the first time
-                if C_col_nonzero[ind_k_thread] == -1:
-                    C_col_nonzero[ind_k_thread] = C_col_head
-                    C_col_head = ind_k_thread
-                    C_col_nnz = C_col_nnz + 1
-
-        # Counter for the number of non-zeros greater than the threshold
-        nnz_th = 0
-
-        # Once a complete column is calculated, iterate through the possible
-        # non-zero values
-        for k in range(C_col_nnz):
-
-            # Get the value
-            val_k = C_col_data[C_col_head]
-
-            # Increment the counter if the value is larger than the threshold
-            if abs(val_k) > zero_value:
-                nnz_th = nnz_th + 1
-
-            # Get the next index
-            C_col_head_temp = C_col_head
-            C_col_head = C_col_nonzero[C_col_head]
-
-            # Clear the arrays
-            C_col_data[C_col_head_temp] = 0
-            C_col_nonzero[C_col_head_temp] = -1
-
-        # Append the number of non-zeros in the column to the index pointer
-        # array
-        C_indptr[i+1] = nnz_th
-
-    # Calculate the cumulative sum (the true index pointers)
-    for i in range(B_ncols):
-        C_indptr[i+1] = C_indptr[i+1] + C_indptr[i]
-
-    # Get the total number of non-zeros
+    # Find the number of non-zeros
     nnz = C_indptr[B_ncols]
 
-    # SECOND LOOP - TO ASSIGN THE ELEMENTS
+    # Special case for empty matrix
+    if nnz == 0:
+        C = csc_array((A_nrows, B_ncols))
+        return C
 
-    # Allocate memory for result data and indices
-    cdef double complex [::1] C_data = np.zeros(nnz, dtype=np.complex128)
-    cdef long long [::1] C_indices = np.zeros(nnz, dtype=np.longlong)
-
-    # Iterate through the columns of matrix B
-    for i in prange(B_ncols, nogil=True, schedule='static'):
-
-        # Get the thread ID
-        thread_id = omp_get_thread_num()
-
-        # Calculate the thread starting index
-        thread_start = thread_id * A_nrows
-
-        # Counter for the non-zero values in the current column (thread-local)
-        C_col_nnz = 0
-
-        # Current head of the column
-        C_col_head = -2
-
-        # Obtain the starting and ending indices of the current column of B
-        start_B = B_indptr[i]
-        end_B = B_indptr[i+1]
-
-        # Loop through the column of B
-        for j in range(start_B, end_B):
-
-            # Get the row index and the value
-            ind_j = B_indices[j]
-            val_j = B_data[j]
-
-            # Find the column from A that the current element is multiplying
-            start_A = A_indptr[ind_j]
-            end_A = A_indptr[ind_j+1]
-
-            # Loop through the column of A
-            for k in range(start_A, end_A):
-
-                # Get the row index and the value
-                ind_k = A_indices[k]
-                ind_k_thread = ind_k + thread_start
-                val_k = A_data[k]
-
-                # Multiply and add to the array
-                C_col_data[ind_k_thread] = \
-                    C_col_data[ind_k_thread] + val_j * val_k
-                
-                # Check if a non-zero value is found for the matrix element for
-                # the first time
-                if C_col_nonzero[ind_k_thread] == -1:
-                    C_col_nonzero[ind_k_thread] = C_col_head
-                    C_col_head = ind_k_thread
-                    C_col_nnz = C_col_nnz + 1
-
-        # Counter for the number of non-zeros greater than the threshold
-        nnz_th = C_indptr[i]
+    # Maximum integer for 32 bits
+    max_32 = 2**31 - 1
         
-        # Once a complete column is calculated, iterate through the possible
-        # non-zero values
-        for k in range(C_col_nnz):
+    # In case of overflow, change to 64 bits
+    if nnz > max_32 and dtype_I == np.int32:
+        dtype_I = np.int64
+        A_indices = A_indices.astype(dtype_I)
+        A_indptr = A_indptr.astype(dtype_I)
+        B_indices = B_indices.astype(dtype_I)
+        B_indptr = B_indptr.astype(dtype_I)
+    
+    # Otherwise make sure that the data types match
+    else:
+        C_indptr = C_indptr.astype(dtype_I, copy=False)
 
-            # Get the value
-            val_k = C_col_data[C_col_head]
+    # Create the result array
+    C_data = np.zeros(nnz, dtype=dtype_T)
+    C_indices = np.zeros(nnz, dtype=dtype_I)
+    
+    # Perform the matrix multiplication (modifies C inplace)
+    cy_sparse_dot(
+        A_data, A_indices, A_indptr, A_nrows,
+        B_data, B_indices, B_indptr, B_ncols,
+        C_data, C_indices, C_indptr,
+        zero_value
+    )
 
-            # Add to the array if the value is larger than the threshold
-            if abs(val_k) > zero_value:
-                C_data[nnz_th] = val_k
-                C_indices[nnz_th] = C_col_head - thread_start
-                nnz_th = nnz_th + 1
+    # Construct the SciPy CSC array
+    C = csc_array((C_data, C_indices, C_indptr), shape=(A_nrows, B_ncols))
 
-            # Get the next index
-            C_col_head_temp = C_col_head
-            C_col_head = C_col_nonzero[C_col_head]
-
-            # Clear the arrays
-            C_col_data[C_col_head_temp] = 0
-            C_col_nonzero[C_col_head_temp] = -1
-
-    # Convert the memoryviews back to arrays
-    C_data = np.asarray(C_data)
-    C_indices = np.asarray(C_indices)
-    C_indptr = np.asarray(C_indptr)
-
-    return C_data, C_indices, C_indptr
+    return C
