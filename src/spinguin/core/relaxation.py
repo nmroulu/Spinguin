@@ -2,8 +2,6 @@
 relaxation.py
 
 This module provides functions for calculating relaxation superoperators.
-
-TODO: Random field malli relaksaatioon.
 """
 
 # Imports
@@ -625,6 +623,11 @@ def sop_R_redfield(basis: np.ndarray,
     print()
 
     return sop_R
+
+def sop_R_random_field():
+    """
+    TODO PERTTU?
+    """
 
 def sop_R_phenomenological(basis: np.ndarray,
                            R1: np.ndarray,
