@@ -926,31 +926,48 @@ def pulse_and_acquire(
     
     return fid
 
+def inversion_recovery_fid():
+    """
+    TODO
+    """
+
 def inversion_recovery(
-        spin_system: SpinSystem
+        spin_system: SpinSystem,
+        isotope: str,
+        npoints: int,
+        time_step: float
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Performs the inversion-recovery experiment. The experiment differs slightly
     from the actual inversion-recovery experiments performed on spectrometers.
     In this experiment, the inversion is performed only once, and the
-    magnetization is detected at each step during the recovery.
+    magnetization is detected at each step during the recovery (much faster).
+    
+    If the traditional inversion recovery is desired, use the function
+    `inversion_recovery_fid()`.
 
     This experiment requires the following spin system properties to be defined:
-    - basis : must be built
-    - relaxation.theory
-    - relaxation.thermalization : must be True
+    - spin_system.basis : must be built
+    - spin_system.relaxation.theory
+    - spin_system.relaxation.thermalization : must be True
 
     This experiment requires the following parameters to be defined:
-    - magnetic_field : magnetic field of the spectrometer in Tesla
-    - temperature : temperature of the sample in Kelvin
-    - isotope : nucleus to-be-inverted & measured
-    - dwell_time : time step in the simulation in seconds
-    - npoints : number of time steps
+    - parameters.magnetic_field : magnetic field of the spectrometer in Tesla
+    - parameters.temperature : temperature of the sample in Kelvin
 
     Parameters
     ----------
     spin_system : SpinSystem
         Spin system to which the inversion-recovery experiment is performed.
+    isotope : str
+        Specifies the isotope whose magnetization is inverted and detected. This
+        function applies hard pulses.
+    npoints : int
+        Number of points in the simulation. Defines the total simulation time
+        together with `time_step`.
+    time_step : float
+        Time step in the simulation (in seconds). Should be kept relatively
+        short (e.g. 1 ms).
 
     Returns
     -------
@@ -974,14 +991,6 @@ def inversion_recovery(
     if parameters.temperature is None:
         raise ValueError("Please set the temperature before using "
                          "inversion recovery.")
-    if parameters.isotope is None:
-        raise ValueError("Please define isotope when using inversion recovery.")
-    if parameters.dwell_time is None:
-        raise ValueError("Please define dwell time when using inversion "
-                         "recovery.")
-    if parameters.npoints is None:
-        raise ValueError("Please define number of points when using "
-                         "inversion recovery.")
     
     # Obtain the Liouvillian
     H = hamiltonian(spin_system)
@@ -992,7 +1001,7 @@ def inversion_recovery(
     rho = equilibrium_state(spin_system)
 
     # Find indices of the isotopes to be measured
-    indices = np.where(spin_system.isotopes == parameters.isotope[0])[0]
+    indices = np.where(spin_system.isotopes == isotope)[0]
     nspins = indices.shape[0]
 
     # Apply 180-degree pulse
@@ -1004,11 +1013,9 @@ def inversion_recovery(
     L, rho = spin_system.basis.truncate_by_coherence([0], L, rho)
 
     # Construct the time propagator
-    dt = parameters.dwell_time[0]
-    P = propagator(L, dt)
+    P = propagator(L, time_step)
 
     # Initialize an array for storing results
-    npoints = parameters.npoints[0]
     magnetizations = np.zeros((nspins, npoints), dtype=complex)
 
     # Perform the time evolution
@@ -1019,20 +1026,21 @@ def inversion_recovery(
 
     return magnetizations
 
-def time_axis():
+def time_axis(npoints: int, time_step: float):
     """
-    Generates the time axis for an FID signal.
+    Generates a 1D array with `npoints` elements using a constant `time_step`.
 
-    Notes
-    -----
-    Required global parameters:
-    - parameters.npoints
-    - parameters.dwell_time
+    Parameters
+    ----------
+    npoints : int
+        Number of points.
+    time_step : float
+        Time step (in seconds).
     """
     # Obtain the time array
     start = 0
-    stop = parameters.npoints[-1] * parameters.dwell_time[-1]
-    num = parameters.npoints[-1]
+    stop = npoints * time_step
+    num = npoints
     t_axis = np.linspace(start, stop, num, endpoint=False)
 
     return t_axis
