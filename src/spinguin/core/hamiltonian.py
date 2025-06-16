@@ -9,7 +9,7 @@ import numpy as np
 import time
 from typing import Literal
 from scipy.sparse import csc_array
-from spinguin.core.la import increase_sparsity
+from spinguin.core.la import eliminate_small
 from spinguin.core.superoperators import sop_prod
 
 def sop_H_Z(basis: np.ndarray,
@@ -298,7 +298,7 @@ def sop_H(
                              f"The possible options are: {INTERACTIONDEFAULT}.")
 
     # Remove small values to enhance sparsity
-    increase_sparsity(sop_H, zero_value)
+    eliminate_small(sop_H, zero_value)
 
     print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.')
     print()

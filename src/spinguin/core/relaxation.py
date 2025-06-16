@@ -12,7 +12,7 @@ import scipy.sparse as sp
 from scipy.special import eval_legendre
 from spinguin.core.superoperators import sop_T_coupled, sop_prod
 from spinguin.core.la import \
-    increase_sparsity, principal_axis_system, \
+    eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \
     auxiliary_matrix_expm, expm
 from spinguin.core.basis import idx_to_lq, lq_to_idx, parse_operator_string
@@ -616,7 +616,7 @@ def sop_R_redfield(basis: np.ndarray,
         sop_R = sop_R.real
     
     # Eliminate small values
-    increase_sparsity(sop_R, relaxation_zero)
+    eliminate_small(sop_R, relaxation_zero)
     
     print("Redfield relaxation superoperator constructed in "
           f"{time.time() - time_start:.4f} seconds.")

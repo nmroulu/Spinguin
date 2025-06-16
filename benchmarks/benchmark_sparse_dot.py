@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy.sparse import random_array
-from spinguin.core.la import sparse_dot
+from spinguin.core.la import custom_dot
 from time import perf_counter
 
 # Densities to test (fraction of non-zero elements in the matrix)
@@ -56,7 +56,7 @@ for density in densities:
         # Measure execution time for the custom sparse dot implementation
         time_start_custom = perf_counter()
         for _ in range(nrounds):
-            sparse_dot(A_CSC, A_CSC, zero_value=0)
+            custom_dot(A_CSC, A_CSC, zero_value=0)
         time_end_custom = perf_counter()
         result_custom[i] = (time_end_custom - time_start_custom)/nrounds
 
