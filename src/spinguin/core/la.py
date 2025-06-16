@@ -78,7 +78,7 @@ def norm_1(A: csc_array | np.ndarray, ord: str = 'row') -> float:
     # Calculate sums along rows or columns and get the maximum of them
     return abs(A).sum(axis).max()
 
-def expm_custom_dot(A: csc_array, zero_value: float) -> csc_array:
+def expm(A: csc_array, zero_value: float) -> csc_array:
     """
     Calculates the matrix exponential of a SciPy sparse CSC array using the
     scaling and squaring method with the Taylor series, shown to be the fastest
@@ -94,8 +94,9 @@ def expm_custom_dot(A: csc_array, zero_value: float) -> csc_array:
     A : csc_array
         Array to be exponentiated.
     zero_value : float
-        Values below this threshold are considered zero. Used to increase the sparsity
-        of the result and estimate the convergence of the Taylor series.
+        Values below this threshold are considered zero. Used to increase the
+        sparsity of the result and estimate the convergence of the Taylor
+        series.
 
     Returns
     -------
@@ -115,28 +116,28 @@ def expm_custom_dot(A: csc_array, zero_value: float) -> csc_array:
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2 ** scaling_count
 
-        print(f"Scaling the matrix down by {scaling_factor}.")
+        print(f"Scaling the matrix down {scaling_count} times.")
 
         # Scale the matrix down
         A = A / scaling_factor
 
-        # Calculate the matrix exponential of the scaled matrix using the Taylor series
-        expm_A = expm_taylor_custom_dot(A, zero_value)
+        # Calculate the expm of the scaled matrix using the Taylor series
+        expm_A = expm_taylor(A, zero_value)
 
         # Scale the matrix exponential back up by repeated squaring
         for i in range(scaling_count):
             print(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
-            expm_A = sparse_dot(expm_A, expm_A, zero_value)
+            expm_A = custom_dot(expm_A, expm_A, zero_value)
     
     # If the norm of the matrix is small, proceed without scaling
     else:
-        expm_A = expm_taylor_custom_dot(A, zero_value)
+        expm_A = expm_taylor(A, zero_value)
 
     print("Matrix exponential completed.")
 
     return expm_A
 
-def expm_taylor_custom_dot(A: csc_array, zero_value: float) -> csc_array:
+def expm_taylor(A: csc_array, zero_value: float) -> csc_array:
     """
     Computes the matrix exponential using the Taylor series. This function is 
     adapted from an older SciPy version.
@@ -149,8 +150,8 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float) -> csc_array:
     A : csc_array
         Matrix (N, N) to be exponentiated.
     zero_value : float
-        Values below this threshold are considered zero. Used to increase sparsity
-        and check the convergence of the series.
+        Values below this threshold are considered zero. Used to increase
+        sparsity and check the convergence of the series.
 
     Returns
     -------
@@ -161,7 +162,7 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float) -> csc_array:
     print("Calculating the matrix exponential using Taylor series.")
 
     # Increase sparsity of A
-    increase_sparsity(A, zero_value)
+    eliminate_small(A, zero_value)
     
     # Create a unit matrix for the first term
     eA = eye_array(A.shape[0], A.shape[0], dtype=complex, format='csc')
@@ -177,7 +178,7 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float) -> csc_array:
         print(f"Taylor series term: {k}")
 
         # Get the next term
-        trm = sparse_dot(trm, A / k, zero_value)
+        trm = custom_dot(trm, A / k, zero_value)
 
         # Add the term to the result
         eA += trm
@@ -186,162 +187,35 @@ def expm_taylor_custom_dot(A: csc_array, zero_value: float) -> csc_array:
         k += 1
 
         # Continue if the convergence criterion is not met
-        cont = (trm.nnz != 0)
-
-    print("Taylor series converged.")
-
-    return eA
-
-def expm(A: csc_array | np.ndarray, zero_value: float) -> csc_array | np.ndarray:
-    """
-    Calculates the matrix exponential of a SciPy sparse or NumPy array using 
-    the scaling and squaring method with the Taylor series. This method was 
-    shown to be the fastest in:
-
-    https://doi.org/10.1016/j.jmr.2010.12.004
-
-    Parameters
-    ----------
-    A : csc_array or numpy.ndarray
-        Array to be exponentiated.
-    zero_value : float
-        Values below this threshold are considered zero. Used to  increase sparsity of
-        the result and estimate the convergence of the Taylor series.
-
-    Returns
-    -------
-    expm_A : csc_array or numpy.ndarray
-        Matrix exponential of `A`.
-    """
-
-    print("Calculating the matrix exponential...")
-
-    # Calculate the norm of A
-    norm_A = norm_1(A, ord='col')
-
-    # If the norm of the matrix is too large, scale the matrix down
-    if norm_A > 1:
-
-        # Calculate the scaling factor for the matrix
-        scaling_count = int(math.ceil(math.log2(norm_A)))
-        scaling_factor = 2 ** scaling_count
-
-        print(f"Scaling the matrix down by {scaling_factor}.")
-
-        # Scale the matrix down
-        A = A / scaling_factor
-
-        # Calculate the matrix exponential of the scaled matrix using the Taylor series
-        expm_A = expm_taylor(A, zero_value)
-
-        # Scale the matrix exponential back up by repeated squaring
-        for i in range(scaling_count):
-
-            print(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
-
-            # Multiply the matrix exponential with itself
-            expm_A = expm_A @ expm_A
-            
-            # Increase sparsity of the result if using sparse matrices
-            if issparse(expm_A):
-                increase_sparsity(expm_A, zero_value)
-    
-    # If the norm of the matrix is small, proceed without scaling
-    else:
-
-        # Calculate the matrix exponential using the Taylor series
-        expm_A = expm_taylor(A, zero_value)
-
-        # Increase sparsity of the result if using sparse matrices
-        if issparse(expm_A):
-            increase_sparsity(expm_A, zero_value)
-
-    print("Matrix exponential completed.")
-
-    return expm_A
-
-def expm_taylor(A: csc_array | np.ndarray, zero_value: float) -> csc_array | np.ndarray:
-    """
-    Computes the matrix exponential using the Taylor series. This function is 
-    adapted from an older SciPy version.
-
-    Parameters
-    ----------
-    A : csc_array or numpy.ndarray
-        Matrix (N, N) to be exponentiated.
-    zero_value : float
-        Values below this threshold are considered zero. Used to 
-        increase sparsity and check the convergence of the series.
-
-    Returns
-    -------
-    eA : csc_array or numpy.ndarray
-        Matrix exponential of A.
-    """
-
-    print("Calculating the matrix exponential using Taylor series.")
-
-    # Increase sparsity of A if using sparse matrices
-    if issparse(A):
-        increase_sparsity(A, zero_value)
-    
-    # Create a unit matrix for the first term
-    eA = eye_array(A.shape[0], A.shape[0], dtype=complex, format='csc')
-
-    # Convert to NumPy if not using sparse matrices
-    if not issparse(A):
-        eA = eA.toarray()
-
-    # Make a copy for the terms
-    trm = eA.copy()
-
-    # Calculate new terms until their significance becomes negligible
-    k = 1
-    cont = True
-    while cont:
-
-        print(f"Taylor series term: {k}")
-
-        # Get the next term
-        trm = trm @ (A / k)
-
-        # Increase sparsity of the next term if using sparse matrices
-        if issparse(trm):
-            increase_sparsity(trm, zero_value)
-
-        # Add the term to the result
-        eA += trm
-
-        # Increment the counter
-        k += 1
-
-        # Continue if the convergence criterion is not met
-        if issparse(trm):
+        if issparse(A):
             cont = (trm.nnz != 0)
         else:
-            cont = np.any(np.abs(trm) > zero_value)
+            cont = (np.count_nonzero(trm) != 0)
 
     print("Taylor series converged.")
 
     return eA
 
-def increase_sparsity(A: csc_array, zero_value: float):
+def eliminate_small(A: np.ndarray | csc_array, zero_value: float):
     """
-    Increases the sparsity of the given input matrix by replacing small values
-    with zeros. Modification happens in-place.
+    Eliminates small values from the input matrix `A` by replacing values
+    smaller than `zero_value` with zeros. Modification happens inplace.
 
     Parameters
     ----------
-    A : csc_array
-        Sparse matrix to be modified.
+    A : ndarray or csc_array
+        Array to be modified.
     zero_value : float
         Values smaller than this threshold are set to zero.
     """
-
     # Identify values smaller than the threshold and set them to zero
-    nonzero_mask = np.abs(A.data) < zero_value
-    A.data[nonzero_mask] = 0
-    A.eliminate_zeros()
+    if issparse(A):
+        nonzero_mask = np.abs(A.data) < zero_value
+        A.data[nonzero_mask] = 0
+        A.eliminate_zeros()
+    else:
+        nonzero_mask = np.abs(A) < zero_value
+        A[nonzero_mask] = 0
 
 def sparse_to_bytes(A: csc_array) -> bytes:
     """
@@ -708,18 +582,25 @@ def CG_coeff(j1: float, m1: float, j2: float, m2: float, j3: float, m3: float) -
 
     return coeff
 
-def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
+def custom_dot(
+        A: np.ndarray | csc_array,
+        B: np.ndarray | csc_array,
+        zero_value: float
+) -> csc_array:
     """
-    Custom sparse matrix multiplication, which saves memory usage by dropping
-    values smaller than `zero_value` during the calculation. Matrices `A` and
-    `B` must be SciPy CSC arrays. This function is implemented with C++ / Cython
-    and is parallelized with OpenMP.
+    User-friendly wrapper for the custom sparse matrix multiplication, which
+    saves memory usage by dropping values smaller than `zero_value` during the
+    calculation. The sparse multiplication is implemented with C++ / Cython and
+    is parallelized with OpenMP.
+
+    NOTE: If either of the input arrays is NumPy array, this function falls
+    back to the regulat `@` multiplication.
 
     Parameters
     ----------
-    A : csc_array
+    A : ndarray or csc_array
         First matrix in the multiplication.
-    B : csc_array
+    B : ndarray or csc_array
         Second matrix in the multiplication.
     zero_value : float
         Threshold under which the resulting matrix elements are considered as
@@ -727,12 +608,19 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
 
     Returns
     -------
-    C : csc_array
+    C : ndarray or csc_array
         Result of matrix multiplication.
     """
-
-    # Perform the matrix multiplication using the compiled function
-    C = _sparse_dot(A, B, zero_value)
+    # Check input types
+    if isinstance(A, np.ndarray) or isinstance(B, np.ndarray):
+        C = A @ B
+        # TODO Eliminate small values?
+    elif issparse(A) and issparse(B):
+        A = A.tocsc()
+        B = B.tocsc()
+        C = _sparse_dot(A, B, zero_value)
+    else:
+        raise ValueError("Invalid input type for custom dot.")
 
     return C
 
