@@ -205,8 +205,9 @@ def _sop_prod(op_def_bytes: bytes,
             sop_k.append(k_op[ind_k])
 
     # Concatenate the arrays
-    sop_j = np.concatenate(sop_j, dtype=int)
-    sop_k = np.concatenate(sop_k, dtype=int)
+    # NOTE: Sufficient to use 32-bit integers
+    sop_j = np.concatenate(sop_j, dtype=np.int32)
+    sop_k = np.concatenate(sop_k, dtype=np.int32)
     sop_vals = np.concatenate(sop_vals, dtype=complex)
 
     # Construct the superoperator
