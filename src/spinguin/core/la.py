@@ -594,7 +594,7 @@ def custom_dot(
     is parallelized with OpenMP.
 
     NOTE: If either of the input arrays is NumPy array, this function falls
-    back to the regulat `@` multiplication.
+    back to the regular `@` multiplication.
 
     Parameters
     ----------
@@ -614,7 +614,7 @@ def custom_dot(
     # Check input types
     if isinstance(A, np.ndarray) or isinstance(B, np.ndarray):
         C = A @ B
-        # TODO Eliminate small values?
+        eliminate_small(C, zero_value)
     elif issparse(A) and issparse(B):
         A = A.tocsc()
         B = B.tocsc()
