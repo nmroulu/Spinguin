@@ -15,7 +15,7 @@ arrays becoming faster at ~10 spins.
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
-from spinguin.qm.operators import op_prod
+from spinguin.core.operators import op_prod
 
 # Testing parameters
 max_nspins = 14
