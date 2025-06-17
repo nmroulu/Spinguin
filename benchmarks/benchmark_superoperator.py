@@ -1,18 +1,19 @@
 """
 This script benchmarks the performance of creating Liouville space
-superoperators for varying spin systems. In this test, every spherical
-tensor operator is created for each spin.
+superoperators for varying spin systems and basis set sizes. In this
+test, every spherical tensor superoperator up to two-spin correlation
+is created from the basis set.
 
 On a laptop with 11th gen. i5 processor and 16 GB ram, this bench-
-mark takes a minute to run with `max_nspins=14`, and `max_spin_order=4`.
+mark takes two minutes to run with `max_nspins=14`, and `max_spin_order=4`.
 """
 
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
-from spinguin.qm.superoperators import sop_prod
-from spinguin.qm.basis import make_basis
+from spinguin.core.superoperators import sop_prod
+from spinguin.core.basis import make_basis, spin_order
 
 # Testing parameters
 max_nspins = 14
@@ -35,26 +36,25 @@ for max_so in range(1, max_spin_order+1):
         spins = np.array([1/2 for _ in range(nspins)])
         basis = make_basis(spins, max_so)
 
-        # Define the operators to be tested
-        opers = []
-        for i in range(nspins):
-            for j in range(4):
-                op = np.zeros(nspins, dtype=int)
-                op[i] = j
-                opers.append(op)
-        nopers = len(opers)
+        # Number of operators tested
+        nopers = 0
 
-        # Minimum and maximum runtimes
+        # Runtime for current max_so and nspins
         tot_curr = 0
 
-        # Test with every product operator
-        for op_def in opers:
+        # Go through the operators in basis
+        for op_def in basis:
 
-            # Test with sparse arrays
-            ts = perf_counter()
-            sop_prod(op_def, basis, spins, "comm", sparse=True)
-            te = perf_counter()
-            tot_curr += te-ts
+            # Build only two-spin operators at most
+            so = spin_order(op_def)
+            if so < 3:
+
+                # Measure the time it takes to build the superoperator
+                ts = perf_counter()
+                sop_prod(op_def, basis, spins, "comm", sparse=True)
+                te = perf_counter()
+                nopers += 1
+                tot_curr += te-ts
 
         # Save the results
         avg[max_so-1, nspins-1] = tot_curr/nopers
