@@ -1,9 +1,18 @@
+"""
+This script benchmarks the performance of creating a relaxation
+superoperator using the Redfield theory. It uses a simple
+algorithm for creating an arbitrary geometry for a molecule.
+
+On a laptop with 11th gen. i5 processor and 16 GB ram, this bench-
+mark takes a minute to run with `nspins=12` and `max_spin_order=3`.
+"""
+
 # Imports
 import numpy as np
 from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.qm.hamiltonian import sop_H_coherent
-from spinguin.qm.relaxation import sop_R_redfield
-from spinguin.qm.basis import make_basis
+from spinguin.core.hamiltonian import sop_H
+from spinguin.core.relaxation import sop_R_redfield
+from spinguin.core.basis import make_basis
 
 # Testing parameters
 nspins = 12
@@ -49,12 +58,11 @@ for i in range(nspins):
         J_couplings[i,j] = 20 / distances[i,j]**3
 
 # Create the Hamiltonian superoperator
-sop_H = sop_H_coherent(basis, gammas, spins, chemical_shifts, J_couplings, B,
-                       "comm", True, 1e-12)
+H = sop_H(basis, spins, gammas, B, chemical_shifts, J_couplings)
 
 # Benchmark the Redfield superoperator
 sop_R_redfield(basis = basis,
-               sop_H = sop_H,
+               sop_H = H,
                tau_c = tau_c,
                spins = spins,
                B = B,
