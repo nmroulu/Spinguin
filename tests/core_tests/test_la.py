@@ -379,6 +379,27 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         for _ in range(10):
             A = la.custom_dot(A, A, zero_value=1e-32)
 
+        # Test varying dtypes
+        dtypes_I = [np.int32, np.int64]
+        dtypes_T = [np.int32, np.int64, np.float64, np.complex128]
+        for dtype_AI in dtypes_I:
+            for dtype_BI in dtypes_I:
+                for dtype_AT in dtypes_T:
+                    for dtype_BT in dtypes_T:
+                        A = random_array((200, 200), density=0.2).tocsc()
+                        B = random_array((200, 200), density=0.2).tocsc()
+                        A.data = A.data.astype(dtype_AT)
+                        A.indices = A.indices.astype(dtype_AI)
+                        A.indptr = A.indptr.astype(dtype_AI)
+                        B.data = B.data.astype(dtype_BT)
+                        B.indices = B.indices.astype(dtype_BI)
+                        B.indptr = B.indptr.astype(dtype_BI)
+                        C_custom = la.custom_dot(A, B, zero_value=1e-18)
+                        C_SciPy = A @ B
+                        self.assertTrue(np.allclose(C_SciPy.toarray(),
+                                                    C_custom.toarray()))
+
+
 def spherical_tensor(l, q):
     """
     Helper function for tests.
