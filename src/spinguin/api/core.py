@@ -590,7 +590,6 @@ def propagator(L: np.ndarray | sp.csc_array,
     P = _sop_propagator(
         L = L,
         t = t,
-        custom_dot = parameters.custom_dot,
         zero_value = parameters.zero_propagator,
         density_threshold = parameters.propagator_density
     )
@@ -646,8 +645,7 @@ def propagator_to_rotframe(spin_system: SpinSystem,
         sop_P = P,
         sop_H0 = H_frame,
         t = t,
-        zero_value = parameters.zero_propagator,
-        custom_dot = parameters.custom_dot
+        zero_value = parameters.zero_propagator
     )
     
     return P
