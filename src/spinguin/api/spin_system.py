@@ -19,7 +19,6 @@ class SpinSystem:
 
     Parameters
     ----------
-
     isotopes : list or tuple or ndarray or str
         Specifies the isotopes that constitute the spin system and determine
         other properties, such as spin quantum numbers and gyromagnetic ratios.
