@@ -1007,8 +1007,8 @@ def dissociate(spin_system_A: SpinSystem,
                spin_system_B: SpinSystem,
                spin_system_C: SpinSystem,
                rho_C: np.ndarray | sp.csc_array,
-               spin_map_A: tuple,
-               spin_map_B: tuple
+               spin_map_A: list | tuple | np.ndarray,
+               spin_map_B: list | tuple | np.ndarray
                ) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
     """
     Dissociates the density vector of composite system C into density vectors of
@@ -1034,9 +1034,9 @@ def dissociate(spin_system_A: SpinSystem,
         Spin system C.
     rho_C : ndarray or csc_array
         State vector of the composite spin system C.
-    spin_map_A : ndarray
+    spin_map_A : list or tuple or ndarray
         Indices of spin system A within spin system C.
-    spin_map_B : ndarray
+    spin_map_B : list or tuple or ndarray
         Indices of spin system B within spin system C.
 
     Returns
@@ -1065,8 +1065,9 @@ def associate(spin_system_A: SpinSystem,
               spin_system_C: SpinSystem,
               rho_A: np.ndarray | sp.csc_array,
               rho_B: np.ndarray | sp.csc_array,
-              spin_map_A: np.ndarray,
-              spin_map_B: np.ndarray) -> np.ndarray | sp.csc_array:
+              spin_map_A: list | tuple | np.ndarray,
+              spin_map_B: list | tuple | np.ndarray
+) -> np.ndarray | sp.csc_array:
     """
     Combines two state vectors when spin systems associate in a chemical
     reaction A + B -> C.
@@ -1095,9 +1096,9 @@ def associate(spin_system_A: SpinSystem,
         State vector of spin system A.
     rho_B : ndarray or csc_array
         State vector of spin system B.
-    spin_map_A : ndarray
+    spin_map_A : list or tuple or ndarray
         Indices of spin system A within spin system C.
-    spin_map_B : ndarray
+    spin_map_B : list or tuple or ndarray
         Indices of spin system B within spin system C.
 
     Returns
@@ -1119,7 +1120,9 @@ def associate(spin_system_A: SpinSystem,
     return rho_C
 
 def permute_spins(spin_system: SpinSystem,
-                  spin_map: np.ndarray) -> np.ndarray | sp.csc_array:
+                  rho: np.ndarray | sp.csc_array,
+                  spin_map: list | tuple | np.ndarray
+) -> np.ndarray | sp.csc_array:
     """
     Permutes the state vector of a spin system to correspond to a reordering
     of the spins in the system. 
@@ -1138,7 +1141,7 @@ def permute_spins(spin_system: SpinSystem,
         The spin system whose density vector is going to be permuted.
     rho : ndarray or csc_array
         State vector of the spin system.
-    spin_map : ndarray
+    spin_map : list or tuple or ndarray
         Indices of the spins in the spin system after permutation.
 
     Returns

@@ -8,6 +8,7 @@ This module contains functions responsible for chemical kinetics.
 import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
+from spinguin.core.la import arraylike_to_array
 
 @lru_cache(maxsize=16)
 def _dissociate_index_map(basis_A_bytes: bytes,
@@ -167,8 +168,8 @@ def dissociate(basis_A: np.ndarray,
                spins_A : np.ndarray,
                spins_B : np.ndarray,
                rho_C: np.ndarray | sp.csc_array,
-               spin_map_A: tuple,
-               spin_map_B: tuple
+               spin_map_A: list | tuple | np.ndarray,
+               spin_map_B: list | tuple | np.ndarray,
                ) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
     """
     Dissociates the density vector of composite system C into density vectors of
@@ -200,9 +201,9 @@ def dissociate(basis_A: np.ndarray,
         irreducible spherical tensors.
     rho_C : ndarray or csc_array
         State vector of the composite spin system C.
-    spin_map_A : ndarray
+    spin_map_A : list or tuple or ndarray
         Indices of spin system A within spin system C.
-    spin_map_B : ndarray
+    spin_map_B : list or tuple or ndarray
         Indices of spin system B within spin system C.
 
     Returns
@@ -212,6 +213,10 @@ def dissociate(basis_A: np.ndarray,
     rho_B : ndarray or csc_array
         State vector of spin system B.
     """
+    
+    # Convert the spin maps to NumPy arrays
+    spin_map_A = arraylike_to_array(spin_map_A)
+    spin_map_B = arraylike_to_array(spin_map_B)
 
     # Obtain the basis set dimensions
     dim_A = basis_A.shape[0]
@@ -374,8 +379,9 @@ def associate(basis_A: np.ndarray,
               basis_C: np.ndarray,
               rho_A: np.ndarray | sp.csc_array,
               rho_B: np.ndarray | sp.csc_array,
-              spin_map_A: np.ndarray,
-              spin_map_B: np.ndarray) -> np.ndarray | sp.csc_array:
+              spin_map_A: list | tuple | np.ndarray,
+              spin_map_B: list | tuple | np.ndarray
+) -> np.ndarray | sp.csc_array:
     """
     Combines two state vectors when spin systems associate in a chemical
     reaction A + B -> C.
@@ -410,9 +416,9 @@ def associate(basis_A: np.ndarray,
         State vector of spin system A.
     rho_B : ndarray or csc_array
         State vector of spin system B.
-    spin_map_A : ndarray
+    spin_map_A : list or tuple or ndarray
         Indices of spin system A within spin system C.
-    spin_map_B : ndarray
+    spin_map_B : list or tuple or ndarray
         Indices of spin system B within spin system C.
 
     Returns
@@ -420,6 +426,10 @@ def associate(basis_A: np.ndarray,
     rho_C : ndarray or csc_array
         State vector of the composite spin system C.
     """
+
+    # Convert the spin maps into NumPy
+    spin_map_A = arraylike_to_array(spin_map_A)
+    spin_map_B = arraylike_to_array(spin_map_B)
 
     # Acquire the C basis dimension
     dim_C = basis_C.shape[0]
@@ -488,7 +498,8 @@ def _permutation_matrix(basis_bytes: bytes,
     return perm
 
 def permutation_matrix(basis: np.ndarray,
-                       spin_map: np.ndarray) -> sp.csc_array:
+                       spin_map: list | tuple | np.ndarray
+) -> sp.csc_array:
     """
     Creates a permutation matrix to reorder the spins in the system.
 
@@ -506,7 +517,7 @@ def permutation_matrix(basis: np.ndarray,
         A 2-dimensional array containing the basis set that consists sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
-    spin_map : ndarray
+    spin_map : list or tuple or ndarray
         Indices of the spins in the spin system after permutation.
 
     Returns
@@ -514,6 +525,9 @@ def permutation_matrix(basis: np.ndarray,
     perm : csc_array
         The permutation matrix.
     """
+    # Convert the spin map into NumPy
+    spin_map = arraylike_to_array(spin_map)
+
     # Convert the arrays to bytes for hashing
     basis_bytes = basis.tobytes()
     spin_map_bytes = spin_map.tobytes()
@@ -525,7 +539,8 @@ def permutation_matrix(basis: np.ndarray,
 
 def permute_spins(basis: np.ndarray,
                   rho: np.ndarray | sp.csc_array,
-                  spin_map: np.ndarray) -> np.ndarray | sp.csc_array:
+                  spin_map: list | tuple | np.ndarray
+) -> np.ndarray | sp.csc_array:
     """
     Permutes the state vector of a spin system to correspond to a reordering
     of the spins in the system. 
@@ -546,7 +561,7 @@ def permute_spins(basis: np.ndarray,
         tensors.
     rho : ndarray or csc_array
         State vector of the spin system.
-    spin_map : ndarray
+    spin_map : list or tuple or ndarray
         Indices of the spins in the spin system after permutation.
     sparse : bool, default=True
         Specifies whether to use sparse arrays for constructing the permutation
@@ -557,6 +572,9 @@ def permute_spins(basis: np.ndarray,
     rho : ndarray or csc_array
         Permuted state vector of the spin system.
     """
+    # Convert the spin map into NumPy
+    spin_map = arraylike_to_array(spin_map)
+
     # Get the permutation matrix
     perm = permutation_matrix(basis, spin_map)
 
