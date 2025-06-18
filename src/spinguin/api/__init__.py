@@ -21,7 +21,6 @@ from spinguin.api.core import (
     singlet_state,
     spectral_width_to_dwell_time,
     spectrum,
-    spin_system,
     state,
     state_to_zeeman,
     superoperator,
@@ -33,3 +32,5 @@ from spinguin.api.core import (
 )
 
 from spinguin.api.parameters import parameters
+
+from spinguin.api.spin_system import SpinSystem

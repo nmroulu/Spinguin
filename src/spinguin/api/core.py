@@ -54,38 +54,6 @@ from spinguin.core.states import (
     unit_state as _unit_state
 )
 
-def spin_system(isotopes: list | tuple | np.ndarray | str) -> SpinSystem:
-    """
-    Initializes a new `SpinSystem` object.
-
-    Parameters
-    ----------
-    isotopes : list or tuple or ndarray or str
-        Specifies the isotopes that constitute the spin system and determine
-        other properties, such as spin quantum numbers and gyromagnetic ratios.
-        Two input types are supported:
-
-        - If `ArrayLike`: A 1D array of size N containing isotope names as
-          strings. Example:
-
-        ```python
-        np.array(['1H', '15N', '19F'])
-        ```
-
-        - If `str`: Path to the file containing the isotopes.
-
-        The input will be stored as a NumPy array.
-
-    Returns
-    -------
-    spin_system : SpinSystem
-        The presently initialized `SpinSystem` instance.
-    """
-    # Create a new SpinSystem instance
-    spin_system = SpinSystem(isotopes=isotopes)
-
-    return spin_system
-
 def operator(spin_system: SpinSystem,
              operator: str) -> np.ndarray | sp.csc_array:
     """
