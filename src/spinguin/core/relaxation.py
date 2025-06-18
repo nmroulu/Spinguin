@@ -757,7 +757,7 @@ def sop_R_sr2k(basis: np.ndarray,
         relaxation of the second kind.
     """
 
-    print("Processing scalar relaxation of the second kind.")
+    print("Processing scalar relaxation of the second kind...")
     time_start = time.time()
 
     # Obtain the number of spins
@@ -859,11 +859,17 @@ def ldb_thermalization(R: np.ndarray | sp.csc_array,
     R : ndarray or csc_array
         Thermalized relaxation superoperator.
     """
+    print("Applying thermalization to the relaxation superoperator...")
+    time_start = time.time()
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
-    P = expm(const.hbar / (const.k * T) * H_left, zero_value)
+    with HidePrints():
+        P = expm(const.hbar / (const.k * T) * H_left, zero_value)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P
+
+    print(f"Thermalization applied in {time.time() - time_start:.4f} seconds.")
+    print()
 
     return R
