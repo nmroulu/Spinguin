@@ -462,11 +462,11 @@ def sop_R_redfield(basis: np.ndarray,
     interaction_zero : float=1e-9
         If the eigenvalues of the interaction tensor, estimated using the
         1-norm, are smaller than this threshold, the interaction is ignored.
-    aux_zero = float=1e-18
+    aux_zero : float=1e-18
         This threshold is used to estimate the convergence of the Taylor series
         when exponentiating the auxiliary matrix, and also to eliminate small
         values from the arrays in the matrix exponential squaring step.
-    relaxation_zero = float=1e-12
+    relaxation_zero : float=1e-12
         Smaller values than this threshold are eliminated from the relaxation
         superoperator before returning the array.
     sparse : bool=True
