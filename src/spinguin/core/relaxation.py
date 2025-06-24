@@ -9,12 +9,13 @@ import time
 import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
+from joblib import Parallel, delayed
 from scipy.special import eval_legendre
 from spinguin.core.superoperators import sop_T_coupled, sop_prod
 from spinguin.core.la import \
     eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \
-    auxiliary_matrix_expm, expm
+    auxiliary_matrix_expm, expm, read_shared_sparse, write_shared_sparse
 from spinguin.core.basis import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin.core.hide_prints import HidePrints
 from typing import Literal
@@ -387,8 +388,115 @@ def get_sop_T(basis: np.ndarray,
 
     return sop
 
+def sop_R_redfield_term(
+        l: int, q: int,
+        type_r: str, spin_r1: int, spin_r2: int, tensor_r: np.ndarray,
+        top_l_shared: dict, top_r_shared: dict, bottom_r_shared: dict,
+        t_max: float, aux_zero: float,
+        sop_Ts: dict, interactions: dict
+) -> sp.csc_array:
+    """
+    Helper function for the Redfield relaxation theory. This function calculates
+    one term of the relaxation superoperator and enables the use of parallel
+    computation.
+
+    NOTE: This function returns some of the input parameters to display the
+    progress in the computation of the total Redfield relaxation superoperator.
+
+    Parameters
+    ----------
+    l : int
+        Operator rank.
+    q : int
+        Operator projection.
+    type_r : str
+        Interaction type. Possible options are "CSA", "Q", and "DD".
+    spin_r1 : int
+        Index of the first spin.
+    spin_r2 : int
+        Index of the second spin. Leave empty for single-spin interactions
+        (e.g., CSA).
+    tensor_r : np.ndarray
+        Interaction tensor for the right-hand interaction.
+    top_l_shared : dict
+        Dictionary containing the shared top left block of the auxiliary matrix.
+    top_r_shared : dict
+        Dictionary containing the shared top right block of the auxiliary
+        matrix.
+    bottom_r_shared : dict
+        Dictionary containing the shared bottom right block of the auxiliary
+        matrix.
+    t_max : float
+        Integration limit for the auxiliary matrix method.
+    aux_zero : float
+        Threshold for the convergence of the Taylor series when exponentiating
+        the auxiliary matrix.
+    sop_Ts : dict
+        Dictionary containing the shared coupled T superoperators for different
+        interactions.
+    interactions : dict
+        Dictionary containing the interactions organized by rank.
+
+    Returns
+    -------
+    l : int
+        Operator rank.
+    q : int
+        Operator projection.
+    type_r : str
+        Interaction type.
+    spin_r1 : int
+        Index of the first spin.
+    spin_r2 : int
+        Index of the second spin.
+    sop_R_term : csc_array
+        Relaxation superoperator term for the given interaction.
+    """
+    # Convert the shared arrays back to CSC arrays
+    top_l = read_shared_sparse(top_l_shared)
+    top_r = read_shared_sparse(top_r_shared)
+    bottom_r = read_shared_sparse(bottom_r_shared)
+    dim = top_r.shape[0]
+
+    # Calculate the Redfield integral using the auxiliary matrix method
+    aux_expm = auxiliary_matrix_expm(top_l, top_r, bottom_r, t_max, aux_zero)
+
+    # Extract top left and top right blocks
+    aux_top_l = aux_expm[:dim, :dim]
+    aux_top_r = aux_expm[:dim, dim:]
+
+    # Extract the Redfield integral
+    integral = aux_top_l.conj().T @ aux_top_r
+
+    # Initialize the left coupled T superoperator
+    sop_T_l = sp.csc_array((dim, dim), dtype=complex)
+
+    # Iterate over the LEFT interactions
+    for interaction_l in interactions[l]:
+
+        # Extract the interaction information
+        type_l = interaction_l[0]
+        spin_l1 = interaction_l[1]
+        spin_l2 = interaction_l[2]
+        tensor_l = interaction_l[3]
+
+        # Compute G0
+        G_0 = G0(tensor_l, tensor_r, l)
+
+        # Add current term to the left operator
+        sop_T = read_shared_sparse(sop_Ts[(l, q, type_l, spin_l1, spin_l2)])
+        sop_T_l += G_0 * sop_T
+
+    # Handle negative q values by spherical tensor properties
+    if q == 0:
+        sop_R_term = sop_T_l.conj().T @ integral
+    else:
+        sop_R_term = sop_T_l.conj().T @ integral + sop_T_l @ integral.conj().T
+
+    return l, q, type_r, spin_r1, spin_r2, sop_R_term
+
 def sop_R_redfield(basis: np.ndarray,
-                   sop_H: np.ndarray | sp.csc_array,
+                   sop_H: sp.csc_array,
                    tau_c: float,
                    spins: np.ndarray,
                    B: float = None,
@@ -403,6 +511,7 @@ def sop_R_redfield(basis: np.ndarray,
                    interaction_zero: float=1e-9,
                    aux_zero: float=1e-18,
                    relaxation_zero: float=1e-12,
+                   parallel_dim: int=1000,
                    sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Calculates the relaxation superoperator using Redfield relaxation theory.
@@ -469,6 +578,10 @@ def sop_R_redfield(basis: np.ndarray,
     relaxation_zero : float=1e-12
         Smaller values than this threshold are eliminated from the relaxation
         superoperator before returning the array.
+    parallel_dim : int=1000
+        If the basis set dimension is larger than this value, the Redfield
+        integrals are calculated in parallel. Otherwise, the integrals are
+        calculated in serial.
     sparse : bool=True
         Specifies whether to calculate the relaxation superoperator as sparse or
         dense array.
@@ -484,13 +597,6 @@ def sop_R_redfield(basis: np.ndarray,
 
     # Obtain the basis set dimension
     dim = basis.shape[0]
-
-    # Ensure that sop_H matches the sparsity setting
-    if sp.issparse(sop_H) != sparse:
-        if sparse:
-            sop_H = sp.csc_array(sop_H)
-        else:
-            sop_H = sop_H.toarray()
 
     # Initialize a dictionary for incoherent interactions
     interactions = {}
@@ -520,103 +626,128 @@ def sop_R_redfield(basis: np.ndarray,
     interactions = process_interactions(interactions, interaction_zero)
 
     # Initialize the relaxation superoperator
-    if sparse:
-        sop_R = sp.csc_array((dim, dim), dtype=complex)
-    else:
-        sop_R = np.zeros((dim, dim), dtype=complex)
+    sop_R = sp.csc_array((dim, dim), dtype=complex)
 
     # Define the integration limit for the auxiliary matrix method
     t_max = np.log(1 / relative_error) * tau_c
 
     # Top left array of auxiliary matrix
     top_left = 1j * sop_H
+    top_left = write_shared_sparse(top_left)
 
+    # FIRST LOOP
+    # -- PRECOMPUTE THE COUPLED T SUPEROPERATORS
+    # -- CREATE THE LIST OF TASKS
+    print("Building superoperators...")
+    sop_Ts = {}
+    tasks = []
+    
     # Iterate over the ranks
     for l in [1, 2]:
 
         # Diagonal matrix of correlation time
-        if sparse:
-            tau_c_diagonal_l = 1 / tau_c_l(tau_c, l) * \
-                               sp.eye_array(sop_H.shape[0], format='csc')
-        else:
-            tau_c_diagonal_l = 1 / tau_c_l(tau_c, l) * np.eye(sop_H.shape[0])
+        tau_c_diagonal_l = 1 / tau_c_l(tau_c, l) * \
+                            sp.eye_array(sop_H.shape[0], format='csc')
 
         # Bottom right array of auxiliary matrix
         bottom_right = 1j * sop_H - tau_c_diagonal_l
+        bottom_right = write_shared_sparse(bottom_right)
 
         # Iterate over the projections (negative q values are handled by 
         # spherical tensor properties)
         for q in range(0, l + 1):
 
-            print(f"Processing rank l={l}, projection q={q}")
-
-            # Iterate over the RIGHT interactions
-            for interaction_right in interactions[l]:
+            # Iterate over the interactions
+            for interaction in interactions[l]:
 
                 # Extract the interaction information
-                type_right = interaction_right[0]
-                spin_right1 = interaction_right[1]
-                spin_right2 = interaction_right[2]
-                tensor_right = interaction_right[3]
+                itype = interaction[0]
+                spin1 = interaction[1]
+                spin2 = interaction[2]
+                tensor = interaction[3]
 
                 # Show current status
-                if spin_right2 is None:
-                    print(f"{type_right} for spin {spin_right1}")
+                if spin2 is None:
+                    print(f"l: {l}, q: {q} - {itype} for spin {spin1}")
                 else:
-                    print(f"{type_right} for spins {spin_right1}-{spin_right2}")
+                    print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
 
-                # Compute the right operator
-                sop_T_right = get_sop_T(basis, spins, l, q, type_right, 
-                                        spin_right1, spin_right2, sparse)
+                # Compute a shared version of the coupled T superoperator
+                sop_T = write_shared_sparse(get_sop_T(
+                    basis, spins, l, q, itype, spin1, spin2, sparse))
 
-                # Calculate the Redfield integral using the auxiliary matrix
-                # method
-                sop_T_right = auxiliary_matrix_expm(
-                    top_left, sop_T_right, bottom_right, t_max, aux_zero)
+                # Save to the dictionary
+                sop_Ts[(l, q, itype, spin1, spin2)] = sop_T
 
-                # Extract top left and top right blocks
-                top_l = sop_T_right[:dim, :dim]
-                top_r = sop_T_right[:dim, dim:]
+                # Add to the list of tasks
+                tasks.append((
+                    # Rank and projection
+                    l, q,
+                    
+                    # Right interaction
+                    itype, spin1, spin2, tensor,
 
-                # Compute the relaxation superoperator term
-                sop_T_right = top_l.conj().T @ top_r
+                    # Aux matrix components
+                    top_left, sop_T, bottom_right, t_max, aux_zero,
 
-                # Initialize the left operator
-                if sparse:
-                    sop_T_left = sp.csc_array((dim, dim), dtype=complex)
-                else:
-                    sop_T_left = np.zeros((dim, dim), dtype=complex)
+                    # Ingredients for left interaction
+                    sop_Ts, interactions
+                ))
 
-                # Iterate over the LEFT interactions
-                for interaction_left in interactions[l]:
+    print("Superoperators built.")
 
-                    # Extract the interaction information
-                    type_left = interaction_left[0]
-                    spin_left1 = interaction_left[1]
-                    spin_left2 = interaction_left[2]
-                    tensor_left = interaction_left[3]
+    # SECOND LOOP -- Iterate over the tasks in parallel
+    if dim > parallel_dim:
+        print("Performing the Redfield integrals in parallel...")
 
-                    # Compute G0
-                    G_0 = G0(tensor_left, tensor_right, l)
+        # Create the parallel tasks
+        parallel = Parallel(n_jobs=-1, return_as="generator_unordered")
+        output_generator = parallel(
+            delayed(sop_R_redfield_term)(*task) for task in tasks
+        )
 
-                    # Add to the left operator
-                    sop_T_left += G_0 * get_sop_T(basis, spins, l, q, type_left,
-                                                  spin_left1, spin_left2,
-                                                  sparse)
+        # Process the results from parallel processing
+        for result in output_generator:
 
-                # Add to the total relaxation superoperator term
-                if q == 0:
-                    sop_R += sop_T_left.conj().T @ sop_T_right
-                else:
-                    sop_R += sop_T_left.conj().T @ sop_T_right + \
-                             sop_T_left @ sop_T_right.conj().T
+            # Parse the result and add term to total relaxation superoperator
+            l, q, itype, spin1, spin2, sop_R_term = result
+            sop_R += sop_R_term
+
+            # Show current status
+            if spin2 is None:
+                print(f"l: {l}, q: {q} - {itype} for spin {spin1}")
+            else:
+                print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
+
+    # SECOND LOOP -- Iterate over the tasks in serial
+    else:
+        print("Performing the Redfield integrals in serial...")
+
+        # Process the tasks in serial
+        for task in tasks:
+
+            # Parse the result and add term to total relaxation superoperator
+            l, q, itype, spin1, spin2, sop_R_term = sop_R_redfield_term(*task)
+            sop_R += sop_R_term
+
+            # Show current status
+            if spin2 is None:
+                print(f"l: {l}, q: {q} - {itype} for spin {spin1}")
+            else:
+                print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
+
+    print("Redfield integrals completed.")
 
     # Return only real values unless dynamic frequency shifts are requested
     if not include_dynamic_frequency_shift:
+        print("Removing the dynamic frequency shifts...")
         sop_R = sop_R.real
+        print("Dynamic frequency shifts removed.")
     
     # Eliminate small values
+    print("Eliminating small values from the relaxation superoperator...")
     eliminate_small(sop_R, relaxation_zero)
+    print("Small values eliminated.")
     
     print("Redfield relaxation superoperator constructed in "
           f"{time.time() - time_start:.4f} seconds.")

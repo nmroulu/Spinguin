@@ -17,6 +17,97 @@ from spinguin.core.sparse_dot import sparse_dot as _sparse_dot
 from spinguin.core.intersect_indices import intersect_indices
 from spinguin.core.hide_prints import HidePrints
 from spinguin.core.nmr_isotopes import ISOTOPES
+from multiprocessing.shared_memory import SharedMemory
+
+def write_shared_sparse(
+        A: csc_array
+) -> dict[str, SharedMemory | np.dtype | tuple[int]]:
+    """
+    Creates a shared memory representation of a sparse CSC array.
+
+    Parameters
+    ----------
+    A : csc_array
+        Sparse array to be shared.
+
+    Returns
+    -------
+    A_shared : dict
+        Dictionary containing shared memory objects for the sparse array's data,
+        indices, and indptr, along with their shapes and dtypes.
+    """
+    # Create a shared memory of the sparse array
+    A_data = SharedMemory(create=True, size=A.data.nbytes)
+    A_indices = SharedMemory(create=True, size=A.indices.nbytes)
+    A_indptr = SharedMemory(create=True, size=A.indptr.nbytes)
+    A_data_shared = np.ndarray(A.data.shape, dtype=A.data.dtype,
+                               buffer=A_data.buf)
+    A_indices_shared = np.ndarray(A.indices.shape, dtype=A.indices.dtype,
+                                  buffer=A_indices.buf)
+    A_indptr_shared = np.ndarray(A.indptr.shape, dtype=A.indptr.dtype,
+                                 buffer=A_indptr.buf)
+    A_data_shared[:] = A.data[:]
+    A_indices_shared[:] = A.indices[:]
+    A_indptr_shared[:] = A.indptr[:]
+
+    # Save the memory to a dictionary
+    A_shared = {
+        'A_data' : A_data,
+        'A_indices' : A_indices,
+        'A_indptr' : A_indptr,
+        'A_data_shape' : A.data.shape,
+        'A_indices_shape' : A.indices.shape,
+        'A_indptr_shape' : A.indptr.shape,
+        'A_data_dtype' : A.data.dtype,
+        'A_indices_dtype' : A.indices.dtype,
+        'A_indptr_dtype' : A.indptr.dtype,
+        'A_shape' : A.shape
+    }
+
+    return A_shared
+
+def read_shared_sparse(
+        A_shared: dict[str, SharedMemory | np.dtype | tuple[int]]
+) -> csc_array:
+    """
+    Reads a shared memory representation of a sparse CSC array and reconstructs
+    it.
+
+    Parameters
+    ----------
+    A_shared : dict
+        Dictionary containing shared memory objects for the sparse array's data,
+        indices, and indptr, along with their shapes and dtypes.
+
+    Returns
+    -------
+    A : csc_array
+        Sparse array reconstructed from the shared memory.
+    """
+    # Parse the dictionary
+    A_data = A_shared['A_data']
+    A_indices = A_shared['A_indices']
+    A_indptr = A_shared['A_indptr']
+    A_data_shape = A_shared['A_data_shape']
+    A_indices_shape = A_shared['A_indices_shape']
+    A_indptr_shape = A_shared['A_indptr_shape']
+    A_data_dtype = A_shared['A_data_dtype']
+    A_indices_dtype = A_shared['A_indices_dtype']
+    A_indptr_dtype = A_shared['A_indptr_dtype']
+    A_shape = A_shared['A_shape']
+
+    # Obtain the previously shared array
+    A_data = np.ndarray(shape=A_data_shape, dtype=A_data_dtype,
+                        buffer=A_data.buf)
+    A_indices = np.ndarray(shape=A_indices_shape, dtype=A_indices_dtype,
+                           buffer=A_indices.buf)
+    A_indptr = np.ndarray(shape=A_indptr_shape, dtype=A_indptr_dtype,
+                          buffer=A_indptr.buf)
+
+    # Create the sparse array
+    A = csc_array((A_data, A_indices, A_indptr), shape=A_shape, copy=True)
+
+    return A
 
 def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
     """
