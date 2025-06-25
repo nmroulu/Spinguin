@@ -452,12 +452,20 @@ def sop_R_redfield_term(
     sop_R_term : csc_array
         Relaxation superoperator term for the given interaction.
     """
+    # Create an empty list for the SharedMemory objects
+    shms = []
+
     # Convert the shared arrays back to CSC arrays
-    top_l = read_shared_sparse(top_l_shared)
-    top_r = read_shared_sparse(top_r_shared)
-    bottom_r = read_shared_sparse(bottom_r_shared)
+    top_l, top_l_shm = read_shared_sparse(top_l_shared)
+    top_r, top_r_shm = read_shared_sparse(top_r_shared)
+    bottom_r, bottom_r_shm = read_shared_sparse(bottom_r_shared)
     dim = top_r.shape[0]
 
+    # Store the SharedMemories
+    shms.extend(top_l_shm)
+    shms.extend(top_r_shm)
+    shms.extend(bottom_r_shm)
+    
     # Calculate the Redfield integral using the auxiliary matrix method
     aux_expm = auxiliary_matrix_expm(top_l, top_r, bottom_r, t_max, aux_zero)
 
@@ -484,14 +492,20 @@ def sop_R_redfield_term(
         G_0 = G0(tensor_l, tensor_r, l)
 
         # Add current term to the left operator
-        sop_T = read_shared_sparse(sop_Ts[(l, q, type_l, spin_l1, spin_l2)])
+        sop_T, sop_T_shm = \
+            read_shared_sparse(sop_Ts[(l, q, type_l, spin_l1, spin_l2)])
         sop_T_l += G_0 * sop_T
+        shms.extend(sop_T_shm)
 
     # Handle negative q values by spherical tensor properties
     if q == 0:
         sop_R_term = sop_T_l.conj().T @ integral
     else:
         sop_R_term = sop_T_l.conj().T @ integral + sop_T_l @ integral.conj().T
+
+    # Close the SharedMemory objects
+    for shm in shms:
+        shm.close()
 
     return l, q, type_r, spin_r1, spin_r2, sop_R_term
 
@@ -598,6 +612,9 @@ def sop_R_redfield(basis: np.ndarray,
     # Obtain the basis set dimension
     dim = basis.shape[0]
 
+    # Initialize a list to hold all SharedMemories
+    shms = []
+
     # Initialize a dictionary for incoherent interactions
     interactions = {}
 
@@ -633,7 +650,8 @@ def sop_R_redfield(basis: np.ndarray,
 
     # Top left array of auxiliary matrix
     top_left = 1j * sop_H
-    top_left = write_shared_sparse(top_left)
+    top_left, top_left_shm = write_shared_sparse(top_left)
+    shms.extend(top_left_shm)
 
     # FIRST LOOP
     # -- PRECOMPUTE THE COUPLED T SUPEROPERATORS
@@ -651,7 +669,8 @@ def sop_R_redfield(basis: np.ndarray,
 
         # Bottom right array of auxiliary matrix
         bottom_right = 1j * sop_H - tau_c_diagonal_l
-        bottom_right = write_shared_sparse(bottom_right)
+        bottom_right, bottom_right_shm = write_shared_sparse(bottom_right)
+        shms.extend(bottom_right_shm)
 
         # Iterate over the projections (negative q values are handled by 
         # spherical tensor properties)
@@ -673,11 +692,10 @@ def sop_R_redfield(basis: np.ndarray,
                     print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
 
                 # Compute a shared version of the coupled T superoperator
-                sop_T = write_shared_sparse(get_sop_T(
+                sop_T, sop_T_shm = write_shared_sparse(get_sop_T(
                     basis, spins, l, q, itype, spin1, spin2, sparse))
-
-                # Save to the dictionary
                 sop_Ts[(l, q, itype, spin1, spin2)] = sop_T
+                shms.extend(sop_T_shm)
 
                 # Add to the list of tasks
                 tasks.append((
@@ -736,6 +754,11 @@ def sop_R_redfield(basis: np.ndarray,
             else:
                 print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
 
+    # Clear the shared memories
+    for shm in shms:
+        shm.close()
+        shm.unlink()
+    
     print("Redfield integrals completed.")
 
     # Return only real values unless dynamic frequency shifts are requested
