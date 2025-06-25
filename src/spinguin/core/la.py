@@ -556,7 +556,7 @@ def principal_axis_system(tensor: np.ndarray) -> tuple[np.ndarray, np.ndarray, n
     The PAS is defined as the coordinate system that diagonalizes
     the symmetric traceless part of the tensor.
 
-    The eigenvalues are ordered as (|largest|, |middle|, |smallest|).
+    The eigenvalues are ordered as `(|largest|, |middle|, |smallest|)`.
 
     Parameters
     ----------

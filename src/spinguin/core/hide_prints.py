@@ -3,14 +3,10 @@ import sys
 
 class HidePrints:
     """
-    This class can be used to hide printing to the console.
+    This class can be used to hide printing to the console. Usage::
 
-    Usage:
-
-    ```python
-    with HidePrints():
-        do_something()
-    ```
+        with HidePrints():
+            do_something()
 
     Solution from:
     https://stackoverflow.com/questions/8391411/how-to-block-calls-to-print

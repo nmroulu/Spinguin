@@ -15,106 +15,25 @@ from spinguin.core.nmr_isotopes import ISOTOPES
 
 class SpinSystem:
     """
-    Initializes a spin system with one 1H nucleus with the default parameters.
+    Initializes a spin system with the given `isotopes`. Examples::
+
+        spin_system = SpinSystem(['1H', '15N', '19F'])
+        spin_system = SpinSystem("/path/to/isotopes.txt")
 
     Parameters
     ----------
     isotopes : list or tuple or ndarray or str
         Specifies the isotopes that constitute the spin system and determine
-        other properties, such as spin quantum numbers and gyromagnetic ratios.
+        other properties, such as spin quantum numbers and gyromagnetic
+        ratios.
+
         Two input types are supported:
 
         - If `ArrayLike`: A 1D array of size N containing isotope names as
-          strings. Example:
-
-        ```python
-        np.array(['1H', '15N', '19F'])
-        ```
-
+          strings. 
         - If `str`: Path to the file containing the isotopes.
 
-        The input will be stored as a NumPy array.
-
-    Attributes
-    ----------
-    isotopes : ndarray
-        Specifies the isotopes that constitute the spin system and determine
-        other properties, such as spin quantum numbers and gyromagnetic ratios.
-        Example:
-
-        ```python
-        np.array(['1H', '15N', '19F'])
-        ```
-    
-    chemical_shifts : ndarray
-        Chemical shifts arising from the isotropic component of the nuclear
-        shielding tensors. Used when calculating the coherent Hamiltonian.
-        Example:
-
-        ```python
-        np.array([8.00, -200, -130])
-        ```
-
-    J_couplings : ndarray
-        Specifies the scalar coupling constants between each spin pair in the
-        spin system. Used when calculating the coherent Hamiltonian. Example:
-
-        ```python
-        np.array([
-            [0,    0,    0],
-            [1,    0,    0],
-            [0.2,  8,    0]
-        ])
-        ```
-
-    xyz : ndarray
-        Coordinates in the XYZ format for each nucleus in the spin system. Used
-        in Redfield relaxation theory when calculating the dipole-dipole
-        coupling tensors. Example:
-
-        ```python
-        np.array([
-            [1.025, 2.521, 1.624],
-            [0.667, 2.754, 0.892]
-        ])
-        ```
-
-    shielding : ndarray
-        Specifies the nuclear shielding tensors for each nucleus. Note that the
-        isotropic part of the tensor is handled by `chemical_shifts`. The
-        shielding tensors are used only for relaxation. Example:
-
-        ```python
-        np.array([
-            [[0, 0, 0],
-             [0, 0, 0],
-             [0, 0, 0]],
-            [[101.6, -75.2, 11.1],
-             [30.5,   10.1, 87.4],
-             [99.7,  -21.1, 11.2]]
-        ])
-        ```
-
-    efg : ndarray   TODO: Merkin määrittely selväksi. (Perttu)
-        Electric field gradient tensors used for incorporating the quadrupolar
-        interaction relaxation mechanism. Example:
-
-        ```python
-        efg = np.array([
-            [[0, 0, 0],
-             [0, 0, 0],
-             [0, 0, 0]],
-            [[ 0.31, 0.00, 0.01],
-             [-0.20, 0.04, 0.87],
-             [ 0.11, 0.16, 0.65]]
-        ])
-        ```
-
-    basis : Basis
-        Basis set for the spin system.
-
-    relaxation : RelaxationProperties
-        Relaxation theory settings for the spin system.
+        The input will be converted and stored as a NumPy array.  
     """
 
     def __init__(self, isotopes: list | tuple | np.ndarray | str):

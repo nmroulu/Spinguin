@@ -8,55 +8,6 @@ global parameters required for spin dynamics simulations.
 class Parameters:
     """
     Parameters class contains all the global settings for the Spinguin package.
-
-    Attributes
-    ----------
-    magnetic_field : float
-        Magnetic field of the spectrometer (in Tesla).
-    temperature : float
-        Temperature of the sample (in Kelvin).
-    parallel_dim : int, default=1000
-        If the number of items in the basis is larger than this value, the
-        parallelization is used to speed up the calculation of the Redfield
-        relaxation superoperator.
-    propagator_density : float, default=0.5
-        Threshold that specifies when to use dense or sparse arrays for the
-        propagators.
-    sparse_hamiltonian : bool, default=True
-        Specifies whether to use sparse or dense arrays for Hamiltonian.
-    sparse_operator : bool, default=True
-        Specifies whether to use sparse or dense arrays for operators.
-    sparse_pulse : bool, default=True
-        Specifies whether to use sparse or dense arrays for pulses.
-    sparse_relaxation : bool, default=True
-        Specifies whether to use sparse or dense arrays for relaxation
-        superoperator.
-    sparse_state : bool, default=False
-        Specifies whether to use sparse or dense arrays for states.
-    sparse_superoperator : bool, default=True
-        Specifies whether to use sparse or dense arrays for superoperators.
-    zero_aux : float, default=1e-18
-        Threshold under which a value is considered to be zero in auxiliary
-        matrix method which is used in the Redfield relaxation theory.
-    zero_equilibrium : float, default=1e-18
-        Threshold under which a value is considered to be zero when performing
-        the matrix exponential while constructing the equilibrium state.
-    zero_hamiltonian : float, default=1e-12
-        Threshold under which a value is considered to be zero in Hamiltonian.
-    zero_interaction : float, default=1e-9
-        If the 1-norm of an interaction tensor (upper bound for its eigenvalues)
-        is smaller than this threshold, the interaction is ignored when
-        constructing the Redfield relaxation superoperator.
-    zero_propagator : float, default=1e-18
-        Threshold under which a value is considered to be zero in propagator.
-    zero_pulse : float, default=1e-18
-        Threshold under which a value is considered to be zero in pulse.
-    zero_relaxation : float, default=1e-12
-        Threshold under which a value is considered to be zero in relaxation
-        superoperator.
-    zero_thermalization : float, default=1e-18
-        Threshold under which a value is considered to be zero when performing
-        the matrix exponential while applying the Levitt-di Bari thermalization.
     """
 
     # Experimental conditions
@@ -92,7 +43,7 @@ class Parameters:
     @magnetic_field.setter
     def magnetic_field(self, magnetic_field: float):
         """
-        External magnetic field in the units of T.
+        External magnetic field (in Tesla).
         """
         self._magnetic_field = magnetic_field
         print(f"Magnetic field set to: {self.magnetic_field} T\n")
@@ -104,7 +55,7 @@ class Parameters:
     @temperature.setter
     def temperature(self, temperature: float):
         """
-        Temperature in the units of K.
+        Temperature of the sample (in Kelvin).
         """
         self._temperature = temperature
         print(f"Temperature set to: {self.temperature} K\n")

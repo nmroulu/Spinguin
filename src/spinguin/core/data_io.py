@@ -75,8 +75,10 @@ def read_tensors(file_path: str) -> np.ndarray:
     for each spin or spin pair.
 
     The file should have the following format:
-        - The first column is the index of the spin.
-        - The subsequent columns represent the components of a 3x3 tensor.
+    
+    - The first column is the index of the spin.
+    - The subsequent columns represent the components of a 3x3 tensor.
+    
     This structure is repeated for each spin.
 
     Parameters
