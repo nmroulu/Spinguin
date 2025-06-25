@@ -134,7 +134,8 @@ class TestRelaxation(unittest.TestCase):
                                     include_antisymmetric=False,
                                     include_dynamic_frequency_shift=False,
                                     relative_error=1e-6, interaction_zero=1e-9,
-                                    relaxation_zero=1e-12, sparse=True)
+                                    relaxation_zero=1e-12, parallel_dim=1000,
+                                    sparse=True)
         R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R_redfield, B, sparse=True)
 
@@ -284,14 +285,16 @@ class TestRelaxation(unittest.TestCase):
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
-                           relaxation_zero=1e-12, sparse=True)
+                           relaxation_zero=1e-12, parallel_dim=1000,
+                           sparse=True)
         
         # Obtain R again (to check possible errors from caches etc.)
         R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
-                           relaxation_zero=1e-12, sparse=True)
+                           relaxation_zero=1e-12, parallel_dim=1000,
+                           sparse=True)
 
         # Load the previously calculated R for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))
