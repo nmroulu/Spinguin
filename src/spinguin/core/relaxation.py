@@ -392,7 +392,7 @@ def sop_R_redfield_term(
         l: int, q: int,
         type_r: str, spin_r1: int, spin_r2: int, tensor_r: np.ndarray,
         top_l_shared: dict, top_r_shared: dict, bottom_r_shared: dict,
-        t_max: float, aux_zero: float,
+        t_max: float, aux_zero: float, relaxation_zero: float,
         sop_Ts: dict, interactions: dict
 ) -> sp.csc_array:
     """
@@ -431,6 +431,9 @@ def sop_R_redfield_term(
     aux_zero : float
         Threshold for the convergence of the Taylor series when exponentiating
         the auxiliary matrix.
+    relaxation_zero : float
+        Values below this threshold are disregarded in the construction of the
+        relaxation superoperator term.
     sop_Ts : dict
         Dictionary containing the shared coupled T superoperators for different
         interactions.
@@ -503,6 +506,9 @@ def sop_R_redfield_term(
     else:
         sop_R_term = sop_T_l.conj().T @ integral + sop_T_l @ integral.conj().T
 
+    # Eliminate small values
+    eliminate_small(sop_R_term, relaxation_zero)
+    
     # Close the SharedMemory objects
     for shm in shms:
         shm.close()
@@ -699,17 +705,11 @@ def sop_R_redfield(basis: np.ndarray,
 
                 # Add to the list of tasks
                 tasks.append((
-                    # Rank and projection
-                    l, q,
-                    
-                    # Right interaction
-                    itype, spin1, spin2, tensor,
-
-                    # Aux matrix components
-                    top_left, sop_T, bottom_right, t_max, aux_zero,
-
-                    # Ingredients for left interaction
-                    sop_Ts, interactions
+                    l, q,                               # Rank and projection
+                    itype, spin1, spin2, tensor,        # Right interaction
+                    top_left, sop_T, bottom_right,      # Aux matrix components
+                    t_max, aux_zero, relaxation_zero,   # Numerical parameters
+                    sop_Ts, interactions                # Left interaction
                 ))
 
     print("Superoperators built.")
