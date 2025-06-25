@@ -15,6 +15,10 @@ class Parameters:
         Magnetic field of the spectrometer (in Tesla).
     temperature : float
         Temperature of the sample (in Kelvin).
+    parallel_dim : int, default=1000
+        If the number of items in the basis is larger than this value, the
+        parallelization is used to speed up the calculation of the Redfield
+        relaxation superoperator.
     propagator_density : float, default=0.5
         Threshold that specifies when to use dense or sparse arrays for the
         propagators.
@@ -59,6 +63,9 @@ class Parameters:
     _magnetic_field: float = None
     _temperature: float = None
 
+    # Parallelisation settings
+    _parallel_dim: int=1000
+
     # Sparsity settings
     _propagator_density: float=0.5
     _sparse_hamiltonian: bool=True
@@ -101,6 +108,20 @@ class Parameters:
         """
         self._temperature = temperature
         print(f"Temperature set to: {self.temperature} K\n")
+
+    @property
+    def parallel_dim(self) -> int:
+        return self._parallel_dim
+    
+    @parallel_dim.setter
+    def parallel_dim(self, parallel_dim: int):
+        """
+        If the number of items in the basis is larger than this value,
+        parallelization is used to speed up the calculation of the Redfield
+        relaxation superoperator.
+        """
+        self._parallel_dim = parallel_dim
+        print(f"Threshold for parallel Redfield set to: {self.parallel_dim}\n")
 
     @property
     def sparse_operator(self) -> bool:

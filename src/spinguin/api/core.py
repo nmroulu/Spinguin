@@ -324,6 +324,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             interaction_zero = parameters.zero_interaction,
             aux_zero = parameters.zero_aux,
             relaxation_zero = parameters.zero_relaxation,
+            parallel_dim = parameters.parallel_dim,
             sparse = parameters.sparse_relaxation
         )
     
