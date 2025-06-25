@@ -861,7 +861,7 @@ def pulse_and_acquire(
     # Find indices of the isotopes to be measured
     indices = np.where(spin_system.isotopes == isotope)[0]
 
-    # Apply 180-degree pulse
+    # Apply pulse
     op_pulse = "+".join(f"I(y,{i})" for i in indices)
     Px = pulse(spin_system, op_pulse, angle)
     rho = Px @ rho
