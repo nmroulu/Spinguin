@@ -31,3 +31,12 @@
 
 # Allow .hpp files
 !*.hpp
+
+# Allow source in docs
+!docs/source/*
+
+# Allow make.bat in docs
+!docs/make.bat
+
+# Allow Makefile in docs
+!docs/Makefile
