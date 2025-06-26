@@ -20,7 +20,7 @@ from spinguin.core.chem import (
 )
 from spinguin.core.hamiltonian import sop_H as _sop_H
 from spinguin.core.hide_prints import HidePrints
-from spinguin.core.liouvillian import sop_L as _sop_L
+from spinguin.core.liouvillian import sop_L as liouvillian
 from spinguin.core.operators import op_from_string as _op_from_string
 from spinguin.core.propagation import (
     propagator_to_rotframe as _propagator_to_rotframe,
@@ -34,7 +34,7 @@ from spinguin.core.relaxation import (
     ldb_thermalization as _ldb_thermalization
 )
 from spinguin.core.specutils import (
-    frequency_to_chemical_shift as _frequency_to_chemical_shift,
+    frequency_to_chemical_shift,
     resonance_frequency as _resonance_frequency,
     spectral_width_to_dwell_time as _spectral_width_to_dwell_time,
     spectrum as _spectrum
@@ -54,6 +54,38 @@ from spinguin.core.states import (
     unit_state as _unit_state
 )
 
+__all__ = [
+    "alpha_state",
+    "associate",
+    "beta_state",
+    "dissociate",
+    "equilibrium_state",
+    "frequency_to_chemical_shift",
+    "hamiltonian",
+    "inversion_recovery",
+    "liouvillian",
+    "measure",
+    "operator",
+    "permute_spins",
+    "propagator",
+    "propagator_to_rotframe",
+    "pulse",
+    "pulse_and_acquire",
+    "relaxation",
+    "resonance_frequency",
+    "singlet_state",
+    "spectral_width_to_dwell_time",
+    "spectrum",
+    "state",
+    "state_to_zeeman",
+    "superoperator",
+    "time_axis",
+    "triplet_minus_state",
+    "triplet_plus_state",
+    "triplet_zero_state",
+    "unit_state"
+]
+
 def operator(spin_system: SpinSystem,
              operator: str) -> np.ndarray | sp.csc_array:
     """
@@ -68,8 +100,8 @@ def operator(spin_system: SpinSystem,
         Defines the operator to be generated. The operator string must
         follow the rules below:
 
-        - Cartesian and ladder operators: `I(component,index)` or
-            `I(component)`. Examples:
+        - Cartesian and ladder operators: `I(component,index)` or 
+          `I(component)`. Examples:
 
             - `I(x,4)` --> Creates x-operator for spin at index 4.
             - `I(x)`--> Creates x-operator for all spins.
@@ -195,11 +227,14 @@ def hamiltonian(
         Spin system for which the Hamiltonian is going to be generated.
     interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
         Specifies which interactions are taken into account. The options are:
+
         - 'zeeman' -- Zeeman interaction
         - 'chemical_shift' -- Isotropic chemical shift
         - 'J_coupling' -- Scalar J-coupling
+
     side : {'comm', 'left', 'right'}
         The type of superoperator:
+        
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
@@ -510,34 +545,6 @@ def pulse(spin_system: SpinSystem,
 
     return P
 
-def liouvillian(H: np.ndarray | sp.csc_array = None,
-                R: np.ndarray | sp.csc_array = None,
-                K: np.ndarray | sp.csc_array = None
-                ) -> np.ndarray | sp.csc_array:
-    """
-    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation
-    superoperator, and exchange superoperator.
-
-    Parameters
-    ----------
-    H : ndarray or csc_array
-        Hamiltonian superoperator.
-    R : ndarray or csc_array
-        Relaxation superoperator
-    K : ndarray or csc_array
-        Exchange superoperator.
-
-    Returns
-    -------
-    L : ndarray or csc_array
-        Liouvillian superoperator.
-    """
-
-    # Construct the Liouvillian
-    L = _sop_L(H, R, K)
-
-    return L
-
 def propagator(L: np.ndarray | sp.csc_array,
                t: float) -> np.ndarray | sp.csc_array:
     """
@@ -587,7 +594,7 @@ def propagator_to_rotframe(spin_system: SpinSystem,
 
     Returns
     -------
-    sop_P : ndarray or csc_array
+    P_rot : ndarray or csc_array
         The time propagator transformed into the rotating frame.
     """
     # Obtain an array of center frequencies for each spin
@@ -610,14 +617,14 @@ def propagator_to_rotframe(spin_system: SpinSystem,
     )
 
     # Convert the propagator to rotating frame
-    P = _propagator_to_rotframe(
+    P_rot = _propagator_to_rotframe(
         sop_P = P,
         sop_H0 = H_frame,
         t = t,
         zero_value = parameters.zero_propagator
     )
     
-    return P
+    return P_rot
 
 def measure(spin_system: SpinSystem,
             rho: np.ndarray | sp.csc_array,
@@ -641,7 +648,7 @@ def measure(spin_system: SpinSystem,
           `I(component)`. Examples:
 
             - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
+            - `I(x)` --> Creates x-operator for all spins.
 
         - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
 
@@ -796,39 +803,6 @@ def resonance_frequency(
 
     return omega
 
-def frequency_to_chemical_shift(
-        frequency: float | np.ndarray, 
-        reference_frequency: float,
-        spectrometer_frequency: float
-) -> float | np.ndarray:
-    """
-    Converts a frequency (or an array of frequencies, e.g., a frequency axis) to
-    a chemical shift value based on the reference frequency and the spectrometer
-    frequency.
-
-    Parameters
-    ----------
-    frequency : float or ndarray
-        Frequency (or array of frequencies) to convert [in Hz].
-    reference_frequency : float
-        Reference frequency for the conversion [in Hz].
-    spectrometer_frequency : float
-        Spectrometer frequency for the conversion [in Hz].
-
-    Returns
-    -------
-    chemical_shift : float or ndarray
-        Converted chemical shift value (or array of values).
-    """
-    # Perform the conversion
-    chemical_shift = _frequency_to_chemical_shift(
-        frequency = frequency,
-        reference_frequency = reference_frequency,
-        spectrometer_frequency = spectrometer_frequency
-    )
-
-    return chemical_shift
-
 def pulse_and_acquire(
         spin_system: SpinSystem,
         isotope: str,
@@ -839,6 +813,17 @@ def pulse_and_acquire(
 ) -> np.ndarray:
     """
     Simple pulse-and-acquire experiment.
+
+    This experiment requires the following spin system properties to be defined:
+
+    - spin_system.basis : must be built
+    - spin_system.relaxation.theory
+    - spin_system.relaxation.thermalization : must be True
+
+    This experiment requires the following parameters to be defined:
+
+    - parameters.magnetic_field : magnetic field of the spectrometer in Tesla
+    - parameters.temperature : temperature of the sample in Kelvin
 
     Parameters
     ----------
@@ -906,11 +891,13 @@ def inversion_recovery(
     `inversion_recovery_fid()`.
 
     This experiment requires the following spin system properties to be defined:
+
     - spin_system.basis : must be built
     - spin_system.relaxation.theory
     - spin_system.relaxation.thermalization : must be True
 
     This experiment requires the following parameters to be defined:
+
     - parameters.magnetic_field : magnetic field of the spectrometer in Tesla
     - parameters.temperature : temperature of the sample in Kelvin
 
@@ -919,8 +906,8 @@ def inversion_recovery(
     spin_system : SpinSystem
         Spin system to which the inversion-recovery experiment is performed.
     isotope : str
-        Specifies the isotope whose magnetization is inverted and detected. This
-        function applies hard pulses.
+        Specifies the isotope, for example "1H", whose magnetization is inverted
+        and detected. This function applies hard pulses.
     npoints : int
         Number of points in the simulation. Defines the total simulation time
         together with `time_step`.
@@ -1018,12 +1005,10 @@ def dissociate(spin_system_A: SpinSystem,
     Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).
     We want to dissociate this into two subsystems A and B. Spins 0 and 2 should
     go to subsystem A and the rest to subsystem B. In this case, we define the
-    following spin maps:
+    following spin maps::
 
-    ```python
-    spin_map_A = np.array([0, 2])
-    spin_map_B = np.array([1, 3, 4])
-    ```
+        spin_map_A = np.array([0, 2])
+        spin_map_B = np.array([1, 3, 4])
 
     Parameters
     ----------
@@ -1078,12 +1063,10 @@ def associate(spin_system_A: SpinSystem,
     has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
     from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
     spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows:
+    maps as follows::
 
-    ```python
-    spin_map_A = np.ndarray([0, 2])
-    spin_map_B = np.ndarray([1, 3, 4])
-    ```
+        spin_map_A = np.ndarray([0, 2])
+        spin_map_B = np.ndarray([1, 3, 4])
 
     Parameters
     ----------
@@ -1128,13 +1111,16 @@ def permute_spins(spin_system: SpinSystem,
     Permutes the state vector of a spin system to correspond to a reordering
     of the spins in the system. 
 
-    Example. Our spin system has three spins, which are indexed (0, 1, 2).
-    Spins 0 and 2 switch positions and we want to re-order our state vector
-    accordingly. In this case, we want to assign the following map:
+    Example. Our spin system has three spins, which are indexed (0, 1, 2). We
+    want to perform the following permulation:
 
-    ```python
-    spin_map = np.array([2, 1, 0])
-    ```
+    - 0 --> 2 (Spin 0 goes to position 2)
+    - 1 --> 0 (Spin 1 goes to position 0)
+    - 2 --> 1 (Spin 2 goes to position 1)
+
+    In this case, we want to assign the following map::
+
+        spin_map = np.array([2, 0, 1])
 
     Parameters
     ----------
@@ -1303,7 +1289,7 @@ def alpha_state(spin_system: SpinSystem,
 
     Parameters
     ----------
-    spin_system: SpinSystem,
+    spin_system: SpinSystem
         Spin system for which the alpha state is created.
     index : int
         Index of the spin that has the alpha state.
@@ -1336,7 +1322,7 @@ def beta_state(spin_system: SpinSystem,
 
     Parameters
     ----------
-    spin_system: SpinSystem,
+    spin_system: SpinSystem
         Spin system for which the beta state is created.
     index : int
         Index of the spin that has the beta state.

@@ -132,11 +132,9 @@ class SpinSystem:
         """
         Specifies the isotopes that constitute the spin system and determine
         other properties, such as spin quantum numbers and gyromagnetic ratios.
-        Example:
+        Example::
 
-        ```python
-        np.array(['1H', '15N', '19F'])
-        ```
+            np.array(['1H', '15N', '19F'])
 
         Isotopes are set during the initialization of the spin system.
         """
@@ -343,23 +341,27 @@ class SpinSystem:
 
     @property
     def nspins(self) -> int:
-        """Returns the number of spins in the spin system."""
+        """Number of spins in the spin system."""
         return len(self.isotopes)
     
     @property
     def spins(self) -> np.ndarray:
-        """Returns the spin quantum numbers of the spin system."""
+        """Spin quantum numbers for each isotope the spin system."""
         return np.array([ISOTOPES[isotope][0] for isotope in self.isotopes])
     
     @property
     def mults(self) -> np.ndarray:
-        """Returns the spin multiplicities of the spin system."""
+        """
+        Spin multiplicities for each isotope in the `SpinSystem`.
+        """
         return np.array([int(2 * ISOTOPES[isotope][0] + 1)
                          for isotope in self.isotopes], dtype=int)
     
     @property
     def gammas(self) -> np.ndarray:
-        """Returns the gyromagnetic ratios in rad/s/T."""
+        """
+        Gyromagnetic ratios of each isotope in the `SpinSystem` in rad/s/T.
+        """
         return np.array([2 * np.pi * ISOTOPES[isotope][1] * 1e6
                          for isotope in self.isotopes])
     
@@ -375,7 +377,11 @@ class SpinSystem:
 
     @property
     def basis(self) -> Basis:
-        """Returns the basis set."""
+        """
+        Contains the basis set for the `SpinSystem`. Includes functionality for
+        restricting the maximum spin order, building the basis set, and applying
+        more advanced truncation to the basis set.
+        """
         return self._basis
     
     ################################
@@ -384,5 +390,9 @@ class SpinSystem:
 
     @property
     def relaxation(self) -> RelaxationProperties:
-        """Returns the relaxation properties."""
+        """
+        Contains the properties that define the relaxation of the `SpinSystem`.
+        Allows the definition of relaxation theory, correlation time, relaxation
+        times, etc.
+        """
         return self._relaxation

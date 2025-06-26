@@ -125,10 +125,10 @@ def spectrum(signal: np.ndarray,
 
     return freqs, spectrum
 
-def frequency_to_chemical_shift(frequency: float | np.ndarray, 
-                                reference_frequency: float,
-                                spectrometer_frequency: float
-                                ) -> float | np.ndarray:
+def frequency_to_chemical_shift(
+        frequency: float | np.ndarray, 
+        reference_frequency: float,
+        spectrometer_frequency: float) -> float | np.ndarray:
     """
     Converts a frequency (or an array of frequencies, e.g., a frequency axis) to
     a chemical shift value based on the reference frequency and the spectrometer
