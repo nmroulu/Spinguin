@@ -1,3 +1,8 @@
+"""
+This module provides user friendly wrapper functions of the Spinguin's core 
+functionality by making use of the `SpinSystem` class.
+"""
+
 # Expose only the necessary functions from the API
 from spinguin.api.core import (
     alpha_state,

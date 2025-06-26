@@ -1,19 +1,17 @@
-spinguin package
+Spinguin (Basic)
 ================
-
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   spinguin.api
-   spinguin.core
-
-Module contents
----------------
 
 .. automodule:: spinguin
    :members:
-   :show-inheritance:
-   :undoc-members:
+
+Table of contents
+-----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   spinguin.api
+   spinguin.api.parameters
+   spinguin.api.basis
+   spinguin.api.relaxation_properties
+   

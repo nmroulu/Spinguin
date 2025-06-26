@@ -1,19 +1,23 @@
-.. Spinguin documentation master file, created by
-   sphinx-quickstart on Wed Jun 25 16:07:00 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Spinguin
+========
 
-Spinguin documentation
-======================
-
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+Spinguin is a user-friendly Python package designed for versatile numerical
+spin-dynamics simulations in liquid state. It offers tools for performing
+simulations using restricted basis sets, enabling the use of large spin systems
+with more than 10 spins on consumer-level hardware. Spinguin supports the
+simulation of coherent dynamics, relaxation, and chemical exchange processes.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 1
+    :caption: Getting started
+    
+    installation
+    basics
+    advanced
 
-   modules
+.. toctree::
+    :maxdepth: 1
+    :caption: Documentation
 
+    spinguin
+    spinguin.core
