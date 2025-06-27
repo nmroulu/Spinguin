@@ -1,7 +1,12 @@
 """
-basis.py
+This module provides the Basis class which is assigned as a part of `SpinSystem`
+object upon its instantiation. Here is an example of accessing the most
+important functionality of the class::
 
-This module provides the Basis class.
+    import spinguin as sg                   # Import the package
+    spin_system = sg.SpinSystem(["1H"])     # Create an example spin system
+    spin_system.basis.max_spin_order = 1    # Set the maximum spin order
+    spin_system.basis.build()               # Build the basis set
 """
 
 # Referencing SpinSystem class
@@ -21,7 +26,9 @@ from spinguin.core.la import isvector
 
 class Basis:
     """
-    TODO
+    Basis class manages the basis set of a spin system. Most importantly, the
+    basis set contains the information on the truncation of the basis set and is
+    responsible for building and making changes to the basis set.
     """
 
     # Basis set properties
@@ -43,19 +50,32 @@ class Basis:
 
     @property
     def max_spin_order(self) -> int:
-        return self._max_spin_order
-    
-    @property
-    def basis(self) -> np.ndarray:
-        return self._basis
-    
-    @max_spin_order.setter
-    def max_spin_order(self, max_spin_order):
         """
         Specifies the maximum number of a active spins that are included in the
         product operators that constitute the basis set. Must be at least 1 and
         not larger than the number of spins in the system.
         """
+        return self._max_spin_order
+    
+    @property
+    def basis(self) -> np.ndarray:
+        """
+        Contains the actual basis set as an array of dimensions (N, M) where
+        N is the number of states in the basis and M is the number of spins in
+        the system. The basis set is constructed from Kronecker products of
+        irreducible spherical tensor operators, which are indexed using integers
+        starting from 0 with increasing rank `l` and decreasing projection `q`:
+
+        - 0 --> T(0, 0)
+        - 1 --> T(1, 1)
+        - 2 --> T(1, 0)
+        - 3 --> T(1, -1) and so on...
+
+        """
+        return self._basis
+    
+    @max_spin_order.setter
+    def max_spin_order(self, max_spin_order):
         if max_spin_order < 1:
             raise ValueError("Maximum spin order must be at least 1.")
         if max_spin_order > self._spin_system.nspins:
@@ -67,7 +87,8 @@ class Basis:
     def build(self):
         """
         Builds the basis set for the spin system. Prior to building the basis,
-        the isotopes must be defined.
+        the maximum spin order should be defined. If it is not defined, it is
+        set equal to the number of spins in the system (may be very slow)!
         """
         # If maximum spin order is not specified, raise a warning and set it
         # equal to the number of spins
@@ -80,10 +101,11 @@ class Basis:
         self._basis = make_basis(spins = self._spin_system.spins,
                                  max_spin_order = self.max_spin_order)
         
-    def truncate_by_coherence(self,
-                              coherence_orders: list,
-                              *objs: np.ndarray | sp.csc_array
-                              ) -> None | tuple[np.ndarray | sp.csc_array]:
+    def truncate_by_coherence(
+            self,
+            coherence_orders: list,
+            *objs: np.ndarray | sp.csc_array
+        ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
         """
         Truncates the basis set by retaining only the product operators that
         correspond to coherence orders specified in the `coherence_orders` list.
@@ -98,7 +120,7 @@ class Basis:
 
         Returns
         -------
-        objs_transformed : tuple
+        objs_transformed : ndarray or csc_array or tuple
             Superoperators and state vectors transformed into the truncated
             basis.
         """

@@ -158,7 +158,7 @@ def superoperator(spin_system: SpinSystem,
         follow the rules below:
 
         - Cartesian and ladder operators: `I(component,index)` or
-            `I(component)`. Examples:
+          `I(component)`. Examples:
 
             - `I(x,4)` --> Creates x-operator for spin at index 4.
             - `I(x)`--> Creates x-operator for all spins.
@@ -276,6 +276,31 @@ def hamiltonian(
 def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     """
     Creates the relaxation superoperator using the requested relaxation theory.
+
+    Requires that the following spin system properties are set:
+
+    - spin_system.relaxation.theory : must be specified
+    - spin_system.basis : must be built
+
+    If `phenomenological` relaxation theory is requested, the following must
+    be set:
+
+    - spin_system.relaxation.T1
+    - spin_system.relaxation.T2
+
+    If `redfield` relaxation theory is requested, the following must be set:
+
+    - spin_system.relaxation.tau_c
+    - parameters.magnetic_field
+
+    If `sr2k` is requested, the following must be set:
+
+    - parameters.magnetic_field
+
+    If `thermalization` is requested, the following must be set:
+
+    - parameters.magnetic_field
+    - parameters.thermalization
 
     Parameters
     ----------
@@ -709,6 +734,12 @@ def spectral_width_to_dwell_time(
     -------
     dwell_time : float
         Dwell time in seconds.
+
+    Notes
+    -----
+    Requires that the following is set:
+
+    - parameters.magnetic_field
     """
     # Obtain the dwell time
     dwell_time = _spectral_width_to_dwell_time(
@@ -752,6 +783,7 @@ def spectrum(signal: np.ndarray,
     Notes
     -----
     Required global parameters:
+
     - parameters.dwell_time
     """
     # Compute the Fourier transform
@@ -786,11 +818,12 @@ def resonance_frequency(
     Returns
     -------
     omega : float
-        Spectrometer frequency in the requested units.
+        Resonance frequency in the requested units.
 
     Notes
     -----
     Required global parameters:
+
     - parameters.magnetic_field
     """
     # Get the resonance frequency
@@ -1195,7 +1228,7 @@ def state(spin_system: SpinSystem,
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system to which the state is created.
+        Spin system for which the state is created.
     operator : str
         Defines the state to be generated. The operator string must follow the
         rules below:
