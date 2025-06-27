@@ -1,14 +1,17 @@
 """
-nmr_isotopes.py
+This module contains a dictionary of NMR isotopes with the following properties:
 
-This file contains a dictionary of NMR isotopes with the following properties:
-    - Spin quantum number
-    - Gyromagnetic ratio (gamma) in MHz/T
-    - Quadrupole moment (Q) in barns
+- Spin quantum number
+- Gyromagnetic ratio (gamma) in MHz/T
+- Quadrupole moment (Q) in barns
 
 Source: https://www.kherb.io/docs/nmr_table.html
 
-If your isotope is not listed, you can add it by following the format of the existing entries.
+If your isotope is not listed, you can add it by following the format of the
+existing entries.
+
+TODO: Mahdollista oman isotoopin lisääminen suoraan paketista?
+TODO: Tarkista kvadrupolimomentit?
 """
 
 # Imports

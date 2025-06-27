@@ -1,7 +1,6 @@
 """
-data_io.py
-
-This module contains functions for reading data from files and converting it into suitable formats.
+This module contains functions for reading data from files and converting it
+into suitable formats.
 """
 
 # Imports
@@ -9,7 +8,8 @@ import numpy as np
 
 def read_array(file_path: str, data_type: type) -> np.ndarray:
     """
-    Reads a .txt file where values are stored in a space-separated format.
+    Reads a .txt file where values are stored in a space-separated format and
+    converts that into a NumPy array.
 
     Parameters
     ----------
@@ -20,7 +20,7 @@ def read_array(file_path: str, data_type: type) -> np.ndarray:
 
     Returns
     -------
-    value_array : numpy.ndarray
+    value_array : ndarray
         A NumPy array containing the values read from the file.
     """
 
@@ -44,7 +44,7 @@ def read_xyz(file_path: str) -> np.ndarray:
 
     Returns
     -------
-    xyz : numpy.ndarray
+    xyz : ndarray
         A NumPy array containing the atom symbols and Cartesian coordinates.
     """
 
@@ -81,6 +81,8 @@ def read_tensors(file_path: str) -> np.ndarray:
     
     This structure is repeated for each spin.
 
+    TODO: Input mahdollinen ilman nollatensoreita?
+
     Parameters
     ----------
     file_path : str
@@ -88,10 +90,8 @@ def read_tensors(file_path: str) -> np.ndarray:
 
     Returns
     -------
-    tensors : numpy.ndarray
+    tensors : ndarray
         A NumPy array containing the tensors.
-
-    TODO: Input mahdollinen ilman nollatensoreita?
     """
 
     # Initialize the lists and the current index

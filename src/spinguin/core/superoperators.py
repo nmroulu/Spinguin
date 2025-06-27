@@ -1,6 +1,4 @@
 """
-superoperators.py
-
 This module provides functions for calculating Liouville-space superoperators
 either in full or truncated basis set.
 """
@@ -227,6 +225,8 @@ def sop_prod(op_def: np.ndarray,
     defined by `op_def`.
     
     This function is called frequently and is cached for high performance.
+
+    TODO: Vastaava cache pohdinta kuin sop_T_coupled() -funktion kanssa.
 
     Parameters
     ----------
@@ -491,6 +491,10 @@ def sop_T_coupled(basis: np.ndarray,
     tensor operators of rank 1.
 
     This function is frequently called and is cached for high performance.
+
+    TODO: Mieti, onko cache tarpeellinen. Nyt hyöty tulee vain, kun lasketaan R
+    useaan kertaan samalle systeemille (esim. eri magneettikentissä). Voisi
+    mahdollisesti olla asetus ohjelmassa (cachet päälle / pois).
 
     Parameters
     ----------

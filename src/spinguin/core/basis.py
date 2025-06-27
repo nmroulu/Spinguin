@@ -1,6 +1,4 @@
 """
-basis.py
-
 This module provides functionality for constructing a basis set.
 """
 
@@ -23,7 +21,7 @@ def make_basis(spins: np.ndarray, max_spin_order: int):
     spherical tensor operator of rank `l` and projection `q` using the following
     relation: `N = l^2 + l - q`. The indexing scheme has been adapted from:
 
-    Hogben, H. J., Hore, P. J., & Kuprov, I. (2010)
+    Hogben, H. J., Hore, P. J., & Kuprov, I. (2010):
     https://doi.org/10.1063/1.3398146
 
     Parameters
@@ -188,7 +186,7 @@ def truncate_basis_by_coherence(basis: np.ndarray,
 def lq_to_idx(l: int, q: int) -> int:
     """
     Returns the index of a single-spin irreducible spherical tensor operator
-    determined by rank l and projection q.
+    determined by rank `l` and projection `q`.
 
     Parameters
     ----------
@@ -210,7 +208,7 @@ def lq_to_idx(l: int, q: int) -> int:
 
 def idx_to_lq(idx: int) -> tuple[int, int]:
     """
-    Converts the given operator index to rank l and projection q.
+    Converts the given operator index to rank `l` and projection `q`.
 
     Parameters
     ----------
@@ -235,7 +233,8 @@ def idx_to_lq(idx: int) -> tuple[int, int]:
 
 def coherence_order(op_def: np.ndarray) -> int:
     """
-    Determines the coherence order of a given operator defined by `op_def`.
+    Determines the coherence order of a given product operator in the basis set,
+    defined by an array of integers `op_def`.
 
     Parameters
     ----------
@@ -499,7 +498,7 @@ def parse_operator_string(operator: str, nspins: int):
 
 def state_idx(basis: np.ndarray, op_def: np.ndarray) -> int:
     """
-    Finds the index corresponding to the given operator definition.
+    Finds the index of the state defined by the `op_def` in the basis set.
 
     Parameters
     ----------

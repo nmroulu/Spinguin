@@ -1,6 +1,4 @@
 """
-states.py
-
 This module provides functions for creating state vectors.
 """
 
@@ -28,7 +26,7 @@ def unit_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -83,9 +81,8 @@ def _state_from_op_def(
     basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0])
     op_def = np.frombuffer(op_def_bytes, dtype=int)
 
-    # Obtain the basis dimension, number of spins and spin multiplicities
+    # Obtain the basis dimension and spin multiplicities
     dim = basis.shape[0]
-    nspins = spins.shape[0]
     mults = (2*spins + 1).astype(int)
 
     # Initialize the state vector
@@ -135,16 +132,15 @@ def state_from_op_def(
         sparse : bool=False
 ) -> np.ndarray | sp.csc_array:
     """
-    Generates a state vector from the given operator definition. The output of
-    the state function corresponds to a density matrix, which is expressed as a
-    linear combination of the basis set operators. The output of this function
-    is a column vector, which contains the coefficients.
+    Generates a state from the given operator definition. The output of this
+    function is a column vector where the requested state has been populated.
     
     Normalization:
-    The basis set operators are constructed from products of single-spin
-    spherical tensor operators and they are normalized. Therefore, requesting a
-    state that corresponds to any operator `O` will result in a coefficient of
-    `norm(O)` for the state.
+    The output of this function corresponds to the non-normalized operator.
+    However, because the basis set operators are constructed from products of
+    normalized single-spin spherical tensor operators, requesting a state that
+    corresponds to any operator `O` will result in a coefficient of `norm(O)`
+    for the state.
 
     NOTE: This function is sometimes called often and is cached for high
     performance.
@@ -152,7 +148,7 @@ def state_from_op_def(
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -261,7 +257,7 @@ def state_from_string(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -324,7 +320,7 @@ def state_to_zeeman(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -386,7 +382,7 @@ def equilibrium_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -435,7 +431,7 @@ def alpha_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -475,7 +471,7 @@ def beta_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -516,7 +512,7 @@ def singlet_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -564,7 +560,7 @@ def triplet_zero_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -612,7 +608,7 @@ def triplet_plus_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -658,7 +654,7 @@ def triplet_minus_state(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -704,7 +700,7 @@ def measure(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray

@@ -1,6 +1,4 @@
 """
-relaxation.py
-
 This module provides functions for calculating relaxation superoperators.
 """
 
@@ -82,7 +80,7 @@ def G0(tensor1: np.ndarray, tensor2: np.ndarray, l: int) -> float:
     Parameters
     ----------
     tensor1 : ndarray
-        Cartesian tensor 1.s
+        Cartesian tensor 1.
     tensor2 : ndarray
         Cartesian tensor 2.
     l : int
@@ -336,7 +334,7 @@ def get_sop_T(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -394,7 +392,7 @@ def sop_R_redfield_term(
         top_l_shared: dict, top_r_shared: dict, bottom_r_shared: dict,
         t_max: float, aux_zero: float, relaxation_zero: float,
         sop_Ts: dict, interactions: dict
-) -> sp.csc_array:
+) -> tuple[int, int, str, int, int, sp.csc_array]:
     """
     Helper function for the Redfield relaxation theory. This function calculates
     one term of the relaxation superoperator and enables the use of parallel
@@ -412,10 +410,10 @@ def sop_R_redfield_term(
     type_r : str
         Interaction type. Possible options are "CSA", "Q", and "DD".
     spin_r1 : int
-        Index of the first spin.
+        Index of the first spin in the interaction.
     spin_r2 : int
-        Index of the second spin. Leave empty for single-spin interactions
-        (e.g., CSA).
+        Index of the second spin in the interaction. Leave empty for single-spin
+        interactions (e.g., CSA).
     tensor_r : np.ndarray
         Interaction tensor for the right-hand interaction.
     top_l_shared : dict
@@ -550,7 +548,7 @@ def sop_R_redfield(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     sop_H : ndarray or csc_array
@@ -794,7 +792,7 @@ def sop_R_phenomenological(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     R1 : ndarray
@@ -880,7 +878,7 @@ def sop_R_sr2k(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray

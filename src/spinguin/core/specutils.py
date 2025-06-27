@@ -1,6 +1,4 @@
 """
-specutils.py
-
 This module provides core functions for spectral data analysis, including
 Fourier transforms, spectrum generation, and unit conversions commonly used in
 NMR and signal processing.
@@ -106,9 +104,9 @@ def spectrum(signal: np.ndarray,
 
     Returns
     -------
-    freqs : numpy.ndarray
+    freqs : ndarray
         Frequencies corresponding to the Fourier-transformed signal.
-    spectrum : numpy.ndarray
+    spectrum : ndarray
         Specified part (real or imaginary) of the Fourier-transformed signal 
         in the frequency domain.
     """

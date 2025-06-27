@@ -1,6 +1,4 @@
 """
-chem.py
-
 This module contains functions responsible for chemical kinetics.
 """
 
@@ -102,12 +100,10 @@ def dissociate_index_map(basis_A: np.ndarray,
     Example. Basis set C contains five spins, which are indexed as
     (0, 1, 2, 3, 4). We want to dissociate this into two subsystems A and B.
     Spins 0 and 2 should go to subsystem A and the rest to subsystem B. In this
-    case, we define the following spin maps:
+    case, we define the following spin maps::
 
-    ```python
-    spin_map_A = np.array([0, 2])
-    spin_map_B = np.array([1, 3, 4])
-    ```
+        spin_map_A = np.array([0, 2])
+        spin_map_B = np.array([1, 3, 4])
 
     Parameters
     ----------
@@ -178,12 +174,10 @@ def dissociate(basis_A: np.ndarray,
     Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).
     We want to dissociate this into two subsystems A and B. Spins 0 and 2 should
     go to subsystem A and the rest to subsystem B. In this case, we define the
-    following spin maps:
+    following spin maps::
 
-    ```python
-    spin_map_A = np.array([0, 2])
-    spin_map_B = np.array([1, 3, 4])
-    ```
+        spin_map_A = np.array([0, 2])
+        spin_map_B = np.array([1, 3, 4])
 
     Parameters
     ----------
@@ -199,6 +193,10 @@ def dissociate(basis_A: np.ndarray,
         Basis set for the composite system C. It is a 2-dimensional array
         containing sequences of integers describing the Kronecker products of
         irreducible spherical tensors.
+    spins_A : ndarray
+        Spin quantum numbers for each spin in system A.
+    spins_B : ndarray
+        Spin quantum numbers for each spin in system B.
     rho_C : ndarray or csc_array
         State vector of the composite spin system C.
     spin_map_A : list or tuple or ndarray
@@ -319,12 +317,10 @@ def associate_index_map(basis_A: np.ndarray,
     has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
     from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
     spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows:
+    maps as follows::
 
-    ```python
-    spin_map_A = np.ndarray([0, 2])
-    spin_map_B = np.ndarray([1, 3, 4])
-    ```
+        spin_map_A = np.ndarray([0, 2])
+        spin_map_B = np.ndarray([1, 3, 4])
 
     Parameters
     ----------
@@ -391,12 +387,10 @@ def associate(basis_A: np.ndarray,
     has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
     from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
     spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows:
+    maps as follows::
 
-    ```python
-    spin_map_A = np.ndarray([0, 2])
-    spin_map_B = np.ndarray([1, 3, 4])
-    ```
+        spin_map_A = np.ndarray([0, 2])
+        spin_map_B = np.ndarray([1, 3, 4])
 
     Parameters
     ----------
@@ -503,18 +497,25 @@ def permutation_matrix(basis: np.ndarray,
     """
     Creates a permutation matrix to reorder the spins in the system.
 
-    Example. Our spin system has three spins, which are indexed (0, 1, 2).
-    Spins 0 and 2 switch positions and we want to re-order our state vector
-    accordingly. In this case, we want to assign the following map:
+    Example. Our spin system has three spins, which are indexed (0, 1, 2). We
+    want to perform the following permulation:
 
-    ```python
-    spin_map = np.array([2, 1, 0])
-    ```
+    - 0 --> 2 (Spin 0 goes to position 2)
+    - 1 --> 0 (Spin 1 goes to position 0)
+    - 2 --> 1 (Spin 2 goes to position 1)
+
+    In this case, we want to assign the following map::
+
+        spin_map = np.array([2, 0, 1])
+
+    The permutation can be applied by::
+
+        rho_permuted = perm @ rho
 
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spin_map : list or tuple or ndarray
@@ -545,27 +546,27 @@ def permute_spins(basis: np.ndarray,
     Permutes the state vector of a spin system to correspond to a reordering
     of the spins in the system. 
 
-    Example. Our spin system has three spins, which are indexed (0, 1, 2).
-    Spins 0 and 2 switch positions and we want to re-order our state vector
-    accordingly. In this case, we want to assign the following map:
+    Example. Our spin system has three spins, which are indexed (0, 1, 2). We
+    want to perform the following permulation:
 
-    ```python
-    spin_map = np.array([2, 1, 0])
-    ```
+    - 0 --> 2 (Spin 0 goes to position 2)
+    - 1 --> 0 (Spin 1 goes to position 0)
+    - 2 --> 1 (Spin 2 goes to position 1)
+
+    In this case, we want to assign the following map::
+
+        spin_map = np.array([2, 0, 1])
 
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     rho : ndarray or csc_array
         State vector of the spin system.
     spin_map : list or tuple or ndarray
         Indices of the spins in the spin system after permutation.
-    sparse : bool, default=True
-        Specifies whether to use sparse arrays for constructing the permutation
-        matrix. The array is very sparse, so using sparse format is recommended.
 
     Returns
     -------

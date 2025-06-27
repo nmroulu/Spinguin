@@ -1,3 +1,8 @@
+"""
+This module contains a Cython function for finding the intersection of two 
+sorted 2D arrays.
+"""
+
 # Imports
 import numpy as np
 cimport cython
@@ -6,14 +11,14 @@ cimport cython
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.initializedcheck(False)
-cpdef intersect_indices(const long long[::1] A,
-                        const long long[::1] B,
-                        const long long row_len):
+def intersect_indices(const long long[::1] A,
+                      const long long[::1] B,
+                      const long long row_len) -> tuple[np.ndarray, np.ndarray]:
     """
     Fast O(n) implementation for finding the indices of common rows from two 2D
     arrays. The arrays must be pre-prepared into contiguous 1D format. Each row
-    in the original 2D array must be unique and they must be sorted in lexi-
-    cographic order.
+    in the original 2D array must be unique and they must be sorted in
+    lexicographic order.
 
     Parameters
     ----------

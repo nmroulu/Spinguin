@@ -1,7 +1,6 @@
 """
-la.py
-
-Provides various linear algebra tools required for spin dynamics simulations.
+This module provides various linear algebra tools required for spin dynamics
+simulations.
 """
 
 # Imports
@@ -131,7 +130,7 @@ def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
 
     Parameters
     ----------
-    v : csc_array or numpy.ndarray
+    v : csc_array or ndarray
         Array to be checked. Must be two-dimensional.
     ord : str
         Can be either "col" or "row".
@@ -163,10 +162,11 @@ def norm_1(A: csc_array | np.ndarray, ord: str = 'row') -> float:
 
     Parameters
     ----------
-    A : csc_array or numpy.ndarray
+    A : csc_array or ndarray
         Array for which the norm is calculated.
-    ord : str
-        Either 'row' or 'col', specifying the direction for the 1-norm calculation.
+    ord : str, default='row'
+        Either 'row' or 'col', specifying the direction for the 1-norm
+        calculation.
 
     Returns
     -------
@@ -185,7 +185,8 @@ def norm_1(A: csc_array | np.ndarray, ord: str = 'row') -> float:
     # Calculate sums along rows or columns and get the maximum of them
     return abs(A).sum(axis).max()
 
-def expm(A: csc_array, zero_value: float) -> csc_array:
+def expm(A: np.ndarray | csc_array,
+         zero_value: float) -> np.ndarray | csc_array:
     """
     Calculates the matrix exponential of a SciPy sparse CSC array using the
     scaling and squaring method with the Taylor series, shown to be the fastest
@@ -198,7 +199,7 @@ def expm(A: csc_array, zero_value: float) -> csc_array:
 
     Parameters
     ----------
-    A : csc_array
+    A : ndarray or csc_array
         Array to be exponentiated.
     zero_value : float
         Values below this threshold are considered zero. Used to increase the
@@ -207,7 +208,7 @@ def expm(A: csc_array, zero_value: float) -> csc_array:
 
     Returns
     -------
-    expm_A : csc_array
+    expm_A : ndarray or csc_array
         Matrix exponential of `A`.
     """
 
@@ -244,7 +245,8 @@ def expm(A: csc_array, zero_value: float) -> csc_array:
 
     return expm_A
 
-def expm_taylor(A: csc_array, zero_value: float) -> csc_array:
+def expm_taylor(A: np.ndarray | csc_array,
+                zero_value: float) -> np.ndarray | csc_array:
     """
     Computes the matrix exponential using the Taylor series. This function is 
     adapted from an older SciPy version.
@@ -254,7 +256,7 @@ def expm_taylor(A: csc_array, zero_value: float) -> csc_array:
 
     Parameters
     ----------
-    A : csc_array
+    A : ndarray or csc_array
         Matrix (N, N) to be exponentiated.
     zero_value : float
         Values below this threshold are considered zero. Used to increase
@@ -262,7 +264,7 @@ def expm_taylor(A: csc_array, zero_value: float) -> csc_array:
 
     Returns
     -------
-    eA : csc_array
+    eA : ndarray or csc_array
         Matrix exponential of A.
     """
 
@@ -373,20 +375,21 @@ def bytes_to_sparse(A_bytes: bytes) -> csc_array:
 
     return A
 
-def comm(A: csc_array | np.ndarray, B: csc_array | np.ndarray) -> csc_array | np.ndarray:
+def comm(A: csc_array | np.ndarray,
+         B: csc_array | np.ndarray) -> csc_array | np.ndarray:
     """
     Calculates the commutator [A, B] of two operators.
 
     Parameters
     ----------
-    A : csc_array or numpy.ndarray
+    A : csc_array or ndarray
         First operator.
-    B : csc_array or numpy.ndarray
+    B : csc_array or ndarray
         Second operator.
 
     Returns
     -------
-    C : csc_array or numpy.ndarray
+    C : csc_array or ndarray
         Commutator [A, B].
     """
 
@@ -395,11 +398,12 @@ def comm(A: csc_array | np.ndarray, B: csc_array | np.ndarray) -> csc_array | np
 
     return C
 
-def find_common_rows(A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def find_common_rows(A: np.ndarray,
+                     B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Identifies the indices of common rows between two arrays, `A` and `B`.
     Each row must appear only once in the arrays and they must be sorted
-    in lexicographical order. Data type must be np.longlong.
+    in lexicographical order.
 
     Parameters
     ----------
@@ -460,15 +464,15 @@ def auxiliary_matrix_expm(A: np.ndarray | csc_array,
     t : float
         Integration time.
     zero_value : float
-        Threshold below which values are considered zero when exponentiating the auxiliary
-        matrix using the Taylor series. This significantly impacts performance. Use the
-        largest value that still provides correct results.
+        Threshold below which values are considered zero when exponentiating the
+        auxiliary matrix using the Taylor series. This significantly impacts
+        performance. Use the largest value that still provides correct results.
     
     Returns
     -------
     expm_aux : ndarray or csc_array
-        Matrix exponential of the auxiliary matrix. The output is sparse or dense
-        matching the sparsity of the input.
+        Matrix exponential of the auxiliary matrix. The output is sparse or
+        dense matching the sparsity of the input.
     """
 
     # Ensure that the input arrays are all either sparse or dense
@@ -500,9 +504,9 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
 
     Parameters
     ----------
-    v1 : numpy.ndarray
+    v1 : ndarray
         First vector.
-    v2 : numpy.ndarray
+    v2 : ndarray
         Second vector.
 
     Returns
@@ -515,29 +519,32 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
     if np.array_equal(v1, v2):
         theta = 0
     else:
-        theta = np.arccos(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
+        theta = np.arccos(
+            np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
 
     return theta
 
-def decompose_matrix(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def decompose_matrix(matrix: np.ndarray) \
+    -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Decomposes a matrix into three components:
-        - Isotropic part.
-        - Antisymmetric part.
-        - Symmetric traceless part.
+
+    - Isotropic part.
+    - Antisymmetric part.
+    - Symmetric traceless part.
 
     Parameters
     ----------
-    matrix : numpy.ndarray
+    matrix : ndarray
         Matrix to decompose.
 
     Returns
     -------
-    isotropic : numpy.ndarray
+    isotropic : ndarray
         Isotropic part of the input matrix.
-    antisymmetric : numpy.ndarray
+    antisymmetric : ndarray
         Antisymmetric part of the input matrix.
-    symmetric_traceless : numpy.ndarray
+    symmetric_traceless : ndarray
         Symmetric traceless part of the input matrix.
     """
 
@@ -548,7 +555,8 @@ def decompose_matrix(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.nda
     
     return isotropic, antisymmetric, symmetric_traceless
 
-def principal_axis_system(tensor: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def principal_axis_system(tensor: np.ndarray) \
+    -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Determines the principal axis system (PAS) of a Cartesian tensor
     and transforms the tensor into the PAS.
@@ -565,11 +573,11 @@ def principal_axis_system(tensor: np.ndarray) -> tuple[np.ndarray, np.ndarray, n
 
     Returns
     -------
-    eigenvalues : numpy.ndarray
+    eigenvalues : ndarray
         Eigenvalues of the tensor in the PAS.
-    eigenvectors : numpy.ndarray
+    eigenvectors : ndarray
         Two-dimensional array where rows contain the eigenvectors of the PAS.
-    tensor_PAS : numpy.ndarray
+    tensor_PAS : ndarray
         Tensor transformed into the PAS.
     """
 
@@ -599,7 +607,7 @@ def cartesian_tensor_to_spherical_tensor(C: np.ndarray) -> dict:
 
     Parameters
     ----------
-    C : numpy.ndarray
+    C : ndarray
         Rank-2 tensor in Cartesian coordinates.
 
     Returns
@@ -639,7 +647,7 @@ def vector_to_spherical_tensor(vector: np.ndarray) -> dict:
 
     Parameters
     ----------
-    vector : numpy.ndarray
+    vector : ndarray
         Vector in the format [x, y, z].
 
     Returns
@@ -659,7 +667,9 @@ def vector_to_spherical_tensor(vector: np.ndarray) -> dict:
     return spherical_tensor
 
 @lru_cache(maxsize=32784)
-def CG_coeff(j1: float, m1: float, j2: float, m2: float, j3: float, m3: float) -> float:
+def CG_coeff(j1: float, m1: float,
+             j2: float, m2: float,
+             j3: float, m3: float) -> float:
     """
     Computes the Clebsch-Gordan coefficients.
 
@@ -753,7 +763,8 @@ def arraylike_to_tuple(A: ArrayLike) -> tuple:
     elif A.ndim == 1:
         A = tuple(A)
     else:
-        raise ValueError(f"Cannot convert {A.ndim}-dimensional array into tuple.")
+        raise ValueError(f"Cannot convert {A.ndim}-dimensional array into "
+                         "tuple.")
     
     return A
 

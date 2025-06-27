@@ -1,6 +1,4 @@
 """
-operators.py
-
 This module provides functions for calculating quantum mechanical spin operators
 in Hilbert space. It includes functions for single-spin operators as well as
 many-spin product operators.

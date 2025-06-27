@@ -1,3 +1,8 @@
+"""
+This module contains a class that can be used to hide printing to the console.
+"""
+
+# Imports
 import os
 import sys
 

@@ -1,6 +1,4 @@
 """
-propagation.py
-
 This module is responsible for calculating time propagators.
 """
 
@@ -13,18 +11,16 @@ from spinguin.core.la import expm
 from spinguin.core.superoperators import sop_from_string
 from spinguin.core.hide_prints import HidePrints
 
-def sop_propagator(L: sp.csc_array,
+def sop_propagator(L: np.ndarray | sp.csc_array,
                    t: float,
                    zero_value: float=1e-18,
                    density_threshold: float=0.5) -> sp.csc_array | np.ndarray:
     """
     Constructs the time propagator exp(L*t).
 
-    TODO: Handle dense arrays (custom dot works only with sparses)
-
     Parameters
     ----------
-    L : csc_array
+    L : ndarray or csc_array
         Liouvillian superoperator, L = -iH - R + K.
     t : float
         Time step of the simulation in seconds.
@@ -71,8 +67,6 @@ def propagator_to_rotframe(
 ) -> np.ndarray | sp.csc_array:
     """
     Transforms the time propagator to the rotating frame.
-
-    TODO: Handle dense arrays (custom dot works only with sparses)
 
     Parameters
     ----------
@@ -125,7 +119,7 @@ def sop_pulse(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray

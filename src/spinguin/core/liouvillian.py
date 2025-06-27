@@ -1,3 +1,7 @@
+"""
+This module provides a function for calculating the Liouvillian.
+"""
+
 # Imports
 import numpy as np
 import scipy.sparse as sp

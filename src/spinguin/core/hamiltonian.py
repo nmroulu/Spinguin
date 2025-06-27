@@ -1,6 +1,4 @@
 """
-hamiltonian.py
-
 This module provides functions for calculating Hamiltonian superoperators.
 """
 
@@ -24,7 +22,7 @@ def sop_H_Z(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     gammas : ndarray
@@ -83,7 +81,7 @@ def sop_H_CS(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     gammas : ndarray
@@ -143,7 +141,7 @@ def sop_H_J(basis: np.ndarray,
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray
@@ -218,12 +216,12 @@ def sop_H(
 ) -> np.ndarray | csc_array:
     """
     Computes the coherent part of the Hamiltonian superoperator, including the
-    Zeeman interaction and J-couplings.
+    Zeeman interaction, isotropic chemical shift, and J-couplings.
 
     Parameters
     ----------
     basis : ndarray
-        A 2-dimensional array containing the basis set that consists sequences
+        A 2-dimensional array containing the basis set that contains sequences
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     spins : ndarray

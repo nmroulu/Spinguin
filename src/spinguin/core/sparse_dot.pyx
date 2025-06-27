@@ -1,3 +1,8 @@
+"""
+This module provides a Cython wrapper for the sparse matrix multiplication
+algorithm written in C++.
+"""
+
 import numpy as np
 cimport numpy as np
 from scipy.sparse import csc_array
@@ -28,7 +33,7 @@ ctypedef fused TType:
     np.float64_t
     np.complex128_t
 
-def cy_sparse_dot_indptr(
+def _cy_sparse_dot_indptr(
     TType[::1] A_data, IType[::1] A_indices, IType[::1] A_indptr, IType A_nrows,
     TType[::1] B_data, IType[::1] B_indices, IType[::1] B_indptr, IType B_ncols,
     IType[::1] C_indptr, np.float64_t zero_value
@@ -45,7 +50,7 @@ def cy_sparse_dot_indptr(
             &B_data[0], &B_indices[0], &B_indptr[0], B_ncols,
             &C_indptr[0], zero_value)
 
-def cy_sparse_dot(
+def _cy_sparse_dot(
     TType[::1] A_data, IType[::1] A_indices, IType[::1] A_indptr, IType A_nrows,
     TType[::1] B_data, IType[::1] B_indices, IType[::1] B_indptr, IType B_ncols,
     TType[::1] C_data, IType[::1] C_indices, IType[::1] C_indptr,
@@ -111,7 +116,7 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
     C_indptr = np.zeros(B_ncols+1, dtype=dtype_I)
 
     # Calculate the index pointer array for result matrix
-    cy_sparse_dot_indptr(
+    _cy_sparse_dot_indptr(
         A_data, A_indices, A_indptr, A_nrows,
         B_data, B_indices, B_indptr, B_ncols,
         C_indptr, zero_value
@@ -148,7 +153,7 @@ def sparse_dot(A: csc_array, B: csc_array, zero_value: float) -> csc_array:
     C_indices = np.zeros(nnz, dtype=dtype_I)
     
     # Perform the matrix multiplication (modifies C inplace)
-    cy_sparse_dot(
+    _cy_sparse_dot(
         A_data, A_indices, A_indptr, A_nrows,
         B_data, B_indices, B_indptr, B_ncols,
         C_data, C_indices, C_indptr,
