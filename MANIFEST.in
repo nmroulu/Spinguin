@@ -1,0 +1,2 @@
+include src/spinguin/core/sparse_dot.pyx
+include src/spinguin/core/intersect_indices.pyx

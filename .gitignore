@@ -43,3 +43,6 @@
 
 # Allow .yml files
 !*.yml
+
+# Allow .in files
+!*.in
