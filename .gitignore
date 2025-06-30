@@ -40,3 +40,6 @@
 
 # Allow Makefile in docs
 !docs/Makefile
+
+# Allow .yml files
+!*.yml
