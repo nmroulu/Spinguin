@@ -22,13 +22,8 @@ release = '0.0.1'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'myst_parser'
+    'sphinx.ext.viewcode'
 ]
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.md': 'markdown',
-}
 templates_path = ['_templates']
 exclude_patterns = []
 add_module_names = False
