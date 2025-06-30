@@ -3,8 +3,10 @@ This module provides a Cython wrapper for the sparse matrix multiplication
 algorithm written in C++.
 """
 
+# Imports
 import numpy as np
 cimport numpy as np
+cimport cython
 from scipy.sparse import csc_array
 
 # Define the C++ functions
@@ -33,6 +35,7 @@ ctypedef fused TType:
     np.float64_t
     np.complex128_t
 
+@cython.boundscheck(False)
 def _cy_sparse_dot_indptr(
     TType[::1] A_data, IType[::1] A_indices, IType[::1] A_indptr, IType A_nrows,
     TType[::1] B_data, IType[::1] B_indices, IType[::1] B_indptr, IType B_ncols,
@@ -50,6 +53,7 @@ def _cy_sparse_dot_indptr(
             &B_data[0], &B_indices[0], &B_indptr[0], B_ncols,
             &C_indptr[0], zero_value)
 
+@cython.boundscheck(False)
 def _cy_sparse_dot(
     TType[::1] A_data, IType[::1] A_indices, IType[::1] A_indptr, IType A_nrows,
     TType[::1] B_data, IType[::1] B_indices, IType[::1] B_indptr, IType B_ncols,
