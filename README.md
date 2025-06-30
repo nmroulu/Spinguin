@@ -9,7 +9,7 @@ simulation of coherent dynamics, relaxation, and chemical exchange processes.
 
 ## Documentation
 Documentation for the package is available here:
-LINK
+https://nmroulu.github.io/Spinguin/
 
 ## Installation
 Spinguin can be installed in various ways, depending on your needs and
