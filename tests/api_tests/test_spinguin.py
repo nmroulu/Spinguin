@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from spinguin.system.spinguin import Spinguin
+import spinguin as sg
 
 class TestSpinguin(unittest.TestCase):
 
@@ -10,19 +10,15 @@ class TestSpinguin(unittest.TestCase):
         """
 
         # Initialize two SpinSystem objects
-        sg = Spinguin()
-        ss1 = sg.new_spin_system("test1")
-        ss2 = sg.new_spin_system("test2")
-        ss1.isotopes = ['1H', '1H']
-        ss2.isotopes = ['1H', '1H', '1H']
+        ss1 = sg.SpinSystem(['1H', '1H'])
+        ss2 = sg.SpinSystem(['1H', '1H', '1H'])
 
         # Operator to make
         operator = "I(x,0) * I(y,1)"
         
-        # Creating an operator to any of these systems raises no errors
-        sg.operator("test1", operator)
-        sg.operator("test2", operator)
-        sg.operator("all", operator)
+        # Creating an operator to either of these systems raises no errors
+        sg.operator(ss1, operator)
+        sg.operator(ss2, operator)
 
     def test_create_superoperator(self):
         """
@@ -30,27 +26,23 @@ class TestSpinguin(unittest.TestCase):
         """
 
         # Initialize two SpinSystem objects
-        sg = Spinguin()
-        ss1 = sg.new_spin_system("test1")
-        ss2 = sg.new_spin_system("test2")
-        ss1.isotopes = ['1H', '1H']
-        ss2.isotopes = ['1H', '1H', '1H']
+        ss1 = sg.SpinSystem(['1H', '1H'])
+        ss2 = sg.SpinSystem(['1H', '1H', '1H'])
 
         # Superoperator to make
         operator = "I(x,0) * I(y,1)"
         
         # Trying to make a superoperator before defining basis causes error
         with self.assertRaises(ValueError):
-            sg.superoperator("test1", operator, "comm")
+            sg.superoperator(ss1, operator, "comm")
 
         # When basis is built, constructing superoperator should work
         ss1.basis.max_spin_order = 2
         ss2.basis.max_spin_order = 2
         ss1.basis.build()
         ss2.basis.build()
-        sg.superoperator("test1", operator, "comm")
-        sg.superoperator("test2", operator, "comm")
-        sg.superoperator("all", operator, "comm")
+        sg.superoperator(ss1, operator, "comm")
+        sg.superoperator(ss2, operator, "comm")
 
     def test_create_hamiltonian(self):
         """
@@ -58,68 +50,28 @@ class TestSpinguin(unittest.TestCase):
         """
 
         # Initialize two SpinSystem objects
-        sg = Spinguin()
-        ss1 = sg.new_spin_system("test1")
-        ss2 = sg.new_spin_system("test2")
-        ss1.isotopes = ['1H', '1H']
-        ss2.isotopes = ['1H', '1H', '1H']
+        ss1 = sg.SpinSystem(['1H', '1H'])
 
         # Trying to make Hamiltonian before building basis causes error
         with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="all")
+            sg.hamiltonian(ss1)
 
         # Build the basis
         ss1.basis.max_spin_order = 2
-        ss2.basis.max_spin_order = 2
         ss1.basis.build()
-        ss2.basis.build()
 
-        # Trying to make Zeeman, chemical shift, or "all" Hamiltonian before
-        # setting field causes error
+        # Trying to make Hamiltonian before setting field causes error
         with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="zeeman")
-        with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="chemical_shift")
-        with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="all")
+            sg.hamiltonian(ss1)
+
+        # Only J-coupling Hamiltonian should be fine
+        sg.hamiltonian(ss1, interactions=["J_coupling"])
 
         # Set the magnetic field
         sg.parameters.magnetic_field = 1
 
-        # Trying to make chemical shift or "all" Hamiltonian before setting
-        # chemical shifts causes error
-        with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="chemical_shift")
-        with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="all")
-
-        # Set the chemical shifts
-        ss1.chemical_shifts = [6.00, 7.00]
-        ss2.chemical_shifts = [6.00, 7.00, 8.00]
-
-        # Trying to make J-coupling or "all" Hamiltonian before setting
-        # J-couplings causes error
-        with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="J_coupling")
-        with self.assertRaises(ValueError):
-            sg.hamiltonian("test1", interactions="all")
-
-        # Set the J-couplings
-        ss1.J_couplings = [
-            [0, 0],
-            [1, 0]
-        ]
-        ss2.J_couplings = [
-            [0, 0, 0],
-            [1, 0, 0],
-            [2, 1, 0]
-        ]
-
-        # After all parameters are set, no errors should be raised
-        sg.hamiltonian("all", interactions="all")
-        sg.hamiltonian("all", interactions="zeeman")
-        sg.hamiltonian("all", interactions="chemical_shift")
-        sg.hamiltonian("all", interactions="J_coupling")
+        # After assigning the field, no error is raised
+        sg.hamiltonian(ss1)
 
     def test_create_relaxation(self):
         """
@@ -127,11 +79,8 @@ class TestSpinguin(unittest.TestCase):
         """
 
         # Initialize two SpinSystem objects
-        sg = Spinguin()
-        ss1 = sg.new_spin_system("test1")
-        ss2 = sg.new_spin_system("test2")
-        ss1.isotopes = ['1H', '1H']
-        ss2.isotopes = ['1H', '1H', '1H']
+        ss1 = sg.SpinSystem(['1H', '1H'])
+        ss2 = sg.SpinSystem(['1H', '1H', '1H'])
 
         # Build the basis sets
         ss1.basis.max_spin_order = 2
@@ -176,14 +125,5 @@ class TestSpinguin(unittest.TestCase):
 
         # Create a relaxation superoperator for both systems separately
         # and simultaneously
-        R1 = sg.relaxation("test1")
-        R2 = sg.relaxation("test2")
-        Rall = sg.relaxation("all")
-
-        # Extract the separate parts
-        Rall1 = Rall[:R1.shape[0], :R1.shape[0]]
-        Rall2 = Rall[R1.shape[0]:, R1.shape[0]:]
-
-        # Compare
-        self.assertTrue(np.allclose(R1.toarray(), Rall1.toarray()))
-        self.assertTrue(np.allclose(R2.toarray(), Rall2.toarray()))
+        sg.relaxation(ss1)
+        sg.relaxation(ss2)
