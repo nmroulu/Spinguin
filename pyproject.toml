@@ -17,3 +17,6 @@ dev = ["cython >= 3.0.11", "build", "setuptools"]
 [build-system]
 requires = ["setuptools>=74.1", "wheel", "Cython", "numpy", "cibuildwheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+skip = ["*-win32"]
