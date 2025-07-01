@@ -100,7 +100,7 @@ class Parameters:
     @sparse_pulse.setter
     def sparse_pulse(self, sparse_pulse: bool):
         self._sparse_pulse = sparse_pulse
-        print(f"Sparsity setting of pulses set to: {self.pulse}\n")
+        print(f"Sparsity setting of pulses set to: {self.sparse_pulse}\n")
 
     @property
     def sparse_superoperator(self) -> bool:
