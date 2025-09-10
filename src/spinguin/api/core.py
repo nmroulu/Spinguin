@@ -8,6 +8,7 @@ of the Spinguin package.
 # Imports
 import numpy as np
 import scipy.sparse as sp
+from copy import deepcopy
 from typing import Literal
 
 from spinguin.api.parameters import parameters
@@ -954,6 +955,9 @@ def inversion_recovery(
         Two-dimensional array of size (nspins, npoints) containing the
         observed z-magnetizations for each spin at various times.
     """
+    # Operate on a copy of the SpinSystem object
+    spin_system = deepcopy(spin_system)
+
     # Check that the required attributes have been set
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before using "
