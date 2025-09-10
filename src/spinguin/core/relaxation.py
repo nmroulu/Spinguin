@@ -489,14 +489,19 @@ def sop_R_redfield_term(
         spin_l2 = interaction_l[2]
         tensor_l = interaction_l[3]
 
-        # Compute G0
-        G_0 = G0(tensor_l, tensor_r, l)
+        # Continue only if T is found (non-zero)
+        if (l, q, type_l, spin_l1, spin_l2) in sop_Ts:
 
-        # Add current term to the left operator
-        sop_T, sop_T_shm = \
-            read_shared_sparse(sop_Ts[(l, q, type_l, spin_l1, spin_l2)])
-        sop_T_l += G_0 * sop_T
-        shms.extend(sop_T_shm)
+            # Compute G0
+            G_0 = G0(tensor_l, tensor_r, l)
+
+            # Get the shared T
+            sop_T_shared = sop_Ts[(l, q, type_l, spin_l1, spin_l2)]
+
+            # Add current term to the left operator
+            sop_T, sop_T_shm = read_shared_sparse(sop_T_shared)
+            sop_T_l += G_0 * sop_T
+            shms.extend(sop_T_shm)
 
     # Handle negative q values by spherical tensor properties
     if q == 0:
@@ -695,22 +700,26 @@ def sop_R_redfield(basis: np.ndarray,
                 else:
                     print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
 
-                # Compute a shared version of the coupled T superoperator
-                sop_T, sop_T_shm = write_shared_sparse(get_sop_T(
-                    basis, spins, l, q, itype, spin1, spin2, sparse))
-                sop_Ts[(l, q, itype, spin1, spin2)] = sop_T
-                shms.extend(sop_T_shm)
+                # Compute the coupled T superoperator
+                sop_T = \
+                    get_sop_T(basis, spins, l, q, itype, spin1, spin2, sparse)
+                
+                # Continue only if T is not empty
+                if sop_T.nnz != 0:
 
-                # Add to the list of tasks
-                tasks.append((
-                    l, q,                               # Rank and projection
-                    itype, spin1, spin2, tensor,        # Right interaction
-                    top_left, sop_T, bottom_right,      # Aux matrix components
-                    t_max, aux_zero, relaxation_zero,   # Numerical parameters
-                    sop_Ts, interactions                # Left interaction
-                ))
+                    # Make a shared version of the coupled T superoperator
+                    sop_T_shared, sop_T_shm = write_shared_sparse(sop_T)
+                    sop_Ts[(l, q, itype, spin1, spin2)] = sop_T_shared
+                    shms.extend(sop_T_shm)
 
-    print("Superoperators built.")
+                    # Add to the list of tasks
+                    tasks.append((
+                        l, q,                                   # Rank and projection
+                        itype, spin1, spin2, tensor,            # Right interaction
+                        top_left, sop_T_shared, bottom_right,   # Aux matrix
+                        t_max, aux_zero, relaxation_zero,       # Numerics
+                        sop_Ts, interactions                    # Left interaction
+                    ))
 
     # SECOND LOOP -- Iterate over the tasks in parallel
     if dim > parallel_dim:
