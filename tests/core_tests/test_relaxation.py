@@ -304,6 +304,28 @@ class TestRelaxation(unittest.TestCase):
         # Assert that the generated Hamiltonian matches the reference
         self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
 
+        # Obtain R again after basis truncation that causes some operators to be
+        # zero
+        basis, _ = truncate_basis_by_coherence(basis, [0])
+        H = sop_H(
+            basis = basis,
+            gammas = gammas,
+            spins = spins,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            B = B,
+            side = "comm",
+            sparse = True,
+            zero_value = 1e-12,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"]
+        )
+        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+                           shielding, efg, include_antisymmetric=False,
+                           include_dynamic_frequency_shift=False,
+                           relative_error=1e-6, interaction_zero=1e-9,
+                           relaxation_zero=1e-12, parallel_dim=1000,
+                           sparse=True)
+
     def test_sop_R_phenomenological(self):
         """
         Test that creates the phenomenological relaxation superoperator and
