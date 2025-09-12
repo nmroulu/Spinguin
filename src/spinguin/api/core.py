@@ -22,6 +22,7 @@ from spinguin.core.chem import (
 from spinguin.core.hamiltonian import sop_H as _sop_H
 from spinguin.core.hide_prints import HidePrints
 from spinguin.core.liouvillian import sop_L as liouvillian
+from spinguin.core.nmr_isotopes import gamma, quadrupole_moment, spin
 from spinguin.core.operators import op_from_string as _op_from_string
 from spinguin.core.propagation import (
     propagator_to_rotframe as _propagator_to_rotframe,
@@ -62,6 +63,7 @@ __all__ = [
     "dissociate",
     "equilibrium_state",
     "frequency_to_chemical_shift",
+    "gamma",
     "hamiltonian",
     "inversion_recovery",
     "liouvillian",
@@ -72,11 +74,13 @@ __all__ = [
     "propagator_to_rotframe",
     "pulse",
     "pulse_and_acquire",
+    "quadrupole_moment",
     "relaxation",
     "resonance_frequency",
     "singlet_state",
     "spectral_width_to_dwell_time",
     "spectrum",
+    "spin",
     "state",
     "state_to_zeeman",
     "superoperator",
