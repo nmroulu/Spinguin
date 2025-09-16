@@ -9,6 +9,8 @@ import re
 import math
 from itertools import product, combinations
 from typing import Iterator
+from spinguin.core.la import eliminate_small
+from scipy.sparse.csgraph import connected_components
         
 def make_basis(spins: np.ndarray, max_spin_order: int):
     """
@@ -535,3 +537,81 @@ def state_idx(basis: np.ndarray, op_def: np.ndarray) -> int:
                          f"requested state: {op_def}")
     
     return idx
+
+def truncate_basis_by_coupling(basis: np.ndarray, J_couplings: np.ndarray,
+                               threshold: float) -> tuple[np.ndarray, list]:
+    """
+    Removes basis states based on the scalar J-couplings. Whenever there exists
+    a coupling network between the spins that constitute the product state, in
+    which the couplings surpass the given threshold, the basis state is kept.
+    Otherwise, the basis state is dropped.
+
+    Parameters
+    ----------
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent
+        a Kronecker product of single-spin irreducible spherical tensors.
+    J_couplings : ndarray
+        A two-dimensional array that contains the scalar J-couplings between
+        the spins in Hz.
+    threshold : float
+        J-coupling between two spins must be above this value in order for the
+        algorithm to consider them connected.
+
+    Returns
+    -------
+    truncated_basis : ndarray
+        A two-dimensional array containing the truncated basis set.
+    index_map : list
+        List that contains an index map from the original basis to the truncated
+        basis.
+    """
+    print("Truncating the basis set based on J-couplings.")
+    time_start = time.time()
+
+    # Create an empty list for the new basis
+    truncated_basis = []
+
+    # Create an empty list for the mapping from old to new basis
+    index_map = []
+
+    # Create the connectivity matrix from the J-couplings
+    J_connectivity = J_couplings.copy()
+    eliminate_small(J_connectivity, zero_value=threshold)
+    J_connectivity[J_connectivity!=0] = 1
+
+    # Iterate over the basis
+    for idx, state in enumerate(basis):
+
+        # Obtain the indices of the participating spins
+        idx_spins = np.nonzero(state)[0]
+
+        # Special case always include the unit state:
+        if len(idx_spins) == 0:
+            truncated_basis.append(state)
+            index_map.append(idx)
+            continue
+
+        # Obtain the current connectivity graph
+        J_connectivity_curr = J_connectivity[np.ix_(idx_spins, idx_spins)]
+
+        # Calculate the number of connected components
+        n_components = connected_components(
+            csgraph = J_connectivity_curr,
+            directed = False,
+            return_labels = False
+        )
+
+        # If the state is connected, keep it
+        if n_components == 1:
+            truncated_basis.append(state)
+            index_map.append(idx)
+
+    # Convert basis to NumPy array
+    truncated_basis = np.array(truncated_basis)
+
+    print("Truncated basis created.")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+    print()
+
+    return truncated_basis, index_map

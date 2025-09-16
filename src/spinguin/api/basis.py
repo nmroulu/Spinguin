@@ -21,7 +21,9 @@ import scipy.sparse as sp
 import warnings
 from spinguin.core.states import state_to_truncated_basis
 from spinguin.core.superoperators import sop_to_truncated_basis
-from spinguin.core.basis import make_basis, truncate_basis_by_coherence
+from spinguin.core.basis import (
+    make_basis, truncate_basis_by_coherence, truncate_basis_by_coupling
+)
 from spinguin.core.la import isvector
 
 class Basis:
@@ -128,6 +130,70 @@ class Basis:
         truncated_basis, index_map = truncate_basis_by_coherence(
             basis = self.basis,
             coherence_orders = coherence_orders
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=index_map,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=index_map,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
+        
+    def truncate_by_coupling(
+            self,
+            threshold: float,
+            *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        """
+        Removes basis states based on the scalar J-couplings. Whenever there
+        exists a coupling network between the spins that constitute the product
+        state, in which the couplings surpass the given threshold, the basis
+        state is kept. Otherwise, the basis state is dropped.
+
+        Optionally, superoperators or state vectors can be given as input. These
+        will be converted to the truncated basis.
+
+        Parameters
+        ----------
+        threshold : float
+            J-coupling between two spins must be above this value in order for the
+            algorithm to consider them connected.
+        *threshold : tuple of {ndarray, csc_array}
+
+        Returns
+        -------
+        objs_transformed : ndarray or csc_array or tuple
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Truncate the basis and obtain the index map
+        truncated_basis, index_map = truncate_basis_by_coupling(
+            basis = self.basis,
+            J_couplings = self._spin_system.J_couplings,
+            threshold = threshold
         )
 
         # Update the basis
