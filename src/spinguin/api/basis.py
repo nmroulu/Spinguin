@@ -19,10 +19,13 @@ if TYPE_CHECKING:
 import numpy as np
 import scipy.sparse as sp
 import warnings
+from typing import Literal
 from spinguin.core.states import state_to_truncated_basis
 from spinguin.core.superoperators import sop_to_truncated_basis
 from spinguin.core.basis import (
-    make_basis, truncate_basis_by_coherence, truncate_basis_by_coupling
+    make_basis,
+    truncate_basis_by_coherence,
+    truncate_basis_by_coupling
 )
 from spinguin.core.la import isvector
 
@@ -163,15 +166,17 @@ class Basis:
             return objs_transformed
         
     def truncate_by_coupling(
-            self,
-            threshold: float,
-            *objs: np.ndarray | sp.csc_array
+        self,
+        threshold: float,
+        method: Literal["weakest_link", "network_strength"] = "weakest_link",
+        *objs: np.ndarray | sp.csc_array
     ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
         """
         Removes basis states based on the scalar J-couplings. Whenever there
-        exists a coupling network between the spins that constitute the product
-        state, in which the couplings surpass the given threshold, the basis
-        state is kept. Otherwise, the basis state is dropped.
+        exists a J-coupling network of sufficient strength between spins that
+        constitute a product state, the particular state is kept in the basis.
+        Otherwise, the state is removed. The coupling strength is evaluated
+        either by the weakest link or by the overall network strength.
 
         Optionally, superoperators or state vectors can be given as input. These
         will be converted to the truncated basis.
@@ -179,13 +184,21 @@ class Basis:
         Parameters
         ----------
         threshold : float
-            J-coupling between two spins must be above this value in order for the
-            algorithm to consider them connected.
-        *threshold : tuple of {ndarray, csc_array}
+            Coupling strength must be above this value in order for the product
+            state to be considered in the basis set.
+        method : {"weakest_link", "network_strength"}
+            Decides how the importance of a product state is evaluated. Weakest
+            link method considers a J-coupling network invalid based on the
+            smallest J-coupling within that network. Network strength method
+            calculates the effective coupling as a geometric mean scaled by the
+            factorial of the number of couplings within the network.
+        *objs : tuple of {ndarray, csc_array}
+            Superoperators or state vectors defined in the original basis. These
+            will be converted into the truncated basis.
 
         Returns
         -------
-        objs_transformed : ndarray or csc_array or tuple
+        objs_transformed : tuple of {ndarray, csc_array}
             Superoperators and state vectors transformed into the truncated
             basis.
         """
@@ -193,7 +206,8 @@ class Basis:
         truncated_basis, index_map = truncate_basis_by_coupling(
             basis = self.basis,
             J_couplings = self._spin_system.J_couplings,
-            threshold = threshold
+            threshold = threshold,
+            method = method
         )
 
         # Update the basis

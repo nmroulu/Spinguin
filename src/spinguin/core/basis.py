@@ -8,9 +8,9 @@ import time
 import re
 import math
 from itertools import product, combinations
-from typing import Iterator
+from typing import Iterator, Literal
 from spinguin.core.la import eliminate_small
-from scipy.sparse.csgraph import connected_components
+from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
         
 def make_basis(spins: np.ndarray, max_spin_order: int):
     """
@@ -541,8 +541,11 @@ def state_idx(basis: np.ndarray, op_def: np.ndarray) -> int:
     
     return idx
 
-def truncate_basis_by_coupling(basis: np.ndarray, J_couplings: np.ndarray,
-                               threshold: float) -> tuple[np.ndarray, list]:
+def truncate_basis_by_coupling_weakest_link(
+    basis: np.ndarray,
+    J_couplings: np.ndarray,
+    threshold: float,
+) -> tuple[np.ndarray, list]:
     """
     Removes basis states based on the scalar J-couplings. Whenever there exists
     a coupling network between the spins that constitute the product state, in
@@ -583,6 +586,9 @@ def truncate_basis_by_coupling(basis: np.ndarray, J_couplings: np.ndarray,
     eliminate_small(J_connectivity, zero_value=threshold)
     J_connectivity[J_connectivity!=0] = 1
 
+    # Cache the connectivity of spins
+    connectivity = dict()
+
     # Iterate over the basis
     for idx, state in enumerate(basis):
 
@@ -595,18 +601,23 @@ def truncate_basis_by_coupling(basis: np.ndarray, J_couplings: np.ndarray,
             index_map.append(idx)
             continue
 
-        # Obtain the current connectivity graph
-        J_connectivity_curr = J_connectivity[np.ix_(idx_spins, idx_spins)]
+        # Analyse the connectivity if not already
+        if not tuple(idx_spins) in connectivity:
 
-        # Calculate the number of connected components
-        n_components = connected_components(
-            csgraph = J_connectivity_curr,
-            directed = False,
-            return_labels = False
-        )
+            # Obtain the current connectivity graph
+            J_connectivity_curr = J_connectivity[np.ix_(idx_spins, idx_spins)]
+
+            # Calculate the number of connected components
+            n_components = connected_components(
+                csgraph = J_connectivity_curr,
+                directed = False,
+                return_labels = False
+            )
+
+            connectivity[tuple(idx_spins)] = n_components
 
         # If the state is connected, keep it
-        if n_components == 1:
+        if connectivity[tuple(idx_spins)] == 1:
             truncated_basis.append(state)
             index_map.append(idx)
 
@@ -614,7 +625,150 @@ def truncate_basis_by_coupling(basis: np.ndarray, J_couplings: np.ndarray,
     truncated_basis = np.array(truncated_basis)
 
     print("Truncated basis created.")
+    print(f"Original dimension: {len(basis)}")
+    print(f"Truncated dimension: {len(truncated_basis)}")
     print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
     print()
 
     return truncated_basis, index_map
+
+def truncate_basis_by_coupling_network_strength(
+    basis: np.ndarray,
+    J_couplings: np.ndarray,
+    threshold: float,
+) -> tuple[np.ndarray, list]:
+    """
+    Removes basis states based on the scalar J-couplings. The coupling network
+    within a product state is evaluated based on the maximum overall coupling
+    strength defined as the geometric mean of the J-couplings divided by the
+    factorial of the number of the couplings.
+    
+    TODO: More rigorous way to estimate the network strength?
+
+    Parameters
+    ----------
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent
+        a Kronecker product of single-spin irreducible spherical tensors.
+    J_couplings : ndarray
+        A two-dimensional array that contains the scalar J-couplings between
+        the spins in Hz.
+    threshold : float
+        Calculated effective J-coupling network strength must be above this
+        value in order for the algorithm to consider them connected.
+
+    Returns
+    -------
+    truncated_basis : ndarray
+        A two-dimensional array containing the truncated basis set.
+    index_map : list
+        List that contains an index map from the original basis to the truncated
+        basis.
+    """
+    print("Truncating the basis set based on J-couplings.")
+    time_start = time.time()
+
+    # Create an empty list for the new basis
+    truncated_basis = []
+
+    # Create an empty list for the mapping from old to new basis
+    index_map = []
+
+    # Prepare the coupling matrix for the Kruskal's algorithm
+    J_couplings = -np.abs(J_couplings)
+
+    # Iterate over the basis
+    for idx, state in enumerate(basis):
+
+        # Obtain the indices of the participating spins
+        idx_spins = np.nonzero(state)[0]
+
+        # Special case: always include the unit state and one-spin states:
+        if len(idx_spins) in {0, 1}:
+            truncated_basis.append(state)
+            index_map.append(idx)
+            continue
+
+        # Obtain the current J-coupling network
+        J_couplings_curr = J_couplings[np.ix_(idx_spins, idx_spins)]
+
+        # Obtain the maximum spanning tree
+        maxtree = abs(minimum_spanning_tree(J_couplings_curr))
+
+        # Continue only if the state is connected in the first place
+        connections = len(idx_spins) - 1
+        if maxtree.nnz == connections:
+
+            # Calculate the coupling strength
+            geomean = np.prod(maxtree.data) ** (1/connections)
+            coupling_strength = geomean / math.factorial(connections)
+
+            # Include the state if the coupling strength is above threshold
+            if coupling_strength >= threshold:
+                truncated_basis.append(state)
+                index_map.append(idx)
+
+    # Convert basis to NumPy array
+    truncated_basis = np.array(truncated_basis)
+
+    print("Truncated basis created.")
+    print(f"Original dimension: {len(basis)}")
+    print(f"Truncated dimension: {len(truncated_basis)}")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+    print()
+
+    return truncated_basis, index_map
+
+def truncate_basis_by_coupling(
+    basis: np.ndarray,
+    J_couplings: np.ndarray,
+    threshold: float,
+    method: Literal["weakest_link", "network_strength"] = "weakest_link"
+) -> tuple[np.ndarray, list]:
+    """
+    Removes basis states based on the scalar J-couplings. Whenever there exists
+    a J-coupling network of sufficient strength between spins that constitute a
+    product state, the particular state is kept in the basis. Otherwise, the
+    state is removed. The coupling strength is evaluated either by the weakest
+    link or by the overall network strength.
+
+    Parameters
+    ----------
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent
+        a Kronecker product of single-spin irreducible spherical tensors.
+    J_couplings : ndarray
+        A two-dimensional array that contains the scalar J-couplings between
+        the spins in Hz.
+    threshold : float
+        Coupling strength must be above this value in order for the product
+        state to be considered in the basis set.
+    method : {"weakest_link", "network_strength"}
+        Decides how the importance of a product state is evaluated. Weakest link
+        method considers a J-coupling network invalid based on the smallest J-
+        coupling within that network. Network strength method calculates the
+        effective coupling as a geometric mean scaled by the factorial of the
+        number of couplings within the network.
+
+    Returns
+    -------
+    truncated_basis : ndarray
+        A two-dimensional array containing the truncated basis set.
+    index_map : list
+        List that contains an index map from the original basis to the truncated
+        basis.
+    """
+    if method == "weakest_link":
+        return truncate_basis_by_coupling_weakest_link(
+            basis = basis,
+            J_couplings = J_couplings,
+            threshold = threshold
+        )
+    elif method == "network_strength":
+        return truncate_basis_by_coupling_network_strength(
+            basis = basis,
+            J_couplings = J_couplings,
+            threshold = threshold
+        )
+    else:
+        raise ValueError(f"Invalid truncation method {method}.")
