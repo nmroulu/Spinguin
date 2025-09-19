@@ -126,7 +126,8 @@ def make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     return basis
     
 def truncate_basis_by_coherence(
-        basis: np.ndarray,coherence_orders: list) -> tuple[np.ndarray, list]:
+    basis: np.ndarray,coherence_orders: list
+) -> tuple[np.ndarray, list]:
     """
     Truncates the basis set by retaining only the product operators that
     correspond to coherence orders specified in the `coherence_orders` list.
@@ -180,6 +181,8 @@ def truncate_basis_by_coherence(
     truncated_basis = np.array(truncated_basis)
 
     print("Truncated basis created.")
+    print(f"Original dimension: {len(basis)}")
+    print(f"Truncated dimension: {len(truncated_basis)}")
     print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
     print()
 
