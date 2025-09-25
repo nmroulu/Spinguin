@@ -317,5 +317,3 @@ class Basis:
                 objs_transformed = tuple(objs_transformed)
 
             return objs_transformed
-
-        return truncated_basis, index_map
