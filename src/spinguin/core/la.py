@@ -789,3 +789,110 @@ def arraylike_to_array(A: ArrayLike) -> np.ndarray:
     A = np.atleast_1d(A)
 
     return A
+
+def expm_vec_taylor(
+    A: np.ndarray | csc_array,
+    v: np.ndarray | csc_array,
+    zero_value: float
+) -> np.ndarray | csc_array:
+    """
+    Computes the action of the matrix exponential of `A` on the vector `v`,
+    i.e., `expm(A) @ v` using the Taylor series.
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        Square matrix (N, N).
+    v : ndarray or csc_array
+        Column vector (N, 1).
+    zero_value : float
+        Used to estimate the convergence of the Taylor series.
+
+    Returns
+    -------
+    eAv : ndarray or csc_array
+        Result of `expm(A) @ v`. Returns a sparse CSC array only when both input
+        arrays are sparse.
+    """
+    # First term (k = 0)
+    trm = v
+    eAv = trm
+
+    # Calculate higher order terms until they converge to zero
+    k = 1
+    cont = True
+    while cont:
+
+        # Get the current term
+        trm = A @ (trm / k)
+
+        # Set very small values to zero
+        eliminate_small(trm, zero_value)
+
+        # Add the term to the result
+        eAv = eAv + trm
+
+        # Increment the counter
+        k += 1
+
+        # Continue if the convergence criterion is not met
+        if issparse(trm):
+            cont = (trm.nnz != 0)
+        else:
+            cont = (np.count_nonzero(trm) != 0)
+
+    return eAv
+
+def expm_vec(
+    A: np.ndarray | csc_array,
+    v: np.ndarray | csc_array,
+    zero_value: float
+) -> np.ndarray | csc_array:
+    """
+    Computes the action of the matrix exponential of `A` on the vector `v`,
+    i.e., `expm(A) @ v` using the Taylor series combined with the scaling of the
+    input matrix `A`.
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        Square matrix (N, N).
+    v : ndarray or csc_array
+        Column vector (N, 1).
+    zero_value : float
+        Used to estimate the convergence of the Taylor series.
+
+    Returns
+    -------
+    eAv : ndarray or csc_array
+        Result of `expm(A) @ v`. Returns a sparse CSC array only when both input
+        arrays are sparse.
+    """
+    print("Calculating the action of matrix exponential on a vector...")
+
+    # Calculate the norm of A
+    norm_A = norm_1(A, ord='col')
+
+    # Calculate the scaling factor for the matrix
+    scaling_A = int(math.ceil(norm_A))
+
+    # Scale the matrix
+    print(f"Scaling the matrix by {scaling_A}.")
+    A = A / scaling_A
+
+    # Calculate a scaling factor for the zero value
+    scaling_zv = abs(v).max()
+
+    # Scale the zero-value
+    print(f"Scaling the zero-value by {scaling_zv}.")
+    zero_value = zero_value / scaling_zv
+
+    # Initialise the result
+    eAv = v
+
+    # Calculate the expm*vec using the scaled matrix
+    for i in range(scaling_A):
+        print(f"Calculating expm(A)*vec. Step {i+1} of {scaling_A}.")
+        eAv = expm_vec_taylor(A, eAv, zero_value)
+
+    return eAv
