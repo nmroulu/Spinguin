@@ -25,9 +25,11 @@ from spinguin.core.superoperators import sop_to_truncated_basis
 from spinguin.core.basis import (
     make_basis,
     truncate_basis_by_coherence,
-    truncate_basis_by_coupling
+    truncate_basis_by_coupling,
+    truncate_basis_by_zte
 )
 from spinguin.core.la import isvector
+from spinguin.api.parameters import parameters
 
 class Basis:
     """
@@ -239,3 +241,81 @@ class Basis:
                 objs_transformed = tuple(objs_transformed)
 
             return objs_transformed
+        
+    def truncate_by_zte(
+        self,
+        L: np.ndarray | sp.csc_array,
+        rho: np.ndarray | sp.csc_array,
+        time_step: float,
+        nsteps: int,
+        *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        """
+        Removes basis states using the Zero-Track Elimination (ZTE) described
+        in:
+
+        Kuprov, I. (2008):
+        https://doi.org/10.1016/j.jmr.2008.08.008
+
+        Parameters
+        ----------
+        L : ndarray or csc_array
+            Liouvillian superoperator, L = -iH - R + K.
+        rho : ndarray or csc_array
+            Initial spin density vector.
+        time_step : float
+            Time step of the propagation within the ZTE.
+        nsteps : int
+            Number of steps to take in the ZTE.
+        *objs : tuple of {ndarray, csc_array}
+            Superoperators or state vectors defined in the original basis. These
+            will be converted into the truncated basis.
+
+        Returns
+        -------
+        objs_transformed : tuple of {ndarray, csc_array}
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Truncate the basis and obtain the index map
+        truncated_basis, index_map = truncate_basis_by_zte(
+            basis = self.basis,
+            L = L,
+            rho = rho,
+            time_step = time_step,
+            nsteps = nsteps,
+            zero_zte = parameters.zero_zte,
+            zero_expm_vec = parameters.zero_time_step
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=index_map,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=index_map,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
+
+        return truncated_basis, index_map

@@ -37,6 +37,8 @@ class Parameters:
     _zero_pulse: float = 1e-18
     _zero_relaxation: float = 1e-12
     _zero_thermalization: float = 1e-18
+    _zero_time_step: float = 1e-18
+    _zero_zte: float = 1e-24
 
     @property
     def magnetic_field(self) -> float:
@@ -282,6 +284,33 @@ class Parameters:
         self._zero_equilibrium = zero_equilibrium
         print("Equilibrium zero-value threshold set to: "
               f"{self.zero_equilibrium}\n")
+        
+    @property
+    def zero_time_step(self) -> float:
+        """
+        Threshold under which a value is considered to be zero when advancing
+        the state vector forward for one time step.
+        """
+        return self._zero_time_step
+    
+    @zero_time_step.setter
+    def zero_time_step(self, zero_time_step: float):
+        self._zero_time_step = zero_time_step
+        print("Time step zero-value threshold set to: "
+              f"{self.zero_time_step}\n")
+        
+    @property
+    def zero_zte(self) -> float:
+        """
+        Threshold under which a value is considered to be zero when performing
+        the zero-track elimination (ZTE) basis truncation.
+        """
+        return self._zero_zte
+    
+    @zero_zte.setter
+    def zero_zte(self, zero_zte: float):
+        self._zero_zte = zero_zte
+        print(f"ZTE zero-value threshold set to: {self.zero_zte}\n")
 
 # Instantiate the Parameters object
 parameters = Parameters()

@@ -4,12 +4,14 @@ This module provides functionality for constructing a basis set.
 
 # Imports
 import numpy as np
+import scipy.sparse as sp
 import time
 import re
 import math
 from itertools import product, combinations
 from typing import Iterator, Literal
-from spinguin.core.la import eliminate_small
+from spinguin.core.la import eliminate_small, expm_vec
+from spinguin.core.hide_prints import HidePrints
 from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
         
 def make_basis(spins: np.ndarray, max_spin_order: int):
@@ -772,3 +774,68 @@ def truncate_basis_by_coupling(
         )
     else:
         raise ValueError(f"Invalid truncation method {method}.")
+    
+def truncate_basis_by_zte(
+    basis: np.ndarray,
+    L: np.ndarray | sp.csc_array,
+    rho: np.ndarray | sp.csc_array,
+    time_step: float,
+    nsteps: int,
+    zero_zte: float,
+    zero_expm_vec: float
+) -> tuple[np.ndarray, list]:
+    """
+    Removes basis states using the Zero-Track Elimination (ZTE) described in:
+
+    Kuprov, I. (2008):
+    https://doi.org/10.1016/j.jmr.2008.08.008
+
+    Parameters
+    ----------
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent
+        a Kronecker product of single-spin irreducible spherical tensors.
+    L : ndarray or csc_array
+        Liouvillian superoperator, L = -iH - R + K.
+    rho : ndarray or csc_array
+        Initial spin density vector.
+    time_step : float
+        Time step of the propagation within the ZTE.
+    nsteps : int
+        Number of steps to take in the ZTE.
+    zero_zte : float
+        If state population is below this value, it is dropped from the basis.
+    zero_expm_vec: float
+        Convergence criterion to be used when calculating the action of matrix
+        exponential of the Liouvillian to the state vector.
+    """
+    print("Truncating the basis set using zero-track elimination.")
+    time_start = time.time()
+
+    # Create empty vector for the maximum values of rho
+    rho_max = abs(np.array(rho))
+
+    # Scale the zero value of the ZTE to take into account different norms
+    scaling_zv = abs(rho).max()
+    zero_zte = zero_zte / scaling_zv
+
+    # Propagate for few steps
+    for i in range(nsteps):
+        print(f"ZTE step {i+1} of {nsteps}...")
+        with HidePrints():
+            rho = expm_vec(L*time_step, rho, zero_expm_vec)
+            rho_max = np.maximum(rho_max, abs(rho))
+
+    # Obtain indices of states that should remain
+    index_map = list(np.where(rho_max > zero_zte)[0])
+
+    # Obtain the truncated basis
+    truncated_basis = basis[index_map]
+
+    print("Truncated basis created.")
+    print(f"Original dimension: {len(basis)}")
+    print(f"Truncated dimension: {len(truncated_basis)}")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+    print()
+
+    return truncated_basis, index_map
