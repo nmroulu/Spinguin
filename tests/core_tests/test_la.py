@@ -398,7 +398,58 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                         C_SciPy = A @ B
                         self.assertTrue(np.allclose(C_SciPy.toarray(),
                                                     C_custom.toarray()))
+                        
+    def test_expm_vec_taylor(self):
 
+        # Create a 3x3 array with large numbers
+        A = np.array([[1, 2, 3],
+                      [4, 5, 6],
+                      [7, 8, 9]])
+
+        # Create a column vector
+        v = np.array([[1], [2], [3]])
+
+        # Calculate the action of matrix exponential to the vector using
+        # sparse and dense matrices and vectors
+        eAv_dd = la.expm_vec_taylor(A, v, 1e-18)
+        eAv_ds = la.expm_vec_taylor(A, csc_array(v), 1e-18)
+        eAv_sd = la.expm_vec_taylor(csc_array(A), v, 1e-18)
+        eAv_ss = la.expm_vec_taylor(csc_array(A), csc_array(v), 1e-18)
+
+        # Calculate reference
+        eAv_ref = expm(A) @ v
+
+        # Should be equal
+        self.assertTrue(np.allclose(eAv_dd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ds, eAv_ref))
+        self.assertTrue(np.allclose(eAv_sd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ss.toarray(), eAv_ref))
+                        
+    def test_expm_vec(self):
+
+        # Create a 3x3 array with large numbers
+        A = np.array([[1, 2, 3],
+                      [4, 5, 6],
+                      [7, 8, 9]])
+
+        # Create a column vector
+        v = np.array([[1], [2], [3]])
+
+        # Calculate the action of matrix exponential to the vector using
+        # sparse and dense matrices and vectors
+        eAv_dd = la.expm_vec(A, v, 1e-18)
+        eAv_ds = la.expm_vec(A, csc_array(v), 1e-18)
+        eAv_sd = la.expm_vec(csc_array(A), v, 1e-18)
+        eAv_ss = la.expm_vec(csc_array(A), csc_array(v), 1e-18)
+
+        # Calculate reference
+        eAv_ref = expm(A) @ v
+
+        # Should be equal
+        self.assertTrue(np.allclose(eAv_dd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ds, eAv_ref))
+        self.assertTrue(np.allclose(eAv_sd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ss.toarray(), eAv_ref))
 
 def spherical_tensor(l, q):
     """
