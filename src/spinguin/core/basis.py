@@ -808,6 +808,14 @@ def truncate_basis_by_zte(
     zero_expm_vec: float
         Convergence criterion to be used when calculating the action of matrix
         exponential of the Liouvillian to the state vector.
+
+    Returns
+    -------
+    truncated_basis : ndarray
+        A two-dimensional array containing the truncated basis set.
+    index_map : list
+        List that contains an index map from the original basis to the truncated
+        basis.
     """
     print("Truncating the basis set using zero-track elimination.")
     time_start = time.time()
