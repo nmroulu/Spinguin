@@ -26,7 +26,8 @@ from spinguin.core.basis import (
     make_basis,
     truncate_basis_by_coherence,
     truncate_basis_by_coupling,
-    truncate_basis_by_zte
+    truncate_basis_by_zte,
+    truncate_basis_by_indices
 )
 from spinguin.core.la import isvector
 from spinguin.api.parameters import parameters
@@ -307,6 +308,65 @@ class Basis:
                 else:
                     objs_transformed.append(sop_to_truncated_basis(
                         index_map=index_map,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
+        
+    def truncate_by_indices(
+        self,
+        indices: list | np.ndarray,
+        *objs: np.ndarray | sp.csc_array
+    ) -> np.ndarray:
+        """
+        Truncate the basis set to include only the basis states specified by the
+        `indices` supplied by the user.
+
+        Parameters
+        ----------
+        indices : list or ndarray
+            List of indices that specify which basis states to retain.
+        *objs : tuple of {ndarray, csc_array}
+            Superoperators or state vectors defined in the original basis. These
+            will be converted into the truncated basis.
+
+        Returns
+        -------
+        objs_transformed : tuple of {ndarray, csc_array}
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Obtain the truncated basis
+        truncated_basis = truncate_basis_by_indices(
+            basis = self.basis,
+            indices = indices
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=indices,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=indices,
                         sop=obj
                     ))
 

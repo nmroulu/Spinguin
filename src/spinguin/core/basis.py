@@ -847,3 +847,41 @@ def truncate_basis_by_zte(
     print()
 
     return truncated_basis, index_map
+
+def truncate_basis_by_indices(
+    basis: np.ndarray,
+    indices: list | np.ndarray
+) -> np.ndarray:
+    """
+    Truncate the basis set to include only the basis states specified by the
+    `indices` supplied by the user.
+
+    Parameters
+    ----------
+    basis : ndarray
+        A two-dimensional array where each row contains integers that represent
+        a Kronecker product of single-spin irreducible spherical tensors.
+    indices : list or ndarray
+        List of indices that specify which basis states to retain.
+
+    Returns
+    -------
+    truncated_basis : ndarray
+        A two-dimensional array containing the truncated basis set.
+    """
+    print("Truncating the basis set based on supplied indices.")
+    time_start = time.time()
+
+    # Sort the indices
+    indices = np.sort(indices)
+
+    # Obtain the truncated basis
+    truncated_basis = basis[indices]
+
+    print("Truncated basis created.")
+    print(f"Original dimension: {len(basis)}")
+    print(f"Truncated dimension: {len(truncated_basis)}")
+    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
+    print()
+
+    return truncated_basis
