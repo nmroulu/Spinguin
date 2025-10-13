@@ -442,6 +442,69 @@ def find_common_rows(A: np.ndarray,
 
     return A_ind, B_ind
 
+def auxiliary_matrix_rotframe_expm(
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+    T: float,
+    dim: int,
+    zero_value: float
+) -> csc_array:
+    """
+    Computes the matrix exponential of an auxiliary matrix that is used to
+    calculate the interaction frame Hamiltonian.
+
+    Based on Goodwin and Kuprov (Eq. 18): https://doi.org/10.1063/1.4928978
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        Diagonal elements of the auxiliary matrix (L0)
+    B : ndarray or csc_array
+        Superdiagonal elements of the auxiliary matrix (L1)
+    T : float
+        Time
+    dim : int
+        Dimension of the auxiliary matrix.
+    zero_value : float
+        Threshold below which values are considered zero when exponentiating the
+        auxiliary matrix using the Taylor series. This significantly impacts
+        performance. Use the largest value that still provides correct results.
+
+    Returns
+    -------
+    expm_aux : csc_array
+        Matrix exponential of the auxiliary matrix. The output is sparse
+        regardless of the input array.
+    """
+    # Convert input arrays to sparse if not already
+    if not issparse(A):
+        A = csc_array(A)
+    if not issparse(B):
+        B = csc_array(B)
+
+    # Create a sparse zero-array
+    Z = csc_array((A.shape[0], B.shape[0]))
+
+    # Construct the auxiliary matrix
+    aux = []
+    for i in range(dim):
+        row = []
+        for j in range(dim):
+            if i == j:
+                row.append(A)
+            elif i == j-1:
+                row.append(B)
+            else:
+                row.append(Z)
+        aux.append(row)
+    aux = block_array(aux, format='csc')
+
+    # Compute the matrix exponential of the auxiliary matrix
+    with HidePrints():
+        expm_aux = expm(T*aux, zero_value)
+
+    return expm_aux
+
 def auxiliary_matrix_expm(A: np.ndarray | csc_array,
                           B: np.ndarray | csc_array,
                           C: np.ndarray | csc_array,

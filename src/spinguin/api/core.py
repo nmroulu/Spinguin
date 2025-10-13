@@ -21,7 +21,11 @@ from spinguin.core.chem import (
 )
 from spinguin.core.hamiltonian import sop_H as _sop_H
 from spinguin.core.hide_prints import HidePrints
-from spinguin.core.liouvillian import sop_L as liouvillian
+from spinguin.core.la import norm_1
+from spinguin.core.liouvillian import (
+    sop_L as liouvillian,
+    sop_L_to_rotframe as _sop_L_to_rotframe
+)
 from spinguin.core.nmr_isotopes import gamma, quadrupole_moment, spin
 from spinguin.core.operators import op_from_string as _op_from_string
 from spinguin.core.propagation import (
@@ -77,6 +81,7 @@ __all__ = [
     "quadrupole_moment",
     "relaxation",
     "resonance_frequency",
+    "rotating_frame"
     "singlet_state",
     "spectral_width_to_dwell_time",
     "spectrum",
@@ -1498,3 +1503,120 @@ def triplet_minus_state(spin_system: SpinSystem,
     )
 
     return rho
+
+def rotating_frame(
+    spin_system: SpinSystem,
+    L: np.ndarray | sp.csc_array,
+    isotopes: list,
+    orders: list = [],
+    center_frequencies: list = [],
+) -> np.ndarray | sp.csc_array:
+    """
+    Transforms the Liouvillian into the rotating frame.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system whose Liouvillian is going to be transformed.
+    L : ndarray or csc_array
+        Liouvillian superoperator in the laboratory frame.
+    isotopes : list
+        List of isotopes whose rotating frames are applied.
+    orders : list, default=[]
+        List of integers that define the order of the rotating frame for each
+        isotope. If empty, the default value defined in
+        `parameters.rotating_frame_order` is used for all isotopes.
+    center_frequencies : list, default=[]
+        List of center frequencies (in ppm) for each isotope. If empty, zero is
+        used for all isotopes.
+
+    Returns
+    -------
+    L_rot : ndarray or csc_array
+        Liouvillian superoperator in the rotating frame.
+    """
+    # Check input types
+    if not isinstance(spin_system, SpinSystem):
+        raise ValueError("spin_system must be a SpinSystem object")
+    if not isinstance(L, (np.ndarray, sp.csc_array)):
+        raise ValueError("L must be NumPy array or SciPy CSC array")
+    if not isinstance(isotopes, list):
+        raise ValueError("isotopes must be a list")
+    if not isinstance(orders, list):
+        raise ValueError("orders must be a list")
+    if not isinstance(center_frequencies, list):
+        raise ValueError("center_frequencies must be a list")
+    
+    # Check list lengths
+    if len(isotopes) == 0:
+        raise ValueError("isotopes cannot be an empty list")
+    if not (len(orders) == len(isotopes) or len(orders) == 0):
+        raise ValueError(
+            "orders must have the same length as isotopes or be empty")
+    if not (len(center_frequencies) == len(isotopes) or
+            len(center_frequencies) == 0):
+        raise ValueError("center_frequencies must have the same length as "
+                         "isotopes or be empty")
+    
+    # Check that the isotopes exist in the spin system
+    for isotope in isotopes:
+        if isotope not in spin_system.isotopes:
+            raise ValueError(f"isotope {isotope} is not in the spin system")
+        
+    # Check that each given isotope is unique
+    if not len(isotopes) == len(set(isotopes)):
+        raise ValueError("given isotopes must be unique")
+    
+    # Fill input lists with default values
+    if len(orders) == 0:
+        orders = [parameters.rotating_frame_order for i in range(len(isotopes))]
+    if len(center_frequencies) == 0:
+        center_frequencies = [0 for i in range(len(isotopes))]
+
+    # Frequencies for the interaction frames
+    freqs = []
+    for i in range(len(isotopes)):
+        freq = resonance_frequency(isotopes[i], center_frequencies[i], "rad/s")
+        freqs.append(freq)
+
+    # Corresponding Hamiltonians
+    hamiltonians = []
+    for i in range(len(isotopes)):
+        spins = np.where(spin_system.isotopes == isotopes[i])[0]
+        dim = spin_system.basis.dim
+        hamiltonian = sp.csc_array((dim, dim))
+        for n in spins:
+            Iz_n = superoperator(spin_system, f"I(z, {n})")
+            hamiltonian = hamiltonian + freqs[i] * Iz_n
+        hamiltonians.append(hamiltonian)
+
+    # Corresponding Liouvillians
+    L0s = []
+    for hamiltonian in hamiltonians:
+        L0s.append(-1j*hamiltonian)
+
+    # Norms of the Liouvillians
+    norms = []
+    for L0 in L0s:
+        norms.append(norm_1(L0))
+
+    # Re-order based on the norms
+    sort = np.argsort(norms)
+    freqs = [freqs[i] for i in sort]
+    orders = [orders[i] for i in sort]
+    L0s = [L0s[i] for i in sort]
+
+    # Calculate the periods
+    Ts = []
+    for freq in freqs:
+        Ts.append(2*np.pi / freq)
+
+    # Apply each rotating frame
+    for i in range(len(L0s)):
+        L0 = L0s[i]
+        L1 = L - L0
+        T = Ts[i]
+        order = orders[i]
+        L = _sop_L_to_rotframe(L0, L1, T, order, parameters.zero_aux_rotframe)
+
+    return L

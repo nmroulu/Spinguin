@@ -12,6 +12,10 @@ class Parameters:
     Parameters class contains all the global settings for the Spinguin package.
     """
 
+    # Rotating frame settings
+    _rotating_frame_order: int = 5
+    _zero_aux_rotframe: float = 1e-18
+
     # Experimental conditions
     _magnetic_field: float = None
     _temperature: float = None
@@ -311,6 +315,32 @@ class Parameters:
     def zero_zte(self, zero_zte: float):
         self._zero_zte = zero_zte
         print(f"ZTE zero-value threshold set to: {self.zero_zte}\n")
+
+    @property
+    def rotating_frame_order(self) -> int:
+        """
+        Order of the rotating frame approximation. Default is 5.
+        """
+        return self._rotating_frame_order
+    
+    @rotating_frame_order.setter
+    def rotating_frame_order(self, rotating_frame_order: int):
+        self._rotating_frame_order = rotating_frame_order
+        print(f"Rotating frame order set to: {self.rotating_frame_order}\n")
+
+    @property
+    def zero_aux_rotframe(self) -> float:
+        """
+        Zero-value threshold for the auxiliary matrix method used in the
+        rotating frame transformation.
+        """
+        return self._zero_aux_rotframe
+    
+    @zero_aux_rotframe.setter
+    def zero_aux_rotframe(self, zero_aux_rotframe: float):
+        self._zero_aux_rotframe = zero_aux_rotframe
+        print(f"Rotating frame auxiliary zero-value threshold set to: "
+              f"{self.zero_aux_rotframe}\n")
 
 # Instantiate the Parameters object
 parameters = Parameters()

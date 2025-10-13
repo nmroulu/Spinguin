@@ -127,3 +127,39 @@ class TestSpinguin(unittest.TestCase):
         # and simultaneously
         sg.relaxation(ss1)
         sg.relaxation(ss2)
+
+    def test_rotating_frame(self):
+        """
+        Test for acquiring the rotating frame Liouvillian
+        """
+        # Example system
+        ss = sg.SpinSystem(["1H", "1H", "19F", "14N"])
+
+        # Build the basis set
+        ss.basis.max_spin_order = 3
+        ss.basis.build()
+
+        # Set the magnetic field
+        sg.parameters.magnetic_field = 1
+
+        # Chemical shifts
+        ss.chemical_shifts = [8, 7, -120, 50]
+
+        # J-couplings
+        ss.J_couplings = [
+            [0,   0,   0,   0],
+            [5,   0,   0,   0],
+            [2,   1,   0,   0],
+            [10,  2,   3,   0]
+        ]
+
+        # Calculate the Hamiltonian
+        H = sg.hamiltonian(ss)
+
+        # Calculate the Liouvillian
+        L = sg.liouvillian(H)
+
+        # Get the Liouvillian in rotating frame
+        L = sg.rotating_frame(ss, L, ["1H"], [2], [0])
+
+        # TODO: Better test (now simply tests that there is no error)
