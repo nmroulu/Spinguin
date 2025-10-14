@@ -13,7 +13,7 @@ important functionality of the class::
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from spinguin.api.spin_system import SpinSystem
+    from spinguin._api.spin_system import SpinSystem
 
 # Imports
 import numpy as np
@@ -30,7 +30,7 @@ from spinguin._core.basis import (
     truncate_basis_by_indices
 )
 from spinguin._core.la import isvector
-from spinguin.api.parameters import parameters
+from spinguin._api.parameters import parameters
 
 class Basis:
     """

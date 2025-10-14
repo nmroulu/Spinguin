@@ -4,7 +4,7 @@ functionality by making use of the `SpinSystem` class.
 """
 
 # Expose only the necessary functions from the API
-from spinguin.api.core import (
+from spinguin._api.core import (
     alpha_state,
     beta_state,
     associate,
@@ -40,9 +40,9 @@ from spinguin.api.core import (
     unit_state
 )
 
-from spinguin.api.parameters import parameters
+from spinguin._api.parameters import parameters
 
-from spinguin.api.spin_system import SpinSystem
+from spinguin._api.spin_system import SpinSystem
 
 __all__ = [
     "alpha_state",

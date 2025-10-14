@@ -7,4 +7,4 @@ the documentation of the re-usable, core functionality, see Spinguin (Advanced).
 
 # Make functionality from the API accessible directly under the spinguin
 # namespace
-from spinguin.api import *
+from spinguin._api import *
