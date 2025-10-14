@@ -14,39 +14,39 @@ from typing import Literal
 from spinguin.api.parameters import parameters
 from spinguin.api.spin_system import SpinSystem
 
-from spinguin.core.chem import (
+from spinguin._core.chem import (
     dissociate as _dissociate,
     associate as _associate,
     permute_spins as _permute_spins
 )
-from spinguin.core.hamiltonian import sop_H as _sop_H
-from spinguin.core.hide_prints import HidePrints
-from spinguin.core.la import norm_1
-from spinguin.core.liouvillian import (
+from spinguin._core.hamiltonian import sop_H as _sop_H
+from spinguin._core.hide_prints import HidePrints
+from spinguin._core.la import norm_1
+from spinguin._core.liouvillian import (
     sop_L as liouvillian,
     sop_L_to_rotframe as _sop_L_to_rotframe
 )
-from spinguin.core.nmr_isotopes import gamma, quadrupole_moment, spin
-from spinguin.core.operators import op_from_string as _op_from_string
-from spinguin.core.propagation import (
+from spinguin._core.nmr_isotopes import gamma, quadrupole_moment, spin
+from spinguin._core.operators import op_from_string as _op_from_string
+from spinguin._core.propagation import (
     propagator_to_rotframe as _propagator_to_rotframe,
     sop_propagator as _sop_propagator,
     sop_pulse as _sop_pulse
 )
-from spinguin.core.relaxation import (
+from spinguin._core.relaxation import (
     sop_R_phenomenological as _sop_R_phenomenological,
     sop_R_redfield as _sop_R_redfield,
     sop_R_sr2k as _sop_R_sr2k,
     ldb_thermalization as _ldb_thermalization
 )
-from spinguin.core.specutils import (
+from spinguin._core.specutils import (
     frequency_to_chemical_shift,
     resonance_frequency as _resonance_frequency,
     spectral_width_to_dwell_time as _spectral_width_to_dwell_time,
     spectrum as _spectrum
 )
-from spinguin.core.superoperators import sop_from_string as _sop_from_string
-from spinguin.core.states import (
+from spinguin._core.superoperators import sop_from_string as _sop_from_string
+from spinguin._core.states import (
     alpha_state as _alpha_state,
     beta_state as _beta_state,
     equilibrium_state as _equilibrium_state,

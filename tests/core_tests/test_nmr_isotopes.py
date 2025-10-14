@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from spinguin.core.nmr_isotopes import spin, gamma, quadrupole_moment
+from spinguin._core.nmr_isotopes import spin, gamma, quadrupole_moment
 
 class TestNMRIsotopes(unittest.TestCase):
 

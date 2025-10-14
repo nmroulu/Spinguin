@@ -7,9 +7,9 @@ import time
 import numpy as np
 import scipy.sparse as sp
 import warnings
-from spinguin.core.la import expm
-from spinguin.core.superoperators import sop_from_string
-from spinguin.core.hide_prints import HidePrints
+from spinguin._core.la import expm
+from spinguin._core.superoperators import sop_from_string
+from spinguin._core.hide_prints import HidePrints
 
 def sop_propagator(L: np.ndarray | sp.csc_array,
                    t: float,

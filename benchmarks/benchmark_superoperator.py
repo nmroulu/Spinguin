@@ -12,8 +12,8 @@ mark takes two minutes to run with `max_nspins=14`, and `max_spin_order=4`.
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
-from spinguin.core.superoperators import sop_prod
-from spinguin.core.basis import make_basis, spin_order
+from spinguin._core.superoperators import sop_prod
+from spinguin._core.basis import make_basis, spin_order
 
 # Testing parameters
 max_nspins = 14

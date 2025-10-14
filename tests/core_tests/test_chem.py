@@ -1,9 +1,9 @@
 import unittest
 import numpy as np
 import itertools
-from spinguin.core.chem import dissociate, associate, permute_spins
-from spinguin.core.basis import make_basis
-from spinguin.core.states import triplet_plus_state, alpha_state
+from spinguin._core.chem import dissociate, associate, permute_spins
+from spinguin._core.basis import make_basis
+from spinguin._core.states import triplet_plus_state, alpha_state
 
 class TestChemMethods(unittest.TestCase):
 

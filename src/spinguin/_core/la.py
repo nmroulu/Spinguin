@@ -12,10 +12,10 @@ from scipy.io import mmwrite, mmread
 from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
-from spinguin.core.sparse_dot import sparse_dot as _sparse_dot
-from spinguin.core.intersect_indices import intersect_indices
-from spinguin.core.hide_prints import HidePrints
-from spinguin.core.nmr_isotopes import ISOTOPES
+from spinguin._core.sparse_dot import sparse_dot as _sparse_dot
+from spinguin._core.intersect_indices import intersect_indices
+from spinguin._core.hide_prints import HidePrints
+from spinguin._core.nmr_isotopes import ISOTOPES
 from multiprocessing.shared_memory import SharedMemory
 
 def write_shared_sparse(A: csc_array) -> tuple[

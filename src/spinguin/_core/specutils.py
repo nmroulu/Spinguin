@@ -7,7 +7,7 @@ NMR and signal processing.
 # Imports
 import numpy as np
 from typing import Literal
-from spinguin.core.nmr_isotopes import gamma
+from spinguin._core.nmr_isotopes import gamma
 
 def resonance_frequency(isotope: str,
                         B: float,

@@ -10,9 +10,9 @@ import time
 from functools import lru_cache
 from itertools import product
 from typing import Literal
-from spinguin.core import la
-from spinguin.core.basis import idx_to_lq, parse_operator_string
-from spinguin.core.operators import op_T
+from spinguin._core import la
+from spinguin._core.basis import idx_to_lq, parse_operator_string
+from spinguin._core.operators import op_T
 
 @lru_cache(maxsize=16)
 def structure_coefficients(spin: float,

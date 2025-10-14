@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-from spinguin.core.basis import make_basis
-from spinguin.core.states import state_from_string
-from spinguin.core.propagation import sop_pulse
+from spinguin._core.basis import make_basis
+from spinguin._core.states import state_from_string
+from spinguin._core.propagation import sop_pulse
 
 class TestPropagation(unittest.TestCase):
 

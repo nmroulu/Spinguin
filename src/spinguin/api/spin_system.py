@@ -9,9 +9,9 @@ modules can be used to calculate its properties.
 import numpy as np
 from spinguin.api.basis import Basis
 from spinguin.api.relaxation_properties import RelaxationProperties
-from spinguin.core.data_io import read_array, read_tensors, read_xyz
-from spinguin.core.la import arraylike_to_array
-from spinguin.core.nmr_isotopes import ISOTOPES
+from spinguin._core.data_io import read_array, read_tensors, read_xyz
+from spinguin._core.la import arraylike_to_array
+from spinguin._core.nmr_isotopes import ISOTOPES
 
 class SpinSystem:
     """
