@@ -30,7 +30,7 @@ from spinguin._core.basis import (
     truncate_basis_by_indices
 )
 from spinguin._core.la import isvector
-from spinguin._api.parameters import parameters
+from spinguin._api._parameters import parameters
 
 class Basis:
     """

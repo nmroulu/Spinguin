@@ -40,7 +40,7 @@ from spinguin._api.core import (
     unit_state
 )
 
-from spinguin._api.parameters import parameters
+from spinguin._api._parameters import parameters
 
 from spinguin._api.spin_system import SpinSystem
 

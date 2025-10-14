@@ -11,7 +11,7 @@ import scipy.sparse as sp
 from copy import deepcopy
 from typing import Literal
 
-from spinguin._api.parameters import parameters
+from spinguin._api._parameters import parameters
 from spinguin._api.spin_system import SpinSystem
 
 from spinguin._core.chem import (
