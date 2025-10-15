@@ -20,6 +20,7 @@ from spinguin._operators import (
     op_T_coupled,
     operator
 )
+from spinguin._parameters import parameters
 from spinguin._superoperators import superoperator
 
 __all__ = [
@@ -36,6 +37,9 @@ __all__ = [
     "op_T",
     "op_T_coupled",
     "operator",
+
+    # _parameters
+    "parameters",
 
     # _superoperators
     "superoperator"

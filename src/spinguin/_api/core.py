@@ -12,7 +12,7 @@ from copy import deepcopy
 from typing import Literal
 
 from spinguin._config import config
-from spinguin._api._parameters import parameters
+from spinguin._parameters import parameters
 from spinguin._api._spin_system import SpinSystem
 
 from spinguin._core.chem import (
