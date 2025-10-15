@@ -3,7 +3,7 @@ This module provides user friendly wrapper functions of the Spinguin's core
 functionality by making use of the `SpinSystem` class.
 """
 
-# Expose only the necessary functions from the API
+# Expose only the necessary functionality from the API
 from spinguin._api.core import (
     alpha_state,
     beta_state,
@@ -39,36 +39,12 @@ from spinguin._api.core import (
     unit_state
 )
 from spinguin._api._config import config
-from spinguin._api._operators import (
-    op_E,
-    op_Sm,
-    op_Sp,
-    op_Sx,
-    op_Sy,
-    op_Sz,
-    op_T,
-    op_T_coupled,
-    operator
-)
 from spinguin._api._parameters import parameters
-
-
 from spinguin._api._spin_system import SpinSystem
 
 __all__ = [
     # spinguin._api._config
     "config",
-
-    # spinguin._api._operators
-    "op_E",
-    "op_Sm",
-    "op_Sp",
-    "op_Sx",
-    "op_Sy",
-    "op_Sz",
-    "op_T",
-    "op_T_coupled",
-    "operator",
 
     # spinguin._api._parameters
     "parameters",

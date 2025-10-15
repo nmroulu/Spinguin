@@ -8,3 +8,26 @@ the documentation of the re-usable, core functionality, see Spinguin (Advanced).
 # Make functionality from the API accessible directly under the spinguin
 # namespace
 from spinguin._api import *
+from spinguin._operators import (
+    op_E,
+    op_Sm,
+    op_Sp,
+    op_Sx,
+    op_Sy,
+    op_Sz,
+    op_T,
+    op_T_coupled,
+    operator
+)
+
+__all__ = [
+    "op_E",
+    "op_Sm",
+    "op_Sp",
+    "op_Sx",
+    "op_Sy",
+    "op_Sz",
+    "op_T",
+    "op_T_coupled",
+    "operator"
+]
