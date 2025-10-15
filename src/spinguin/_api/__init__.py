@@ -16,7 +16,6 @@ from spinguin._api.core import (
     inversion_recovery,
     liouvillian,
     measure,
-    operator,
     permute_spins,
     propagator,
     propagator_to_rotframe,
@@ -40,6 +39,17 @@ from spinguin._api.core import (
     unit_state
 )
 from spinguin._api._config import config
+from spinguin._api._operators import (
+    op_E,
+    op_Sm,
+    op_Sp,
+    op_Sx,
+    op_Sy,
+    op_Sz,
+    op_T,
+    op_T_coupled,
+    operator
+)
 from spinguin._api._parameters import parameters
 
 
@@ -48,6 +58,17 @@ from spinguin._api._spin_system import SpinSystem
 __all__ = [
     # spinguin._api._config
     "config",
+
+    # spinguin._api._operators
+    "op_E",
+    "op_Sm",
+    "op_Sp",
+    "op_Sx",
+    "op_Sy",
+    "op_Sz",
+    "op_T",
+    "op_T_coupled",
+    "operator",
 
     # spinguin._api._parameters
     "parameters",
@@ -63,7 +84,6 @@ __all__ = [
     "inversion_recovery",
     "liouvillian",
     "measure",
-    "operator",
     "permute_spins",
     "propagator",
     "propagator_to_rotframe",
