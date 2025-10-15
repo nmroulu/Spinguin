@@ -7,8 +7,6 @@ functionality by making use of the `SpinSystem` class.
 from spinguin._api.core import (
     alpha_state,
     beta_state,
-    associate,
-    dissociate,
     equilibrium_state,
     frequency_to_chemical_shift,
     gamma,
@@ -16,7 +14,6 @@ from spinguin._api.core import (
     inversion_recovery,
     liouvillian,
     measure,
-    permute_spins,
     propagator,
     propagator_to_rotframe,
     pulse,

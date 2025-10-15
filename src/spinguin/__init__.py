@@ -8,6 +8,11 @@ the documentation of the re-usable, core functionality, see Spinguin (Advanced).
 # Make functionality from the API accessible directly under the spinguin
 # namespace
 from spinguin._api import *
+from spinguin._chem import (
+    associate,
+    dissociate,
+    permute_spins
+)
 from spinguin._config import config
 from spinguin._operators import (
     op_E,
@@ -25,6 +30,11 @@ from spinguin._spin_system import SpinSystem
 from spinguin._superoperators import superoperator
 
 __all__ = [
+    # _chem
+    "associate",
+    "dissociate",
+    "permute_spins",
+
     # _config
     "config",
 
