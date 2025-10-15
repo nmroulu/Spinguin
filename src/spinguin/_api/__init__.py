@@ -39,12 +39,19 @@ from spinguin._api.core import (
     triplet_zero_state,
     unit_state
 )
-
+from spinguin._api._config import config
 from spinguin._api._parameters import parameters
+
 
 from spinguin._api.spin_system import SpinSystem
 
 __all__ = [
+    # spinguin._api._config
+    "config",
+
+    # spinguin._api._parameters
+    "parameters",
+
     "alpha_state",
     "associate",
     "beta_state",
@@ -57,7 +64,6 @@ __all__ = [
     "liouvillian",
     "measure",
     "operator",
-    "parameters",
     "permute_spins",
     "propagator",
     "propagator_to_rotframe",

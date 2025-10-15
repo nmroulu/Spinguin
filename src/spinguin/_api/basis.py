@@ -30,7 +30,7 @@ from spinguin._core.basis import (
     truncate_basis_by_indices
 )
 from spinguin._core.la import isvector
-from spinguin._api._parameters import parameters
+from spinguin._api._config import config
 
 class Basis:
     """
@@ -285,8 +285,8 @@ class Basis:
             rho = rho,
             time_step = time_step,
             nsteps = nsteps,
-            zero_zte = parameters.zero_zte,
-            zero_expm_vec = parameters.zero_time_step
+            zero_zte = config.zero_zte,
+            zero_expm_vec = config.zero_time_step
         )
 
         # Update the basis
