@@ -283,6 +283,239 @@ def spin_order(op_def: np.ndarray) -> int:
 
     return order
 
+def _is_valid_single_spin_operator(operator: str, nspins: int):
+    """
+    Checks that the given operator string is a valid single-spin operator. For
+    example, `operator = 'I(z,0)` is valid, whereas `I(z,y)` is invalid.
+
+    Parameters
+    ----------
+    operator : str
+        A string that defines the single-spin operator.
+    nspins : int
+        Number of spins in the system.
+
+    Returns
+    -------
+    valid : bool
+        True if the operator is valid, False otherwise.
+    """
+    # Empty strings are always invalid
+    if len(operator) == 0:
+        return False
+    
+    # Handle unit operators (must be of length 1)
+    elif operator[0] == 'E' and len(operator) == 1:
+        return True
+        
+    # Handle Cartesian, raising, and lowering operators
+    elif (
+        operator[0] == 'I' and
+        operator.count('(') == 1 and
+        operator.count(')') == 1 and
+        operator.count(',') == 1 and
+        operator[1] == '(' and
+        operator[-1] == ')'
+    ):
+
+        # Find the operator component and index
+        component = operator[2:-1].split(',')[0]
+        index = operator[2:-1].split(',')[1]
+
+        # Check the component and index
+        if (
+            component in {'x', 'y', 'z', '+', '-'} and
+            index.isdigit() and
+            int(index) < nspins
+        ):
+            return True
+        else:
+            return False
+    
+    # Handle spherical tensor operators
+    elif (
+        operator[0] == 'T' and
+        operator.count('(') == 1 and
+        operator.count(')') == 1 and
+        operator.count(',') == 2 and
+        operator[1] == '(' and
+        operator[-1] == ')'
+    ):
+        # Find rank, projection and index
+        l = operator[2:-1].split(',')[0]
+        q = operator[2:-1].split(',')[1]
+        index = operator[2:-1].split(',')[2]
+
+        # Check that they all are integers
+        try:
+            l = int(l)
+            q = int(q)
+            index = int(index)
+        except ValueError:
+            return False
+        
+        # Check the rank, projection and index
+        if (
+            l >= 0 and
+            l >= abs(q) and
+            index < nspins
+        ):
+            return True
+        else:
+            return False
+        
+    # Otherwise not a valid operator
+    else:
+        return False
+    
+def _is_valid_product_operator(operator: str, nspins: int):
+    """
+    Checks whether the given operator string is a valid product operator. For
+    example, `operator = I(z,0)*I(z,1)` and `operator = I(z,0)` are valid.
+
+    Parameters
+    ----------
+    operator : str
+        A string that defines the product operator.
+    nspins : int
+        Number of spins in the system.
+
+    Returns
+    -------
+    valid : bool
+        True if the operator is valid, False otherwise.
+    """
+    # Split the product operator and consider each operator at time
+    ops = operator.split('*')
+    for op in ops:
+        if not _is_valid_single_spin_operator(op, nspins):
+            return False
+    return True
+
+def _is_valid_sum_operator(operator: str):
+    """
+    Checks that the given operator string is a valid representation of a sum
+    operator. For example, `operator = I(x)` is valid, whereas
+    `operator = I(x,2)` is invalid.
+
+    Parameters
+    ----------
+    operator : str
+        A string that defines the sum operator.
+    
+    Returns
+    -------
+    valid : bool
+        True if the operator is valid, False otherwise.
+    """
+    # Empty strings are always invalid
+    if len(operator) == 0:
+        return False
+
+    # Cartesian, raising, and lowering operators (check all possible cases)
+    elif (
+        operator[0] == 'I' and
+        operator in {'I(x)', 'I(y)', 'I(z)', 'I(+)', 'I(-)'}
+    ):
+        return True
+
+    # Spherical tensor operators
+    elif (
+        operator[0] == 'T' and
+        operator.count('(') == 1 and
+        operator.count(')') == 1 and
+        operator.count(',') == 1 and
+        operator[1] == '(' and
+        operator[-1] == ')'
+    ):
+        # Obtain the rank and projection
+        try:
+            l = int(operator[2:-1].split(',')[0])
+            q = int(operator[2:-1].split(',')[1])
+        except ValueError:
+            return False
+
+        # Check the rank and projection
+        if (l >= 0 and l >= abs(q)):
+            return True
+        else:
+            return False
+
+    # Otherwise the operator is invalid
+    else:
+        return False
+
+def _split_sum_operator(operator: str):
+    """
+    Splits the input operator into individual operators.
+
+    Parameters
+    ----------
+    operator : str
+        A string that defines the operator to be generated.
+
+    Returns
+    -------
+    ops : list
+        A list of strings, where each string is a single operator or a product
+        operator.
+    """
+    # Split the given product operator into single-spin operators
+    ops = []
+    status = "start_operator"
+    for i, char in enumerate(operator):
+
+        match status:
+
+            case "start_operator":
+                if char == 'E':
+                    start = i
+                    status = "product_or_sum"
+                elif char == 'I' or char == 'T':
+                    start = i
+                    status = "leftbracket"
+                else:
+                    raise ValueError(f"invalid operator {char}")
+                
+            case "leftbracket":
+                if char == '(':
+                    status = "operator_details"
+                else:
+                    raise ValueError(f"invalid operator {operator[start:i]}")
+                
+            case "operator_details":
+                if char == ')':
+                    status = "product_or_sum"
+                elif not (
+                    char in {'0','1','2','3','4','5','6','7','8','9'} or
+                    char in {'x', 'y', 'z', '+', '-', ','}
+                ):
+                    raise ValueError(f"invalid operator {operator[start:i]}")
+
+            case "product_or_sum":
+                if char == '*':
+                    status = "continue_operator"
+                elif char == '+':
+                    ops.append(operator[start:i])
+                    status = "start_operator"
+                else:
+                    raise ValueError(f"invalid operator {operator[start:i]}")
+
+            case "continue_operator":
+                if char == 'E':
+                    status = "product_or_sum"
+                elif char == 'I' or char == 'T':
+                    status = "leftbracket"
+                else:
+                    raise ValueError(f"invalid operator {operator[start:i]}")
+
+    if status == "product_or_sum":
+        ops.append(operator[start:])
+    else:
+        raise ValueError(f"invalid operator {operator[start:]}")
+
+    return ops
+
 def parse_operator_string(operator: str, nspins: int):
     """
     Parses operator strings and returns their definitions in the basis set as
@@ -338,8 +571,8 @@ def parse_operator_string(operator: str, nspins: int):
     # Remove spaces from the user input
     operator = "".join(operator.split())
 
-    # Create unit operator if input string is empty
-    if operator == "":
+    # Create the unit operator if the input string is empty or "E"
+    if operator == "" or operator == "E":
         op_def = np.array([0 for _ in range(nspins)])
         coeff = 1
         op_defs.append(op_def)
@@ -347,60 +580,37 @@ def parse_operator_string(operator: str, nspins: int):
         return op_defs, coeffs
 
     # Split the user input sum '+' into separate product operators
-    prod_ops = []
-    inside_parantheses = False
-    start = 0
-    for i, char in enumerate(operator):
-        if char == '(':
-            inside_parantheses = True
-        elif char == ')':
-            inside_parantheses = False
-        elif char == '+' and not inside_parantheses:
-            prod_ops.append(operator[start:i])
-            start = i + 1
-    prod_ops.append(operator[start:])
+    prod_ops = _split_sum_operator(operator)
 
-    # Replace inputs of kind I(z) --> Sum operator for all spins
+    # Ensure that each operator is valid
     prod_ops_copy = []
     for prod_op in prod_ops:
-        if '*' not in prod_op:
 
-            # For unit operators, do nothing
-            if prod_op[0] == 'E':
-                prod_ops_copy.append(prod_op)
+        # Replace inputs of kind I(z) --> Sum operator for all spins
+        if _is_valid_sum_operator(prod_op):
 
             # Handle Cartesian and ladder operators
-            elif prod_op[0] == 'I':
-                component = re.search(r'\(([^)]*)\)',
-                                      prod_op).group(1).split(',')
-                if len(component) == 1:
-                    component = component[0]
-                    for index in range(nspins):
-                        prod_ops_copy.append(f"I({component},{index})")
-                else:
-                    prod_ops_copy.append(prod_op)
+            if prod_op[0] == 'I':
+                component = prod_op[2]
+                for index in range(nspins):
+                    prod_ops_copy.append(f"I({component},{index})")
 
             # Handle spherical tensor operators
             elif prod_op[0] == 'T':
-                component = re.search(r'\(([^)]*)\)',
-                                      prod_op).group(1).split(',')
-                if len(component) == 2:
-                    l = component[0]
-                    q = component[1]
-                    for index in range(nspins):
-                        prod_ops_copy.append(f"T({l},{q},{index})")
-                else:
-                    prod_ops_copy.append(prod_op)
+                l = prod_op[2:-1].split(',')[0]
+                q = prod_op[2:-1].split(',')[1]
+                for index in range(nspins):
+                    prod_ops_copy.append(f"T({l},{q},{index})")
 
-            # Otherwise an unsupported operator
-            else:
-                raise ValueError("Cannot parse the following invalid"
-                                 f"operator: {op_term}")
-
-        # Keep operator as is, if the input contains '*'
-        else:
+        # Keep product operators as is
+        elif _is_valid_product_operator(prod_op, nspins):
             prod_ops_copy.append(prod_op)
 
+        # Raise an error for invalid operators
+        else:
+            raise ValueError(f"invalid operator {prod_op}")
+
+    # Use the newly created list
     prod_ops = prod_ops_copy
                 
     # Process each product operator separately
@@ -421,19 +631,15 @@ def parse_operator_string(operator: str, nspins: int):
 
             # Handle Cartesian and ladder operators
             elif op_term[0] == 'I':
-                component_and_index = re.search(r'\(([^)]*)\)',
-                                                op_term).group(1).split(',')
-                component = component_and_index[0]
-                index = int(component_and_index[1])
+                component = op_term[2:-1].split(',')[0]
+                index = int(op_term[2:-1].split(',')[1])
                 op[index] = f"I_{component}"
 
             # Handle spherical tensor operators
             elif op_term[0] == 'T':
-                component_and_index = re.search(r'\(([^)]*)\)',
-                                                op_term).group(1).split(',')
-                l = component_and_index[0]
-                q = component_and_index[1]
-                index = int(component_and_index[2])
+                l = op_term[2:-1].split(',')[0]
+                q = op_term[2:-1].split(',')[1]
+                index = int(op_term[2:-1].split(',')[2])
                 op[index] = f"T_{l}_{q}"
 
             # Other input types are not supported
