@@ -14,6 +14,7 @@ from spinguin._chem import (
     permute_spins
 )
 from spinguin._config import config
+from spinguin._hamiltonian import hamiltonian
 from spinguin._operators import (
     op_E,
     op_Sm,
@@ -37,6 +38,9 @@ __all__ = [
 
     # _config
     "config",
+
+    # _hamiltonian
+    "hamiltonian",
 
     # _operators
     "op_E",
