@@ -43,7 +43,7 @@ from spinguin._api._config import config
 from spinguin._api._parameters import parameters
 
 
-from spinguin._api.spin_system import SpinSystem
+from spinguin._api._spin_system import SpinSystem
 
 __all__ = [
     # spinguin._api._config
