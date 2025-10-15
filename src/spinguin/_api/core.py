@@ -45,7 +45,7 @@ from spinguin._core.specutils import (
     spectral_width_to_dwell_time as _spectral_width_to_dwell_time,
     spectrum as _spectrum
 )
-from spinguin._core.superoperators import sop_from_string as _sop_from_string
+from spinguin._superoperators import superoperator
 from spinguin._core.states import (
     alpha_state as _alpha_state,
     beta_state as _beta_state,
@@ -94,76 +94,6 @@ __all__ = [
     "triplet_zero_state",
     "unit_state"
 ]
-
-def superoperator(spin_system: SpinSystem,
-                  operator: str,
-                  side: Literal["comm", "left", "right"] = "comm"
-                  ) -> np.ndarray | sp.csc_array:
-    """
-    Generates a Liouville-space superoperator for the `spin_system` from the
-    user-specified `operator` string.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the superoperator is going to be generated.
-    operator : str
-        Defines the superoperator to be generated. The operator string must
-        follow the rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit
-        operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-    side : {'comm', 'left', 'right'}
-        The type of superoperator:
-        - 'comm' -- commutation superoperator (default)
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
-
-    Returns
-    -------
-    sop : ndarray or csc_array
-        An array representing the requested superoperator.
-    """
-
-    # Check that the basis has been built
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing "
-                         "superoperators.")
-        
-    # Construct the superoperator
-    sop = _sop_from_string(
-        operator = operator,
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        side = side,
-        sparse = config.sparse_superoperator
-    )
-        
-    return sop
 
 INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
 INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]

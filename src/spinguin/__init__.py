@@ -19,8 +19,10 @@ from spinguin._operators import (
     op_T_coupled,
     operator
 )
+from spinguin._superoperators import superoperator
 
 __all__ = [
+    # _operators
     "op_E",
     "op_Sm",
     "op_Sp",
@@ -29,5 +31,8 @@ __all__ = [
     "op_Sz",
     "op_T",
     "op_T_coupled",
-    "operator"
+    "operator",
+
+    # _superoperators
+    "superoperator"
 ]
