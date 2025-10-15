@@ -37,14 +37,10 @@ from spinguin._api.core import (
     triplet_zero_state,
     unit_state
 )
-from spinguin._api._config import config
 from spinguin._api._parameters import parameters
 from spinguin._api._spin_system import SpinSystem
 
 __all__ = [
-    # spinguin._api._config
-    "config",
-
     # spinguin._api._parameters
     "parameters",
 

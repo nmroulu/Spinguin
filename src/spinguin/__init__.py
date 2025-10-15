@@ -8,6 +8,7 @@ the documentation of the re-usable, core functionality, see Spinguin (Advanced).
 # Make functionality from the API accessible directly under the spinguin
 # namespace
 from spinguin._api import *
+from spinguin._config import config
 from spinguin._operators import (
     op_E,
     op_Sm,
@@ -22,6 +23,9 @@ from spinguin._operators import (
 from spinguin._superoperators import superoperator
 
 __all__ = [
+    # _config
+    "config",
+
     # _operators
     "op_E",
     "op_Sm",
