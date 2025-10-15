@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import numpy as np
     import scipy.sparse as sp
-    from spinguin._api._spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 from typing import Literal

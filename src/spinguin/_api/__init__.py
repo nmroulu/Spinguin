@@ -37,7 +37,6 @@ from spinguin._api.core import (
     triplet_zero_state,
     unit_state
 )
-from spinguin._api._spin_system import SpinSystem
 
 __all__ = [
     "alpha_state",
@@ -64,7 +63,6 @@ __all__ = [
     "spectral_width_to_dwell_time",
     "spectrum",
     "spin",
-    "SpinSystem",
     "state",
     "state_to_zeeman",
     "time_axis",

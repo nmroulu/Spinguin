@@ -13,7 +13,7 @@ important functionality of the class::
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from spinguin._api._spin_system import SpinSystem
+    from spinguin._spin_system import SpinSystem
 
 # Imports
 import numpy as np
