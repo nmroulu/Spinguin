@@ -7,7 +7,7 @@ modules can be used to calculate its properties.
 
 # Imports
 import numpy as np
-from spinguin._api.basis import Basis
+from spinguin._api._basis import Basis
 from spinguin._api.relaxation_properties import RelaxationProperties
 from spinguin._core.data_io import read_array, read_tensors, read_xyz
 from spinguin._core.la import arraylike_to_array
