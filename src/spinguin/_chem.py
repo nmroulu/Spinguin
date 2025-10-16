@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import numpy as np
     import scipy.sparse as sp
-    from spinguin._spin_system import SpinSystem
+    from spinguin._core._spin_system import SpinSystem
 
 # Imports
 from spinguin._core.chem import (

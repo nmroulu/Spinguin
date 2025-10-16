@@ -11,3 +11,11 @@ namespace, described in Spinguin (Basic), using::
 
     import spinguin as sg
 """
+
+# Imports
+from spinguin._core._spin_system import SpinSystem
+
+__all__ = [
+    # spinguin._core._spin_system
+    "SpinSystem",
+]

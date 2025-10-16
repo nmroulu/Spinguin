@@ -12,7 +12,7 @@ instantiation. The relaxation properties can be accessed as follows::
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from spinguin._spin_system import SpinSystem
+    from spinguin._core._spin_system import SpinSystem
 
 # Imports
 import numpy as np

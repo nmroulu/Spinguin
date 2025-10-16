@@ -13,7 +13,7 @@ from typing import Literal
 
 from spinguin._config import config
 from spinguin._parameters import parameters
-from spinguin._spin_system import SpinSystem
+from spinguin._core._spin_system import SpinSystem
 from spinguin._hamiltonian import hamiltonian
 from spinguin._core.hamiltonian import sop_H as _sop_H
 from spinguin._core.hide_prints import HidePrints
