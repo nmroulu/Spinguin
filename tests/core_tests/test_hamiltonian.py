@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import os
 from scipy.sparse import load_npz
-from spinguin._core._hamiltonian import sop_H
+from spinguin._core._hamiltonian import _sop_H
 from spinguin._core.nmr_isotopes import ISOTOPES
 from spinguin._core.basis import make_basis
 
@@ -46,7 +46,7 @@ class TestHamiltonian(unittest.TestCase):
         B = 7e-3
         
         # Generate the Hamiltonian
-        H_comm = sop_H(
+        H_comm = _sop_H(
             basis = basis,
             spins = spins,
             gammas = gammas,
@@ -60,7 +60,7 @@ class TestHamiltonian(unittest.TestCase):
         )
         
         # Generate the same Hamiltonian again (check for cache errors etc.)
-        H_comm = sop_H(
+        H_comm = _sop_H(
             basis = basis,
             spins = spins,
             gammas = gammas,
@@ -74,7 +74,7 @@ class TestHamiltonian(unittest.TestCase):
         )
 
         # Build left and right separately
-        H_left = sop_H(
+        H_left = _sop_H(
             basis = basis,
             spins = spins,
             gammas = gammas,
@@ -86,7 +86,7 @@ class TestHamiltonian(unittest.TestCase):
             sparse = True,
             zero_value = 1e-12
         )
-        H_right = sop_H(
+        H_right = _sop_H(
             basis = basis,
             spins = spins,
             gammas = gammas,

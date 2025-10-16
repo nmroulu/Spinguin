@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.sparse as sp
 import os
-from spinguin._core._hamiltonian import sop_H
+from spinguin._core._hamiltonian import _sop_H
 from spinguin._core._relaxation import dd_constant, relaxation
 from spinguin._core.propagation import sop_pulse, propagator
 from spinguin._core.nmr_isotopes import ISOTOPES
@@ -130,7 +130,7 @@ class TestRelaxation(unittest.TestCase):
         nsteps = 50000      # Number of simulation steps
 
         # Get the Hamiltonian
-        H = sop_H(
+        H = _sop_H(
             basis = basis,
             gammas = gammas,
             spins = spins,
@@ -150,7 +150,7 @@ class TestRelaxation(unittest.TestCase):
         L = -1j*H - R
 
         # Create the thermal equilibrium state
-        H_left = sop_H(
+        H_left = _sop_H(
             basis = basis,
             gammas = gammas,
             spins = spins,
@@ -185,7 +185,7 @@ class TestRelaxation(unittest.TestCase):
             rho = P @ rho
 
         # Create an equilibrium state in the ZQ basis for reference
-        H_left_ZQ = sop_H(
+        H_left_ZQ = _sop_H(
             basis = ZQ_basis,
             gammas = gammas,
             spins = spins,

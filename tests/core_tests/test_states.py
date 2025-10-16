@@ -8,7 +8,7 @@ from spinguin._core.states import \
     state_from_string, unit_state, measure, equilibrium_state
 from spinguin._core.basis import make_basis
 from spinguin._core.nmr_isotopes import ISOTOPES
-from spinguin._core._hamiltonian import sop_H_Z
+from spinguin._core._hamiltonian import _sop_H_Z
 
 class TestStates(unittest.TestCase):
 
@@ -455,7 +455,7 @@ class TestStates(unittest.TestCase):
         T = 273
         
         # Construct the left Hamiltonian superoperator (only Zeeman)
-        H_left = sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
+        H_left = _sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
 
         # Make the thermal equilibrium state
         rho_eq_sparse = equilibrium_state(basis, spins, H_left, T, sparse=True,
@@ -485,7 +485,7 @@ class TestStates(unittest.TestCase):
         T = 1
 
         # Construct the left Hamiltonian superoperator (only Zeeman)
-        H_left = sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
+        H_left = _sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
 
         # Make the thermal equilibrium state
         rho_eq_sparse = equilibrium_state(basis, spins, H_left, T, sparse=True,

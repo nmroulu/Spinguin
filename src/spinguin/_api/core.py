@@ -14,7 +14,7 @@ from spinguin._core._config import config
 from spinguin._core._parameters import parameters
 from spinguin._core._spin_system import SpinSystem
 from spinguin._core._hamiltonian import hamiltonian
-from spinguin._core._hamiltonian import sop_H as _sop_H
+from spinguin._core._hamiltonian import _sop_H
 from spinguin._core.hide_prints import HidePrints
 from spinguin._core.la import norm_1
 from spinguin._core.liouvillian import (

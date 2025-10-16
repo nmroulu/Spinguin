@@ -17,7 +17,7 @@ from spinguin._core._superoperators import sop_prod
 from spinguin._core._config import config
 from spinguin._core._parameters import parameters
 
-def sop_H_Z(basis: np.ndarray,
+def _sop_H_Z(basis: np.ndarray,
             gammas: np.ndarray,
             spins: np.ndarray,
             B: float,
@@ -75,7 +75,7 @@ def sop_H_Z(basis: np.ndarray,
 
     return sop_Hz
 
-def sop_H_CS(basis: np.ndarray,
+def _sop_H_CS(basis: np.ndarray,
              gammas: np.ndarray,
              spins: np.ndarray,
              chemical_shifts: np.ndarray,
@@ -137,7 +137,7 @@ def sop_H_CS(basis: np.ndarray,
 
     return sop_Hcs
 
-def sop_H_J(basis: np.ndarray,
+def _sop_H_J(basis: np.ndarray,
             spins: np.ndarray,
             J_couplings: np.ndarray,
             side: Literal["comm", "left", "right"] = "comm",
@@ -209,7 +209,7 @@ def sop_H_J(basis: np.ndarray,
 
 INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
 INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
-def sop_H(
+def _sop_H(
         basis: np.ndarray,
         spins: np.ndarray,
         gammas: np.ndarray = None,
@@ -292,12 +292,12 @@ def sop_H(
     # Compute the Zeeman and J-coupling Hamiltonians
     for interaction in interactions:
         if interaction == "zeeman":
-            sop_H += sop_H_Z(basis, gammas, spins, B, side, sparse)
+            sop_H += _sop_H_Z(basis, gammas, spins, B, side, sparse)
         elif interaction == "chemical_shift":
-            sop_H += sop_H_CS(basis, gammas, spins, chemical_shifts, B, side, 
+            sop_H += _sop_H_CS(basis, gammas, spins, chemical_shifts, B, side, 
                               sparse)
         elif interaction == "J_coupling":
-            sop_H += sop_H_J(basis, spins, J_couplings, side, sparse)
+            sop_H += _sop_H_J(basis, spins, J_couplings, side, sparse)
         else:
             raise ValueError(f"Unsupported interaction type: {interaction}. "
                              f"The possible options are: {INTERACTIONDEFAULT}.")
@@ -355,7 +355,7 @@ def hamiltonian(
             raise ValueError("Please set the magnetic field before "
                              "constructing the chemical shift Hamiltonian.")
         
-    H = sop_H(
+    H = _sop_H(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         gammas = spin_system.gammas,
