@@ -9,29 +9,23 @@ mark takes a minute to run with `nspins=12` and `max_spin_order=3`.
 
 # Imports
 import numpy as np
-from spinguin._core.nmr_isotopes import ISOTOPES
-from spinguin._core.hamiltonian import sop_H
-from spinguin._core.relaxation import sop_R_redfield
-from spinguin._core.basis import make_basis
+import spinguin as sg
 
 # Testing parameters
 nspins = 12
 max_spin_order = 3
 
 # Set magnetic field
-B = 1
-
-# Set correlation time
-tau_c = 50e-12
+sg.parameters.magnetic_field = 1
 
 # Create the spin system
-spins = np.array([1/2 for _ in range(nspins)])
-basis = make_basis(spins, max_spin_order)
+spin_system = sg.SpinSystem(["1H" for _ in range(nspins)])
+spin_system.basis.max_spin_order = max_spin_order
+spin_system.basis.build()
 
-# Obtain the gyromagnetic ratios
-y1H = 2*np.pi * ISOTOPES['1H'][1] * 1e6
-gammas = np.array([y1H for _ in range(nspins)])
-quad = np.array([0 for _ in range(nspins)])
+# Set the relaxation theory
+spin_system.relaxation.theory = "redfield"
+spin_system.relaxation.tau_c = 50e-12
 
 # Create some geometry
 xyz = []
@@ -43,29 +37,19 @@ for spin in range(nspins):
     y = r * np.sin(theta)
     xyz.append([x, y, z])
 xyz = np.array(xyz)
+spin_system.xyz = xyz
 
-# Get a distance array
+# Create some chemical shifts using the distances
 connectors = xyz[:, np.newaxis] - xyz
 distances = np.linalg.norm(connectors, axis=2)
-
-# Create some chemical shifts
-chemical_shifts = np.array([5 + 0.25*i*(-1)**i for i in range(nspins)])
+spin_system.chemical_shifts = [5 + 0.25*i*(-1)**i for i in range(nspins)]
 
 # Create some J-couplings based on distances
 J_couplings = np.zeros((nspins, nspins))
 for i in range(nspins):
     for j in range(i):
         J_couplings[i,j] = 20 / distances[i,j]**3
+spin_system.J_couplings = J_couplings
 
-# Create the Hamiltonian superoperator
-H = sop_H(basis, spins, gammas, B, chemical_shifts, J_couplings)
-
-# Benchmark the Redfield superoperator
-sop_R_redfield(basis = basis,
-               sop_H = H,
-               tau_c = tau_c,
-               spins = spins,
-               B = B,
-               gammas = gammas,
-               xyz = xyz)
-
+# Benchmark the relaxation superoperator
+sg.relaxation(spin_system)
