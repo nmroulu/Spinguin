@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import scipy.sparse as sp
 import os
-from spinguin._core.hamiltonian import sop_H
+from spinguin._core._hamiltonian import sop_H
 from spinguin._core._relaxation import dd_constant, relaxation
 from spinguin._core.propagation import sop_pulse, propagator
 from spinguin._core.nmr_isotopes import ISOTOPES

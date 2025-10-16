@@ -23,7 +23,7 @@ from spinguin._core.basis import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin._core.hide_prints import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._config import config
-from spinguin._hamiltonian import hamiltonian
+from spinguin._core._hamiltonian import hamiltonian
 from typing import Literal
 
 def dd_constant(y1: float, y2: float) -> float:

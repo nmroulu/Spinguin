@@ -8,7 +8,7 @@ from spinguin._core.states import \
     state_from_string, unit_state, measure, equilibrium_state
 from spinguin._core.basis import make_basis
 from spinguin._core.nmr_isotopes import ISOTOPES
-from spinguin._core.hamiltonian import sop_H_Z
+from spinguin._core._hamiltonian import sop_H_Z
 
 class TestStates(unittest.TestCase):
 

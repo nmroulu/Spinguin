@@ -14,6 +14,7 @@ namespace, described in Spinguin (Basic), using::
 
 # Imports
 from spinguin._core._config import config
+from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._parameters import parameters
 from spinguin._core._relaxation import relaxation
 from spinguin._core._spin_system import SpinSystem
@@ -22,6 +23,9 @@ from spinguin._core._superoperators import superoperator
 __all__ = [
     # spinguin._core._config
     "config",
+
+    # spinguin._core.hamiltonian
+    "hamiltonian",
 
     # spinguin._core._parameters
     "parameters",

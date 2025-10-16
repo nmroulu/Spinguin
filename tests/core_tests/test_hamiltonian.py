@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import os
 from scipy.sparse import load_npz
-from spinguin._core.hamiltonian import sop_H
+from spinguin._core._hamiltonian import sop_H
 from spinguin._core.nmr_isotopes import ISOTOPES
 from spinguin._core.basis import make_basis
 
