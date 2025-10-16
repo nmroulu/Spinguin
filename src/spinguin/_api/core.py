@@ -25,8 +25,8 @@ from spinguin._core.liouvillian import (
 from spinguin._core.nmr_isotopes import gamma, quadrupole_moment, spin
 from spinguin._core.propagation import (
     propagator_to_rotframe as _propagator_to_rotframe,
-    sop_propagator as _sop_propagator,
-    sop_pulse as _sop_pulse
+    sop_pulse as _sop_pulse,
+    propagator
 )
 from spinguin._core.relaxation import (
     sop_R_phenomenological as _sop_R_phenomenological,
@@ -387,33 +387,6 @@ def pulse(spin_system: SpinSystem,
         zero_value = config.zero_pulse
     )
 
-    return P
-
-def propagator(L: np.ndarray | sp.csc_array,
-               t: float) -> np.ndarray | sp.csc_array:
-    """
-    Constructs the time propagator exp(L*t).
-
-    Parameters
-    ----------
-    L : csc_array
-        Liouvillian superoperator, L = -iH - R + K.
-    t : float
-        Time step of the simulation in seconds.
-
-    Returns
-    -------
-    expm_Lt : csc_array or ndarray
-        Time propagator exp(L*t).
-    """
-    # Create the propagator
-    P = _sop_propagator(
-        L = L,
-        t = t,
-        zero_value = config.zero_propagator,
-        density_threshold = config.propagator_density
-    )
-    
     return P
 
 def propagator_to_rotframe(spin_system: SpinSystem,

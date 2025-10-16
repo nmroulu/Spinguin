@@ -10,8 +10,36 @@ import warnings
 from spinguin._core.la import expm
 from spinguin._core._superoperators import sop_from_string
 from spinguin._core.hide_prints import HidePrints
+from spinguin._core._config import config
 
-def sop_propagator(L: np.ndarray | sp.csc_array,
+def propagator(L: np.ndarray | sp.csc_array,
+               t: float) -> np.ndarray | sp.csc_array:
+    """
+    Constructs the time propagator exp(L*t).
+
+    Parameters
+    ----------
+    L : csc_array
+        Liouvillian superoperator, L = -iH - R + K.
+    t : float
+        Time step of the simulation in seconds.
+
+    Returns
+    -------
+    expm_Lt : csc_array or ndarray
+        Time propagator exp(L*t).
+    """
+    # Create the propagator
+    P = _sop_propagator(
+        L = L,
+        t = t,
+        zero_value = config.zero_propagator,
+        density_threshold = config.propagator_density
+    )
+    
+    return P
+
+def _sop_propagator(L: np.ndarray | sp.csc_array,
                    t: float,
                    zero_value: float=1e-18,
                    density_threshold: float=0.5) -> sp.csc_array | np.ndarray:
