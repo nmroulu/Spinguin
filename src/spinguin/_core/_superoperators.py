@@ -89,7 +89,7 @@ def _structure_coefficients(spin: float,
 
     return c
 
-def sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def _sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
     Returns the unit superoperator.
 
@@ -145,7 +145,7 @@ def _sop_prod(op_def_bytes: bytes,
 
     # Return the unit operator if no spins participate in the operator
     if len(idx_spins) == 0:
-        sop = sop_E(dim, sparse)
+        sop = _sop_E(dim, sparse)
         return sop
 
     # Initialize lists for storing non-zero structure coefficients and their
