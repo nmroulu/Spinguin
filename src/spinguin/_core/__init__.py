@@ -13,10 +13,14 @@ namespace, described in Spinguin (Basic), using::
 """
 
 # Imports
+from spinguin._core._config import config
 from spinguin._core._parameters import parameters
 from spinguin._core._spin_system import SpinSystem
 
 __all__ = [
+    # spinguin._core._config
+    "config",
+
     # spinguin._core._parameters
     "parameters",
 

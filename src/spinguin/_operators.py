@@ -24,7 +24,7 @@ from spinguin._core.operators import (
     op_T_coupled as _op_T_coupled,
     op_from_string as _op_from_string
 )
-from spinguin._config import config
+from spinguin._core._config import config
 
 def op_E(S: float) -> np.ndarray | sp.csc_array:
     """

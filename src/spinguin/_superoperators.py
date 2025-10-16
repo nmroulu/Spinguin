@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 # Imports
 from typing import Literal
 from spinguin._core.superoperators import sop_from_string as _sop_from_string
-from spinguin._config import config
+from spinguin._core._config import config
 
 def superoperator(spin_system: SpinSystem,
                   operator: str,

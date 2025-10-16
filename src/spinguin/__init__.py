@@ -13,7 +13,6 @@ from spinguin._chem import (
     dissociate,
     permute_spins
 )
-from spinguin._config import config
 from spinguin._hamiltonian import hamiltonian
 from spinguin._operators import (
     op_E,
@@ -27,6 +26,7 @@ from spinguin._operators import (
     operator
 )
 from spinguin._core import (
+    config,
     parameters,
     SpinSystem
 )
@@ -37,9 +37,6 @@ __all__ = [
     "associate",
     "dissociate",
     "permute_spins",
-
-    # _config
-    "config",
 
     # _hamiltonian
     "hamiltonian",
@@ -56,6 +53,7 @@ __all__ = [
     "operator",
     
     # _core
+    "config",
     "parameters",
     "SpinSystem",
 
