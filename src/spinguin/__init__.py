@@ -26,8 +26,8 @@ from spinguin._operators import (
     op_T_coupled,
     operator
 )
-from spinguin._parameters import parameters
 from spinguin._core import (
+    parameters,
     SpinSystem
 )
 from spinguin._superoperators import superoperator
@@ -54,11 +54,9 @@ __all__ = [
     "op_T",
     "op_T_coupled",
     "operator",
-
-    # _parameters
-    "parameters",
-
+    
     # _core
+    "parameters",
     "SpinSystem",
 
     # _superoperators

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 # Imports
 from typing import Literal
 from spinguin._config import config
-from spinguin._parameters import parameters
+from spinguin._core._parameters import parameters
 from spinguin._core.hamiltonian import sop_H as _sop_H
 
 INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
