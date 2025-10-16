@@ -21,7 +21,7 @@ from spinguin._core.operators import op_T
 from spinguin._core._config import config
 
 @lru_cache(maxsize=16)
-def structure_coefficients(spin: float,
+def _structure_coefficients(spin: float,
                            side: Literal["left", "right"]) -> np.ndarray:
     """
     Computes the (normalized) structure coefficients of the operator algebra
@@ -158,7 +158,7 @@ def _sop_prod(op_def_bytes: bytes,
     for n in idx_spins:
 
         # Get the structure coefficients for the current spin
-        c_jk_n = structure_coefficients(spins[n], side)[op_def[n], :, :]
+        c_jk_n = _structure_coefficients(spins[n], side)[op_def[n], :, :]
 
         # Obtain the indices of the non-zero values
         nonzero_jk = np.nonzero(c_jk_n)
@@ -339,7 +339,7 @@ def sop_prod_ref(op_def: np.ndarray,
                 k_ind = basis[k, n]
 
                 # Get the structure coefficients for the current spin
-                c = structure_coefficients(spins[n], side)
+                c = _structure_coefficients(spins[n], side)
 
                 # Add to the product
                 sop_jk = sop_jk * c[i_ind, j_ind, k_ind]
