@@ -21,12 +21,12 @@ from spinguin._operators import (
     op_Sy,
     op_Sz,
     op_T,
-    op_T_coupled,
-    operator
+    op_T_coupled
 )
 from spinguin._core import (
     config,
     hamiltonian,
+    operator,
     parameters,
     relaxation,
     SpinSystem,
@@ -51,11 +51,11 @@ __all__ = [
     "op_Sz",
     "op_T",
     "op_T_coupled",
-    "operator",
     
     # _core
     "config",
     "hamiltonian",
+    "operator",
     "parameters",
     "relaxation",
     "SpinSystem",

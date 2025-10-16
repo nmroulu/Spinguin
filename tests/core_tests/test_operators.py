@@ -3,8 +3,8 @@ import numpy as np
 import math
 from spinguin._core.la import comm
 from spinguin._core.basis import idx_to_lq
-from spinguin._core.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, \
-    op_T, op_prod, op_from_string, op_T_coupled
+from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, \
+    op_T, op_prod, _op_from_string, op_T_coupled
 
 class TestOperators(unittest.TestCase):
 
@@ -371,8 +371,8 @@ class TestOperators(unittest.TestCase):
 
                     # Create the operator using inbuilt function
                     op_string = f"{op_i} * {op_j} * {op_k}"
-                    oper_sparse = op_from_string(spins, op_string, sparse=True)
-                    oper_dense = op_from_string(spins, op_string, sparse=False)
+                    oper_sparse = _op_from_string(spins, op_string, sparse=True)
+                    oper_dense = _op_from_string(spins, op_string, sparse=False)
 
                     # Create the reference operator
                     oper_ref = np.kron(opers[(i, spins[0])],
@@ -391,8 +391,8 @@ class TestOperators(unittest.TestCase):
                 op_string = f"I({oper})"
                 op_string_ref = f"I({oper},0) + I({oper},1) + I({oper},2)"
 
-                oper = op_from_string(spins, op_string, sparse=False)
-                oper_ref = op_from_string(spins, op_string_ref, sparse=False)
+                oper = _op_from_string(spins, op_string, sparse=False)
+                oper_ref = _op_from_string(spins, op_string_ref, sparse=False)
 
         # Test creating a sum operator for all spins using input type T(l,q)
         for l in range(0, 2):
@@ -401,5 +401,5 @@ class TestOperators(unittest.TestCase):
                 op_string = f"T({l},{q},0)"
                 op_string_ref = f"T({l},{q},0) + T({l},{q},1) + T({l},{q},2)"
 
-                oper = op_from_string(spins, op_string, sparse=False)
-                oper_ref = op_from_string(spins, op_string_ref, sparse=False)
+                oper = _op_from_string(spins, op_string, sparse=False)
+                oper_ref = _op_from_string(spins, op_string_ref, sparse=False)

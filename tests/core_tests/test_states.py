@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import scipy.constants as const
-from spinguin._core.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
+from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
 from spinguin._core.states import \
     alpha_state, beta_state, state_to_zeeman, singlet_state, \
     triplet_zero_state, triplet_plus_state, triplet_minus_state, \

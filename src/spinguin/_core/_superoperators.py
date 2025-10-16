@@ -17,7 +17,7 @@ from itertools import product
 from typing import Literal
 from spinguin._core import la
 from spinguin._core.basis import idx_to_lq, parse_operator_string
-from spinguin._core.operators import op_T
+from spinguin._core._operators import op_T
 from spinguin._core._config import config
 
 @lru_cache(maxsize=16)

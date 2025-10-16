@@ -10,10 +10,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import numpy as np
     import scipy.sparse as sp
-    from spinguin._core._spin_system import SpinSystem
 
 # Imports
-from spinguin._core.operators import (
+from spinguin._core._operators import (
     op_E as _op_E,
     op_Sx as _op_Sx,
     op_Sy as _op_Sy,
@@ -22,7 +21,6 @@ from spinguin._core.operators import (
     op_Sm as _op_Sm,
     op_T as _op_T,
     op_T_coupled as _op_T_coupled,
-    op_from_string as _op_from_string
 )
 from spinguin._core._config import config
 
@@ -187,51 +185,3 @@ def op_T_coupled(l: int,  q: int,
     """
     T = _op_T_coupled(l, q, l1, s1, l2, s2, config.sparse_operator)
     return T
-
-def operator(spin_system: SpinSystem,
-             operator: str) -> np.ndarray | sp.csc_array:
-    """
-    Generates an operator for the `spin_system` in Hilbert space from the user-
-    specified `operators` string.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the operator is going to be generated.
-    operator : str
-        Defines the operator to be generated. The operator string must
-        follow the rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-
-    Returns
-    -------
-    op : ndarray or csc_array
-        An array representing the requested operator.
-    """
-    op = _op_from_string(spin_system.spins, operator, config.sparse_operator)
-    return op

@@ -9,7 +9,7 @@ import scipy.constants as const
 import time
 from functools import lru_cache
 from spinguin._core.la import expm
-from spinguin._core.operators import op_prod
+from spinguin._core._operators import op_prod
 from spinguin._core.basis import parse_operator_string, state_idx
 from spinguin._core.hide_prints import HidePrints
 

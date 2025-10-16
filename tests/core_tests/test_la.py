@@ -5,7 +5,7 @@ from scipy.sparse.linalg import expm
 from scipy.sparse import csc_array, random_array
 from spinguin._core import la
 from spinguin._core.hide_prints import HidePrints
-from spinguin._core.operators import op_E, op_Sx, op_Sy, op_Sz, op_T_coupled
+from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_T_coupled
 
 class TestLinearAlgebraMethods(unittest.TestCase):
 
