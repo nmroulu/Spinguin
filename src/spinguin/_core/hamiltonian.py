@@ -8,7 +8,7 @@ import time
 from typing import Literal
 from scipy.sparse import csc_array
 from spinguin._core.la import eliminate_small
-from spinguin._core.superoperators import sop_prod
+from spinguin._core._superoperators import sop_prod
 
 def sop_H_Z(basis: np.ndarray,
             gammas: np.ndarray,

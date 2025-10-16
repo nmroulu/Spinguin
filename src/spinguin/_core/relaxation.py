@@ -9,7 +9,7 @@ import scipy.constants as const
 import scipy.sparse as sp
 from joblib import Parallel, delayed
 from scipy.special import eval_legendre
-from spinguin._core.superoperators import sop_T_coupled, sop_prod
+from spinguin._core._superoperators import sop_T_coupled, sop_prod
 from spinguin._core.la import \
     eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \

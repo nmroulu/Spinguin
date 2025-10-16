@@ -40,7 +40,7 @@ from spinguin._core.specutils import (
     spectral_width_to_dwell_time as _spectral_width_to_dwell_time,
     spectrum as _spectrum
 )
-from spinguin._superoperators import superoperator
+from spinguin._core._superoperators import superoperator
 from spinguin._core.states import (
     alpha_state as _alpha_state,
     beta_state as _beta_state,

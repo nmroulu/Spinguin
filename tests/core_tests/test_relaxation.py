@@ -9,7 +9,7 @@ from spinguin._core.propagation import sop_pulse, sop_propagator
 from spinguin._core.nmr_isotopes import ISOTOPES
 from spinguin._core.basis import make_basis, truncate_basis_by_coherence
 from spinguin._core.states import equilibrium_state, state_to_truncated_basis
-from spinguin._core.superoperators import sop_to_truncated_basis
+from spinguin._core._superoperators import sop_to_truncated_basis
 
 class TestRelaxation(unittest.TestCase):
 

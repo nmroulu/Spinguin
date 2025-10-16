@@ -28,9 +28,9 @@ from spinguin._operators import (
 from spinguin._core import (
     config,
     parameters,
-    SpinSystem
+    SpinSystem,
+    superoperator
 )
-from spinguin._superoperators import superoperator
 
 __all__ = [
     # _chem
@@ -56,7 +56,5 @@ __all__ = [
     "config",
     "parameters",
     "SpinSystem",
-
-    # _superoperators
-    "superoperator"
+    "superoperator",
 ]
