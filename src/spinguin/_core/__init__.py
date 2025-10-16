@@ -15,7 +15,17 @@ namespace, described in Spinguin (Basic), using::
 # Imports
 from spinguin._core._config import config
 from spinguin._core._hamiltonian import hamiltonian
-from spinguin._core._operators import operator
+from spinguin._core._operators import (
+    op_E,
+    op_Sm,
+    op_Sp,
+    op_Sx,
+    op_Sy,
+    op_Sz,
+    op_T,
+    op_T_coupled,
+    operator
+)
 from spinguin._core._parameters import parameters
 from spinguin._core._relaxation import relaxation
 from spinguin._core._spin_system import SpinSystem
@@ -29,6 +39,14 @@ __all__ = [
     "hamiltonian",
 
     # spinguin._core._operators
+    "op_E",
+    "op_Sm",
+    "op_Sp",
+    "op_Sx",
+    "op_Sy",
+    "op_Sz",
+    "op_T",
+    "op_T_coupled",
     "operator",
 
     # spinguin._core._parameters

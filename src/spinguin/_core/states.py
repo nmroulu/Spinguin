@@ -12,6 +12,7 @@ from spinguin._core.la import expm
 from spinguin._core._operators import op_prod
 from spinguin._core.basis import parse_operator_string, state_idx
 from spinguin._core.hide_prints import HidePrints
+from spinguin._core._config import config
 
 def unit_state(basis: np.ndarray,
                spins: np.ndarray,
@@ -212,10 +213,12 @@ def _state_from_string(basis_bytes: bytes,
         # Calculate the norm of the active operator part if there are active
         # spins
         if len(idx_active) != 0:
-            # TODO: Benchmark sparse vs dense implementation
-            op_norm = np.linalg.norm(
-                op_prod(op_def, spins, include_unit=False, sparse=False),
-                ord='fro')
+            op = op_prod(op_def, spins, include_unit=False)
+            if config.sparse_operator:
+                op_norm = sp.linalg.norm(op, ord='fro')
+            else:
+                op_norm = np.linalg.norm(op, ord='fro')
+
 
         # Otherwise set it to one
         else:
@@ -359,8 +362,8 @@ def state_to_zeeman(basis: np.ndarray,
 
         # Get the normalized product operator in the Zeeman eigenbasis with
         # normalization
-        oper = op_prod(op_def, spins, include_unit=True, sparse=sparse)
-        if sparse:
+        oper = op_prod(op_def, spins, include_unit=True)
+        if config.sparse_operator:
             oper = oper / sp.linalg.norm(oper, ord='fro')
         else:
             oper = oper / np.linalg.norm(oper, ord='fro')

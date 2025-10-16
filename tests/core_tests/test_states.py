@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import scipy.constants as const
-from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
+import spinguin as sg
 from spinguin._core.states import \
     alpha_state, beta_state, state_to_zeeman, singlet_state, \
     triplet_zero_state, triplet_plus_state, triplet_minus_state, \
@@ -25,8 +25,9 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        sg.config.sparse_operator = False
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
         # Create Zeeman alpha states for reference
         alpha1_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(Iz, E)
@@ -65,8 +66,9 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        sg.config.sparse_operator = False
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
         # Create Zeeman beta states
         beta1_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(Iz, E)
@@ -105,10 +107,11 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
-        Ip = op_Sp(1/2, sparse=False)
-        Im = op_Sm(1/2, sparse=False)
+        sg.config.sparse_operator = False
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
+        Ip = sg.op_Sp(1/2)
+        Im = sg.op_Sm(1/2)
 
         # Create the singlet state in both bases and compare
         singlet_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - \
@@ -135,10 +138,11 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
-        Ip = op_Sp(1/2, sparse=False)
-        Im = op_Sm(1/2, sparse=False)
+        sg.config.sparse_operator = False
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
+        Ip = sg.op_Sp(1/2)
+        Im = sg.op_Sm(1/2)
 
         # Create the triplet-zero state and compare
         triplet_zero_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + \
@@ -167,8 +171,9 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        sg.config.sparse_operator = False
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
         # Create the triplet-plus state and compare
         triplet_plus_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + \
@@ -197,8 +202,9 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        sg.config.sparse_operator = False
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
         # Create the triplet-minus state and compare
         triplet_minus_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - \
@@ -230,14 +236,15 @@ class TestStates(unittest.TestCase):
         test_states = ['E', 'x', 'y', 'z', '+', '-']
 
         # Get the Zeeman eigenbasis operators
+        sg.config.sparse_operator = False
         opers = {}
         for spin in spins:
-            opers[('E', spin)] = op_E(spin, sparse=False)
-            opers[('x', spin)] = op_Sx(spin, sparse=False)
-            opers[('y', spin)] = op_Sy(spin, sparse=False)
-            opers[('z', spin)] = op_Sz(spin, sparse=False)
-            opers[('+', spin)] = op_Sp(spin, sparse=False)
-            opers[('-', spin)] = op_Sm(spin, sparse=False)
+            opers[('E', spin)] = sg.op_E(spin)
+            opers[('x', spin)] = sg.op_Sx(spin)
+            opers[('y', spin)] = sg.op_Sy(spin)
+            opers[('z', spin)] = sg.op_Sz(spin)
+            opers[('+', spin)] = sg.op_Sp(spin)
+            opers[('-', spin)] = sg.op_Sm(spin)
 
         # Try all possible state combinations
         for i in test_states:
@@ -271,12 +278,17 @@ class TestStates(unittest.TestCase):
                                                    opers[(k, 3/2)]))
 
                     # Test the conversion using all possible sparsity combinations
+                    # TODO: Make cleaner
+                    sg.config.sparse_operator = False
                     state_sparse_to_zeeman_dense = state_to_zeeman(
                         basis, spins, state_sparse, sparse=False)
+                    sg.config.sparse_operator = True
                     state_sparse_to_zeeman_sparse = state_to_zeeman(
                         basis, spins, state_sparse, sparse=True).toarray()
+                    sg.config.sparse_operator = False
                     state_dense_to_zeeman_dense = state_to_zeeman(
                         basis, spins, state_dense, sparse=False)
+                    sg.config.sparse_operator = True
                     state_dense_to_zeeman_sparse = state_to_zeeman(
                         basis, spins, state_dense, sparse=True).toarray()
 
@@ -303,9 +315,10 @@ class TestStates(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create the unit state in the Zeeman eigenbasis
+        sg.config.sparse_operator = False
         unit_zeeman = np.array([[1]])
         for spin in spins:
-            unit_zeeman = np.kron(unit_zeeman, op_E(spin, sparse=False))
+            unit_zeeman = np.kron(unit_zeeman, sg.op_E(spin))
 
         # Create the non-normalized unit state in the spherical tensor basis
         unit_sparse = unit_state(basis, spins, sparse=True, normalized=False)
@@ -350,14 +363,15 @@ class TestStates(unittest.TestCase):
         test_states = ['E', 'x', 'y', 'z', '+', '-']
 
         # Get the Zeeman eigenbasis operators
+        sg.config.sparse_operator = False
         opers = {}
         for spin in spins:
-            opers[('E', spin)] = op_E(spin, sparse=False)
-            opers[('x', spin)] = op_Sx(spin, sparse=False)
-            opers[('y', spin)] = op_Sy(spin, sparse=False)
-            opers[('z', spin)] = op_Sz(spin, sparse=False)
-            opers[('+', spin)] = op_Sp(spin, sparse=False)
-            opers[('-', spin)] = op_Sm(spin, sparse=False)
+            opers[('E', spin)] = sg.op_E(spin)
+            opers[('x', spin)] = sg.op_Sx(spin)
+            opers[('y', spin)] = sg.op_Sy(spin)
+            opers[('z', spin)] = sg.op_Sz(spin)
+            opers[('+', spin)] = sg.op_Sp(spin)
+            opers[('-', spin)] = sg.op_Sm(spin)
 
         # Try all possible state combinations
         for i in test_states:

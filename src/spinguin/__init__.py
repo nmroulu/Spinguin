@@ -13,7 +13,9 @@ from spinguin._chem import (
     dissociate,
     permute_spins
 )
-from spinguin._operators import (
+from spinguin._core import (
+    config,
+    hamiltonian,
     op_E,
     op_Sm,
     op_Sp,
@@ -21,11 +23,7 @@ from spinguin._operators import (
     op_Sy,
     op_Sz,
     op_T,
-    op_T_coupled
-)
-from spinguin._core import (
-    config,
-    hamiltonian,
+    op_T_coupled,
     operator,
     parameters,
     relaxation,
@@ -38,11 +36,10 @@ __all__ = [
     "associate",
     "dissociate",
     "permute_spins",
-
-    # _hamiltonian
+    
+    # _core
+    "config",
     "hamiltonian",
-
-    # _operators
     "op_E",
     "op_Sm",
     "op_Sp",
@@ -51,10 +48,6 @@ __all__ = [
     "op_Sz",
     "op_T",
     "op_T_coupled",
-    
-    # _core
-    "config",
-    "hamiltonian",
     "operator",
     "parameters",
     "relaxation",

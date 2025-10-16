@@ -32,23 +32,21 @@ class TestSuperoperators(unittest.TestCase):
                 sop_R_ref = np.zeros((dim, dim), dtype=complex)
 
                 # Construct the operator
-                op_i = op_prod(op_def_i, spins, include_unit=True, sparse=False)
+                op_i = op_prod(op_def_i, spins, include_unit=True)
 
                 # Loop over the operator bras
                 for j in range(dim):
 
                     # Construct the operator bra
                     op_def_j = basis[j]
-                    op_j = op_prod(op_def_j, spins, include_unit=True,
-                                   sparse=False)
+                    op_j = op_prod(op_def_j, spins, include_unit=True)
 
                     # Loop over the kets
                     for k in range(dim):
 
                         # Construct the operator ket
                         op_def_k = basis[k]
-                        op_k = op_prod(op_def_k, spins, include_unit=True,
-                                       sparse=False)
+                        op_k = op_prod(op_def_k, spins, include_unit=True)
 
                         # Calculate the elements
                         norm = np.sqrt((op_j.conj().T @ op_j).trace() * \

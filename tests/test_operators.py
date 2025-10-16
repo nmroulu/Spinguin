@@ -4,6 +4,7 @@ import math
 import spinguin as sg
 from spinguin.la import comm
 from spinguin._core.basis import idx_to_lq
+from spinguin._core._operators import op_prod
 
 class TestOperators(unittest.TestCase):
 

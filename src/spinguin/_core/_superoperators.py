@@ -22,7 +22,7 @@ from spinguin._core._config import config
 
 @lru_cache(maxsize=16)
 def _structure_coefficients(spin: float,
-                           side: Literal["left", "right"]) -> np.ndarray:
+                            side: Literal["left", "right"]) -> np.ndarray:
     """
     Computes the (normalized) structure coefficients of the operator algebra
     for a single spin. These coefficients are used in constructing product
@@ -58,14 +58,14 @@ def _structure_coefficients(spin: float,
 
         # Get the spherical tensor for j
         l_j, q_j = idx_to_lq(j)
-        T_j = op_T(spin, l_j, q_j, sparse=False)
+        T_j = op_T(spin, l_j, q_j)
     
         # Iterate over the index k
         for k in range(mult**2):
 
             # Get the spherical tensor for k
             l_k, q_k = idx_to_lq(k)
-            T_k = op_T(spin, l_k, q_k, sparse=False)
+            T_k = op_T(spin, l_k, q_k)
 
             # Apply normalization
             norm = np.sqrt(
@@ -76,7 +76,7 @@ def _structure_coefficients(spin: float,
 
                 # Get the spherical tensor for i
                 l_i, q_i = idx_to_lq(i)
-                T_i = op_T(spin, l_i, q_i, sparse=False)
+                T_i = op_T(spin, l_i, q_i)
 
                 # Compute the structure coefficient
                 if side == 'left':
