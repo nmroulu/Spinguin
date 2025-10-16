@@ -28,6 +28,7 @@ from spinguin._operators import (
 from spinguin._core import (
     config,
     parameters,
+    relaxation,
     SpinSystem,
     superoperator
 )
@@ -55,6 +56,7 @@ __all__ = [
     # _core
     "config",
     "parameters",
+    "relaxation",
     "SpinSystem",
     "superoperator",
 ]

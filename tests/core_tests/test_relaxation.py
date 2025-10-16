@@ -3,13 +3,13 @@ import numpy as np
 import scipy.sparse as sp
 import os
 from spinguin._core.hamiltonian import sop_H
-from spinguin._core.relaxation import sop_R_redfield, sop_R_sr2k, \
-    ldb_thermalization, dd_constant, sop_R_phenomenological
+from spinguin._core._relaxation import dd_constant, relaxation
 from spinguin._core.propagation import sop_pulse, propagator
 from spinguin._core.nmr_isotopes import ISOTOPES
 from spinguin._core.basis import make_basis, truncate_basis_by_coherence
 from spinguin._core.states import equilibrium_state, state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
+import spinguin as sg
 
 class TestRelaxation(unittest.TestCase):
 
@@ -58,10 +58,6 @@ class TestRelaxation(unittest.TestCase):
         y_14N = 2*np.pi * ISOTOPES['14N'][1] * 1e6
         gammas = np.array([y_1H, y_1H, y_1H, y_1H, y_1H, y_14N])
 
-        # Get the quadrupolar moments (in m^2)
-        q_14N = ISOTOPES['14N'][2] * 1e-28
-        quad = np.array([0, 0, 0, 0, 0, q_14N])
-
         # Define the chemical shifts (in ppm)
         chemical_shifts = np.array([8.56, 8.56, 7.47, 7.47, 7.88, 95.94])
 
@@ -101,14 +97,33 @@ class TestRelaxation(unittest.TestCase):
             [0.0000, 0.0000, -1.1037]
         ])
 
-        # Correlation time (in s)
-        tau_c = 50e-12
-
         # Magnetic field (in T)
         B = 1
 
         # Temperature (in K)
         T = 273
+
+        # Set the environment
+        sg.parameters.magnetic_field = B
+        sg.parameters.temperature = T
+
+        # Create a SpinSystem
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Assign parameters
+        spin_system.chemical_shifts = chemical_shifts
+        spin_system.J_couplings = J_couplings
+        spin_system.xyz = xyz
+        spin_system.shielding = shielding
+        spin_system.efg = efg
+
+        # Set the relaxation theory
+        spin_system.relaxation.theory = "redfield"
+        spin_system.relaxation.tau_c = 50e-12
+        spin_system.relaxation.sr2k = True
+        spin_system.relaxation.thermalization = True
 
         # Propagation parameters
         time_step = 2e-3    # Time step in seconds
@@ -128,19 +143,13 @@ class TestRelaxation(unittest.TestCase):
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
         
-        # Get the relaxation superoperator components
-        R_redfield = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad,
-                                    xyz, shielding, efg,
-                                    include_antisymmetric=False,
-                                    include_dynamic_frequency_shift=False,
-                                    relative_error=1e-6, interaction_zero=1e-9,
-                                    relaxation_zero=1e-12, parallel_dim=1000,
-                                    sparse=True)
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
-                            R_redfield, B, sparse=True)
+        # Get the relaxation superoperator
+        R = relaxation(spin_system)
+        
+        # Construct the total Liouvillian
+        L = -1j*H - R
 
-        # Build the total relaxation superoperator and thermalize
-        R = R_redfield + R_sr2k
+        # Create the thermal equilibrium state
         H_left = sop_H(
             basis = basis,
             gammas = gammas,
@@ -153,12 +162,6 @@ class TestRelaxation(unittest.TestCase):
             zero_value = 1e-12,
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
-        R = ldb_thermalization(R, H_left, T, zero_value=1e-18)
-        
-        # Construct the total Liouvillian
-        L = -1j*H - R
-
-        # Create the thermal equilibrium state
         rho = equilibrium_state(basis, spins, H_left, T, sparse=False,
                                 zero_value=1e-18)
 
@@ -216,10 +219,6 @@ class TestRelaxation(unittest.TestCase):
         y_14N = 2*np.pi * ISOTOPES['14N'][1] * 1e6
         gammas = np.array([y_1H, y_1H, y_1H, y_1H, y_1H, y_14N])
 
-        # Get the quadrupolar moments (in m^2)
-        q_14N = ISOTOPES['14N'][2] * 1e-28
-        quad = np.array([0, 0, 0, 0, 0, q_14N])
-
         # Define the chemical shifts (in ppm)
         chemical_shifts = np.array([8.56, 8.56, 7.47, 7.47, 7.88, 95.94])
 
@@ -259,41 +258,32 @@ class TestRelaxation(unittest.TestCase):
             [0.0000, 0.0000, -1.1037]
         ])
 
-        # Correlation time (in s)
-        tau_c = 50e-12
+        # Set the environment
+        sg.parameters.magnetic_field = 1
 
-        # Magnetic field (in T)
-        B = 1
+        # Create a SpinSystem
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
 
-        # Get the Hamiltonian
-        H = sop_H(
-            basis = basis,
-            gammas = gammas,
-            spins = spins,
-            chemical_shifts = chemical_shifts,
-            J_couplings = J_couplings,
-            B = B,
-            side = "comm",
-            sparse = True,
-            zero_value = 1e-12,
-            interactions = ["zeeman", "chemical_shift", "J_coupling"]
-        )
+        # Assign parameters
+        spin_system.chemical_shifts = chemical_shifts
+        spin_system.J_couplings = J_couplings
+        spin_system.xyz = xyz
+        spin_system.shielding = shielding
+        spin_system.efg = efg
+
+        # Set the relaxation theory
+        spin_system.relaxation.theory = "redfield"
+        spin_system.relaxation.tau_c = 50e-12
+        spin_system.relaxation.sr2k = False
+        spin_system.relaxation.thermalization = False
         
         # Get the Redfield relaxation superoperator
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
-                           shielding, efg, include_antisymmetric=False,
-                           include_dynamic_frequency_shift=False,
-                           relative_error=1e-6, interaction_zero=1e-9,
-                           relaxation_zero=1e-12, parallel_dim=1000,
-                           sparse=True)
+        R = relaxation(spin_system)
         
         # Obtain R again (to check possible errors from caches etc.)
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
-                           shielding, efg, include_antisymmetric=False,
-                           include_dynamic_frequency_shift=False,
-                           relative_error=1e-6, interaction_zero=1e-9,
-                           relaxation_zero=1e-12, parallel_dim=1000,
-                           sparse=True)
+        R = relaxation(spin_system)
 
         # Load the previously calculated R for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))
@@ -306,24 +296,7 @@ class TestRelaxation(unittest.TestCase):
         # Obtain R again after basis truncation that causes some operators to be
         # zero
         basis, _ = truncate_basis_by_coherence(basis, [0])
-        H = sop_H(
-            basis = basis,
-            gammas = gammas,
-            spins = spins,
-            chemical_shifts = chemical_shifts,
-            J_couplings = J_couplings,
-            B = B,
-            side = "comm",
-            sparse = True,
-            zero_value = 1e-12,
-            interactions = ["zeeman", "chemical_shift", "J_coupling"]
-        )
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
-                           shielding, efg, include_antisymmetric=False,
-                           include_dynamic_frequency_shift=False,
-                           relative_error=1e-6, interaction_zero=1e-9,
-                           relaxation_zero=1e-12, parallel_dim=1000,
-                           sparse=True)
+        R = relaxation(spin_system)
 
     def test_sop_R_phenomenological(self):
         """
@@ -332,16 +305,20 @@ class TestRelaxation(unittest.TestCase):
         """
 
         # Make the spin system
-        spins = np.array([1/2, 1/2, 1/2, 1/2, 1/2, 1])
-        max_spin_order = 3
-        basis = make_basis(spins, max_spin_order)
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
         
+        # Set the relaxation theory
+        spin_system.relaxation.theory = "phenomenological"
+        spin_system.relaxation.T1 = np.array([5, 5, 5, 5, 5, 1e-3])
+        spin_system.relaxation.T2 = np.array([5, 5, 5, 5, 5, 1e-3])
+
         # Get the relaxation superoperator
-        R1 = R2 = np.array([0.2, 0.2, 0.2, 0.2, 0.2, 1000])
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = relaxation(spin_system)
 
         # Obtain R again (check for cache errors etc.)
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = relaxation(spin_system)
 
         # Load the previously calculated R for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))
@@ -359,45 +336,37 @@ class TestRelaxation(unittest.TestCase):
         """
 
         # Make the spin system
-        spins = np.array([1/2, 1/2, 1/2, 1/2, 1/2, 1])
-        max_spin_order = 3
-        basis = make_basis(spins, max_spin_order)
-
-        # Get the gyromagnetic ratios (in rad/s/T)
-        y_1H = 2*np.pi * ISOTOPES['1H'][1] * 1e6
-        y_14N = 2*np.pi * ISOTOPES['14N'][1] * 1e6
-        gammas = np.array([y_1H, y_1H, y_1H, y_1H, y_1H, y_14N])
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
 
         # Define the chemical shifts (in ppm)
-        chemical_shifts = np.array([8.56, 8.56, 7.47, 7.47, 7.88, 95.94])
+        spin_system.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
 
         # Define scalar couplings (in Hz)
-        J_couplings = np.array([
+        spin_system.J_couplings = [
             [ 0,     0,      0,      0,      0,      0],
             [-1.04,  0,      0,      0,      0,      0],
             [ 4.85,  1.05,   0,      0,      0,      0],
             [ 1.05,  4.85,   0.71,   0,      0,      0],
             [ 1.24,  1.24,   7.55,   7.55,   0,      0],
             [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ])
+        ]
 
         # Magnetic field (in T)
-        B = 3e-6
+        sg.parameters.magnetic_field = 3e-6
+
+        # Set the relaxation theory
+        spin_system.relaxation.theory = "phenomenological"
+        spin_system.relaxation.T1 = np.array([5, 5, 5, 5, 5, 1e-3])
+        spin_system.relaxation.T2 = np.array([5, 5, 5, 5, 5, 1e-3])
+        spin_system.relaxation.sr2k = True
         
         # Get the relaxation superoperator
-        R1 = R2 = np.array([0.2, 0.2, 0.2, 0.2, 0.2, 1000])
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = relaxation(spin_system)
 
-        # Get the SR2K
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
-                            R, B, sparse=True)
-        
-        # Get SR2K again to test cache errors etc.
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
-                            R, B, sparse=True)
-        
-        # Add SR2K to the relaxation superoperator
-        R = R + R_sr2k
+        # Get the relaxation superoperator again (to check cache problems)
+        R = relaxation(spin_system)
 
         # Load the previously calculated R for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))

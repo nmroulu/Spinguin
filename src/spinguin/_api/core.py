@@ -8,7 +8,6 @@ of the Spinguin package.
 # Imports
 import numpy as np
 import scipy.sparse as sp
-from copy import deepcopy
 from typing import Literal
 
 from spinguin._core._config import config
@@ -27,12 +26,6 @@ from spinguin._core.propagation import (
     propagator_to_rotframe as _propagator_to_rotframe,
     sop_pulse as _sop_pulse,
     propagator
-)
-from spinguin._core.relaxation import (
-    sop_R_phenomenological as _sop_R_phenomenological,
-    sop_R_redfield as _sop_R_redfield,
-    sop_R_sr2k as _sop_R_sr2k,
-    ldb_thermalization as _ldb_thermalization
 )
 from spinguin._core.specutils import (
     frequency_to_chemical_shift,
@@ -73,7 +66,6 @@ __all__ = [
     "pulse",
     "pulse_and_acquire",
     "quadrupole_moment",
-    "relaxation",
     "resonance_frequency",
     "rotating_frame"
     "singlet_state",
@@ -91,154 +83,6 @@ __all__ = [
 ]
 
 INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
-
-def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
-    """
-    Creates the relaxation superoperator using the requested relaxation theory.
-
-    Requires that the following spin system properties are set:
-
-    - spin_system.relaxation.theory : must be specified
-    - spin_system.basis : must be built
-
-    If `phenomenological` relaxation theory is requested, the following must
-    be set:
-
-    - spin_system.relaxation.T1
-    - spin_system.relaxation.T2
-
-    If `redfield` relaxation theory is requested, the following must be set:
-
-    - spin_system.relaxation.tau_c
-    - parameters.magnetic_field
-
-    If `sr2k` is requested, the following must be set:
-
-    - parameters.magnetic_field
-
-    If `thermalization` is requested, the following must be set:
-
-    - parameters.magnetic_field
-    - parameters.thermalization
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the relaxation superoperator is going to be
-        generated.
-
-    Returns
-    -------
-    R : ndarray or csc_array
-        Relaxation superoperator. 
-    """
-    # Check that the required attributes have been set
-    if spin_system.relaxation.theory is None:
-        raise ValueError("Please specify relaxation theory before "
-                         "constructing the relaxation superoperator.")
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build basis before constructing the "
-                         "relaxation superoperator.")
-    if spin_system.relaxation.theory == "phenomenological":
-        if spin_system.relaxation.T1 is None:
-            raise ValueError("Please set T1 times before constructing the "
-                             "relaxation superoperator.")
-        if spin_system.relaxation.T2 is None:
-            raise ValueError("Please set T2 times before constructing the "
-                             "relaxation superoperator.")
-    elif spin_system.relaxation.theory == "redfield":
-        if spin_system.relaxation.tau_c is None:
-            raise ValueError("Please set the correlation time before "
-                             "constructing the Redfield relaxation "
-                             "superoperator.")
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field before "
-                             "constructing the Redfield relaxation "
-                             "superoperator.")
-    if spin_system.relaxation.sr2k:
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field before "
-                             "applying scalar relaxation of the second kind.")
-    if spin_system.relaxation.thermalization:
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field when applying "
-                             "thermalization.")
-        if parameters.temperature is None:
-            raise ValueError("Please define temperature when applying "
-                             "thermalization.")
-
-    # Make phenomenological relaxation superoperator
-    if spin_system.relaxation.theory == "phenomenological":
-        R = _sop_R_phenomenological(
-            basis = spin_system.basis.basis,
-            R1 = spin_system.relaxation.R1,
-            R2 = spin_system.relaxation.R2,
-            sparse = config.sparse_relaxation)
-
-    # Make relaxation superoperator using Redfield theory
-    elif spin_system.relaxation.theory == "redfield":
-        
-        # Build the coherent hamiltonian
-        with HidePrints():
-            H = hamiltonian(spin_system=spin_system,
-                            interactions=INTERACTIONDEFAULT,
-                            side="comm")
-
-        # Build the Redfield relaxation superoperator
-        R = _sop_R_redfield(
-            basis = spin_system.basis.basis,
-            sop_H = H,
-            tau_c = spin_system.relaxation.tau_c,
-            spins = spin_system.spins,
-            B = parameters.magnetic_field,
-            gammas = spin_system.gammas,
-            quad = spin_system.quad,
-            xyz = spin_system.xyz,
-            shielding = spin_system.shielding,
-            efg = spin_system.efg,
-            include_antisymmetric = spin_system.relaxation.antisymmetric,
-            include_dynamic_frequency_shift = \
-                spin_system.relaxation.dynamic_frequency_shift,
-            relative_error = spin_system.relaxation.relative_error,
-            interaction_zero = config.zero_interaction,
-            aux_zero = config.zero_aux,
-            relaxation_zero = config.zero_relaxation,
-            parallel_dim = config.parallel_dim,
-            sparse = config.sparse_relaxation
-        )
-    
-    # Apply scalar relaxation of the second kind if requested
-    if spin_system.relaxation.sr2k:
-        R += _sop_R_sr2k(
-            basis = spin_system.basis.basis,
-            spins = spin_system.spins,
-            gammas = spin_system.gammas,
-            chemical_shifts = spin_system.chemical_shifts,
-            J_couplings = spin_system.J_couplings,
-            sop_R = R,
-            B = parameters.magnetic_field,
-            sparse = config.sparse_relaxation
-        )
-        
-    # Apply thermalization if requested
-    if spin_system.relaxation.thermalization:
-        
-        # Build the left Hamiltonian superopertor
-        with HidePrints():
-            H_left = hamiltonian(
-                spin_system = spin_system,
-                interactions = INTERACTIONDEFAULT,
-                side = "left"
-            )
-            
-        # Perform the thermalization
-        R = _ldb_thermalization(
-            R = R,
-            H_left = H_left,
-            T = parameters.temperature,
-            zero_value = config.zero_thermalization)
-
-    return R
 
 def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     """
