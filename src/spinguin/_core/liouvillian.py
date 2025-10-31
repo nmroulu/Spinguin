@@ -6,7 +6,7 @@ This module provides a function for calculating the Liouvillian.
 import numpy as np
 import scipy.sparse as sp
 import math
-from spinguin._core.la import auxiliary_matrix_rotframe_expm, issparse
+from spinguin.la import auxiliary_matrix_rotframe_expm, issparse
 
 def sop_L_to_rotframe(
     L0: np.ndarray | sp.csc_array,

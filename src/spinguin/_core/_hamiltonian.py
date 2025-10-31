@@ -12,7 +12,7 @@ import numpy as np
 import scipy.sparse as sp
 import time
 from typing import Literal
-from spinguin._core.la import eliminate_small
+from spinguin.la import eliminate_small
 from spinguin._core._superoperators import sop_prod
 from spinguin._core._config import config
 from spinguin._core._parameters import parameters

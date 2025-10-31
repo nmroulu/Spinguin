@@ -16,7 +16,7 @@ from spinguin._core._spin_system import SpinSystem
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._hamiltonian import _sop_H
 from spinguin._core.hide_prints import HidePrints
-from spinguin._core.la import norm_1
+from spinguin.la import norm_1
 from spinguin._core.liouvillian import (
     sop_L as liouvillian,
     sop_L_to_rotframe as _sop_L_to_rotframe

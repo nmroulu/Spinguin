@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy.sparse import random_array
-from spinguin._core.la import custom_dot
+from spinguin.la import custom_dot
 from time import perf_counter
 
 # Densities to test (fraction of non-zero elements in the matrix)

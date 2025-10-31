@@ -7,7 +7,7 @@ import time
 import numpy as np
 import scipy.sparse as sp
 import warnings
-from spinguin._core.la import expm
+from spinguin.la import expm
 from spinguin._core._superoperators import sop_from_string
 from spinguin._core.hide_prints import HidePrints
 from spinguin._core._config import config

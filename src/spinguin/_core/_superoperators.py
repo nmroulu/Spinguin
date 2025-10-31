@@ -15,7 +15,7 @@ import time
 from functools import lru_cache
 from itertools import product
 from typing import Literal
-from spinguin._core import la
+from spinguin.la import _la
 from spinguin._core.basis import idx_to_lq, parse_operator_string
 from spinguin._core._operators import op_T
 from spinguin._core._config import config
@@ -200,7 +200,7 @@ def _sop_prod(op_def_bytes: bytes,
             
             # Operator definitions must match for the product of structure
             # coefficients to be nonzero
-            ind_j, ind_k = la.find_common_rows(op_def_j, op_def_k)
+            ind_j, ind_k = _la.find_common_rows(op_def_j, op_def_k)
 
             # Append the products of structure coefficients and the indices to
             # the lists
@@ -464,7 +464,7 @@ def _sop_T_coupled(basis_bytes: bytes,
                 op_def[spin_2] = 2 - q2
 
                 # Use the coupling of angular momenta equation
-                sop += la.CG_coeff(1, q1, 1, q2, l, q) * \
+                sop += _la.CG_coeff(1, q1, 1, q2, l, q) * \
                        sop_prod(op_def, basis, spins, 'comm', sparse)
 
     # Handle linear single-spin interactions
@@ -479,7 +479,7 @@ def _sop_T_coupled(basis_bytes: bytes,
             op_def[spin_1] = 2 - q1
 
             # Use the coupling of angular momenta equation
-            sop += la.CG_coeff(1, q1, 1, 1, l, q) * \
+            sop += _la.CG_coeff(1, q1, 1, 1, l, q) * \
                    sop_prod(op_def, basis, spins, 'comm', sparse)
 
     return sop

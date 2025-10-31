@@ -12,8 +12,8 @@ from scipy.io import mmwrite, mmread
 from io import BytesIO
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
-from spinguin._core.sparse_dot import sparse_dot as _sparse_dot
-from spinguin._core.intersect_indices import intersect_indices
+from spinguin.la._sparse_dot import sparse_dot as _sparse_dot
+from spinguin.la._intersect_indices import intersect_indices
 from spinguin._core.hide_prints import HidePrints
 from spinguin._core.nmr_isotopes import ISOTOPES
 from multiprocessing.shared_memory import SharedMemory

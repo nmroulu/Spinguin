@@ -8,7 +8,7 @@ the documentation of the re-usable, core functionality, see Spinguin (Advanced).
 # Make functionality from the API accessible directly under the spinguin
 # namespace
 from spinguin._api import *
-from spinguin._chem import (
+from spinguin._core._chem import (
     associate,
     dissociate,
     permute_spins
@@ -30,6 +30,8 @@ from spinguin._core import (
     SpinSystem,
     superoperator
 )
+from spinguin import la
+from spinguin import sequences
 
 __all__ = [
     # _chem
@@ -53,4 +55,10 @@ __all__ = [
     "relaxation",
     "SpinSystem",
     "superoperator",
+
+    # la
+    "la",
+
+    # sequences
+    "sequences",
 ]

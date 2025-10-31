@@ -5,7 +5,7 @@ from spinguin._core._operators import op_prod
 from spinguin._core.basis import make_basis, truncate_basis_by_coherence
 from spinguin._core._superoperators import sop_prod, sop_prod_ref, \
     sop_from_string, sop_T_coupled, sop_to_truncated_basis
-from spinguin._core.la import cartesian_tensor_to_spherical_tensor
+from spinguin.la import cartesian_tensor_to_spherical_tensor
 
 class TestSuperoperators(unittest.TestCase):
 

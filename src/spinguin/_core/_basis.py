@@ -29,7 +29,7 @@ from spinguin._core.basis import (
     truncate_basis_by_zte,
     truncate_basis_by_indices
 )
-from spinguin._core.la import isvector
+from spinguin.la import isvector
 from spinguin._core._config import config
 
 class Basis:

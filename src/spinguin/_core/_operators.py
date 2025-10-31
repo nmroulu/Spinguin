@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
-from spinguin._core.la import comm, CG_coeff
+from spinguin.la import comm, CG_coeff
 from spinguin._core.basis import idx_to_lq, parse_operator_string
 from spinguin._core._config import config
 

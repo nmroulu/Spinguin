@@ -10,7 +10,7 @@ cimport cython
 from scipy.sparse import csc_array
 
 # Define the C++ functions
-cdef extern from "c_sparse_dot.hpp" nogil:
+cdef extern from "_c_sparse_dot.hpp" nogil:
     cdef void c_sparse_dot_indptr[I, T](
         T* A_data, I* A_indices, I* A_indptr, I A_nrows,
         T* B_data, I* B_indices, I* B_indptr, I B_ncols,
