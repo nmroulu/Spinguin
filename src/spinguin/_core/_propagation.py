@@ -1,6 +1,11 @@
 """
 This module is responsible for calculating time propagators.
 """
+# Type checking
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
 
 # Imports
 import time
@@ -8,7 +13,7 @@ import numpy as np
 import scipy.sparse as sp
 import warnings
 from spinguin.la import expm
-from spinguin._core._superoperators import sop_from_string
+from spinguin._core._superoperators import superoperator
 from spinguin.utils import HidePrints
 from spinguin._core._config import config
 
@@ -29,56 +34,18 @@ def propagator(L: np.ndarray | sp.csc_array,
     expm_Lt : csc_array or ndarray
         Time propagator exp(L*t).
     """
-    # Create the propagator
-    P = _sop_propagator(
-        L = L,
-        t = t,
-        zero_value = config.zero_propagator,
-        density_threshold = config.propagator_density
-    )
-    
-    return P
-
-def _sop_propagator(L: np.ndarray | sp.csc_array,
-                   t: float,
-                   zero_value: float=1e-18,
-                   density_threshold: float=0.5) -> sp.csc_array | np.ndarray:
-    """
-    Constructs the time propagator exp(L*t).
-
-    Parameters
-    ----------
-    L : ndarray or csc_array
-        Liouvillian superoperator, L = -iH - R + K.
-    t : float
-        Time step of the simulation in seconds.
-    zero_value : float, default=1e-18
-        Calculating the propagator involves a matrix exponential, which is
-        calculated using the scaling and squaring method together with Taylor
-        series. This threshold is used to estimate the convergence of the Taylor
-        series and to eliminate small values during the squaring step.
-    density_threshold : float, default=0.5
-        Sparse matrix is returned if the density is less than this threshold.
-        Otherwise dense matrix is returned.
-
-    Returns
-    -------
-    expm_Lt : csc_array or ndarray
-        Time propagator exp(L*t).
-    """
-
     print("Constructing propagator...")
     time_start = time.time()
 
     # Compute the matrix exponential
-    expm_Lt = expm(L * t, zero_value)
+    expm_Lt = expm(L * t, config.zero_propagator)
 
     # Calculate the density of the propagator
     density = expm_Lt.nnz / (expm_Lt.shape[0] ** 2)
     print(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
-    if density > density_threshold:
+    if density > config.propagator_density:
         print("Density exceeds threshold. Converting to NumPy array.")
         expm_Lt = expm_Lt.toarray()
 
@@ -87,71 +54,17 @@ def _sop_propagator(L: np.ndarray | sp.csc_array,
 
     return expm_Lt
 
-def propagator_to_rotframe(
-        sop_P: np.ndarray | sp.csc_array,
-        sop_H0: np.ndarray | sp.csc_array,
-        t: float,
-        zero_value: float=1e-18
-) -> np.ndarray | sp.csc_array:
+def pulse(spin_system: SpinSystem,
+          operator: str,
+          angle: float) -> np.ndarray | sp.csc_array:
     """
-    Transforms the time propagator to the rotating frame.
+    Creates a hard pulse superoperator that is applied to a state by multiplying
+    from the left.
 
     Parameters
     ----------
-    sop_P : ndarray or csc_array
-        Time propagator.
-    sop_H0 : ndarray or csc_array
-        Hamiltonian superoperator representing the interaction used
-        to define the rotating frame transformation.
-    t : float
-        Time step of the simulation in seconds.
-    zero_value : float, default=1e-18
-        Calculating the rotating frame transformation involves a matrix
-        exponential, which is calculated using the scaling and squaring method
-        together with Taylor series. This threshold is used to estimate the
-        convergence of the Taylor series and to eliminate small values during
-        the squaring step.
-
-    Returns
-    -------
-    sop_P : ndarray or csc_array
-        The time propagator transformed into the rotating frame.
-    """
-
-    print("Applying rotating frame transformation...")
-    time_start = time.time()
-
-    # Acquire matrix exponential from the Hamiltonian
-    with HidePrints():
-        expm_H0t = expm(1j * sop_H0 * t, zero_value)
-
-    # Convert the time propagator to rotating frame
-    sop_P = expm_H0t @ sop_P
-
-    print("Rotating frame transformation applied in "
-          f"{time.time() - time_start:.4f} seconds.")
-    print()
-
-    return sop_P
-
-def sop_pulse(basis: np.ndarray,
-              spins: np.ndarray,
-              operator: str,
-              angle: float,
-              sparse: bool=True,
-              zero_value: float=1e-18) -> np.ndarray | sp.csc_array:
-    """
-    Generates a superoperator corresponding to the pulse described
-    by the given operator and angle.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array containing the spin quantum numbers of each spin.
+    spin_system : SpinSystem
+        Spin system for which the pulse superoperator is going to be created.
     operator : str
         Defines the pulse to be generated. The operator string must
         follow the rules below:
@@ -183,19 +96,11 @@ def sop_pulse(basis: np.ndarray,
         NOTE: Indexing starts from 0!
     angle : float
         Pulse angle in degrees.
-    sparse : bool, default=True
-        Specifies whether to construct the pulse superoperator as sparse or
-        dense array.
-    zero_value : float, default=1e-18
-        Calculating the pulse superoperator involves a matrix exponential, which
-        is calculated using the scaling and squaring method together with Taylor
-        series. This threshold is used to estimate the convergence of the Taylor
-        series and to eliminate small values during the squaring step.
 
     Returns
     -------
-    pul : ndarray or csc_array
-        Superoperator corresponding to the applied pulse.
+    P : ndarray or csc_array
+        Pulse superoperator.
     """
 
     time_start = time.time()
@@ -207,14 +112,14 @@ def sop_pulse(basis: np.ndarray,
                       "a well-defined angle.")
 
     # Generate the operator
-    op = sop_from_string(operator, basis, spins, side="comm", sparse=sparse)
+    op = superoperator(spin_system, operator, side="comm")
 
     # Convert the angle to radians
     angle = angle / 180 * np.pi
 
     # Construct the pulse propagator
     with HidePrints():
-        pul = expm(-1j * angle * op, zero_value)
+        pul = expm(-1j * angle * op, config.zero_pulse)
 
     print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
 

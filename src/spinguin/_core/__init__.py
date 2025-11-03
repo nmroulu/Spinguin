@@ -15,6 +15,12 @@ namespace, described in Spinguin (Basic), using::
 # Imports
 from spinguin._core._config import config
 from spinguin._core._hamiltonian import hamiltonian
+from spinguin._core._nmr_isotopes import (
+    gamma,
+    quadrupole_moment,
+    resonance_frequency,
+    spin
+)
 from spinguin._core._operators import (
     op_E,
     op_Sm,
@@ -27,6 +33,7 @@ from spinguin._core._operators import (
     operator
 )
 from spinguin._core._parameters import parameters
+from spinguin._core._propagation import propagator, pulse
 from spinguin._core._relaxation._relaxation import relaxation
 from spinguin._core._spin_system import SpinSystem
 from spinguin._core._states import (
@@ -49,8 +56,14 @@ __all__ = [
     # spinguin._core._config
     "config",
 
-    # spinguin._core.hamiltonian
+    # spinguin._core._hamiltonian
     "hamiltonian",
+
+    # spinguin._core._nmr_isotopes
+    "gamma",
+    "quadrupole_moment",
+    "resonance_frequency",
+    "spin",
 
     # spinguin._core._operators
     "op_E",
@@ -65,6 +78,10 @@ __all__ = [
 
     # spinguin._core._parameters
     "parameters",
+
+    # spinguin._core._propagation
+    "propagator",
+    "pulse",
 
     # spinguin._core._relaxation
     "relaxation",

@@ -7,36 +7,7 @@ NMR and signal processing.
 # Imports
 import numpy as np
 from typing import Literal
-from spinguin._core._nmr_isotopes import gamma
-
-def resonance_frequency(isotope: str,
-                        B: float,
-                        delta: float = 0,
-                        unit: Literal["Hz", "rad/s"] = "Hz") -> float:
-    """
-    Computes the resonance frequency of a nucleus at specified magnetic field
-    and chemical shift.
-
-    Parameters
-    ----------
-    isotope : str
-        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio.
-    B : float
-        Magnetic field strength in the units of T.
-    delta : float, default=0
-        Chemical shift in ppm.
-    unit :{'Hz', 'rad/s'}
-        Specifies in which units the frequency is returned.
-
-    Returns
-    -------
-    omega : float
-        Resonance frequency of the given nucleus.
-    """
-    # Calculate the resonance frequency
-    omega = - gamma(isotope, unit) * B * (1 + delta*1e-6)
-
-    return omega
+from spinguin._core import resonance_frequency, parameters
 
 def fourier_transform(signal: np.ndarray,
                       dt: float,
@@ -80,11 +51,12 @@ def fourier_transform(signal: np.ndarray,
 
     return freqs, fft_signal
 
-def spectrum(signal: np.ndarray,
-             dt: float,
-             normalize: bool = True,
-             part: Literal["real", "imag"] = "real"
-             ) -> tuple[np.ndarray, np.ndarray]:
+def spectrum(
+    signal: np.ndarray,
+    dt: float,
+    normalize: bool = True,
+    part: Literal["real", "imag"] = "real"
+) -> tuple[np.ndarray, np.ndarray]:
     """
     A wrapper function for the Fourier transform. Computes the Fourier transform
     and returns the frequency and spectrum (either the real or imaginary part of 
@@ -124,9 +96,10 @@ def spectrum(signal: np.ndarray,
     return freqs, spectrum
 
 def frequency_to_chemical_shift(
-        frequency: float | np.ndarray, 
-        reference_frequency: float,
-        spectrometer_frequency: float) -> float | np.ndarray:
+    frequency: float | np.ndarray, 
+    reference_frequency: float,
+    spectrometer_frequency: float
+) -> float | np.ndarray:
     """
     Converts a frequency (or an array of frequencies, e.g., a frequency axis) to
     a chemical shift value based on the reference frequency and the spectrometer
@@ -148,9 +121,7 @@ def frequency_to_chemical_shift(
     """
     return (frequency - reference_frequency) / spectrometer_frequency * 1e6
 
-def spectral_width_to_dwell_time(spectral_width: float,
-                                 isotope: str,
-                                 B: float) -> float:
+def spectral_width_to_dwell_time(spectral_width: float, isotope: str) -> float:
     """
     Calculates the dwell time (in seconds) from the spectral width given in ppm.
 
@@ -161,8 +132,6 @@ def spectral_width_to_dwell_time(spectral_width: float,
     isotope : str
         Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
         required for the conversion.
-    B : float
-        Magnetic field of the spectrometer in T.
 
     Returns
     -------
@@ -170,7 +139,7 @@ def spectral_width_to_dwell_time(spectral_width: float,
         Dwell time in seconds.
     """
     # Calculate the spectral width in Hz
-    spectral_width = spectral_width * 1e-6 * gamma(isotope, "Hz") * B
+    spectral_width = spectral_width * resonance_frequency(isotope, 0, "Hz")
 
     # Obtain the dwell time
     dwell_time = 1/spectral_width

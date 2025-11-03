@@ -17,6 +17,7 @@ TODO: Tarkista kvadrupolimomentit?
 # Imports
 import numpy as np
 from typing import Literal
+from spinguin._core._parameters import parameters
 
 ISOTOPES = {
     '1H': [0.5, 42.577478615342585, 0],
@@ -208,3 +209,31 @@ def quadrupole_moment(isotope: str):
         Quadrupole moment in the units of m^2.
     """
     return ISOTOPES[isotope][2] * 1e-28
+
+def resonance_frequency(isotope: str,
+                        delta: float = 0,
+                        unit: Literal["Hz", "rad/s"] = "Hz") -> float:
+    """
+    Computes the resonance frequency of a nucleus. Note that the magnetic field
+    must be set (e.g. `sg.parameters.magnetic_field = 1`) prior to calling this
+    function.
+
+    Parameters
+    ----------
+    isotope : str
+        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio.
+    delta : float, default=0
+        Chemical shift in ppm.
+    unit :{'Hz', 'rad/s'}
+        Specifies in which units the frequency is returned.
+
+    Returns
+    -------
+    omega : float
+        Resonance frequency of the given nucleus.
+    """
+    # Calculate the resonance frequency
+    B = parameters.magnetic_field
+    omega = - gamma(isotope, unit) * B * (1 + delta*1e-6)
+
+    return omega
