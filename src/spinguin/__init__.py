@@ -14,8 +14,12 @@ from spinguin._core._chem import (
     permute_spins
 )
 from spinguin._core import (
+    alpha_state,
+    beta_state,
     config,
+    equilibrium_state,
     hamiltonian,
+    measure,
     op_E,
     op_Sm,
     op_Sp,
@@ -27,8 +31,16 @@ from spinguin._core import (
     operator,
     parameters,
     relaxation,
+    singlet_state,
     SpinSystem,
-    superoperator
+    state,
+    state_to_truncated_basis,
+    state_to_zeeman,
+    superoperator,
+    triplet_minus_state,
+    triplet_plus_state,
+    triplet_zero_state,
+    unit_state
 )
 from spinguin import la
 from spinguin import sequences
@@ -40,8 +52,12 @@ __all__ = [
     "permute_spins",
     
     # _core
+    "alpha_state",
+    "beta_state",
     "config",
+    "equilibrium_state",
     "hamiltonian",
+    "measure",
     "op_E",
     "op_Sm",
     "op_Sp",
@@ -53,8 +69,16 @@ __all__ = [
     "operator",
     "parameters",
     "relaxation",
+    "singlet_state",
     "SpinSystem",
+    "state",
+    "state_to_truncated_basis",
+    "state_to_zeeman",
     "superoperator",
+    "triplet_minus_state",
+    "triplet_plus_state",
+    "triplet_zero_state",
+    "unit_state",
 
     # la
     "la",

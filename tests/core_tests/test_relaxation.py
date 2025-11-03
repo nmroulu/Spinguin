@@ -3,11 +3,11 @@ import numpy as np
 import scipy.sparse as sp
 import os
 from spinguin._core._hamiltonian import _sop_H
-from spinguin._core._relaxation import dd_constant, relaxation
-from spinguin._core.propagation import sop_pulse, propagator
-from spinguin._core.nmr_isotopes import ISOTOPES
+from spinguin._core._relaxation._relaxation import dd_constant, relaxation
+from spinguin._core._propagation import sop_pulse, propagator
+from spinguin._core._nmr_isotopes import ISOTOPES
 from spinguin._core.basis import make_basis, truncate_basis_by_coherence
-from spinguin._core.states import equilibrium_state, state_to_truncated_basis
+from spinguin._core._states import equilibrium_state, state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 import spinguin as sg
 

@@ -4,7 +4,7 @@ import math
 from scipy.sparse.linalg import expm
 from scipy.sparse import csc_array, random_array
 from spinguin.la import _la
-from spinguin._core.hide_prints import HidePrints
+from spinguin.utils import HidePrints
 import spinguin as sg
 
 class TestLinearAlgebraMethods(unittest.TestCase):

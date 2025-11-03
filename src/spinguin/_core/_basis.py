@@ -20,7 +20,7 @@ import numpy as np
 import scipy.sparse as sp
 import warnings
 from typing import Literal
-from spinguin._core.states import state_to_truncated_basis
+from spinguin._core._states import state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 from spinguin._core.basis import (
     make_basis,

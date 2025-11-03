@@ -11,7 +11,7 @@ import math
 from itertools import product, combinations
 from typing import Iterator, Literal
 from spinguin.la import eliminate_small, expm_vec
-from spinguin._core.hide_prints import HidePrints
+from spinguin.utils import HidePrints
 from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
         
 def make_basis(spins: np.ndarray, max_spin_order: int):

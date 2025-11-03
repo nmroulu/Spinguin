@@ -27,8 +27,22 @@ from spinguin._core._operators import (
     operator
 )
 from spinguin._core._parameters import parameters
-from spinguin._core._relaxation import relaxation
+from spinguin._core._relaxation._relaxation import relaxation
 from spinguin._core._spin_system import SpinSystem
+from spinguin._core._states import (
+    alpha_state,
+    beta_state,
+    equilibrium_state,
+    measure,
+    singlet_state,
+    state,
+    state_to_truncated_basis,
+    state_to_zeeman,
+    triplet_minus_state,
+    triplet_plus_state,
+    triplet_zero_state,
+    unit_state
+)
 from spinguin._core._superoperators import superoperator
 
 __all__ = [
@@ -57,6 +71,20 @@ __all__ = [
 
     # spinguin._core._spin_system
     "SpinSystem",
+
+    # spinguin._core._states
+    "alpha_state",
+    "beta_state",
+    "equilibrium_state",
+    "measure",
+    "singlet_state",
+    "state",
+    "state_to_truncated_basis",
+    "state_to_zeeman",
+    "triplet_minus_state",
+    "triplet_plus_state",
+    "triplet_zero_state",
+    "unit_state",
 
     # spinguin._core._superoperators
     "superoperator",

@@ -6,7 +6,6 @@ simulations.
 # Imports
 import math
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy.sparse import eye_array, csc_array, block_array, issparse
 from scipy.io import mmwrite, mmread
 from io import BytesIO
@@ -14,115 +13,7 @@ from functools import lru_cache
 from sympy.physics.quantum.cg import CG
 from spinguin.la._sparse_dot import sparse_dot as _sparse_dot
 from spinguin.la._intersect_indices import intersect_indices
-from spinguin._core.hide_prints import HidePrints
-from spinguin._core.nmr_isotopes import ISOTOPES
-from multiprocessing.shared_memory import SharedMemory
-
-def write_shared_sparse(A: csc_array) -> tuple[
-    dict[str, str | np.dtype | tuple[int]],
-    tuple[SharedMemory, SharedMemory, SharedMemory]]:
-    """
-    Creates a shared memory representation of a sparse CSC array.
-
-    Parameters
-    ----------
-    A : csc_array
-        Sparse array to be shared.
-
-    Returns
-    -------
-    A_shared : dict
-        Dictionary containing shared memory names and metadata for the sparse
-        array's data, indices, and indptr, along with their shapes and dtypes.
-    A_shm : tuple
-        Tuple containing the shared memory objects for the sparse array's data,
-        indices, and indptr.
-    """
-    # Create a shared memory of the sparse array
-    A_data_shm = SharedMemory(create=True, size=A.data.nbytes)
-    A_indices_shm = SharedMemory(create=True, size=A.indices.nbytes)
-    A_indptr_shm = SharedMemory(create=True, size=A.indptr.nbytes)
-    A_data_shared = np.ndarray(A.data.shape, dtype=A.data.dtype,
-                               buffer=A_data_shm.buf)
-    A_indices_shared = np.ndarray(A.indices.shape, dtype=A.indices.dtype,
-                                  buffer=A_indices_shm.buf)
-    A_indptr_shared = np.ndarray(A.indptr.shape, dtype=A.indptr.dtype,
-                                 buffer=A_indptr_shm.buf)
-    A_data_shared[:] = A.data[:]
-    A_indices_shared[:] = A.indices[:]
-    A_indptr_shared[:] = A.indptr[:]
-
-    # Save the information of the memory to a dictionary
-    A_shared = {
-        'A_data_shm_name' : A_data_shm.name,
-        'A_indices_shm_name' : A_indices_shm.name,
-        'A_indptr_shm_name' : A_indptr_shm.name,
-        'A_data_shape' : A.data.shape,
-        'A_indices_shape' : A.indices.shape,
-        'A_indptr_shape' : A.indptr.shape,
-        'A_data_dtype' : A.data.dtype,
-        'A_indices_dtype' : A.indices.dtype,
-        'A_indptr_dtype' : A.indptr.dtype,
-        'A_shape' : A.shape
-    }
-
-    # Combine the shared memories into one tuple
-    A_shm = (A_data_shm, A_indices_shm, A_indptr_shm)
-
-    return A_shared, A_shm
-
-def read_shared_sparse(A_shared: dict[str, str | np.dtype | tuple[int]]) -> \
-    tuple[csc_array, tuple[SharedMemory, SharedMemory, SharedMemory]]:
-    """
-    Reads a shared memory representation of a sparse CSC array and reconstructs
-    it.
-
-    Parameters
-    ----------
-    A_shared : dict
-        Dictionary containing shared memory names and metadata for the sparse
-        array's data, indices, and indptr, along with their shapes and dtypes.
-
-    Returns
-    -------
-    A : csc_array
-        Sparse array reconstructed from the shared memory.
-    A_shm : tuple
-        Tuple containing the shared memory objects for the sparse array's data,
-        indices, and indptr.
-    """
-    # Parse the dictionary
-    A_data_shm_name = A_shared['A_data_shm_name']
-    A_indices_shm_name = A_shared['A_indices_shm_name']
-    A_indptr_shm_name = A_shared['A_indptr_shm_name']
-    A_data_shape = A_shared['A_data_shape']
-    A_indices_shape = A_shared['A_indices_shape']
-    A_indptr_shape = A_shared['A_indptr_shape']
-    A_data_dtype = A_shared['A_data_dtype']
-    A_indices_dtype = A_shared['A_indices_dtype']
-    A_indptr_dtype = A_shared['A_indptr_dtype']
-    A_shape = A_shared['A_shape']
-
-    # Obtain the shared memories
-    A_data_shm = SharedMemory(name=A_data_shm_name)
-    A_indices_shm = SharedMemory(name=A_indices_shm_name)
-    A_indptr_shm = SharedMemory(name=A_indptr_shm_name)
-
-    # Obtain the previously shared array
-    A_data = np.ndarray(shape=A_data_shape, dtype=A_data_dtype,
-                        buffer=A_data_shm.buf)
-    A_indices = np.ndarray(shape=A_indices_shape, dtype=A_indices_dtype,
-                           buffer=A_indices_shm.buf)
-    A_indptr = np.ndarray(shape=A_indptr_shape, dtype=A_indptr_dtype,
-                          buffer=A_indptr_shm.buf)
-
-    # Create the sparse array
-    A = csc_array((A_data, A_indices, A_indptr), shape=A_shape, copy=False)
-
-    # Combine the shared memories into one tuple
-    A_shm = (A_data_shm, A_indices_shm, A_indptr_shm)
-
-    return A, A_shm
+from spinguin.utils import HidePrints
 
 def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
     """
@@ -442,125 +333,6 @@ def find_common_rows(A: np.ndarray,
 
     return A_ind, B_ind
 
-def auxiliary_matrix_rotframe_expm(
-    A: np.ndarray | csc_array,
-    B: np.ndarray | csc_array,
-    T: float,
-    dim: int,
-    zero_value: float
-) -> csc_array:
-    """
-    Computes the matrix exponential of an auxiliary matrix that is used to
-    calculate the interaction frame Hamiltonian.
-
-    Based on Goodwin and Kuprov (Eq. 18): https://doi.org/10.1063/1.4928978
-
-    Parameters
-    ----------
-    A : ndarray or csc_array
-        Diagonal elements of the auxiliary matrix (L0)
-    B : ndarray or csc_array
-        Superdiagonal elements of the auxiliary matrix (L1)
-    T : float
-        Time
-    dim : int
-        Dimension of the auxiliary matrix.
-    zero_value : float
-        Threshold below which values are considered zero when exponentiating the
-        auxiliary matrix using the Taylor series. This significantly impacts
-        performance. Use the largest value that still provides correct results.
-
-    Returns
-    -------
-    expm_aux : csc_array
-        Matrix exponential of the auxiliary matrix. The output is sparse
-        regardless of the input array.
-    """
-    # Convert input arrays to sparse if not already
-    if not issparse(A):
-        A = csc_array(A)
-    if not issparse(B):
-        B = csc_array(B)
-
-    # Create a sparse zero-array
-    Z = csc_array((A.shape[0], B.shape[0]))
-
-    # Construct the auxiliary matrix
-    aux = []
-    for i in range(dim):
-        row = []
-        for j in range(dim):
-            if i == j:
-                row.append(A)
-            elif i == j-1:
-                row.append(B)
-            else:
-                row.append(Z)
-        aux.append(row)
-    aux = block_array(aux, format='csc')
-
-    # Compute the matrix exponential of the auxiliary matrix
-    with HidePrints():
-        expm_aux = expm(T*aux, zero_value)
-
-    return expm_aux
-
-def auxiliary_matrix_expm(A: np.ndarray | csc_array,
-                          B: np.ndarray | csc_array,
-                          C: np.ndarray | csc_array,
-                          t: float,
-                          zero_value: float) -> csc_array:   
-    """
-    Computes the matrix exponential of an auxiliary matrix. This is used to 
-    calculate the Redfield integral.
-
-    Based on Goodwin and Kuprov (Eq. 3): https://doi.org/10.1063/1.4928978
-    
-    Parameters
-    ----------
-    A : ndarray or csc_array
-        Top-left block of the auxiliary matrix.
-    B : ndarray or csc_array
-        Top-right block of the auxiliary matrix.
-    C : ndarray or csc_array
-        Bottom-right block of the auxiliary matrix.
-    t : float
-        Integration time.
-    zero_value : float
-        Threshold below which values are considered zero when exponentiating the
-        auxiliary matrix using the Taylor series. This significantly impacts
-        performance. Use the largest value that still provides correct results.
-    
-    Returns
-    -------
-    expm_aux : ndarray or csc_array
-        Matrix exponential of the auxiliary matrix. The output is sparse or
-        dense matching the sparsity of the input.
-    """
-
-    # Ensure that the input arrays are all either sparse or dense
-    if not (issparse(A) == issparse(B) == issparse(C)):
-        raise ValueError(f"All arrays A, B and C must be of same type.")
-
-    # Are we using sparse?
-    sparse = issparse(A)
-
-    # Construct the auxiliary matrix
-    if sparse:
-        empty_array = csc_array(A.shape)
-        aux = block_array([[A, B],
-                        [empty_array, C]], format='csc')
-    else:
-        empty_array = np.zeros(A.shape)
-        aux = np.block([[A, B],
-                        [empty_array, C]])
-
-    # Compute the matrix exponential of the auxiliary matrix
-    with HidePrints():
-        expm_aux = expm(aux * t, zero_value)
-
-    return expm_aux
-
 def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
     """
     Computes the angle between two vectors in radians.
@@ -804,56 +576,7 @@ def custom_dot(
 
     return C
 
-def arraylike_to_tuple(A: ArrayLike) -> tuple:
-    """
-    Converts a 1-dimensional `ArrayLike` object into a Python tuple.
-
-    Parameters
-    ----------
-    A : ArrayLike
-        An object that can be converted into NumPy array.
-
-    Returns
-    -------
-    A : tuple
-        The original object represented as Python tuple.
-    """
-
-    # Convert to tuple
-    A = np.asarray(A)
-    if A.ndim == 0:
-        A = tuple([A.item()])
-    elif A.ndim == 1:
-        A = tuple(A)
-    else:
-        raise ValueError(f"Cannot convert {A.ndim}-dimensional array into "
-                         "tuple.")
-    
-    return A
-
-def arraylike_to_array(A: ArrayLike) -> np.ndarray:
-    """
-    Converts an `ArrayLike` object into a NumPy array while ensuring
-    that at least one dimension is created.
-
-    Parameters
-    ----------
-    A : ArrayLike
-        An object that can be converted into NumPy array.
-
-    Returns
-    -------
-    A : ndarray
-        The original object converted into a NumPy array.
-    """
-
-    # Convert to NumPy array and ensure at least one dimension
-    A = np.asarray(A)
-    A = np.atleast_1d(A)
-
-    return A
-
-def expm_vec_taylor(
+def _expm_vec_taylor(
     A: np.ndarray | csc_array,
     v: np.ndarray | csc_array,
     zero_value: float
@@ -956,6 +679,6 @@ def expm_vec(
     # Calculate the expm*vec using the scaled matrix
     for i in range(scaling_A):
         print(f"Calculating expm(A)*vec. Step {i+1} of {scaling_A}.")
-        eAv = expm_vec_taylor(A, eAv, zero_value)
+        eAv = _expm_vec_taylor(A, eAv, zero_value)
 
     return eAv

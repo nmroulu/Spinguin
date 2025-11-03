@@ -18,12 +18,17 @@ from spinguin._core._superoperators import sop_T_coupled, sop_prod
 from spinguin.la import \
     eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \
-    auxiliary_matrix_expm, expm, read_shared_sparse, write_shared_sparse
+    expm
 from spinguin._core.basis import idx_to_lq, lq_to_idx, parse_operator_string
-from spinguin._core.hide_prints import HidePrints
+from spinguin.utils import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._config import config
 from spinguin._core._hamiltonian import hamiltonian
+from spinguin._core._relaxation._utils import auxiliary_matrix_expm
+from spinguin.utils._parallelisation import (
+    read_shared_sparse,
+    write_shared_sparse
+)
 from typing import Literal
 
 def dd_constant(y1: float, y2: float) -> float:

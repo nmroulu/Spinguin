@@ -9,7 +9,7 @@ import scipy.sparse as sp
 import warnings
 from spinguin.la import expm
 from spinguin._core._superoperators import sop_from_string
-from spinguin._core.hide_prints import HidePrints
+from spinguin.utils import HidePrints
 from spinguin._core._config import config
 
 def propagator(L: np.ndarray | sp.csc_array,
