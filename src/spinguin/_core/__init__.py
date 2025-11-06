@@ -14,6 +14,11 @@ from ._chem import (
 )
 from ._core import *
 from ._parameters import parameters
+from ._propagation import (
+    propagator,
+    propagator_to_rotframe,
+    pulse
+)
 from ._spin_system import SpinSystem
 from ._states import (
     alpha_state,

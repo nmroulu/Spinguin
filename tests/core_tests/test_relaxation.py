@@ -5,7 +5,7 @@ import os
 from spinguin._core._hamiltonian import sop_H
 from spinguin._core._relaxation import sop_R_redfield, sop_R_sr2k, \
     ldb_thermalization, dd_constant, sop_R_phenomenological
-from spinguin._core._propagation import sop_pulse, sop_propagator
+from spinguin._core._propagation import _sop_pulse, _sop_propagator
 from spinguin._core._nmr_isotopes import ISOTOPES
 from spinguin._core._basis import make_basis, truncate_basis_by_coherence
 from spinguin._core._states import _equilibrium_state, state_to_truncated_basis
@@ -164,7 +164,7 @@ class TestRelaxation(unittest.TestCase):
 
         # Apply a 180-degree pulse (to all 1H)
         op_string = "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)"
-        pul_180 = sop_pulse(basis, spins, op_string, angle=180, sparse=True,
+        pul_180 = _sop_pulse(basis, spins, op_string, angle=180, sparse=True,
                             zero_value=1e-18)
         rho = pul_180 @ rho
 
@@ -175,7 +175,7 @@ class TestRelaxation(unittest.TestCase):
         rho = state_to_truncated_basis(ZQ_map, rho)
 
         # Get the propagator
-        P = sop_propagator(L, time_step, zero_value=1e-18,
+        P = _sop_propagator(L, time_step, zero_value=1e-18,
                            density_threshold=0.5)
         
         # Simulate the evolution of the spin system

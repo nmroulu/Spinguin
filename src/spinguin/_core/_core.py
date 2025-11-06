@@ -19,9 +19,9 @@ from spinguin._core._liouvillian import sop_L as liouvillian
 from spinguin._core._nmr_isotopes import gamma, quadrupole_moment, spin
 from spinguin._core._operators import op_from_string as _op_from_string
 from spinguin._core._propagation import (
-    propagator_to_rotframe as _propagator_to_rotframe,
-    sop_propagator as _sop_propagator,
-    sop_pulse as _sop_pulse
+    propagator_to_rotframe,
+    propagator,
+    pulse
 )
 from spinguin._core._relaxation import (
     sop_R_phenomenological as _sop_R_phenomenological,
@@ -48,9 +48,6 @@ __all__ = [
     "inversion_recovery",
     "liouvillian",
     "operator",
-    "propagator",
-    "propagator_to_rotframe",
-    "pulse",
     "pulse_and_acquire",
     "quadrupole_moment",
     "relaxation",
@@ -396,153 +393,6 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             zero_value = parameters.zero_thermalization)
 
     return R
-
-def pulse(spin_system: SpinSystem,
-          operator: str,
-          angle: float) -> np.ndarray | sp.csc_array:
-    """
-    Creates a pulse superoperator that is applied to a state by multiplying
-    from the left.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the pulse superoperator is going to be created.
-    operator : str
-        Defines the pulse to be generated. The operator string must
-        follow the rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-    angle : float
-        Pulse angle in degrees.
-
-    Returns
-    -------
-    P : ndarray or csc_array
-        Pulse superoperator.
-    """
-
-    # Check that the required attributes have been set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing pulse "
-                         "superoperators.")
-
-    # Construct the pulse superoperator
-    P = _sop_pulse(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        operator = operator,
-        angle = angle,
-        sparse = parameters.sparse_pulse,
-        zero_value = parameters.zero_pulse
-    )
-
-    return P
-
-def propagator(L: np.ndarray | sp.csc_array,
-               t: float) -> np.ndarray | sp.csc_array:
-    """
-    Constructs the time propagator exp(L*t).
-
-    Parameters
-    ----------
-    L : csc_array
-        Liouvillian superoperator, L = -iH - R + K.
-    t : float
-        Time step of the simulation in seconds.
-
-    Returns
-    -------
-    expm_Lt : csc_array or ndarray
-        Time propagator exp(L*t).
-    """
-    # Create the propagator
-    P = _sop_propagator(
-        L = L,
-        t = t,
-        zero_value = parameters.zero_propagator,
-        density_threshold = parameters.propagator_density
-    )
-    
-    return P
-
-def propagator_to_rotframe(spin_system: SpinSystem,
-                           P: np.ndarray | sp.csc_array,
-                           t: float,
-                           center_frequencies: dict=None
-                           ) -> np.ndarray | sp.csc_array:
-    """
-    Transforms the time propagator to the rotating frame.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system whose time propagator is going to be transformed.
-    P : ndarray or csc_array
-        Time propagator in the laboratory frame.
-    t : float
-        Time step of the simulation in seconds.
-    center_frequencies : dict
-        Dictionary that describes the center frequencies for each isotope in the
-        units of ppm.
-
-    Returns
-    -------
-    P_rot : ndarray or csc_array
-        The time propagator transformed into the rotating frame.
-    """
-    # Obtain an array of center frequencies for each spin
-    center = np.zeros(spin_system.nspins)
-    for spin in range(spin_system.nspins):
-        if spin_system.isotopes[spin] in center_frequencies:
-            center[spin] = center_frequencies[spin_system.isotopes[spin]]
-
-    # Construct Hamiltonian that specifies the interaction frame
-    H_frame = _sop_H(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        gammas = spin_system.gammas,
-        B = parameters.magnetic_field,
-        chemical_shifts = center,
-        interactions = ["zeeman", "chemical_shift"],
-        side = "comm",
-        sparse = parameters.sparse_hamiltonian,
-        zero_value = parameters.zero_hamiltonian
-    )
-
-    # Convert the propagator to rotating frame
-    P_rot = _propagator_to_rotframe(
-        sop_P = P,
-        sop_H0 = H_frame,
-        t = t,
-        zero_value = parameters.zero_propagator
-    )
-    
-    return P_rot
 
 def spectral_width_to_dwell_time(
         spectral_width: float,
