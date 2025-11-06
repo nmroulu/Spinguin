@@ -13,8 +13,7 @@ from typing import Literal
 
 from spinguin._core._parameters import parameters
 from spinguin._core._spin_system import SpinSystem
-from spinguin._core._hamiltonian import sop_H as _sop_H
-from spinguin._core._hide_prints import HidePrints
+from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._liouvillian import sop_L as liouvillian
 from spinguin._core._nmr_isotopes import gamma, quadrupole_moment, spin
 from spinguin._core._operators import op_from_string as _op_from_string
@@ -39,7 +38,6 @@ from spinguin._core._states import (
 __all__ = [
     "frequency_to_chemical_shift",
     "gamma",
-    "hamiltonian",
     "inversion_recovery",
     "liouvillian",
     "operator",
@@ -177,68 +175,6 @@ def superoperator(spin_system: SpinSystem,
     )
         
     return sop
-
-INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
-INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
-def hamiltonian(
-        spin_system: SpinSystem,
-        interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
-        side: Literal["comm", "left", "right"] = "comm"
-) -> np.ndarray | sp.csc_array:
-    """
-    Creates the requested Hamiltonian superoperator for the spin system.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the Hamiltonian is going to be generated.
-    interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
-        Specifies which interactions are taken into account. The options are:
-
-        - 'zeeman' -- Zeeman interaction
-        - 'chemical_shift' -- Isotropic chemical shift
-        - 'J_coupling' -- Scalar J-coupling
-
-    side : {'comm', 'left', 'right'}
-        The type of superoperator:
-        
-        - 'comm' -- commutation superoperator (default)
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
-
-    Returns
-    -------
-    H : ndarray or csc_array
-        Hamiltonian superoperator.
-    """
-        
-    # Check that the required attributes have been set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build basis before constructing " 
-                         "the Hamiltonian.")
-    if "zeeman" in interactions:
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field before "
-                             "constructing the Zeeman Hamiltonian.")
-    if "chemical_shift" in interactions:
-        if parameters.magnetic_field is None:
-            raise ValueError("Please set the magnetic field before "
-                             "constructing the chemical shift Hamiltonian.")
-        
-    H = _sop_H(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        gammas = spin_system.gammas,
-        B = parameters.magnetic_field,
-        chemical_shifts = spin_system.chemical_shifts,
-        J_couplings = spin_system.J_couplings,
-        interactions = interactions,
-        side = side,
-        sparse = parameters.sparse_hamiltonian,
-        zero_value = parameters.zero_hamiltonian
-    )
-
-    return H
 
 def spectral_width_to_dwell_time(
         spectral_width: float,

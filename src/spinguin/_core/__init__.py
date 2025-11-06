@@ -13,6 +13,7 @@ from ._chem import (
     permute_spins
 )
 from ._core import *
+from ._hamiltonian import hamiltonian
 from ._parameters import parameters
 from ._propagation import (
     propagator,
