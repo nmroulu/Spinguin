@@ -7,6 +7,11 @@ directly under `spinguin` namespace, using::
 
 If you still wish to import the _core module, continue with precaution!
 """
+from ._chem import (
+    associate,
+    dissociate,
+    permute_spins
+)
 from ._core import *
 from ._parameters import parameters
 from ._spin_system import SpinSystem

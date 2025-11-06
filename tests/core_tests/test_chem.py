@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import itertools
-from spinguin._core._chem import dissociate, associate, permute_spins
+from spinguin._core._chem import _dissociate, _associate, _permute_spins
 from spinguin._core._basis import make_basis
 from spinguin._core._states import _triplet_plus_state, _alpha_state
 
@@ -43,16 +43,16 @@ class TestChemMethods(unittest.TestCase):
                     rho2_sparse = _alpha_state(basis2, spins2, 0, sparse=True)
 
                     # Perform association
-                    rho3_dense_dense = associate(basis1, basis2, basis3,
+                    rho3_dense_dense = _associate(basis1, basis2, basis3,
                                                  rho1_dense, rho2_dense,
                                                  spinmap1, spinmap2)
-                    rho3_dense_sparse = associate(basis1, basis2, basis3,
+                    rho3_dense_sparse = _associate(basis1, basis2, basis3,
                                                   rho1_dense, rho2_sparse,
                                                   spinmap1, spinmap2)
-                    rho3_sparse_dense = associate(basis1, basis2, basis3,
+                    rho3_sparse_dense = _associate(basis1, basis2, basis3,
                                                   rho1_sparse, rho2_dense,
                                                   spinmap1, spinmap2)
-                    rho3_sparse_sparse = associate(basis1, basis2, basis3,
+                    rho3_sparse_sparse = _associate(basis1, basis2, basis3,
                                                    rho1_sparse, rho2_sparse,
                                                    spinmap1, spinmap2)
 
@@ -103,10 +103,10 @@ class TestChemMethods(unittest.TestCase):
                                                      sparse=False)
 
                     # Perform dissociation
-                    rho1_dense, rho2_dense = dissociate(
+                    rho1_dense, rho2_dense = _dissociate(
                         basis1, basis2, basis3, spins1, spins2, rho3_dense,
                         spinmap1, spinmap2)
-                    rho1_sparse, rho2_sparse = dissociate(
+                    rho1_sparse, rho2_sparse = _dissociate(
                         basis1, basis2, basis3, spins1, spins2, rho3_sparse,
                         spinmap1, spinmap2)
 
@@ -143,7 +143,7 @@ class TestChemMethods(unittest.TestCase):
             perm = np.array(perm)
 
             # Permute the original state
-            rho_perm = permute_spins(basis, rho, perm)
+            rho_perm = _permute_spins(basis, rho, perm)
 
             # Find where the first spin is going to be mapped
             idx = perm[0]
