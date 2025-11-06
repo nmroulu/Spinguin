@@ -6,7 +6,7 @@ This module contains functions responsible for chemical kinetics.
 import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
-from spinguin.core.la import arraylike_to_array
+from spinguin._core._la import arraylike_to_array
 
 @lru_cache(maxsize=16)
 def _dissociate_index_map(basis_A_bytes: bytes,

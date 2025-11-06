@@ -20,16 +20,16 @@ import numpy as np
 import scipy.sparse as sp
 import warnings
 from typing import Literal
-from spinguin.core.states import state_to_truncated_basis
-from spinguin.core.superoperators import sop_to_truncated_basis
-from spinguin.core.basis import (
+from spinguin._core._states import state_to_truncated_basis
+from spinguin._core._superoperators import sop_to_truncated_basis
+from spinguin._core._basis import (
     make_basis,
     truncate_basis_by_coherence,
     truncate_basis_by_coupling,
     truncate_basis_by_zte,
     truncate_basis_by_indices
 )
-from spinguin.core.la import isvector
+from spinguin._core._la import isvector
 from spinguin.api.parameters import parameters
 
 class Basis:

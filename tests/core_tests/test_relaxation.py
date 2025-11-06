@@ -2,14 +2,14 @@ import unittest
 import numpy as np
 import scipy.sparse as sp
 import os
-from spinguin.core.hamiltonian import sop_H
-from spinguin.core.relaxation import sop_R_redfield, sop_R_sr2k, \
+from spinguin._core._hamiltonian import sop_H
+from spinguin._core._relaxation import sop_R_redfield, sop_R_sr2k, \
     ldb_thermalization, dd_constant, sop_R_phenomenological
-from spinguin.core.propagation import sop_pulse, sop_propagator
-from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.core.basis import make_basis, truncate_basis_by_coherence
-from spinguin.core.states import equilibrium_state, state_to_truncated_basis
-from spinguin.core.superoperators import sop_to_truncated_basis
+from spinguin._core._propagation import sop_pulse, sop_propagator
+from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._basis import make_basis, truncate_basis_by_coherence
+from spinguin._core._states import equilibrium_state, state_to_truncated_basis
+from spinguin._core._superoperators import sop_to_truncated_basis
 
 class TestRelaxation(unittest.TestCase):
 

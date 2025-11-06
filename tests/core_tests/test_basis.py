@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import math
-from spinguin.core.basis import state_idx, make_basis, parse_operator_string, \
+from spinguin._core._basis import state_idx, make_basis, parse_operator_string, \
     idx_to_lq, lq_to_idx, coherence_order, truncate_basis_by_coherence
 
 class TestBasis(unittest.TestCase):

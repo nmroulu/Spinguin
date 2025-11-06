@@ -9,10 +9,10 @@ mark takes a minute to run with `nspins=12` and `max_spin_order=3`.
 
 # Imports
 import numpy as np
-from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.core.hamiltonian import sop_H
-from spinguin.core.relaxation import sop_R_redfield
-from spinguin.core.basis import make_basis
+from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._hamiltonian import sop_H
+from spinguin._core._relaxation import sop_R_redfield
+from spinguin._core._basis import make_basis
 
 # Testing parameters
 nspins = 12

@@ -10,8 +10,8 @@ import re
 import math
 from itertools import product, combinations
 from typing import Iterator, Literal
-from spinguin.core.la import eliminate_small, expm_vec
-from spinguin.core.hide_prints import HidePrints
+from spinguin._core._la import eliminate_small, expm_vec
+from spinguin._core._hide_prints import HidePrints
 from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
         
 def make_basis(spins: np.ndarray, max_spin_order: int):

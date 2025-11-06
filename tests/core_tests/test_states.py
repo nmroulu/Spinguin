@@ -1,14 +1,14 @@
 import unittest
 import numpy as np
 import scipy.constants as const
-from spinguin.core.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
-from spinguin.core.states import \
+from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
+from spinguin._core._states import \
     alpha_state, beta_state, state_to_zeeman, singlet_state, \
     triplet_zero_state, triplet_plus_state, triplet_minus_state, \
     state_from_string, unit_state, measure, equilibrium_state
-from spinguin.core.basis import make_basis
-from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.core.hamiltonian import sop_H_Z
+from spinguin._core._basis import make_basis
+from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._hamiltonian import sop_H_Z
 
 class TestStates(unittest.TestCase):
 

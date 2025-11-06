@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 # Imports
 import numpy as np
 from typing import Literal
-from spinguin.core.data_io import read_array
-from spinguin.core.la import arraylike_to_array
+from spinguin._core._data_io import read_array
+from spinguin._core._la import arraylike_to_array
 
 class RelaxationProperties:
     """
