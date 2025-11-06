@@ -14,7 +14,7 @@ from spinguin._core._la import \
     eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \
     auxiliary_matrix_expm, expm, read_shared_sparse, write_shared_sparse
-from spinguin._core._basis import idx_to_lq, lq_to_idx, parse_operator_string
+from spinguin._core._utils import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from typing import Literal
 

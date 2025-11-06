@@ -10,7 +10,7 @@ import time
 from functools import lru_cache
 from spinguin._core._la import expm
 from spinguin._core._operators import op_prod
-from spinguin._core._basis import parse_operator_string, state_idx
+from spinguin._core._utils import parse_operator_string, state_idx
 from spinguin._core._hide_prints import HidePrints
 
 def unit_state(basis: np.ndarray,

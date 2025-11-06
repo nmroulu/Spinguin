@@ -9,7 +9,7 @@ import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
 from spinguin._core._la import comm, CG_coeff
-from spinguin._core._basis import idx_to_lq, parse_operator_string
+from spinguin._core._utils import idx_to_lq, parse_operator_string
 
 def op_E(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """

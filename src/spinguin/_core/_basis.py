@@ -1,18 +1,390 @@
 """
 This module provides functionality for constructing a basis set.
 """
+# Referencing SpinSystem class
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
 
 # Imports
 import numpy as np
 import scipy.sparse as sp
 import time
-import re
 import math
 from itertools import product, combinations
 from typing import Iterator, Literal
 from spinguin._core._la import eliminate_small, expm_vec
 from spinguin._core._hide_prints import HidePrints
+from spinguin._core._utils import coherence_order
 from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
+
+"""
+This module provides the Basis class which is assigned as a part of `SpinSystem`
+object upon its instantiation. Here is an example of accessing the most
+important functionality of the class::
+
+    import spinguin as sg                   # Import the package
+    spin_system = sg.SpinSystem(["1H"])     # Create an example spin system
+    spin_system.basis.max_spin_order = 1    # Set the maximum spin order
+    spin_system.basis.build()               # Build the basis set
+"""
+
+# Imports
+import numpy as np
+import scipy.sparse as sp
+import warnings
+from typing import Literal
+from spinguin._core._states import state_to_truncated_basis
+from spinguin._core._superoperators import sop_to_truncated_basis
+from spinguin._core._la import isvector
+from spinguin._core._parameters import parameters
+
+class Basis:
+    """
+    Basis class manages the basis set of a spin system. Most importantly, the
+    basis set contains the information on the truncation of the basis set and is
+    responsible for building and making changes to the basis set.
+    """
+
+    # Basis set properties
+    _basis: np.ndarray = None
+    _max_spin_order: int = None
+    _spin_system: SpinSystem = None
+
+    def __init__(self, spin_system: SpinSystem):
+        print("Basis set has been initialized with the following defaults:")
+        print(f"max_spin_order: {self.max_spin_order}\n")
+
+        # Store a reference to the SpinSystem
+        self._spin_system = spin_system
+
+    @property
+    def dim(self) -> int:
+        """Dimension of the basis set."""
+        return self.basis.shape[0]
+
+    @property
+    def max_spin_order(self) -> int:
+        """
+        Specifies the maximum number of a active spins that are included in the
+        product operators that constitute the basis set. Must be at least 1 and
+        not larger than the number of spins in the system.
+        """
+        return self._max_spin_order
+    
+    @property
+    def basis(self) -> np.ndarray:
+        """
+        Contains the actual basis set as an array of dimensions (N, M) where
+        N is the number of states in the basis and M is the number of spins in
+        the system. The basis set is constructed from Kronecker products of
+        irreducible spherical tensor operators, which are indexed using integers
+        starting from 0 with increasing rank `l` and decreasing projection `q`:
+
+        - 0 --> T(0, 0)
+        - 1 --> T(1, 1)
+        - 2 --> T(1, 0)
+        - 3 --> T(1, -1) and so on...
+
+        """
+        return self._basis
+    
+    @max_spin_order.setter
+    def max_spin_order(self, max_spin_order):
+        if max_spin_order < 1:
+            raise ValueError("Maximum spin order must be at least 1.")
+        if max_spin_order > self._spin_system.nspins:
+            raise ValueError("Maximum spin order must not be larger than "
+                             "the number of spins in the system.")
+        self._max_spin_order = max_spin_order
+        print(f"Maximum spin order set to: {self.max_spin_order}\n")
+
+    def build(self):
+        """
+        Builds the basis set for the spin system. Prior to building the basis,
+        the maximum spin order should be defined. If it is not defined, it is
+        set equal to the number of spins in the system (may be very slow)!
+        """
+        # If maximum spin order is not specified, raise a warning and set it
+        # equal to the number of spins
+        if self.max_spin_order is None:
+            warnings.warn("Maximum spin order not specified. "
+                          "Defaulting to the number of spins.")
+            self.max_spin_order = self._spin_system.nspins
+
+        # Build the basis
+        self._basis = make_basis(spins = self._spin_system.spins,
+                                 max_spin_order = self.max_spin_order)
+        
+    def truncate_by_coherence(
+            self,
+            coherence_orders: list,
+            *objs: np.ndarray | sp.csc_array
+        ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        """
+        Truncates the basis set by retaining only the product operators that
+        correspond to coherence orders specified in the `coherence_orders` list.
+
+        Optionally, superoperators or state vectors can be given as input. These
+        will be converted to the truncated basis.
+
+        Parameters
+        ----------
+        coherence_orders : list
+            List of coherence orders to be retained in the basis.
+
+        Returns
+        -------
+        objs_transformed : ndarray or csc_array or tuple
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Truncate the basis and obtain the index map
+        truncated_basis, index_map = truncate_basis_by_coherence(
+            basis = self.basis,
+            coherence_orders = coherence_orders
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=index_map,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=index_map,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
+        
+    def truncate_by_coupling(
+        self,
+        threshold: float,
+        method: Literal["weakest_link", "network_strength"] = "weakest_link",
+        *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        """
+        Removes basis states based on the scalar J-couplings. Whenever there
+        exists a J-coupling network of sufficient strength between spins that
+        constitute a product state, the particular state is kept in the basis.
+        Otherwise, the state is removed. The coupling strength is evaluated
+        either by the weakest link or by the overall network strength.
+
+        Optionally, superoperators or state vectors can be given as input. These
+        will be converted to the truncated basis.
+
+        Parameters
+        ----------
+        threshold : float
+            Coupling strength must be above this value in order for the product
+            state to be considered in the basis set.
+        method : {"weakest_link", "network_strength"}
+            Decides how the importance of a product state is evaluated. Weakest
+            link method considers a J-coupling network invalid based on the
+            smallest J-coupling within that network. Network strength method
+            calculates the effective coupling as a geometric mean scaled by the
+            factorial of the number of couplings within the network.
+        *objs : tuple of {ndarray, csc_array}
+            Superoperators or state vectors defined in the original basis. These
+            will be converted into the truncated basis.
+
+        Returns
+        -------
+        objs_transformed : tuple of {ndarray, csc_array}
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Truncate the basis and obtain the index map
+        truncated_basis, index_map = truncate_basis_by_coupling(
+            basis = self.basis,
+            J_couplings = self._spin_system.J_couplings,
+            threshold = threshold,
+            method = method
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=index_map,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=index_map,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
+        
+    def truncate_by_zte(
+        self,
+        L: np.ndarray | sp.csc_array,
+        rho: np.ndarray | sp.csc_array,
+        time_step: float,
+        nsteps: int,
+        *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        """
+        Removes basis states using the Zero-Track Elimination (ZTE) described
+        in:
+
+        Kuprov, I. (2008):
+        https://doi.org/10.1016/j.jmr.2008.08.008
+
+        Parameters
+        ----------
+        L : ndarray or csc_array
+            Liouvillian superoperator, L = -iH - R + K.
+        rho : ndarray or csc_array
+            Initial spin density vector.
+        time_step : float
+            Time step of the propagation within the ZTE.
+        nsteps : int
+            Number of steps to take in the ZTE.
+        *objs : tuple of {ndarray, csc_array}
+            Superoperators or state vectors defined in the original basis. These
+            will be converted into the truncated basis.
+
+        Returns
+        -------
+        objs_transformed : tuple of {ndarray, csc_array}
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Truncate the basis and obtain the index map
+        truncated_basis, index_map = truncate_basis_by_zte(
+            basis = self.basis,
+            L = L,
+            rho = rho,
+            time_step = time_step,
+            nsteps = nsteps,
+            zero_zte = parameters.zero_zte,
+            zero_expm_vec = parameters.zero_time_step
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=index_map,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=index_map,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
+        
+    def truncate_by_indices(
+        self,
+        indices: list | np.ndarray,
+        *objs: np.ndarray | sp.csc_array
+    ) -> np.ndarray:
+        """
+        Truncate the basis set to include only the basis states specified by the
+        `indices` supplied by the user.
+
+        Parameters
+        ----------
+        indices : list or ndarray
+            List of indices that specify which basis states to retain.
+        *objs : tuple of {ndarray, csc_array}
+            Superoperators or state vectors defined in the original basis. These
+            will be converted into the truncated basis.
+
+        Returns
+        -------
+        objs_transformed : tuple of {ndarray, csc_array}
+            Superoperators and state vectors transformed into the truncated
+            basis.
+        """
+        # Obtain the truncated basis
+        truncated_basis = truncate_basis_by_indices(
+            basis = self.basis,
+            indices = indices
+        )
+
+        # Update the basis
+        self._basis = truncated_basis
+
+        # Optionally, convert the superoperators and state vectors to the
+        # truncated basis
+        if objs:
+            objs_transformed = []
+            for obj in objs:
+
+                # Consider state vectors
+                if isvector(obj):
+                    objs_transformed.append(state_to_truncated_basis(
+                        index_map=indices,
+                        rho=obj))
+                    
+                # Consider superoperators
+                else:
+                    objs_transformed.append(sop_to_truncated_basis(
+                        index_map=indices,
+                        sop=obj
+                    ))
+
+            # Convert to tuple or just single value
+            if len(objs_transformed) == 1:
+                objs_transformed = objs_transformed[0]
+            else:
+                objs_transformed = tuple(objs_transformed)
+
+            return objs_transformed
         
 def make_basis(spins: np.ndarray, max_spin_order: int):
     """
@@ -189,359 +561,6 @@ def truncate_basis_by_coherence(
     print()
 
     return truncated_basis, index_map
-
-def lq_to_idx(l: int, q: int) -> int:
-    """
-    Returns the index of a single-spin irreducible spherical tensor operator
-    determined by rank `l` and projection `q`.
-
-    Parameters
-    ----------
-    l : int
-        Operator rank.
-    q : int
-        Operator projection.
-
-    Returns
-    -------
-    idx : int
-        Index of the operator.
-    """
-
-    # Get the operator index
-    idx = l**2 + l - q
-
-    return idx
-
-def idx_to_lq(idx: int) -> tuple[int, int]:
-    """
-    Converts the given operator index to rank `l` and projection `q`.
-
-    Parameters
-    ----------
-    idx : int
-        Index that describes the irreducible spherical tensor.
-
-    Returns
-    -------
-    l : int
-        Operator rank.
-    q : int
-        Operator projection.
-    """
-
-    # Calculate l
-    l = math.ceil(-1 + math.sqrt(1 + idx))
-
-    # Calculate q
-    q = l**2 + l - idx
-    
-    return l, q
-
-def coherence_order(op_def: np.ndarray) -> int:
-    """
-    Determines the coherence order of a given product operator in the basis set,
-    defined by an array of integers `op_def`.
-
-    Parameters
-    ----------
-    op_def : ndarray
-        Contains the indices that describe the product operator.
-
-    Returns
-    -------
-    order : int
-        Coherence order of the operator.
-    """
-
-    # Initialize the coherence order
-    order = 0
-
-    # Iterate over the product operator and sum the q values together
-    for op in op_def:
-        _, q = idx_to_lq(op)
-        order += q
-
-    return order
-
-def spin_order(op_def: np.ndarray) -> int:
-    """
-    Finds out the spin order of a given operator defined by `op_def`.
-
-    Parameters
-    ----------
-    op_def : ndarray
-        Contains the indices that describe the product operator.
-
-    Returns
-    -------
-    order : int
-        Spin order of the operator
-    """
-    # Spin order is equal to the number of non-zeros
-    order = np.count_nonzero(op_def)
-
-    return order
-
-def parse_operator_string(operator: str, nspins: int):
-    """
-    Parses operator strings and returns their definitions in the basis set as
-    well as their corresponding coefficients. The operator string must
-    follow the rules below:
-
-    - Cartesian and ladder operators: `I(component,index)` or
-      `I(component)`. Examples:
-
-        - `I(x,4)` --> Creates x-operator for spin at index 4.
-        - `I(x)`--> Creates x-operator for all spins.
-
-    - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-        - `T(1,-1,3)` --> \
-          Creates operator with `l=1`, `q=-1` for spin at index 3.
-        - `T(1, -1)` --> \
-          Creates operator with `l=1`, `q=-1` for all spins.
-        
-    - Product operators have `*` in between the single-spin operators:
-      `I(z,0) * I(z,1)`
-    - Sums of operators have `+` in between the operators:
-      `I(x,0) + I(x,1)`
-    - Unit operators are ignored in the input. Interpretation of these
-      two is identical: `E * I(z,1)`, `I(z,1)`
-    
-    Special case: An empty `operator` string is considered as unit operator.
-
-    Whitespace will be ignored in the input.
-
-    NOTE: Indexing starts from 0!
-
-    Parameters
-    ----------
-    operator : str
-        String that defines the operator to be generated.
-    nspins : int
-        Number of spins in the system.
-
-    Returns
-    -------
-    op_defs : list of ndarray
-        A list that contains arrays, which describe the requested operator with
-        integers. Example: `[[2, 0, 1]]` --> `T_1_0 * E * T_1_1`
-    coeffs : list of floats
-        Coefficients that account for the different norms of operator relations.
-    """
-
-    # Create empty lists to hold the operator definitions and the coefficients
-    op_defs = []
-    coeffs = []
-
-    # Remove spaces from the user input
-    operator = "".join(operator.split())
-
-    # Create unit operator if input string is empty
-    if operator == "":
-        op_def = np.array([0 for _ in range(nspins)])
-        coeff = 1
-        op_defs.append(op_def)
-        coeffs.append(coeff)
-        return op_defs, coeffs
-
-    # Split the user input sum '+' into separate product operators
-    prod_ops = []
-    inside_parantheses = False
-    start = 0
-    for i, char in enumerate(operator):
-        if char == '(':
-            inside_parantheses = True
-        elif char == ')':
-            inside_parantheses = False
-        elif char == '+' and not inside_parantheses:
-            prod_ops.append(operator[start:i])
-            start = i + 1
-    prod_ops.append(operator[start:])
-
-    # Replace inputs of kind I(z) --> Sum operator for all spins
-    prod_ops_copy = []
-    for prod_op in prod_ops:
-        if '*' not in prod_op:
-
-            # For unit operators, do nothing
-            if prod_op[0] == 'E':
-                prod_ops_copy.append(prod_op)
-
-            # Handle Cartesian and ladder operators
-            elif prod_op[0] == 'I':
-                component = re.search(r'\(([^)]*)\)',
-                                      prod_op).group(1).split(',')
-                if len(component) == 1:
-                    component = component[0]
-                    for index in range(nspins):
-                        prod_ops_copy.append(f"I({component},{index})")
-                else:
-                    prod_ops_copy.append(prod_op)
-
-            # Handle spherical tensor operators
-            elif prod_op[0] == 'T':
-                component = re.search(r'\(([^)]*)\)',
-                                      prod_op).group(1).split(',')
-                if len(component) == 2:
-                    l = component[0]
-                    q = component[1]
-                    for index in range(nspins):
-                        prod_ops_copy.append(f"T({l},{q},{index})")
-                else:
-                    prod_ops_copy.append(prod_op)
-
-            # Otherwise an unsupported operator
-            else:
-                raise ValueError("Cannot parse the following invalid"
-                                 f"operator: {op_term}")
-
-        # Keep operator as is, if the input contains '*'
-        else:
-            prod_ops_copy.append(prod_op)
-
-    prod_ops = prod_ops_copy
-                
-    # Process each product operator separately
-    for prod_op in prod_ops:
-
-        # Start from a unit operator
-        op = np.array(['E' for _ in range(nspins)], dtype='<U10')
-
-        # Separate the terms in the product operator
-        op_terms = prod_op.split('*')
-
-        # Process each term separately
-        for op_term in op_terms:
-
-            # Handle unit operators (by default exist in the operator)
-            if op_term[0] == 'E':
-                pass
-
-            # Handle Cartesian and ladder operators
-            elif op_term[0] == 'I':
-                component_and_index = re.search(r'\(([^)]*)\)',
-                                                op_term).group(1).split(',')
-                component = component_and_index[0]
-                index = int(component_and_index[1])
-                op[index] = f"I_{component}"
-
-            # Handle spherical tensor operators
-            elif op_term[0] == 'T':
-                component_and_index = re.search(r'\(([^)]*)\)',
-                                                op_term).group(1).split(',')
-                l = component_and_index[0]
-                q = component_and_index[1]
-                index = int(component_and_index[2])
-                op[index] = f"T_{l}_{q}"
-
-            # Other input types are not supported
-            else:
-                raise ValueError("Cannot parse the following invalid"
-                                 f"operator: {op_term}")
-
-        # Create empty lists of lists to hold the current operator definitions
-        # and coefficients
-        op_defs_curr = [[]]
-        coeffs_curr = [[]]
-
-        # Iterate over all of the operator strings
-        for o in op:
-
-            # Get the corresponding integers and coefficients
-            match o:
-
-                case 'E':
-                    op_ints = [0]
-                    op_coeffs = [1]
-
-                case 'I_+':
-                    op_ints = [1]
-                    op_coeffs = [-np.sqrt(2)]
-
-                case 'I_z':
-                    op_ints = [2]
-                    op_coeffs = [1]
-
-                case 'I_-':
-                    op_ints = [3]
-                    op_coeffs = [np.sqrt(2)]
-
-                case 'I_x':
-                    op_ints = [1, 3]
-                    op_coeffs = [-np.sqrt(2)/2, np.sqrt(2)/2]
-
-                case 'I_y':
-                    op_ints = [1, 3]
-                    op_coeffs = [-np.sqrt(2)/(2j), -np.sqrt(2)/(2j)]
-
-                # Default case handles spherical tensors
-                case _:
-                    o = o.split('_')
-                    l = int(o[1])
-                    q = int(o[2])
-                    idx = lq_to_idx(l, q)
-                    op_ints = [idx]
-                    op_coeffs = [1]
-
-            # Add each possible value
-            op_defs_curr = [op_def + [op_int] for op_def in op_defs_curr
-                            for op_int in op_ints]
-            coeffs_curr = [coeff + [op_coeff] for coeff in coeffs_curr
-                           for op_coeff in op_coeffs]
-
-        # Convert the operator definition to NumPy
-        op_defs_curr = [np.array(op_def) for op_def in op_defs_curr]
-
-        # Calculate the coefficients
-        coeffs_curr = [np.prod(coeff) for coeff in coeffs_curr]
-
-        # Extend the total lists
-        op_defs.extend(op_defs_curr)
-        coeffs.extend(coeffs_curr)
-
-    return op_defs, coeffs
-
-def state_idx(basis: np.ndarray, op_def: np.ndarray) -> int:
-    """
-    Finds the index of the state defined by the `op_def` in the basis set.
-
-    Parameters
-    ----------
-    basis : ndarray
-        Two dimensional array containing the basis set that consists of rows of
-        integers defining the products of irreducible spherical tensors.
-    op_def : ndarray
-        A one-dimensional array of integers that describes the operator of
-        interest.
-
-    Returns
-    -------
-    idx : int
-        Index of the given state in the basis set.
-    """
-
-    # Check that the dimensions match
-    if not basis.shape[1] == op_def.shape[0]:
-        raise ValueError("Cannot find the index of state, as the dimensions do "
-                         f"not match. 'basis': {basis.shape[1]}, "
-                         f"'op_def': {op_def.shape[0]}")
-
-    # Search for the state
-    is_equal = np.all(basis == op_def, axis=1)
-    idx = np.where(is_equal)[0]
-
-    # Confirm that exactly one state was found
-    if idx.shape[0] == 1:
-        idx = idx[0]
-    elif idx.shape[0] == 0:
-        raise ValueError(f"Could not find the index of state: {op_def}.")
-    else:
-        raise ValueError("Multiple states in the basis match with the "
-                         f"requested state: {op_def}")
-    
-    return idx
 
 def truncate_basis_by_coupling_weakest_link(
     basis: np.ndarray,

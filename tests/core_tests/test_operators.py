@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import math
 from spinguin._core._la import comm
-from spinguin._core._basis import idx_to_lq
+from spinguin._core._utils import idx_to_lq
 from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm, \
     op_T, op_prod, op_from_string, op_T_coupled
 
