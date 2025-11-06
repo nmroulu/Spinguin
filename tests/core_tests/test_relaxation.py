@@ -8,7 +8,7 @@ from spinguin._core._relaxation import sop_R_redfield, sop_R_sr2k, \
 from spinguin._core._propagation import sop_pulse, sop_propagator
 from spinguin._core._nmr_isotopes import ISOTOPES
 from spinguin._core._basis import make_basis, truncate_basis_by_coherence
-from spinguin._core._states import equilibrium_state, state_to_truncated_basis
+from spinguin._core._states import _equilibrium_state, state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 
 class TestRelaxation(unittest.TestCase):
@@ -159,7 +159,7 @@ class TestRelaxation(unittest.TestCase):
         L = -1j*H - R
 
         # Create the thermal equilibrium state
-        rho = equilibrium_state(basis, spins, H_left, T, sparse=False,
+        rho = _equilibrium_state(basis, spins, H_left, T, sparse=False,
                                 zero_value=1e-18)
 
         # Apply a 180-degree pulse (to all 1H)
@@ -195,7 +195,7 @@ class TestRelaxation(unittest.TestCase):
             zero_value = 1e-12,
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
-        rho_ref = equilibrium_state(ZQ_basis, spins, H_left_ZQ, T, sparse=False,
+        rho_ref = _equilibrium_state(ZQ_basis, spins, H_left_ZQ, T, sparse=False,
                                     zero_value=1e-18)
 
         # Verify that the final state matches the thermal equilibrium state
