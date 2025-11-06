@@ -11,14 +11,13 @@ if TYPE_CHECKING:
 import numpy as np
 import scipy.sparse as sp
 import scipy.constants as const
-import time
 from functools import lru_cache
-from spinguin.la import expm
-from spinguin.utils import HidePrints
-from spinguin._core.basis import parse_operator_string, state_idx
+from spinguin._core._basis_indexing import parse_operator_string
 from spinguin._core._config import config
 from spinguin._core._hamiltonian import hamiltonian
-from spinguin._core._operators import op_prod
+from spinguin._core._hide_prints import HidePrints
+from spinguin._core._la import expm
+from spinguin._core._operators import operator_from_op_def
 from spinguin._core._parameters import parameters
 
 def alpha_state(
@@ -376,47 +375,14 @@ def state_from_op_def(
 
     return rho
 
-def state_to_truncated_basis(
-    index_map: list,
-    rho: np.ndarray | sp.csc_array
-) -> np.ndarray | sp.csc_array:
-    """
-    Transforms a state vector to a truncated basis using the `index_map`,
-    which contains indices that determine the elements that are retained
-    after the transformation.
-
-    Parameters
-    ----------
-    index_map : list
-        Index mapping from the original basis to the truncated basis.
-    rho : ndarray or csc_array
-        State vector to be transformed.
-
-    Returns
-    -------
-    rho_transformed : ndarray or csc_array
-        State vector transformed into the truncated basis.
-    """
-
-    print("Transforming the state vector into the truncated basis.")
-    time_start = time.time()
-
-    # Perform the transformation to truncated basis
-    rho_transformed = rho[index_map]
-
-    print("Transformation completed.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
-
-    return rho_transformed
-
-def state_to_zeeman(
+def state_vector_to_density_matrix(
     spin_system: SpinSystem,
     rho: np.ndarray | sp.csc_array
 ) -> np.ndarray | sp.csc_array:
     """
     Takes the state vector defined in the normalized spherical tensor basis
-    and converts it into the Zeeman eigenbasis. Useful for error checking.
+    and converts it into a density matrix defined in the Zeeman eigenbasis.
+    Useful for error checking.
 
     Parameters
     ----------

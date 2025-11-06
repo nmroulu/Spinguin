@@ -6,14 +6,11 @@ simulations.
 # Imports
 import math
 import numpy as np
-from scipy.sparse import eye_array, csc_array, block_array, issparse
-from scipy.io import mmwrite, mmread
-from io import BytesIO
+from scipy.sparse import eye_array, csc_array, issparse
 from functools import lru_cache
 from sympy.physics.quantum.cg import CG
-from spinguin.la._sparse_dot import sparse_dot as _sparse_dot
-from spinguin.la._intersect_indices import intersect_indices
-from spinguin.utils import HidePrints
+from spinguin._core._sparse_dot import sparse_dot as _sparse_dot
+from spinguin._core._intersect_indices import intersect_indices
 
 def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
     """
@@ -121,7 +118,7 @@ def expm(A: np.ndarray | csc_array,
         A = A / scaling_factor
 
         # Calculate the expm of the scaled matrix using the Taylor series
-        expm_A = expm_taylor(A, zero_value)
+        expm_A = _expm_taylor(A, zero_value)
 
         # Scale the matrix exponential back up by repeated squaring
         for i in range(scaling_count):
@@ -130,13 +127,13 @@ def expm(A: np.ndarray | csc_array,
     
     # If the norm of the matrix is small, proceed without scaling
     else:
-        expm_A = expm_taylor(A, zero_value)
+        expm_A = _expm_taylor(A, zero_value)
 
     print("Matrix exponential completed.")
 
     return expm_A
 
-def expm_taylor(A: np.ndarray | csc_array,
+def _expm_taylor(A: np.ndarray | csc_array,
                 zero_value: float) -> np.ndarray | csc_array:
     """
     Computes the matrix exponential using the Taylor series. This function is 
@@ -216,55 +213,6 @@ def eliminate_small(A: np.ndarray | csc_array, zero_value: float):
     else:
         nonzero_mask = np.abs(A) < zero_value
         A[nonzero_mask] = 0
-
-def sparse_to_bytes(A: csc_array) -> bytes:
-    """
-    Converts the given SciPy sparse array into a byte representation.
-
-    Parameters
-    ----------
-    A : csc_array
-        Sparse matrix to be converted into bytes.
-
-    Returns
-    -------
-    A_bytes : bytes
-        Byte representation of the input matrix.
-    """
-    
-    # Initialize a BytesIO object
-    bytes_io = BytesIO()
-
-    # Write the matrix A to bytes
-    mmwrite(bytes_io, A)
-
-    # Retrieve the bytes
-    A_bytes = bytes_io.getvalue()
-
-    return A_bytes
-
-def bytes_to_sparse(A_bytes: bytes) -> csc_array:
-    """
-    Converts a byte representation back to a SciPy sparse array.
-
-    Parameters
-    ----------
-    A_bytes : bytes
-        Byte representation of a SciPy sparse array.
-
-    Returns
-    -------
-    A : csc_array
-        Sparse array reconstructed from the byte representation.
-    """
-
-    # Initialize a BytesIO object
-    bytes_io = BytesIO(A_bytes)
-
-    # Read the SciPy sparse array from bytes
-    A = mmread(bytes_io)
-
-    return A
 
 def comm(A: csc_array | np.ndarray,
          B: csc_array | np.ndarray) -> csc_array | np.ndarray:

@@ -16,6 +16,7 @@ TODO: Tarkista kvadrupolimomentit?
 
 # Imports
 import numpy as np
+import scipy.constants as const
 from typing import Literal
 from spinguin._core._parameters import parameters
 
@@ -155,6 +156,28 @@ ISOTOPES = {
     '247Cm': [4.5, 0.6098074583288254, 0]
 }
 
+def dd_constant(y1: float, y2: float) -> float:
+    """
+    Calculates the dipole-dipole coupling constant (excluding the distance).
+
+    Parameters
+    ----------
+    y1 : float
+        Gyromagnetic ratio of the first spin in units of rad/s/T.
+    y2 : float
+        Gyromagnetic ratio of the second spin in units of rad/s/T.
+
+    Returns
+    -------
+    dd_const : float
+        Dipole-dipole coupling constant in units of rad/s * m^3.
+    """
+
+    # Calculate the constant
+    dd_const = -const.mu_0 / (4 * np.pi) * y1 * y2 * const.hbar
+
+    return dd_const
+
 def spin(isotope: str) -> float:
     """
     Returns the spin quantum number of the requested isotope.
@@ -193,6 +216,31 @@ def gamma(isotope: str, unit: Literal["Hz", "rad/s"]):
         return ISOTOPES[isotope][1] * 1e6 * 2*np.pi
     else:
         raise ValueError(f"Incorrect units: {unit}")
+    
+def Q_constant(S: float, Q_moment: float) -> float:
+    """
+    Calculates the nuclear quadrupolar coupling constant in (rad/s) / (V/m^2).
+    
+    Parameters
+    ----------
+    S : float
+        Spin quantum number.
+    Q_moment : float
+        Nuclear quadrupole moment (in units of m^2).
+
+    Returns
+    -------
+    Q_const : float
+        Quadrupolar coupling constant.
+    """
+
+    # Calculate the quadrupolar coupling constant
+    if (S >= 1) and (Q_moment > 0):
+        Q_const = -const.e * Q_moment / const.hbar / (2 * S * (2 * S - 1))
+    else:
+        Q_const = 0
+    
+    return Q_const
     
 def quadrupole_moment(isotope: str):
     """

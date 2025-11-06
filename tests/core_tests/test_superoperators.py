@@ -1,26 +1,29 @@
 import unittest
 import numpy as np
 import scipy.sparse as sp
-from spinguin._core._operators import op_prod
-from spinguin._core.basis import make_basis, truncate_basis_by_coherence
-from spinguin._core._superoperators import sop_prod, sop_prod_ref, \
-    sop_from_string, sop_T_coupled, sop_to_truncated_basis
+import spinguin as sg
 from spinguin.la import cartesian_tensor_to_spherical_tensor
 
 class TestSuperoperators(unittest.TestCase):
 
-    def test_structure_coefficients(self):
+    def test_superoperator(self):
         """
-        Test creating a superoperator using the structure coefficients.
+        Test creating a superoperator.
         """
 
         # Create a test spin system
-        spins = np.array([1/2, 1])
-        nspins = spins.shape[0]
-        basis = make_basis(spins, nspins)
-        dim = basis.shape[0]
+        spin_system = sg.SpinSystem(["1H", "14N"])
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
 
-        # Test all product operators from the basis set
+        # Build a list of all operators in the basis set
+        operators = []
+        for i in range(spin_system.mults[0] ** 2):
+            for j in range(spin_system.mults[1] ** 2):
+                l, q = sg.basis.idx_to_lq()
+                op = f""
+
+        # Test all product operators from the basis set 
         for i in range(int(2*spins[0]+1)):
             for j in range(int(2*spins[1]+1)):
 

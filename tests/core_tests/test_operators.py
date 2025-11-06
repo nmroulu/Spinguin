@@ -2,9 +2,6 @@ import unittest
 import numpy as np
 import math
 import spinguin as sg
-from spinguin.la import comm
-from spinguin._core.basis import idx_to_lq
-from spinguin._core._operators import op_prod
 
 class TestOperators(unittest.TestCase):
 
@@ -124,26 +121,26 @@ class TestOperators(unittest.TestCase):
         sg.config.sparse_operator = True
         for spin in spins:
             self.assertTrue(np.allclose(
-                comm(sg.op_E(spin), sg.op_E(spin)).toarray(), 0
+                sg.comm(sg.op_E(spin), sg.op_E(spin)).toarray(), 0
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sx(spin), sg.op_Sy(spin)).toarray(),
+                sg.comm(sg.op_Sx(spin), sg.op_Sy(spin)).toarray(),
                 1j*sg.op_Sz(spin).toarray()
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sy(spin), sg.op_Sz(spin)).toarray(),
+                sg.comm(sg.op_Sy(spin), sg.op_Sz(spin)).toarray(),
                 1j*sg.op_Sx(spin).toarray()
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sz(spin), sg.op_Sx(spin)).toarray(),
+                sg.comm(sg.op_Sz(spin), sg.op_Sx(spin)).toarray(),
                 1j*sg.op_Sy(spin).toarray()
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sp(spin), sg.op_Sz(spin)).toarray(),
+                sg.comm(sg.op_Sp(spin), sg.op_Sz(spin)).toarray(),
                 -sg.op_Sp(spin).toarray()
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sm(spin), sg.op_Sz(spin)).toarray(),
+                sg.comm(sg.op_Sm(spin), sg.op_Sz(spin)).toarray(),
                 sg.op_Sm(spin).toarray()
             ))
 
@@ -151,22 +148,22 @@ class TestOperators(unittest.TestCase):
         sg.config.sparse_operator = False
         for spin in spins:
             self.assertTrue(np.allclose(
-                comm(sg.op_E(spin), sg.op_E(spin)), 0
+                sg.comm(sg.op_E(spin), sg.op_E(spin)), 0
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sx(spin), sg.op_Sy(spin)), 1j*sg.op_Sz(spin)
+                sg.comm(sg.op_Sx(spin), sg.op_Sy(spin)), 1j*sg.op_Sz(spin)
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sy(spin), sg.op_Sz(spin)), 1j*sg.op_Sx(spin)
+                sg.comm(sg.op_Sy(spin), sg.op_Sz(spin)), 1j*sg.op_Sx(spin)
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sz(spin), sg.op_Sx(spin)), 1j*sg.op_Sy(spin)
+                sg.comm(sg.op_Sz(spin), sg.op_Sx(spin)), 1j*sg.op_Sy(spin)
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sp(spin), sg.op_Sz(spin)), -sg.op_Sp(spin)
+                sg.comm(sg.op_Sp(spin), sg.op_Sz(spin)), -sg.op_Sp(spin)
             ))
             self.assertTrue(np.allclose(
-                comm(sg.op_Sm(spin), sg.op_Sz(spin)), sg.op_Sm(spin)
+                sg.comm(sg.op_Sm(spin), sg.op_Sz(spin)), sg.op_Sm(spin)
             ))
 
     def test_op_T(self):
@@ -187,24 +184,30 @@ class TestOperators(unittest.TestCase):
 
                     # Check the commutation relations
                     self.assertTrue(np.allclose(
-                        comm(sg.op_Sz(spin), sg.op_T(spin, l, q)).toarray(),
+                        sg.comm(sg.op_Sz(spin), sg.op_T(spin, l, q)).toarray(),
                         q*sg.op_T(spin, l, q).toarray()
                     ))
                     self.assertTrue(np.allclose(
-                        comm(sg.op_Sx(spin)@sg.op_Sx(spin) + \
+                        sg.comm(sg.op_Sx(spin)@sg.op_Sx(spin) + \
                              sg.op_Sy(spin)@sg.op_Sy(spin) + \
                              sg.op_Sz(spin)@sg.op_Sz(spin),
                              sg.op_T(spin, l, q)).toarray(), 0))
                     if not q == -l:
                         self.assertTrue(np.allclose(
-                            comm(sg.op_Sm(spin), sg.op_T(spin, l, q)).toarray(),
+                            sg.comm(
+                                sg.op_Sm(spin),
+                                sg.op_T(spin, l, q)
+                            ).toarray(),
                             math.sqrt(l*(l+1) - q*(q-1)) * \
                             sg.op_T(spin, l, q-1).toarray()
                         ))
                     if not q == l:
                         # NOTE: Tolerance of allclose had to be increased
                         self.assertTrue(np.allclose(
-                            comm(sg.op_Sp(spin), sg.op_T(spin, l, q)).toarray(),
+                            sg.comm(
+                                sg.op_Sp(spin),
+                                sg.op_T(spin, l, q)
+                            ).toarray(),
                             math.sqrt(l*(l+1) - q*(q+1)) * \
                             sg.op_T(spin, l, q+1).toarray(), atol=1e-7
                         ))
@@ -219,23 +222,23 @@ class TestOperators(unittest.TestCase):
 
                     # Check the commutation relations
                     self.assertTrue(np.allclose(
-                        comm(sg.op_Sz(spin), sg.op_T(spin, l, q)),
+                        sg.comm(sg.op_Sz(spin), sg.op_T(spin, l, q)),
                         q*sg.op_T(spin, l, q)
                     ))
                     self.assertTrue(np.allclose(
-                        comm(sg.op_Sx(spin)@sg.op_Sx(spin) + \
-                             sg.op_Sy(spin)@sg.op_Sy(spin) + \
-                             sg.op_Sz(spin)@sg.op_Sz(spin),
-                             sg.op_T(spin, l, q)), 0))
+                        sg.comm(sg.op_Sx(spin)@sg.op_Sx(spin) + \
+                                sg.op_Sy(spin)@sg.op_Sy(spin) + \
+                                sg.op_Sz(spin)@sg.op_Sz(spin),
+                                sg.op_T(spin, l, q)), 0))
                     if not q == -l:
                         self.assertTrue(np.allclose(
-                            comm(sg.op_Sm(spin), sg.op_T(spin, l, q)),
+                            sg.comm(sg.op_Sm(spin), sg.op_T(spin, l, q)),
                             math.sqrt(l*(l+1) - q*(q-1)) * \
                             sg.op_T(spin, l, q-1)
                         ))
                     if not q == l:
                         self.assertTrue(np.allclose(
-                            comm(sg.op_Sp(spin), sg.op_T(spin, l, q)),
+                            sg.comm(sg.op_Sp(spin), sg.op_T(spin, l, q)),
                             math.sqrt(l*(l+1) - q*(q+1)) * \
                             sg.op_T(spin, l, q+1)
                         ))

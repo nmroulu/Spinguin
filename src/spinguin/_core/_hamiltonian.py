@@ -12,40 +12,27 @@ import numpy as np
 import scipy.sparse as sp
 import time
 from typing import Literal
-from spinguin.la import eliminate_small
-from spinguin._core._superoperators import sop_prod
 from spinguin._core._config import config
+from spinguin._core._la import eliminate_small
 from spinguin._core._parameters import parameters
+from spinguin._core._superoperators import superoperator_from_op_def
 
-def _sop_H_Z(basis: np.ndarray,
-            gammas: np.ndarray,
-            spins: np.ndarray,
-            B: float,
-            side: Literal["comm", "left", "right"] = "comm",
-            sparse: bool=True) -> np.ndarray | sp.csc_array:
+def _hamiltonian_Z(
+    spin_system: SpinSystem,
+    side: Literal["comm", "left", "right"] = "comm"
+) -> np.ndarray | sp.csc_array:
     """
     Computes the Hamiltonian superoperator for the Zeeman interaction.
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    gammas : ndarray
-        A 1-dimensional array containing the gyromagnetic ratios of each spin in
-        the units of rad/s/T
-    spins : ndarray
-        A 1-dimensional array containing the spin quantum numbers of each spin.
-    B : float
-        External magnetic field in the units of T.
+    spin_system : SpinSystem
+        Spin system for which the Zeeman Hamiltonian is calculated.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
-    sparse : bool, default=True
-        Specifies whether to construct the Hamiltonian as sparse or dense array.
 
     Returns
     -------
@@ -54,11 +41,11 @@ def _sop_H_Z(basis: np.ndarray,
     """
 
     # Obtain the basis set dimension and number of spins
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
+    dim = spin_system.basis.dim
+    nspins = spin_system.nspins
 
     # Initialize the Hamiltonian
-    if sparse:
+    if config.sparse_superoperator:
         sop_Hz = sp.csc_array((dim, dim), dtype=complex)
     else:
         sop_Hz = np.zeros((dim, dim), dtype=complex)
@@ -70,57 +57,40 @@ def _sop_H_Z(basis: np.ndarray,
         op_def = np.array([2 if i == n else 0 for i in range(nspins)])
 
         # Compute the Zeeman interaction for the current spin
-        sop_Hz = sop_Hz - gammas[n] * B * sop_prod(op_def, basis, spins, side,
-                                                   sparse)
+        sop_Hz = sop_Hz - spin_system.gammas[n] * \
+                          parameters.magnetic_field * \
+                          superoperator_from_op_def(spin_system, op_def, side)
 
     return sop_Hz
 
-def _sop_H_CS(basis: np.ndarray,
-             gammas: np.ndarray,
-             spins: np.ndarray,
-             chemical_shifts: np.ndarray,
-             B: float,
-             side: Literal["comm", "left", "right"] = "comm",
-             sparse: bool=True) -> np.ndarray | sp.csc_array:
+def _hamiltonian_CS(
+    spin_system: SpinSystem,
+    side: Literal["comm", "left", "right"] = "comm"
+) -> np.ndarray | sp.csc_array:
     """
     Computes the Hamiltonian superoperator for the chemical shift.
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    gammas : ndarray
-        A 1-dimensional array containing the gyromagnetic ratios of each spin in
-        the units of rad/s/T
-    spins : ndarray
-        A 1-dimensional array containing the spin quantum numbers of each spin.
-    chemical_shifts : ndarray
-        A 1-dimensional array containing the chemical shifts of each spin in the
-        units of ppm.
-    B : float
-        External magnetic field in the units of T.
+    spin_system : SpinSystem
+        Spin system for which the chemical shift Hamiltonian is calculated.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
-    sparse : bool, default=True
-        Specifies whether to construct the Hamiltonian as sparse or dense array.
 
     Returns
     -------
     sop_Hz : ndarray or csc_array
         The Hamiltonian superoperator for the chemical shift.
     """
-
     # Obtain the basis set dimension and number of spins
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
+    dim = spin_system.basis.dim
+    nspins = spin_system.nspins
 
     # Initialize the Hamiltonian
-    if sparse:
+    if config.sparse_superoperator:
         sop_Hcs = sp.csc_array((dim, dim), dtype=complex)
     else:
         sop_Hcs = np.zeros((dim, dim), dtype=complex)
@@ -132,37 +102,29 @@ def _sop_H_CS(basis: np.ndarray,
         op_def = np.array([2 if i == n else 0 for i in range(nspins)])
 
         # Compute the contribution from chemical shift for the current spin
-        sop_Hcs = sop_Hcs - gammas[n] * B * chemical_shifts[n] * 1e-6 * \
-            sop_prod(op_def, basis, spins, side, sparse)
+        sop_Hcs = sop_Hcs - spin_system.gammas[n] * \
+                            parameters.magnetic_field * \
+                            spin_system.chemical_shifts[n] * 1e-6 * \
+                            superoperator_from_op_def(spin_system, op_def, side)
 
     return sop_Hcs
 
-def _sop_H_J(basis: np.ndarray,
-            spins: np.ndarray,
-            J_couplings: np.ndarray,
-            side: Literal["comm", "left", "right"] = "comm",
-            sparse: bool=True) -> np.ndarray | sp.csc_array:
+def _hamiltonian_J(
+    spin_system: SpinSystem,
+    side: Literal["comm", "left", "right"] = "comm",
+) -> np.ndarray | sp.csc_array:
     """
     Computes the J-coupling term of the Hamiltonian.
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array containing the spin quantum numbers of each spin.
-    J_couplings : ndarray
-        A 2-dimensional array containing the scalar J-couplings between each
-        spin in the units of Hz. Only the bottom triangle is considered.
+    spin_system : SpinSystem
+        Spin system whose J-coupling Hamiltonian is going to be calculated.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator (default)
         - 'left' -- left superoperator
         - 'right' -- right superoperator
-    sparse : bool, default=True
-        Specifies whether to construct the Hamiltonian as sparse or dense array.
 
     Returns
     -------
@@ -171,11 +133,11 @@ def _sop_H_J(basis: np.ndarray,
     """
 
     # Obtain the basis set dimension and number of spins
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
+    dim = spin_system.basis.dim
+    nspins = spin_system.nspins
 
     # Initialize the Hamiltonian
-    if sparse:
+    if config.sparse_superoperator:
         sop_Hj = sp.csc_array((dim, dim), dtype=complex)
     else:
         sop_Hj = np.zeros((dim, dim), dtype=complex)
@@ -200,120 +162,20 @@ def _sop_H_J(basis: np.ndarray,
                     1 if i == k else 0 for i in range(nspins)])
 
                 # Compute the J-coupling term
-                sop_Hj += 2 * np.pi * J_couplings[n][k] * (
-                    sop_prod(op_def_00, basis, spins, side, sparse) \
-                        - sop_prod(op_def_p1m1, basis, spins, side, sparse) \
-                        - sop_prod(op_def_m1p1, basis, spins, side, sparse))
+                sop_Hj += 2 * np.pi * spin_system.J_couplings[n][k] * (
+                    superoperator_from_op_def(spin_system, op_def_00, side) -\
+                    superoperator_from_op_def(spin_system, op_def_p1m1, side) -\
+                    superoperator_from_op_def(spin_system, op_def_m1p1, side)
+                )
 
     return sop_Hj
 
-INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
-INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
-def _sop_H(
-        basis: np.ndarray,
-        spins: np.ndarray,
-        gammas: np.ndarray = None,
-        B: float = None,
-        chemical_shifts: np.ndarray = None,
-        J_couplings: np.ndarray = None,
-        interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
-        side: Literal["comm", "left", "right"] = "comm",
-        sparse: bool=True,
-        zero_value: float=1e-12
-) -> np.ndarray | sp.csc_array:
-    """
-    Computes the coherent part of the Hamiltonian superoperator, including the
-    Zeeman interaction, isotropic chemical shift, and J-couplings.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array containing the spin quantum numbers of each spin.
-    gammas : ndarray
-        A 1-dimensional array containing the gyromagnetic ratios of each spin in
-        the units of rad/s/T.
-    B : float
-        External magnetic field in the units of T.
-    chemical_shifts : ndarray
-        A 1-dimensional array containing the chemical shifts of each spin in the
-        units of ppm.
-    J_couplings : ndarray
-        A 2-dimensional array containing the scalar J-couplings between each
-        spin in the units of Hz. Only the bottom triangle is considered.
-    interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
-        Specifies which interactions are taken into account. The options are:
-        - 'zeeman' -- Zeeman interaction
-        - 'chemical_shift' -- Isotropic chemical shift
-        - 'J_coupling' -- Scalar J-coupling
-    side : {'comm', 'left', 'right'}
-        Specifies the type of superoperator:
-        - 'comm' -- commutation superoperator (default)
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
-    sparse : bool, default=True
-        Specifies whether to construct the Hamiltonian as sparse or dense array.
-    zero_value : float, default=1e-12
-        Smaller values than this threshold are made equal to zero after
-        calculating the Hamiltonian. When using sparse arrays, larger values
-        decrease the memory requirement at the cost of accuracy.
-
-    Returns
-    -------
-    sop_H : ndarray or csc_array
-        The coherent Hamiltonian.
-    """
-
-    time_start = time.time()
-    print("Constructing Hamiltonian...")
-
-    # Check that each item in the interactions list is unique
-    if not len(set(interactions)) == len(interactions):
-        raise ValueError("Cannot compute Hamiltonian, as duplicate "
-                         "interactions were specified.")
-    
-    # Check that at least one interaction has been specified
-    if len(interactions) == 0:
-        raise ValueError("Cannot compute Hamiltonian, as no interactions were "
-                         "specified.")
-
-    # Obtain the basis set dimension
-    dim = basis.shape[0]
-
-    # Initialize the Hamiltonian
-    if sparse:
-        sop_H = sp.csc_array((dim, dim), dtype=complex)
-    else:
-        sop_H = np.zeros((dim, dim), dtype=complex)
-
-    # Compute the Zeeman and J-coupling Hamiltonians
-    for interaction in interactions:
-        if interaction == "zeeman":
-            sop_H += _sop_H_Z(basis, gammas, spins, B, side, sparse)
-        elif interaction == "chemical_shift":
-            sop_H += _sop_H_CS(basis, gammas, spins, chemical_shifts, B, side, 
-                              sparse)
-        elif interaction == "J_coupling":
-            sop_H += _sop_H_J(basis, spins, J_couplings, side, sparse)
-        else:
-            raise ValueError(f"Unsupported interaction type: {interaction}. "
-                             f"The possible options are: {INTERACTIONDEFAULT}.")
-
-    # Remove small values to enhance sparsity
-    eliminate_small(sop_H, zero_value)
-
-    print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.')
-    print()
-
-    return sop_H
-
+_INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
+_INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
 def hamiltonian(
-        spin_system: SpinSystem,
-        interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
-        side: Literal["comm", "left", "right"] = "comm"
+    spin_system: SpinSystem,
+    interactions: list[_INTERACTIONTYPE] = _INTERACTIONDEFAULT,
+    side: Literal["comm", "left", "right"] = "comm"
 ) -> np.ndarray | sp.csc_array:
     """
     Creates the requested Hamiltonian superoperator for the spin system.
@@ -341,6 +203,8 @@ def hamiltonian(
     H : ndarray or csc_array
         Hamiltonian superoperator.
     """
+    time_start = time.time()
+    print("Constructing Hamiltonian...")
         
     # Check that the required attributes have been set
     if spin_system.basis.basis is None:
@@ -355,17 +219,43 @@ def hamiltonian(
             raise ValueError("Please set the magnetic field before "
                              "constructing the chemical shift Hamiltonian.")
         
-    H = _sop_H(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        gammas = spin_system.gammas,
-        B = parameters.magnetic_field,
-        chemical_shifts = spin_system.chemical_shifts,
-        J_couplings = spin_system.J_couplings,
-        interactions = interactions,
-        side = side,
-        sparse = config.sparse_hamiltonian,
-        zero_value = config.zero_hamiltonian
-    )
+    # Check that each item in the interactions list is unique
+    if not len(set(interactions)) == len(interactions):
+        raise ValueError("Cannot compute Hamiltonian, as duplicate "
+                         "interactions were specified.")
+    
+    # Check that at least one interaction has been specified
+    if len(interactions) == 0:
+        raise ValueError("Cannot compute Hamiltonian, as no interactions were "
+                         "specified.")
+
+    # Obtain the basis set dimension
+    dim = spin_system.basis.dim
+
+    # Initialize the Hamiltonian
+    if config.sparse_superoperator:
+        H = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        H = np.zeros((dim, dim), dtype=complex)
+
+    # Compute the Zeeman and J-coupling Hamiltonians
+    for interaction in interactions:
+        if interaction == "zeeman":
+            H += _hamiltonian_Z(spin_system, side)
+        elif interaction == "chemical_shift":
+            H += _hamiltonian_CS(spin_system, side)
+        elif interaction == "J_coupling":
+            H += _hamiltonian_J(spin_system, side)
+        else:
+            raise ValueError(
+                f"Unsupported interaction type: {interaction}. "
+                f"The possible options are: {_INTERACTIONDEFAULT}."
+            )
+
+    # Remove small values to enhance sparsity
+    eliminate_small(H, config.zero_hamiltonian)
+
+    print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.')
+    print()
 
     return H

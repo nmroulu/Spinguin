@@ -11,14 +11,13 @@ if TYPE_CHECKING:
 # Imports
 import numpy as np
 import scipy.sparse as sp
-import time
 from functools import lru_cache
 from itertools import product
 from typing import Literal
-from spinguin.la import _la
-from spinguin._core.basis import idx_to_lq, parse_operator_string
-from spinguin._core._operators import op_T
+from spinguin._core._basis_indexing import idx_to_lq, parse_operator_string
 from spinguin._core._config import config
+from spinguin._core._la import CG_coeff, find_common_rows
+from spinguin._core._operators import op_T
 
 @lru_cache(maxsize=16)
 def _structure_coefficients(spin: float,
@@ -89,7 +88,7 @@ def _structure_coefficients(spin: float,
 
     return c
 
-def _sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
+def unit_superoperator(dim: int) -> np.ndarray | sp.csc_array:
     """
     Returns the unit superoperator.
 
@@ -97,8 +96,6 @@ def _sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     ----------
     dim : int
         Dimension of the basis set.
-    sparse: bool, default=True
-        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
@@ -107,7 +104,7 @@ def _sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
 
     # Create the unit operator
-    if sparse:
+    if config.sparse_superoperator:
         unit = sp.eye_array(dim, format='csc')
     else:
         unit = np.eye(dim)
@@ -115,18 +112,22 @@ def _sop_E(dim: int, sparse: bool=True) -> np.ndarray | sp.csc_array:
     return unit
 
 @lru_cache(maxsize=4096)
-def _sop_prod(op_def_bytes: bytes,
-              basis_bytes: bytes,
-              spins_bytes: bytes,
-              side: Literal["comm", "left", "right"],
-              sparse: bool=True) -> np.ndarray | sp.csc_array:
+def _superoperator_from_op_def(
+    op_def_bytes: bytes,
+    basis_bytes: bytes,
+    spins_bytes: bytes,
+    side: Literal["comm", "left", "right"],
+    sparse: bool=True
+) -> np.ndarray | sp.csc_array:
 
     # If commutation superoperator, calculate left and right superoperators and
     # return their difference
     if side == 'comm':
-        sop = \
-            _sop_prod(op_def_bytes, basis_bytes, spins_bytes, 'left', sparse) \
-            - _sop_prod(op_def_bytes, basis_bytes, spins_bytes, 'right', sparse)
+        left = _superoperator_from_op_def(op_def_bytes, basis_bytes,
+                                          spins_bytes, 'left', sparse)
+        right = _superoperator_from_op_def(op_def_bytes, basis_bytes,
+                                          spins_bytes, 'right', sparse)
+        sop = left - right
         return sop
     
     # Obtain the hashed elements
@@ -145,7 +146,7 @@ def _sop_prod(op_def_bytes: bytes,
 
     # Return the unit operator if no spins participate in the operator
     if len(idx_spins) == 0:
-        sop = _sop_E(dim, sparse)
+        sop = unit_superoperator(dim)
         return sop
 
     # Initialize lists for storing non-zero structure coefficients and their
@@ -200,7 +201,7 @@ def _sop_prod(op_def_bytes: bytes,
             
             # Operator definitions must match for the product of structure
             # coefficients to be nonzero
-            ind_j, ind_k = _la.find_common_rows(op_def_j, op_def_k)
+            ind_j, ind_k = find_common_rows(op_def_j, op_def_k)
 
             # Append the products of structure coefficients and the indices to
             # the lists
@@ -208,8 +209,7 @@ def _sop_prod(op_def_bytes: bytes,
             sop_j.append(j_op[ind_j])
             sop_k.append(k_op[ind_k])
 
-    # Concatenate the arrays
-    # NOTE: Sufficient to use 32-bit integers
+    # Concatenate the arrays (sufficient to use 32-bit integers)
     sop_j = np.concatenate(sop_j, dtype=np.int32)
     sop_k = np.concatenate(sop_k, dtype=np.int32)
     sop_vals = np.concatenate(sop_vals, dtype=complex)
@@ -221,53 +221,48 @@ def _sop_prod(op_def_bytes: bytes,
 
     return sop
 
-def sop_prod(op_def: np.ndarray,
-             basis: np.ndarray,
-             spins: np.ndarray,
-             side: Literal["comm", "left", "right"],
-             sparse: bool=True) -> np.ndarray | sp.csc_array:
+def superoperator_from_op_def(
+    spin_system: SpinSystem,
+    op_def: np.ndarray,
+    side: Literal["comm", "left", "right"],
+) -> np.ndarray | sp.csc_array:
     """
     Generates a product superoperator corresponding to the product operator
     defined by `op_def`.
     
     This function is called frequently and is cached for high performance.
 
-    TODO: Vastaava cache pohdinta kuin sop_T_coupled() -funktion kanssa.
-
     Parameters
     ----------
+    spin_system : SpinSystem
+        Spin system for which the superoperator is going to be created.
     op_def : ndarray
         Specifies the product operator to be generated. For example,
         input `np.array([0, 2, 0, 1])` will generate `E*T_10*E*T_11`. The
         indices are given by `N = l^2 + l - q`, where `l` is the rank and `q` is
         the projection.
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    spins : ndarray
-        A sequence of floats describing the spin quantum numbers of the spin
-        system.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator
         - 'left' -- left superoperator
         - 'right' -- right superoperator
-    sparse: bool, default=True
-        Specifies whether to return the operator as sparse or dense array.
 
     Returns
     -------
     sop : ndarray or csc_array
         Superoperator defined by `op_def`.
     """
-    
     # Convert types suitable for hashing
     op_def_bytes = op_def.tobytes()
-    basis_bytes = basis.tobytes()
-    spins_bytes = spins.tobytes()
+    basis_bytes = spin_system.basis.basis.tobytes()
+    spins_bytes = spin_system.spins.tobytes()
     
-    # Ensure a different instance is returned
-    sop = _sop_prod(op_def_bytes, basis_bytes, spins_bytes, side, sparse).copy()
+    # Create the superoperator and ensure that a different instance is returned
+    sop = _superoperator_from_op_def(op_def_bytes,
+                                     basis_bytes,
+                                     spins_bytes,
+                                     side,
+                                     config.sparse_superoperator).copy()
 
     return sop
 
@@ -349,232 +344,11 @@ def sop_prod_ref(op_def: np.ndarray,
 
     return sop
 
-def sop_from_string(operator: str,
-                    basis: np.ndarray,
-                    spins: np.ndarray,
-                    side: Literal["comm", "left", "right"],
-                    sparse: bool=True) -> np.ndarray | sp.csc_array:
-    """
-    Generates a superoperator from the user-specified `operators` string.
-
-    Parameters
-    ----------
-    operator : str
-        Defines the operator to be generated. The operator string must
-        follow the rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    spins : ndarray
-        A sequence of floats describing the spin quantum numbers of the spin
-        system.
-    side : {'comm', 'left', 'right'}
-        Specifies the type of superoperator:
-        - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
-    sparse: bool, default=True
-        Specifies whether to return the operator as sparse or dense array.
-
-    Returns
-    -------
-    sop : ndarray or csc_array
-        The requested superoperator.
-    """
-
-    # Obtain basis dimension and number of spins
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
-
-    # Initialize the superoperator
-    if sparse:
-        sop = sp.csc_array((dim, dim), dtype=complex)
-    else:
-        sop = np.zeros((dim, dim), dtype=complex)
-
-    # Get the operator definitions and coefficients
-    op_defs, coeffs = parse_operator_string(operator, nspins)
-
-    # Add to the operator
-    for op_def, coeff in zip(op_defs, coeffs):
-        sop = sop + coeff * sop_prod(op_def, basis, spins, side, sparse)
-
-    return sop
-
-@lru_cache(maxsize=4096)
-def _sop_T_coupled(basis_bytes: bytes,
-                   spins_bytes: bytes,
-                   l: int,
-                   q: int,
-                   spin_1: int,
-                   spin_2: int=None,
-                   sparse: bool=True) -> np.ndarray | sp.csc_array:
-
-    # Obtain the hashed elements
-    spins = np.frombuffer(spins_bytes, dtype=float)
-    basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0])
-
-    # Obtain the basis dimension and number of spins
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
-    
-    # Initialize the operator
-    if sparse:
-        sop = sp.csc_array((dim, dim), dtype=complex)
-    if not sparse:
-        sop = np.zeros((dim, dim), dtype=complex)
-
-    # Handle two-spin bilinear interactions
-    if isinstance(spin_2, int):
-
-        # Loop over the projections of the rank-1 spherical tensors
-        for q1 in range(-1, 2):
-            for q2 in range(-1, 2):
-
-                # Get the product operator definition corresponding to the
-                # coupled operator
-                op_def = np.zeros(nspins, dtype=int)
-                op_def[spin_1] = 2 - q1
-                op_def[spin_2] = 2 - q2
-
-                # Use the coupling of angular momenta equation
-                sop += _la.CG_coeff(1, q1, 1, q2, l, q) * \
-                       sop_prod(op_def, basis, spins, 'comm', sparse)
-
-    # Handle linear single-spin interactions
-    else:
-
-        # Only non-zero component for the second spherical tensor is (1, 0) = 1
-        for q1 in range(-1, 2):
-
-            # Get the product operator definition corresponding to the coupled
-            # operator
-            op_def = np.zeros(nspins, dtype=int)
-            op_def[spin_1] = 2 - q1
-
-            # Use the coupling of angular momenta equation
-            sop += _la.CG_coeff(1, q1, 1, 1, l, q) * \
-                   sop_prod(op_def, basis, spins, 'comm', sparse)
-
-    return sop
-
-def sop_T_coupled(basis: np.ndarray,
-                  spins: np.ndarray,
-                  l: int,
-                  q: int,
-                  spin_1: int,
-                  spin_2: int=None,
-                  sparse: bool=True) -> np.ndarray | sp.csc_array:
-    """
-    Computes the product superoperator corresponding to the coupled spherical
-    tensor operator of rank `l` and projection `q`, derived from two spherical
-    tensor operators of rank 1.
-
-    This function is frequently called and is cached for high performance.
-
-    TODO: Mieti, onko cache tarpeellinen. Nyt hyöty tulee vain, kun lasketaan R
-    useaan kertaan samalle systeemille (esim. eri magneettikentissä). Voisi
-    mahdollisesti olla asetus ohjelmassa (cachet päälle / pois).
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    spins : ndarray
-        A sequence of floats describing the spin quantum numbers of the spin
-        system.
-    l : int
-        Rank of the coupled operator.
-    q : int
-        Projection of the coupled operator.
-    spin_1 : int
-        Index of the first spin.
-    spin_2 : int, default=None
-        Index of the second spin. Leave empty for linear single-spin
-        interactions (e.g., shielding).
-    sparse: bool, default=True
-        Specifies whether to return the operator as sparse or dense array.
-
-    Returns
-    -------
-    sop : ndarray or csc_array
-        Coupled spherical tensor superoperator of rank `l` and projection `q`.
-    """
-    
-    # Convert to bytes to make hashing possible
-    basis_bytes = basis.tobytes()
-    spins_bytes = spins.tobytes()
-    
-    # Ensure a different instance is returned
-    sop = _sop_T_coupled(
-        basis_bytes, spins_bytes, l, q, spin_1, spin_2, sparse).copy()
-
-    return sop
-
-def sop_to_truncated_basis(index_map: list,
-                           sop: np.ndarray | sp.csc_array
-                           ) -> np.ndarray | sp.csc_array:
-    """
-    Transforms a superoperator to a truncated basis using the `index_map`,
-    which contains indices that determine the elements that are retained
-    after the transformation.
-
-    Parameters
-    ----------
-    index_map : list
-        Index mapping from the original basis to the truncated basis.
-    sop : ndarray or csc_array
-        Superoperators to be transformed.
-
-    Returns
-    -------
-    sop_transformed : ndarray or csc_array
-        Superoperator transformed into the truncated basis.
-    """
-
-    print("Transforming the superoperator into the truncated basis.")
-    time_start = time.time()
-
-    # Perform the transformation to truncated basis
-    sop_transformed = sop[np.ix_(index_map, index_map)]
-
-    print("Transformation completed.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
-
-    return sop_transformed
-
-def superoperator(spin_system: SpinSystem,
-                  operator: str,
-                  side: Literal["comm", "left", "right"] = "comm"
-                  ) -> np.ndarray | sp.csc_array:
+def superoperator(
+    spin_system: SpinSystem,
+    operator: str,
+    side: Literal["comm", "left", "right"] = "comm"
+) -> np.ndarray | sp.csc_array:
     """
     Generates a Liouville-space superoperator for the `spin_system` from the
     user-specified `operator` string.
@@ -624,19 +398,101 @@ def superoperator(spin_system: SpinSystem,
     sop : ndarray or csc_array
         An array representing the requested superoperator.
     """
-
     # Check that the basis has been built
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before constructing "
                          "superoperators.")
-        
-    # Construct the superoperator
-    sop = sop_from_string(
-        operator = operator,
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        side = side,
-        sparse = config.sparse_superoperator
-    )
-        
+
+    # Obtain basis dimension and number of spins
+    dim = spin_system.basis.dim
+    nspins = spin_system.nspins
+
+    # Initialize the superoperator
+    if config.sparse_superoperator:
+        sop = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        sop = np.zeros((dim, dim), dtype=complex)
+
+    # Get the operator definitions and coefficients
+    op_defs, coeffs = parse_operator_string(operator, nspins)
+
+    # Build the operator
+    for op_def, coeff in zip(op_defs, coeffs):
+        sop = sop + coeff * superoperator_from_op_def(spin_system, op_def, side)
+
+    return sop
+
+def superoperator_T_coupled(
+    spin_system: SpinSystem,
+    l: int,
+    q: int,
+    spin_1: int,
+    spin_2: int=None
+) -> np.ndarray | sp.csc_array:
+    """
+    Computes the product superoperator corresponding to the coupled spherical
+    tensor operator of rank `l` and projection `q`, derived from two spherical
+    tensor operators of rank 1.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the coupled superoperator is built.
+    l : int
+        Rank of the coupled operator.
+    q : int
+        Projection of the coupled operator.
+    spin_1 : int
+        Index of the first spin.
+    spin_2 : int, default=None
+        Index of the second spin. Leave empty for linear single-spin
+        interactions (e.g., shielding).
+
+    Returns
+    -------
+    sop : ndarray or csc_array
+        Coupled spherical tensor superoperator of rank `l` and projection `q`.
+    """
+    # Obtain the basis dimension and number of spins
+    dim = spin_system.basis.dim
+    nspins = spin_system.nspins
+    
+    # Initialize the superoperator
+    if config.sparse_superoperator:
+        sop = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        sop = np.zeros((dim, dim), dtype=complex)
+
+    # Handle two-spin bilinear interactions
+    if isinstance(spin_2, int):
+
+        # Loop over the projections of the rank-1 spherical tensors
+        for q1 in range(-1, 2):
+            for q2 in range(-1, 2):
+
+                # Get the product operator definition corresponding to the
+                # coupled operator
+                op_def = np.zeros(nspins, dtype=int)
+                op_def[spin_1] = 2 - q1
+                op_def[spin_2] = 2 - q2
+
+                # Use the coupling of angular momenta equation
+                sop += CG_coeff(1, q1, 1, q2, l, q) * \
+                       superoperator_from_op_def(spin_system, op_def, "comm")
+
+    # Handle linear single-spin interactions
+    else:
+
+        # Only non-zero component for the second spherical tensor is (1, 0) = 1
+        for q1 in range(-1, 2):
+
+            # Get the product operator definition corresponding to the coupled
+            # operator
+            op_def = np.zeros(nspins, dtype=int)
+            op_def[spin_1] = 2 - q1
+
+            # Use the coupling of angular momenta equation
+            sop += CG_coeff(1, q1, 1, 1, l, q) * \
+                   superoperator_from_op_def(spin_system, op_def, "comm")
+
     return sop

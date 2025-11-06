@@ -8,10 +8,11 @@ modules can be used to calculate its properties.
 # Imports
 import numpy as np
 from spinguin._core._basis import Basis
-from spinguin._core._relaxation_properties import RelaxationProperties
 from spinguin._core._data_io import read_array, read_tensors, read_xyz
-from spinguin.utils._type_conversions import arraylike_to_array
-from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._nmr_isotopes import ISOTOPES, dd_constant, Q_constant
+from spinguin._core._parameters import parameters
+from spinguin._core._relaxation_properties import RelaxationProperties
+from spinguin._core._type_conversions import arraylike_to_array
 
 class SpinSystem:
     """
@@ -370,6 +371,83 @@ class SpinSystem:
         """Returns the quadrupolar moments in m^2."""
         return np.array([ISOTOPES[isotope][2] * 1e-28
                          for isotope in self.isotopes])
+    
+    @property
+    def dd_coupling_tensors(self) -> np.ndarray:
+        """
+        Returns the the dipole-dipole coupling tensors between all nuclei
+        in the spin system as an array of dimensions (N, N, 3, 3).
+        """
+        # Convert the molecular coordinates to SI units
+        xyz = self.xyz * 1e-10
+
+        # Get the connector and distance arrays
+        connectors = xyz[:, np.newaxis] - xyz
+        distances = np.linalg.norm(connectors, axis=2)
+
+        # Initialize the array of tensors
+        dd_tensors = np.zeros((self.nspins, self.nspins, 3, 3))
+
+        # Go through each spin pair
+        for i in range(self.nspins):
+            for j in range(self.nspins):
+
+                # Only the lower triangular part is computed
+                if i > j:
+                    rr = np.outer(connectors[i, j], connectors[i, j])
+                    dd_tensors[i, j] = \
+                        dd_constant(self.gammas[i], self.gammas[j]) * \
+                        (3 * rr - distances[i, j]**2 * np.eye(3)) / \
+                        distances[i, j]**5
+
+        return dd_tensors
+    
+    # TODO: Check the sign (Perttu?)
+    @property
+    def Q_intr_tensors(self) -> np.ndarray:
+        """
+        Returns the quadrupolar interaction tensors for the spin system.
+        """
+        # Convert from a.u. to V/m^2
+        Q_tensors = -9.7173624292e21 * self.efg
+
+        # Create quadrupolar coupling constants
+        Q_constants = [Q_constant(S, Q) for S, Q in zip(self.spins, self.quad)]
+
+        # Multiply the tensors with the quadrupolar coupling constants
+        for i, val in enumerate(Q_constants):
+            Q_tensors[i] *= val
+
+        return Q_tensors
+    
+    @property
+    def shielding_intr_tensors(self) -> np.ndarray:
+        """
+        Returns the shielding interaction tensors for the spin system.
+        """
+
+        # Convert from ppm to dimensionless
+        shielding_tensors = self.shielding * 1e-6
+
+        # Create Larmor frequencies ("shielding constants" for relaxation)
+        # TODO: Check the sign of the Larmor frequency (Perttu?)
+        w0s = -self.gammas * parameters.magnetic_field
+
+        # Multiply with the Larmor frequencies
+        for i, val in enumerate(w0s):
+            shielding_tensors[i] *= val
+
+        return shielding_tensors
+    
+    @property
+    def resonance_frequencies(self) -> np.ndarray:
+        """
+        Returns the resonance frequencies for each nucleus in the spin system.
+        """
+        freqs = -self.gammas * \
+                parameters.magnetic_field * \
+                (1+self.chemical_shifts*1e-6)
+        return freqs
 
     ########################
     # BASIS SET PROPERTIES #

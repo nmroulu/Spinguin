@@ -1,15 +1,8 @@
 """
-This module provides the Basis class which is assigned as a part of `SpinSystem`
-object upon its instantiation. Here is an example of accessing the most
-important functionality of the class::
-
-    import spinguin as sg                   # Import the package
-    spin_system = sg.SpinSystem(["1H"])     # Create an example spin system
-    spin_system.basis.max_spin_order = 1    # Set the maximum spin order
-    spin_system.basis.build()               # Build the basis set
+This module provides the basis class, which manages the basis set of a spin
+system.
 """
-
-# Referencing SpinSystem class
+# Type checking
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -20,16 +13,14 @@ import numpy as np
 import scipy.sparse as sp
 import warnings
 from typing import Literal
-from spinguin._core._states import state_to_truncated_basis
-from spinguin._core._superoperators import sop_to_truncated_basis
-from spinguin._core.basis import (
-    make_basis,
+from spinguin._core._basis_build import build_basis
+from spinguin._core._basis_truncate import (
     truncate_basis_by_coherence,
     truncate_basis_by_coupling,
+    truncate_basis_by_indices,
     truncate_basis_by_zte,
-    truncate_basis_by_indices
+    truncate_objects
 )
-from spinguin.la import isvector
 from spinguin._core._config import config
 
 class Basis:
@@ -106,14 +97,55 @@ class Basis:
             self.max_spin_order = self._spin_system.nspins
 
         # Build the basis
-        self._basis = make_basis(spins = self._spin_system.spins,
-                                 max_spin_order = self.max_spin_order)
+        self._basis = build_basis(spins = self._spin_system.spins,
+                                  max_spin_order = self.max_spin_order)
+
+    def state_idx(self, op_def: np.ndarray) -> int:
+        """
+        Finds the index of the state defined by the `op_def` in the basis set.
+
+        Parameters
+        ----------
+        op_def : ndarray
+            A one-dimensional array of integers that describes the operator of
+            interest.
+
+        Returns
+        -------
+        idx : int
+            Index of the given state in the basis set.
+        """
+
+        # Check that the dimensions match
+        nspins = self._spin_system.nspins
+        if not nspins == op_def.shape[0]:
+            raise ValueError(
+                f"Cannot find the index of state, "
+                f"as the dimensions do not match. "
+                f"'basis': {nspins}, "
+                f"'op_def': {op_def.shape[0]}"
+            )
+
+        # Search for the state
+        is_equal = np.all(self._basis == op_def, axis=1)
+        idx = np.where(is_equal)[0]
+
+        # Confirm that exactly one state was found
+        if idx.shape[0] == 1:
+            idx = idx[0]
+        elif idx.shape[0] == 0:
+            raise ValueError(f"Could not find the index of state: {op_def}.")
+        else:
+            raise ValueError(f"Multiple states in the basis match with the "
+                             f"requested state: {op_def}")
+        
+        return idx
         
     def truncate_by_coherence(
-            self,
-            coherence_orders: list,
-            *objs: np.ndarray | sp.csc_array
-        ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        self,
+        coherence_orders: list,
+        *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
         """
         Truncates the basis set by retaining only the product operators that
         correspond to coherence orders specified in the `coherence_orders` list.
@@ -144,28 +176,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = truncate_objects(objs, index_map)
             return objs_transformed
         
     def truncate_by_coupling(
@@ -219,28 +230,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = truncate_objects(objs, index_map)
             return objs_transformed
         
     def truncate_by_zte(
@@ -295,28 +285,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = truncate_objects(objs, index_map)
             return objs_transformed
         
     def truncate_by_indices(
@@ -354,26 +323,5 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=indices,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=indices,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = truncate_objects(objs, indices)
             return objs_transformed

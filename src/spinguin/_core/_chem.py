@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 # Imports
 from functools import lru_cache
-from spinguin.utils import arraylike_to_array
+from spinguin._core._type_conversions import arraylike_to_array
 
 @lru_cache(maxsize=16)
 def _associate_index_map(

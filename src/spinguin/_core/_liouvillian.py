@@ -6,12 +6,15 @@ This module provides a function for calculating the Liouvillian.
 import numpy as np
 import scipy.sparse as sp
 
-def sop_L(H: np.ndarray | sp.csc_array = None,
-          R: np.ndarray | sp.csc_array = None,
-          K: np.ndarray | sp.csc_array = None) -> np.ndarray | sp.csc_array:
+def liouvillian(
+    H: np.ndarray | sp.csc_array = None,
+    R: np.ndarray | sp.csc_array = None,
+    K: np.ndarray | sp.csc_array = None
+) -> np.ndarray | sp.csc_array:
     """
-    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation
-    superoperator, and exchange superoperator.
+    Helper function that constructs the Liouvillian superoperator, -iH - R + K,
+    from the given Hamiltonian `H`, relaxation superoperator `R`, and exchange
+    superoperator `K`.
 
     Parameters
     ----------

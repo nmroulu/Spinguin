@@ -5,7 +5,7 @@ A test that constructs a superoperator for a large spin system.
 # Imports
 import numpy as np
 from time import perf_counter
-from spinguin._core.basis import make_basis
+from spinguin._core._basis._basis import make_basis
 from spinguin._core._superoperators import sop_prod
 
 print("Test started.")

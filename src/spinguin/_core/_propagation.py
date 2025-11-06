@@ -12,10 +12,10 @@ import time
 import numpy as np
 import scipy.sparse as sp
 import warnings
-from spinguin.la import expm
-from spinguin._core._superoperators import superoperator
-from spinguin.utils import HidePrints
 from spinguin._core._config import config
+from spinguin._core._hide_prints import HidePrints
+from spinguin._core._la import expm
+from spinguin._core._superoperators import superoperator
 
 def propagator(L: np.ndarray | sp.csc_array,
                t: float) -> np.ndarray | sp.csc_array:

@@ -1,32 +1,55 @@
-"""
-Spinguin package is desined to be imported as `import spinguin as sg`, which
-reveals the user-friendly functionality to the user. This is documented under
-the Spinguin (Basic). For more in-depth documentation of the package, including
-the documentation of the re-usable, core functionality, see Spinguin (Advanced).
-"""
+from ._core import (
+    # basis_indexing
+    coherence_order,
+    idx_to_lq,
+    lq_to_idx,
+    spin_order,
 
-# Make functionality from the API accessible directly under the spinguin
-# namespace
-from spinguin._core._chem import (
+    # chem
     associate,
     dissociate,
-    permute_spins
-)
-from spinguin._core import (
+    permutation_matrix,
+    permute_spins,
+
     # config
     config,
 
     # hamiltonian
     hamiltonian,
 
+    # hide_prints
+    HidePrints,
+
+    # la
+    angle_between_vectors,
+    cartesian_tensor_to_spherical_tensor,
+    CG_coeff,
+    comm,
+    custom_dot,
+    decompose_matrix,
+    eliminate_small,
+    expm,
+    expm_vec,
+    find_common_rows,
+    isvector,
+    norm_1,
+    principal_axis_system,
+    vector_to_spherical_tensor,
+
+    # liouvillian
+    liouvillian,
+
     # nmr_isotopes
+    dd_constant,
     gamma,
+    Q_constant,
     quadrupole_moment,
     resonance_frequency,
     spin,
 
     # operators
     op_E,
+    op_from_op_def,
     op_Sm,
     op_Sp,
     op_Sx,
@@ -44,7 +67,12 @@ from spinguin._core import (
     pulse,
 
     # relaxation
+    G0,
     relaxation,
+    tau_c_l,
+
+    # rotframe
+    rotating_frame,
 
     # spin_system
     SpinSystem,
@@ -56,40 +84,77 @@ from spinguin._core import (
     measure,
     singlet_state,
     state,
-    state_to_truncated_basis,
-    state_to_zeeman,
+    state_from_op_def,
+    state_vector_to_density_matrix,
     triplet_minus_state,
     triplet_plus_state,
     triplet_zero_state,
     unit_state,
 
-    # superoperator
-    superoperator
+    # superoperators
+    superoperator,
+    superoperator_from_op_def,
+    superoperator_T_coupled,
+    
+    # type_conversions
+    arraylike_to_array,
+    arraylike_to_tuple,
+    bytes_to_sparse,
+    sparse_to_bytes
 )
-from spinguin import la
-from spinguin import processing
-from spinguin import sequences
 
 __all__ = [
-    # _chem
+    # basis_indexing
+    "coherence_order",
+    "idx_to_lq",
+    "lq_to_idx",
+    "spin_order",
+
+    # chem
     "associate",
     "dissociate",
+    "permutation_matrix",
     "permute_spins",
     
-    # _core: config
-    config,
+    # config
+    "config",
 
-    # _core: hamiltonian
+    # hamiltonian
     "hamiltonian",
 
-    # _core: nmr_isotopes
+    # hide_prints
+    "HidePrints",
+
+    # la
+    "angle_between_vectors",
+    "cartesian_tensor_to_spherical_tensor",
+    "CG_coeff",
+    "comm",
+    "custom_dot",
+    "decompose_matrix",
+    "eliminate_small",
+    "expm",
+    "expm_vec",
+    "find_common_rows",
+    "isvector",
+    "norm_1",
+    "principal_axis_system",
+    "vector_to_spherical_tensor",
+
+    # liouvillian
+    "liouvillian",
+
+    # nmr_isotopes
+    "dd_constant",
     "gamma",
+    "Q_constant",
     "quadrupole_moment",
     "resonance_frequency",
     "spin",
 
-    # _core: operators
+    # operators
     "op_E",
+    "op_from_op_def",
     "op_Sm",
     "op_Sp",
     "op_Sx",
@@ -99,42 +164,46 @@ __all__ = [
     "op_T_coupled",
     "operator",
 
-    # _core: parameters
+    # parameters
     "parameters",
 
-    # _core: propagation
+    # propagation
     "propagator",
     "pulse",
 
-    # _core: relaxation
+    # relaxation
+    "G0",
     "relaxation",
+    "tau_c_l",
 
-    # _core: spin_system
+    # rotframe
+    "rotating_frame",
+
+    # spin_system
     "SpinSystem",
 
-    # _core: states
+    # states
     "alpha_state",
     "beta_state",
     "equilibrium_state",
     "measure",
     "singlet_state",
     "state",
-    "state_to_truncated_basis",
-    "state_to_zeeman",
+    "state_from_op_def",
+    "state_vector_to_density_matrix",
     "triplet_minus_state",
     "triplet_plus_state",
     "triplet_zero_state",
     "unit_state",
 
-    # _core: superoperator
+    # superoperators
     "superoperator",
+    "superoperator_from_op_def",
+    "superoperator_T_coupled",
 
-    # la
-    "la",
-
-    # processing
-    "processing",
-
-    # sequences
-    "sequences",
+    # type_conversions
+    "arraylike_to_array",
+    "arraylike_to_tuple",
+    "bytes_to_sparse",
+    "sparse_to_bytes",
 ]

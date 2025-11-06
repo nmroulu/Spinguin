@@ -4,7 +4,7 @@ import os
 from scipy.sparse import load_npz
 from spinguin._core._hamiltonian import _sop_H
 from spinguin._core._nmr_isotopes import ISOTOPES
-from spinguin._core.basis import make_basis
+from spinguin._core._basis._basis import make_basis
 
 class TestHamiltonian(unittest.TestCase):
     """

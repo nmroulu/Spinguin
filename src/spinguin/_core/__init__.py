@@ -1,28 +1,64 @@
 """
-This module provides the core functionality of Spinguin which is not dependent
-on any inbuilt class. Therefore, these functions can be reused in any context
-elsewhere. These can be accessed using::
-
-    # Replace module and function with something
-    from spinguin.core.module.function
-
-The preferred way to use Spinguin is to use the functionality under `spinguin`
-namespace, described in Spinguin (Basic), using::
+This module provides the core functionality of Spinguin, which is accessed
+directly under the Spinguin namespace. For example, to create an instance of
+SpinSystem, the user should::
 
     import spinguin as sg
+    spin_system = sg.SpinSystem
 """
 
 # Imports
-from spinguin._core._config import config
-from spinguin._core._hamiltonian import hamiltonian
-from spinguin._core._nmr_isotopes import (
+from ._basis_indexing import (
+    coherence_order,
+    idx_to_lq,
+    lq_to_idx,
+    spin_order
+)
+
+from ._chem import (
+    associate,
+    dissociate,
+    permutation_matrix,
+    permute_spins
+)
+
+from ._config import config
+
+from ._hamiltonian import hamiltonian
+
+from ._hide_prints import HidePrints
+
+from ._la import (
+    angle_between_vectors,
+    cartesian_tensor_to_spherical_tensor,
+    CG_coeff,
+    comm,
+    custom_dot,
+    decompose_matrix,
+    eliminate_small,
+    expm,
+    expm_vec,
+    find_common_rows,
+    isvector,
+    norm_1,
+    principal_axis_system,
+    vector_to_spherical_tensor
+)
+
+from ._liouvillian import liouvillian
+
+from ._nmr_isotopes import (
+    dd_constant,
     gamma,
+    Q_constant,
     quadrupole_moment,
     resonance_frequency,
     spin
 )
-from spinguin._core._operators import (
+
+from ._operators import (
     op_E,
+    op_from_op_def,
     op_Sm,
     op_Sp,
     op_Sx,
@@ -32,41 +68,104 @@ from spinguin._core._operators import (
     op_T_coupled,
     operator
 )
-from spinguin._core._parameters import parameters
-from spinguin._core._propagation import propagator, pulse
-from spinguin._core._relaxation._relaxation import relaxation
-from spinguin._core._spin_system import SpinSystem
-from spinguin._core._states import (
+
+from ._parameters import parameters
+
+from ._propagation import (
+    propagator,
+    pulse
+)
+
+from ._relaxation import (
+    G0,
+    relaxation,
+    tau_c_l
+)
+
+from ._rotframe import rotating_frame
+
+from ._spin_system import SpinSystem
+
+from ._states import (
     alpha_state,
     beta_state,
     equilibrium_state,
     measure,
     singlet_state,
     state,
-    state_to_truncated_basis,
-    state_to_zeeman,
+    state_from_op_def,
+    state_vector_to_density_matrix,
     triplet_minus_state,
     triplet_plus_state,
     triplet_zero_state,
     unit_state
 )
-from spinguin._core._superoperators import superoperator
+
+from ._superoperators import (
+    superoperator,
+    superoperator_from_op_def,
+    superoperator_T_coupled
+)
+
+from ._type_conversions import (
+    arraylike_to_array,
+    arraylike_to_tuple,
+    bytes_to_sparse,
+    sparse_to_bytes
+)
 
 __all__ = [
-    # spinguin._core._config
+    # basis_indexing
+    "coherence_order",
+    "idx_to_lq",
+    "lq_to_idx",
+    "spin_order",
+
+    # chem
+    "associate",
+    "dissociate",
+    "permutation_matrix",
+    "permute_spins",
+    
+    # config
     "config",
 
-    # spinguin._core._hamiltonian
+    # hamiltonian
     "hamiltonian",
 
-    # spinguin._core._nmr_isotopes
+    # hide_prints
+    "HidePrints",
+
+    # la
+    "angle_between_vectors",
+    "cartesian_tensor_to_spherical_tensor",
+    "CG_coeff",
+    "comm",
+    "custom_dot",
+    "decompose_matrix",
+    "eliminate_small",
+    "expm",
+    "expm_vec",
+    "find_common_rows",
+    "isvector",
+    "norm_1",
+    "principal_axis_system",
+    "vector_to_spherical_tensor",
+
+    # liouvillian
+    "liouvillian",
+
+    # nmr_isotopes
+    "dd_constant",
     "gamma",
+    "Q_constant",
     "quadrupole_moment",
     "resonance_frequency",
     "spin",
 
-    # spinguin._core._operators
+    # operators
     "op_E",
+    "op_from_op_def",
     "op_Sm",
     "op_Sp",
     "op_Sx",
@@ -76,33 +175,46 @@ __all__ = [
     "op_T_coupled",
     "operator",
 
-    # spinguin._core._parameters
+    # parameters
     "parameters",
 
-    # spinguin._core._propagation
+    # propagation
     "propagator",
     "pulse",
 
-    # spinguin._core._relaxation
+    # relaxation
+    "G0",
     "relaxation",
+    "tau_c_l",
 
-    # spinguin._core._spin_system
+    # rotframe
+    "rotating_frame",
+
+    # spin_system
     "SpinSystem",
 
-    # spinguin._core._states
+    # states
     "alpha_state",
     "beta_state",
     "equilibrium_state",
     "measure",
     "singlet_state",
     "state",
-    "state_to_truncated_basis",
-    "state_to_zeeman",
+    "state_from_op_def",
+    "state_vector_to_density_matrix",
     "triplet_minus_state",
     "triplet_plus_state",
     "triplet_zero_state",
     "unit_state",
 
-    # spinguin._core._superoperators
+    # superoperators
     "superoperator",
+    "superoperator_from_op_def",
+    "superoperator_T_coupled",
+
+    # type_conversions
+    "arraylike_to_array",
+    "arraylike_to_tuple",
+    "bytes_to_sparse",
+    "sparse_to_bytes",
 ]
