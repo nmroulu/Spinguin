@@ -35,3 +35,4 @@ from ._states import (
     triplet_zero_state,
     unit_state,
 )
+from ._superoperators import superoperator
