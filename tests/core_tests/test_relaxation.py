@@ -3,8 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 import os
 from spinguin._core._hamiltonian import sop_H
-from spinguin._core._relaxation import sop_R_redfield, sop_R_sr2k, \
-    ldb_thermalization, dd_constant, sop_R_phenomenological
+from spinguin._core._relaxation import _sop_R_redfield, _sop_R_sr2k, \
+    _ldb_thermalization, dd_constant, _sop_R_phenomenological
 from spinguin._core._propagation import _sop_pulse, _sop_propagator
 from spinguin._core._nmr_isotopes import ISOTOPES
 from spinguin._core._basis import make_basis, truncate_basis_by_coherence
@@ -129,14 +129,14 @@ class TestRelaxation(unittest.TestCase):
         )
         
         # Get the relaxation superoperator components
-        R_redfield = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad,
+        R_redfield = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad,
                                     xyz, shielding, efg,
                                     include_antisymmetric=False,
                                     include_dynamic_frequency_shift=False,
                                     relative_error=1e-6, interaction_zero=1e-9,
                                     relaxation_zero=1e-12, parallel_dim=1000,
                                     sparse=True)
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
+        R_sr2k = _sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R_redfield, B, sparse=True)
 
         # Build the total relaxation superoperator and thermalize
@@ -153,7 +153,7 @@ class TestRelaxation(unittest.TestCase):
             zero_value = 1e-12,
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
-        R = ldb_thermalization(R, H_left, T, zero_value=1e-18)
+        R = _ldb_thermalization(R, H_left, T, zero_value=1e-18)
         
         # Construct the total Liouvillian
         L = -1j*H - R
@@ -281,7 +281,7 @@ class TestRelaxation(unittest.TestCase):
         )
         
         # Get the Redfield relaxation superoperator
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+        R = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
@@ -289,7 +289,7 @@ class TestRelaxation(unittest.TestCase):
                            sparse=True)
         
         # Obtain R again (to check possible errors from caches etc.)
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+        R = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
@@ -319,7 +319,7 @@ class TestRelaxation(unittest.TestCase):
             zero_value = 1e-12,
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+        R = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
@@ -339,10 +339,10 @@ class TestRelaxation(unittest.TestCase):
         
         # Get the relaxation superoperator
         R1 = R2 = np.array([0.2, 0.2, 0.2, 0.2, 0.2, 1000])
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = _sop_R_phenomenological(basis, R1, R2, sparse=True)
 
         # Obtain R again (check for cache errors etc.)
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = _sop_R_phenomenological(basis, R1, R2, sparse=True)
 
         # Load the previously calculated R for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))
@@ -387,14 +387,14 @@ class TestRelaxation(unittest.TestCase):
         
         # Get the relaxation superoperator
         R1 = R2 = np.array([0.2, 0.2, 0.2, 0.2, 0.2, 1000])
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = _sop_R_phenomenological(basis, R1, R2, sparse=True)
 
         # Get the SR2K
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
+        R_sr2k = _sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R, B, sparse=True)
         
         # Get SR2K again to test cache errors etc.
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
+        R_sr2k = _sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R, B, sparse=True)
         
         # Add SR2K to the relaxation superoperator

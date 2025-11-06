@@ -19,6 +19,7 @@ from ._propagation import (
     propagator_to_rotframe,
     pulse
 )
+from ._relaxation import relaxation
 from ._spin_system import SpinSystem
 from ._states import (
     alpha_state,
