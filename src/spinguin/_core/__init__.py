@@ -12,7 +12,6 @@ from ._chem import (
     dissociate,
     permute_spins
 )
-from ._core import *
 from ._hamiltonian import hamiltonian
 from ._liouvillian import liouvillian
 from ._nmr_isotopes import (

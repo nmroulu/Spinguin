@@ -9,3 +9,4 @@ SpinSystem object with one 1H nucleus, the user should::
 
 # Make the core functionality directly available under the spinguin namespace
 from spinguin._core import *
+from spinguin import sequences
