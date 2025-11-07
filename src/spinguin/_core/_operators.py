@@ -3,6 +3,11 @@ This module provides functions for calculating quantum mechanical spin operators
 in Hilbert space. It includes functions for single-spin operators as well as
 many-spin product operators.
 """
+# Referencing SpinSystem class
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
 
 # Imports
 import numpy as np
@@ -10,6 +15,7 @@ import scipy.sparse as sp
 from functools import lru_cache
 from spinguin._core._la import comm, CG_coeff
 from spinguin._core._utils import idx_to_lq, parse_operator_string
+from spinguin._core._parameters import parameters
 
 def op_E(S: float, sparse: bool=True) -> np.ndarray | sp.csc_array:
     """
@@ -417,4 +423,59 @@ def op_from_string(spins: np.ndarray,
         op = op + coeff * op_prod(op_def, spins, include_unit=True,
                                   sparse=sparse)
 
+    return op
+
+def operator(spin_system: SpinSystem,
+             operator: str) -> np.ndarray | sp.csc_array:
+    """
+    Generates an operator for the `spin_system` in Hilbert space from the
+    user-specified `operator` string.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the operator is going to be generated.
+    operator : str
+        Defines the operator to be generated. The operator string must
+        follow the rules below:
+
+        - Cartesian and ladder operators: `I(component,index)` or 
+          `I(component)`. Examples:
+
+            - `I(x,4)` --> Creates x-operator for spin at index 4.
+            - `I(x)`--> Creates x-operator for all spins.
+
+        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+
+            - `T(1,-1,3)` --> \
+              Creates operator with `l=1`, `q=-1` for spin at index 3.
+            - `T(1, -1)` --> \
+              Creates operator with `l=1`, `q=-1` for all spins.
+            
+        - Product operators have `*` in between the single-spin operators:
+          `I(z,0) * I(z,1)`
+        - Sums of operators have `+` in between the operators:
+          `I(x,0) + I(x,1)`
+        - Unit operators are ignored in the input. Interpretation of these
+          two is identical: `E * I(z,1)`, `I(z,1)`
+        
+        Special case: An empty `operator` string is considered as unit
+        operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
+
+    Returns
+    -------
+    op : ndarray or csc_array
+        An array representing the requested operator.
+    """
+    # Construct the operator
+    op = op_from_string(
+        spins = spin_system.spins,
+        operator = operator,
+        sparse = parameters.sparse_operator
+    )
+    
     return op

@@ -14,6 +14,7 @@ from ._chem import (
 )
 from ._core import *
 from ._hamiltonian import hamiltonian
+from ._operators import operator
 from ._parameters import parameters
 from ._propagation import (
     propagator,

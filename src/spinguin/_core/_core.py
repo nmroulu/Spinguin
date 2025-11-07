@@ -39,7 +39,6 @@ __all__ = [
     "gamma",
     "inversion_recovery",
     "liouvillian",
-    "operator",
     "pulse_and_acquire",
     "quadrupole_moment",
     "resonance_frequency",
@@ -48,61 +47,6 @@ __all__ = [
     "spin",
     "time_axis",
 ]
-
-def operator(spin_system: SpinSystem,
-             operator: str) -> np.ndarray | sp.csc_array:
-    """
-    Generates an operator for the `spin_system` in Hilbert space from the
-    user-specified `operator` string.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the operator is going to be generated.
-    operator : str
-        Defines the operator to be generated. The operator string must
-        follow the rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or 
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit
-        operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-
-    Returns
-    -------
-    op : ndarray or csc_array
-        An array representing the requested operator.
-    """
-    # Construct the operator
-    op = _op_from_string(
-        spins = spin_system.spins,
-        operator = operator,
-        sparse = parameters.sparse_operator
-    )
-    
-    return op
 
 def spectral_width_to_dwell_time(
         spectral_width: float,
