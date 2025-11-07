@@ -1,6 +1,6 @@
 [project]
 name = "spinguin"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = ["numpy >= 1.26.4", "scipy >= 1.14.1", "sympy >= 1.13.1", "joblib >= 1.5.1"]
 requires-python = ">=3.11"
 authors = [
