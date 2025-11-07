@@ -15,6 +15,11 @@ from ._chem import (
 from ._core import *
 from ._hamiltonian import hamiltonian
 from ._liouvillian import liouvillian
+from ._nmr_isotopes import (
+    gamma,
+    quadrupole_moment,
+    spin
+)
 from ._operators import operator
 from ._parameters import parameters
 from ._propagation import (

@@ -13,7 +13,6 @@ from spinguin._core._parameters import parameters
 from spinguin._core._spin_system import SpinSystem
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._liouvillian import liouvillian
-from spinguin._core._nmr_isotopes import gamma, quadrupole_moment, spin
 from spinguin._core._propagation import (
     propagator_to_rotframe,
     propagator,
@@ -26,11 +25,8 @@ from spinguin._core._states import (
 )
 
 __all__ = [
-    "gamma",
     "inversion_recovery",
     "pulse_and_acquire",
-    "quadrupole_moment",
-    "spin",
 ]
 
 def pulse_and_acquire(
