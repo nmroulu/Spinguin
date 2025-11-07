@@ -22,6 +22,14 @@ from ._propagation import (
     pulse
 )
 from ._relaxation import relaxation
+from ._specutils import (
+    fourier_transform,
+    frequency_to_chemical_shift,
+    resonance_frequency,
+    spectral_width_to_dwell_time,
+    spectrum,
+    time_axis
+)
 from ._spin_system import SpinSystem
 from ._states import (
     alpha_state,

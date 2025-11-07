@@ -7,167 +7,32 @@ of the Spinguin package.
 
 # Imports
 import numpy as np
-import scipy.sparse as sp
 from copy import deepcopy
-from typing import Literal
 
 from spinguin._core._parameters import parameters
 from spinguin._core._spin_system import SpinSystem
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._liouvillian import sop_L as liouvillian
 from spinguin._core._nmr_isotopes import gamma, quadrupole_moment, spin
-from spinguin._core._operators import op_from_string as _op_from_string
 from spinguin._core._propagation import (
     propagator_to_rotframe,
     propagator,
     pulse
 )
 from spinguin._core._relaxation import relaxation
-from spinguin._core._specutils import (
-    frequency_to_chemical_shift,
-    resonance_frequency as _resonance_frequency,
-    spectral_width_to_dwell_time as _spectral_width_to_dwell_time,
-    spectrum as _spectrum
-)
 from spinguin._core._states import (
     equilibrium_state,
     measure
 )
 
 __all__ = [
-    "frequency_to_chemical_shift",
     "gamma",
     "inversion_recovery",
     "liouvillian",
     "pulse_and_acquire",
     "quadrupole_moment",
-    "resonance_frequency",
-    "spectral_width_to_dwell_time",
-    "spectrum",
     "spin",
-    "time_axis",
 ]
-
-def spectral_width_to_dwell_time(
-        spectral_width: float,
-        isotope: str
-) -> float:
-    """
-    Calculates the dwell time (in seconds) from the spectral width given in ppm.
-
-    Parameters
-    ----------
-    spectral_width : float
-        Spectral width in ppm.
-    isotope: str
-        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
-        required for the conversion.
-
-    Returns
-    -------
-    dwell_time : float
-        Dwell time in seconds.
-
-    Notes
-    -----
-    Requires that the following is set:
-
-    - parameters.magnetic_field
-    """
-    # Obtain the dwell time
-    dwell_time = _spectral_width_to_dwell_time(
-        spectral_width = spectral_width,
-        isotope = isotope,
-        B = parameters.magnetic_field
-    )
-
-    return dwell_time
-
-def spectrum(signal: np.ndarray,
-             dwell_time: float,
-             normalize: bool = True,
-             part: Literal["real", "imag"] = "real"
-             ) -> tuple[np.ndarray, np.ndarray]:
-    """
-    A wrapper function for the Fourier transform. Computes the Fourier transform
-    and returns the frequency and spectrum (either the real or imaginary part of 
-    the Fourier transform).
-
-    Parameters
-    ----------
-    signal : ndarray
-        Input signal in the time domain.
-    dwell_time : float
-        Time step between consecutive samples in the signal.
-    normalize : bool, default=True
-        Whether to normalize the Fourier transform.
-    part : {'real', 'imag'}
-        Specifies which part of the Fourier transform to return. Can be "real" 
-        or "imag".
-
-    Returns
-    -------
-    freqs : ndarray
-        Frequencies corresponding to the Fourier-transformed signal.
-    spectrum : ndarray
-        Specified part (real or imaginary) of the Fourier-transformed signal 
-        in the frequency domain.
-
-    Notes
-    -----
-    Required global parameters:
-
-    - parameters.dwell_time
-    """
-    # Compute the Fourier transform
-    freqs, spectrum = _spectrum(
-        signal = signal,
-        dt = dwell_time,
-        normalize = normalize,
-        part = part
-    )
-
-    return freqs, spectrum
-
-def resonance_frequency(
-        isotope: str,
-        offset: float = 0,
-        unit: Literal["Hz", "rad/s"] = "Hz"
-) -> float:
-    """
-    Computes the resonance frequency of the given `isotope` at the specified
-    magnetic field.
-
-    Parameters
-    ----------
-    isotope : str
-        Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
-        required for the conversion.
-    offset : float, default=0
-        Offset in ppm.
-    unit : {'Hz', 'rad/s'}
-        Specifies in which units the frequency is returned.
-    
-    Returns
-    -------
-    omega : float
-        Resonance frequency in the requested units.
-
-    Notes
-    -----
-    Required global parameters:
-
-    - parameters.magnetic_field
-    """
-    # Get the resonance frequency
-    omega = _resonance_frequency(
-        isotope = isotope,
-        B = parameters.magnetic_field,
-        delta = offset,
-        unit = unit
-    )
-
-    return omega
 
 def pulse_and_acquire(
         spin_system: SpinSystem,
@@ -340,22 +205,3 @@ def inversion_recovery(
         rho = P @ rho
 
     return magnetizations
-
-def time_axis(npoints: int, time_step: float):
-    """
-    Generates a 1D array with `npoints` elements using a constant `time_step`.
-
-    Parameters
-    ----------
-    npoints : int
-        Number of points.
-    time_step : float
-        Time step (in seconds).
-    """
-    # Obtain the time array
-    start = 0
-    stop = npoints * time_step
-    num = npoints
-    t_axis = np.linspace(start, stop, num, endpoint=False)
-
-    return t_axis

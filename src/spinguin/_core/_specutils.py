@@ -8,11 +8,14 @@ NMR and signal processing.
 import numpy as np
 from typing import Literal
 from spinguin._core._nmr_isotopes import gamma
+from spinguin._core._parameters import parameters
 
-def resonance_frequency(isotope: str,
-                        B: float,
-                        delta: float = 0,
-                        unit: Literal["Hz", "rad/s"] = "Hz") -> float:
+def resonance_frequency(
+    isotope: str,
+    B: float = None,
+    delta: float = 0,
+    unit: Literal["Hz", "rad/s"] = "Hz"
+) -> float:
     """
     Computes the resonance frequency of a nucleus at specified magnetic field
     and chemical shift.
@@ -21,8 +24,9 @@ def resonance_frequency(isotope: str,
     ----------
     isotope : str
         Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio.
-    B : float
-        Magnetic field strength in the units of T.
+    B : float, default=None
+        Magnetic field strength in the units of T. If not supplied, the function 
+        uses the magnetic field determined in parameters.magnetic_field.
     delta : float, default=0
         Chemical shift in ppm.
     unit :{'Hz', 'rad/s'}
@@ -33,6 +37,16 @@ def resonance_frequency(isotope: str,
     omega : float
         Resonance frequency of the given nucleus.
     """
+    # Retrieve the magnetic field
+    if B is None:
+
+        # Check that the magnetic field has been set in parameters
+        if parameters.magnetic_field is None:
+            raise ValueError("'magnetic_field' has not been set in parameters.")
+        
+        # Set the magnetic field
+        B = parameters.magnetic_field
+
     # Calculate the resonance frequency
     omega = - gamma(isotope, unit) * B * (1 + delta*1e-6)
 
@@ -80,11 +94,12 @@ def fourier_transform(signal: np.ndarray,
 
     return freqs, fft_signal
 
-def spectrum(signal: np.ndarray,
-             dt: float,
-             normalize: bool = True,
-             part: Literal["real", "imag"] = "real"
-             ) -> tuple[np.ndarray, np.ndarray]:
+def spectrum(
+    signal: np.ndarray,
+    dt: float,
+    normalize: bool = True,
+    part: Literal["real", "imag"] = "real"
+) -> tuple[np.ndarray, np.ndarray]:
     """
     A wrapper function for the Fourier transform. Computes the Fourier transform
     and returns the frequency and spectrum (either the real or imaginary part of 
@@ -148,9 +163,11 @@ def frequency_to_chemical_shift(
     """
     return (frequency - reference_frequency) / spectrometer_frequency * 1e6
 
-def spectral_width_to_dwell_time(spectral_width: float,
-                                 isotope: str,
-                                 B: float) -> float:
+def spectral_width_to_dwell_time(
+    spectral_width: float,
+    isotope: str,
+    B: float=None
+) -> float:
     """
     Calculates the dwell time (in seconds) from the spectral width given in ppm.
 
@@ -161,14 +178,25 @@ def spectral_width_to_dwell_time(spectral_width: float,
     isotope : str
         Nucleus symbol (e.g. `'1H'`) used to select the gyromagnetic ratio 
         required for the conversion.
-    B : float
-        Magnetic field of the spectrometer in T.
+    B : float, default=None
+        Magnetic field of the spectrometer in T. If not supplied, the magnetic
+        field is obtained from parameters.magnetic_field.
 
     Returns
     -------
     dwell_time : float
         Dwell time in seconds.
     """
+    # Retrieve the magnetic field
+    if B is None:
+
+        # Check that the magnetic field has been set in parameters
+        if parameters.magnetic_field is None:
+            raise ValueError("'magnetic_field' has not been set in parameters.")
+        
+        # Set the magnetic field
+        B = parameters.magnetic_field
+
     # Calculate the spectral width in Hz
     spectral_width = spectral_width * 1e-6 * gamma(isotope, "Hz") * B
 
@@ -176,3 +204,22 @@ def spectral_width_to_dwell_time(spectral_width: float,
     dwell_time = 1/spectral_width
 
     return dwell_time
+
+def time_axis(npoints: int, time_step: float):
+    """
+    Generates a 1D array with `npoints` elements using a constant `time_step`.
+
+    Parameters
+    ----------
+    npoints : int
+        Number of points.
+    time_step : float
+        Time step (in seconds).
+    """
+    # Obtain the time array
+    start = 0
+    stop = npoints * time_step
+    num = npoints
+    t_axis = np.linspace(start, stop, num, endpoint=False)
+
+    return t_axis
