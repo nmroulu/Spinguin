@@ -10,8 +10,26 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine output folder
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == refs/heads/main ]]; then
+            echo "folder=latest" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"
+            echo "folder=${tag}" >> $GITHUB_OUTPUT
+          else
+            echo "This workflow can only be run on the 'main' branch or a tag."
+            exit 1
+          fi
+
+      - name: Set-up Python
+        uses: actions/setup-python@v5
 
       - name: Install dependencies
         run: |
@@ -21,14 +39,14 @@ jobs:
       - name: Sphinx build
         run: |
           cd docs
-          make clean
           make html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/build/html
-          force_orphan: true
+          destination_dir: ${{ steps.vars.outputs.folder }}
+          keep_files: true
+          commit_message: "Deploy ${{ steps.vars.outputs.folder }} docs"
