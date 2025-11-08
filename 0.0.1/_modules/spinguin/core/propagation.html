@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin.core.propagation &#8212; Spinguin 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=e645c8fa"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/core/propagation';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced usage</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../spinguin.html">Spinguin (Basic)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.html">Main functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.parameters.html">Global parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.basis.html">Basis set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.relaxation_properties.html">Relaxation properties</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../spinguin.core.html">Spinguin (Advanced)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.basis.html">spinguin.core.basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.chem.html">spinguin.core.chem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.data_io.html">spinguin.core.data_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.hamiltonian.html">spinguin.core.hamiltonian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.hide_prints.html">spinguin.core.hide_prints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.intersect_indices.html">spinguin.core.intersect_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.la.html">spinguin.core.la</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.liouvillian.html">spinguin.core.liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.nmr_isotopes.html">spinguin.core.nmr_isotopes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.operators.html">spinguin.core.operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.propagation.html">spinguin.core.propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.relaxation.html">spinguin.core.relaxation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.sparse_dot.html">spinguin.core.sparse_dot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.specutils.html">spinguin.core.specutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.states.html">spinguin.core.states</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.superoperators.html">spinguin.core.superoperators</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin.core.propagation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module is responsible for calculating time propagators.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.la</span><span class="w"> </span><span class="kn">import</span> <span class="n">expm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.superoperators</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_from_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
+
+<div class="viewcode-block" id="sop_propagator">
+<a class="viewcode-back" href="../../../spinguin.core.propagation.html#spinguin.core.propagation.sop_propagator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_propagator</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+                   <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                   <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span><span class="p">,</span>
+                   <span class="n">density_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs the time propagator exp(L*t).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    L : ndarray or csc_array</span>
+<span class="sd">        Liouvillian superoperator, L = -iH - R + K.</span>
+<span class="sd">    t : float</span>
+<span class="sd">        Time step of the simulation in seconds.</span>
+<span class="sd">    zero_value : float, default=1e-18</span>
+<span class="sd">        Calculating the propagator involves a matrix exponential, which is</span>
+<span class="sd">        calculated using the scaling and squaring method together with Taylor</span>
+<span class="sd">        series. This threshold is used to estimate the convergence of the Taylor</span>
+<span class="sd">        series and to eliminate small values during the squaring step.</span>
+<span class="sd">    density_threshold : float, default=0.5</span>
+<span class="sd">        Sparse matrix is returned if the density is less than this threshold.</span>
+<span class="sd">        Otherwise dense matrix is returned.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    expm_Lt : csc_array or ndarray</span>
+<span class="sd">        Time propagator exp(L*t).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constructing propagator...&quot;</span><span class="p">)</span>
+    <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Compute the matrix exponential</span>
+    <span class="n">expm_Lt</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">L</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the density of the propagator</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">expm_Lt</span><span class="o">.</span><span class="n">nnz</span> <span class="o">/</span> <span class="p">(</span><span class="n">expm_Lt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Propagator density: </span><span class="si">{</span><span class="n">density</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert to NumPy array if density exceeds the threshold</span>
+    <span class="k">if</span> <span class="n">density</span> <span class="o">&gt;</span> <span class="n">density_threshold</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Density exceeds threshold. Converting to NumPy array.&quot;</span><span class="p">)</span>
+        <span class="n">expm_Lt</span> <span class="o">=</span> <span class="n">expm_Lt</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Propagator constructed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> seconds.&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">expm_Lt</span></div>
+
+
+<div class="viewcode-block" id="propagator_to_rotframe">
+<a class="viewcode-back" href="../../../spinguin.core.propagation.html#spinguin.core.propagation.propagator_to_rotframe">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">propagator_to_rotframe</span><span class="p">(</span>
+        <span class="n">sop_P</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+        <span class="n">sop_H0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+        <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms the time propagator to the rotating frame.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sop_P : ndarray or csc_array</span>
+<span class="sd">        Time propagator.</span>
+<span class="sd">    sop_H0 : ndarray or csc_array</span>
+<span class="sd">        Hamiltonian superoperator representing the interaction used</span>
+<span class="sd">        to define the rotating frame transformation.</span>
+<span class="sd">    t : float</span>
+<span class="sd">        Time step of the simulation in seconds.</span>
+<span class="sd">    zero_value : float, default=1e-18</span>
+<span class="sd">        Calculating the rotating frame transformation involves a matrix</span>
+<span class="sd">        exponential, which is calculated using the scaling and squaring method</span>
+<span class="sd">        together with Taylor series. This threshold is used to estimate the</span>
+<span class="sd">        convergence of the Taylor series and to eliminate small values during</span>
+<span class="sd">        the squaring step.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sop_P : ndarray or csc_array</span>
+<span class="sd">        The time propagator transformed into the rotating frame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Applying rotating frame transformation...&quot;</span><span class="p">)</span>
+    <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Acquire matrix exponential from the Hamiltonian</span>
+    <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+        <span class="n">expm_H0t</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">sop_H0</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+    <span class="c1"># Convert the time propagator to rotating frame</span>
+    <span class="n">sop_P</span> <span class="o">=</span> <span class="n">expm_H0t</span> <span class="o">@</span> <span class="n">sop_P</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rotating frame transformation applied in &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">sop_P</span></div>
+
+
+<div class="viewcode-block" id="sop_pulse">
+<a class="viewcode-back" href="../../../spinguin.core.propagation.html#spinguin.core.propagation.sop_pulse">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_pulse</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+              <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+              <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a superoperator corresponding to the pulse described</span>
+<span class="sd">    by the given operator and angle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array containing the spin quantum numbers of each spin.</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        Defines the pulse to be generated. The operator string must</span>
+<span class="sd">        follow the rules below:</span>
+
+<span class="sd">        - Cartesian and ladder operators: `I(component,index)` or</span>
+<span class="sd">          `I(component)`. Examples:</span>
+
+<span class="sd">            - `I(x,4)` --&gt; Creates x-operator for spin at index 4.</span>
+<span class="sd">            - `I(x)`--&gt; Creates x-operator for all spins.</span>
+
+<span class="sd">        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:</span>
+
+<span class="sd">            - `T(1,-1,3)` --&gt; \</span>
+<span class="sd">              Creates operator with `l=1`, `q=-1` for spin at index 3.</span>
+<span class="sd">            - `T(1, -1)` --&gt; \</span>
+<span class="sd">              Creates operator with `l=1`, `q=-1` for all spins.</span>
+<span class="sd">            </span>
+<span class="sd">        - Product operators have `*` in between the single-spin operators:</span>
+<span class="sd">          `I(z,0) * I(z,1)`</span>
+<span class="sd">        - Sums of operators have `+` in between the operators:</span>
+<span class="sd">          `I(x,0) + I(x,1)`</span>
+<span class="sd">        - Unit operators are ignored in the input. Interpretation of these</span>
+<span class="sd">          two is identical: `E * I(z,1)`, `I(z,1)`</span>
+<span class="sd">        </span>
+<span class="sd">        Special case: An empty `operator` string is considered as unit operator.</span>
+
+<span class="sd">        Whitespace will be ignored in the input.</span>
+
+<span class="sd">        NOTE: Indexing starts from 0!</span>
+<span class="sd">    angle : float</span>
+<span class="sd">        Pulse angle in degrees.</span>
+<span class="sd">    sparse : bool, default=True</span>
+<span class="sd">        Specifies whether to construct the pulse superoperator as sparse or</span>
+<span class="sd">        dense array.</span>
+<span class="sd">    zero_value : float, default=1e-18</span>
+<span class="sd">        Calculating the pulse superoperator involves a matrix exponential, which</span>
+<span class="sd">        is calculated using the scaling and squaring method together with Taylor</span>
+<span class="sd">        series. This threshold is used to estimate the convergence of the Taylor</span>
+<span class="sd">        series and to eliminate small values during the squaring step.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pul : ndarray or csc_array</span>
+<span class="sd">        Superoperator corresponding to the applied pulse.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating a pulse superoperator...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Show a warning if pulse is generated using a product operator</span>
+    <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">operator</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Applying a pulse using a product operator does not have &quot;</span>
+                      <span class="s2">&quot;a well-defined angle.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Generate the operator</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">sop_from_string</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Convert the angle to radians</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">angle</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="c1"># Construct the pulse propagator</span>
+    <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+        <span class="n">pul</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">angle</span> <span class="o">*</span> <span class="n">op</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pulse constructed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> seconds.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pul</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

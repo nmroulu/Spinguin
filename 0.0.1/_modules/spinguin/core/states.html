@@ -1,0 +1,1216 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin.core.states &#8212; Spinguin 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=e645c8fa"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/core/states';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced usage</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../spinguin.html">Spinguin (Basic)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.html">Main functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.parameters.html">Global parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.basis.html">Basis set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.relaxation_properties.html">Relaxation properties</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../spinguin.core.html">Spinguin (Advanced)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.basis.html">spinguin.core.basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.chem.html">spinguin.core.chem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.data_io.html">spinguin.core.data_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.hamiltonian.html">spinguin.core.hamiltonian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.hide_prints.html">spinguin.core.hide_prints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.intersect_indices.html">spinguin.core.intersect_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.la.html">spinguin.core.la</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.liouvillian.html">spinguin.core.liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.nmr_isotopes.html">spinguin.core.nmr_isotopes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.operators.html">spinguin.core.operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.propagation.html">spinguin.core.propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.relaxation.html">spinguin.core.relaxation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.sparse_dot.html">spinguin.core.sparse_dot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.specutils.html">spinguin.core.specutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.states.html">spinguin.core.states</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.superoperators.html">spinguin.core.superoperators</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin.core.states</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides functions for creating state vectors.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">const</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.la</span><span class="w"> </span><span class="kn">import</span> <span class="n">expm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">op_prod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.basis</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_operator_string</span><span class="p">,</span> <span class="n">state_idx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
+
+<div class="viewcode-block" id="unit_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.unit_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a unit state vector. This is equivalent to the density matrix, which</span>
+<span class="sd">    has ones on the diagonal. Because the basis set is normalized, the</span>
+<span class="sd">    coefficient of the unit operator in the state vector is equal to the norm of</span>
+<span class="sd">    the unit operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+<span class="sd">    normalized : bool, default=True</span>
+<span class="sd">        If set to True, the function will return a state vector that represents</span>
+<span class="sd">        the trace-normalized density matrix. If False, returns a state vector</span>
+<span class="sd">        that corresponds to the identity operator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the unit state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Obtain the basis dimension</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Acquire the spin multiplicities</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the state vector</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Assign unit state coefficient</span>
+    <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
+        <span class="n">rho</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rho</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Convert to csc_array if requesting sparse</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">8192</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_state_from_op_def</span><span class="p">(</span>
+    <span class="n">basis_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spins_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">op_def_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+    
+    <span class="c1"># Obtain the hashed elements</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spins_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">op_def_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Obtain the basis dimension and spin multiplicities</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the state vector</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Get the state index</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">state_idx</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">op_def</span><span class="p">)</span>
+
+    <span class="c1"># Find indices of the active and inactive spins</span>
+    <span class="n">idx_active</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">idx_inactive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Calculate the norm of the active operator part if there are active</span>
+    <span class="c1"># spins</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_active</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># TODO: Benchmark sparse vs dense implementation</span>
+        <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+            <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Otherwise set it to one</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">op_norm</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="c1"># Calculate the norm of the unit operator part</span>
+    <span class="n">unit_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">[</span><span class="n">idx_inactive</span><span class="p">]))</span>
+
+    <span class="c1"># Total norm of the operator</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">op_norm</span> <span class="o">*</span> <span class="n">unit_norm</span>
+
+    <span class="c1"># Set the properly normalized coefficient</span>
+    <span class="n">rho</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span>
+
+    <span class="c1"># Convert to csc_array if requesting sparse</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rho</span>
+
+<div class="viewcode-block" id="state_from_op_def">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.state_from_op_def">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_from_op_def</span><span class="p">(</span>
+        <span class="n">basis</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">spins</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">op_def</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">sparse</span> <span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a state from the given operator definition. The output of this</span>
+<span class="sd">    function is a column vector where the requested state has been populated.</span>
+<span class="sd">    </span>
+<span class="sd">    Normalization:</span>
+<span class="sd">    The output of this function corresponds to the non-normalized operator.</span>
+<span class="sd">    However, because the basis set operators are constructed from products of</span>
+<span class="sd">    normalized single-spin spherical tensor operators, requesting a state that</span>
+<span class="sd">    corresponds to any operator `O` will result in a coefficient of `norm(O)`</span>
+<span class="sd">    for the state.</span>
+
+<span class="sd">    NOTE: This function is sometimes called often and is cached for high</span>
+<span class="sd">    performance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    op_def : ndarray</span>
+<span class="sd">        An array of integers that specify the product operator.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the requested state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert types suitable for hashing</span>
+    <span class="n">basis_bytes</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="n">spins_bytes</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="n">op_def_bytes</span> <span class="o">=</span> <span class="n">op_def</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+    <span class="c1"># Ensure that a different instance is returned</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_op_def</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spins_bytes</span><span class="p">,</span> <span class="n">op_def_bytes</span><span class="p">,</span>
+                             <span class="n">sparse</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_state_from_string</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+                       <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+                       <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+
+    <span class="c1"># Obtain the hashed elements</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spins_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+
+    <span class="c1"># Obtain the basis dimension, number of spins and spin multiplicities</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the state vector</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Get the operator definition and coefficients</span>
+    <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+
+    <span class="c1"># Get the state indices</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">state_idx</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">op_def</span><span class="p">)</span> <span class="k">for</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="n">op_defs</span><span class="p">]</span>
+
+    <span class="c1"># Assign the state</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">op_defs</span><span class="p">):</span>
+
+        <span class="c1"># Find indices of the active and inactive spins</span>
+        <span class="n">idx_active</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx_inactive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Calculate the norm of the active operator part if there are active</span>
+        <span class="c1"># spins</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_active</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># TODO: Benchmark sparse vs dense implementation</span>
+            <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Otherwise set it to one</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">op_norm</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="c1"># Calculate the norm of the unit operator part</span>
+        <span class="n">unit_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">[</span><span class="n">idx_inactive</span><span class="p">]))</span>
+
+        <span class="c1"># Total norm of the operator</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">op_norm</span> <span class="o">*</span> <span class="n">unit_norm</span>
+
+        <span class="c1"># Set the properly normalized coefficient</span>
+        <span class="n">rho</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">norm</span>
+
+    <span class="c1"># Convert to csc_array if requesting sparse</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rho</span>
+
+<div class="viewcode-block" id="state_from_string">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.state_from_string">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                      <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                      <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                      <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a column vector representing the density matrix as a</span>
+<span class="sd">    linear combination of spin operators. Each element of the vector corresponds</span>
+<span class="sd">    to the coefficient of a specific spin operator in the expansion.</span>
+<span class="sd">    </span>
+<span class="sd">    Normalization:</span>
+<span class="sd">    The output of this function uses a normalised basis built from normalised</span>
+<span class="sd">    products of single-spin spherical tensor operators. However, the</span>
+<span class="sd">    coefficients are scaled so that the resulting linear combination represents</span>
+<span class="sd">    the non-normalised version of the requested operator.</span>
+
+<span class="sd">    NOTE: This function is sometimes called often and is cached for high</span>
+<span class="sd">    performance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        Defines the state to be generated. The operator string must follow the</span>
+<span class="sd">        rules below:</span>
+
+<span class="sd">        - Cartesian and ladder operators: `I(component,index)` or</span>
+<span class="sd">          `I(component)`. Examples:</span>
+
+<span class="sd">            - `I(x,4)` --&gt; Creates x-operator for spin at index 4.</span>
+<span class="sd">            - `I(x)`--&gt; Creates x-operator for all spins.</span>
+
+<span class="sd">        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:</span>
+
+<span class="sd">            - `T(1,-1,3)` --&gt; \</span>
+<span class="sd">              Creates operator with `l=1`, `q=-1` for spin at index 3.</span>
+<span class="sd">            - `T(1, -1)` --&gt; \</span>
+<span class="sd">              Creates operator with `l=1`, `q=-1` for all spins.</span>
+<span class="sd">            </span>
+<span class="sd">        - Product operators have `*` in between the single-spin operators:</span>
+<span class="sd">          `I(z,0) * I(z,1)`</span>
+<span class="sd">        - Sums of operators have `+` in between the operators:</span>
+<span class="sd">          `I(x,0) + I(x,1)`</span>
+<span class="sd">        - Unit operators are ignored in the input. Interpretation of these</span>
+<span class="sd">          two is identical: `E * I(z,1)`, `I(z,1)`</span>
+<span class="sd">        </span>
+<span class="sd">        Special case: An empty `operator` string is considered as unit operator.</span>
+
+<span class="sd">        Whitespace will be ignored in the input.</span>
+
+<span class="sd">        NOTE: Indexing starts from 0!</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the requested state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Convert types suitable for hashing</span>
+    <span class="n">basis_bytes</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="n">spins_bytes</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+    <span class="c1"># Ensure that a different instance is returned</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_string</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spins_bytes</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="state_to_zeeman">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.state_to_zeeman">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_to_zeeman</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+                    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes the state vector defined in the normalized spherical tensor basis</span>
+<span class="sd">    and converts it into the Zeeman eigenbasis. Useful for error checking.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector defined in the normalized spherical tensor basis.</span>
+<span class="sd">    sparse : bool, default=True</span>
+<span class="sd">        Specifies whether to return the density matrix as sparse or dense array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho_zeeman : ndarray or csc_array</span>
+<span class="sd">        Spin density matrix defined in the Zeeman eigenbasis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Obtain the spin multiplicities</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Get the dimension of density matrix</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the spin density matrix</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    
+    <span class="c1"># Obtain indices of the non-zero coefficients from the state vector</span>
+    <span class="n">idx_nonzero</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Loop over the nonzero indices</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idx_nonzero</span><span class="p">:</span>
+
+        <span class="c1"># Get the corresponding operator definition</span>
+        <span class="n">op_def</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="c1"># Get the normalized product operator in the Zeeman eigenbasis with</span>
+        <span class="c1"># normalization</span>
+        <span class="n">oper</span> <span class="o">=</span> <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+            <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Add to the total density matrix</span>
+        <span class="n">rho_zeeman</span> <span class="o">+=</span> <span class="n">rho</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">oper</span>
+    
+    <span class="k">return</span> <span class="n">rho_zeeman</span></div>
+
+
+<div class="viewcode-block" id="equilibrium_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.equilibrium_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">equilibrium_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                      <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                      <span class="n">H_left</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+                      <span class="n">T</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                      <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                      <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the state vector corresponding to thermal equilibrium.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    H_left : ndarray</span>
+<span class="sd">        Left-side coherent Hamiltonian superoperator.</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature of the spin bath in Kelvin.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+<span class="sd">    zero_value : float, default=1e-18</span>
+<span class="sd">        This threshold value is used to estimate the convergence of Taylor</span>
+<span class="sd">        series in matrix exponential, and to eliminate value smaller than this</span>
+<span class="sd">        threshold while squaring the matrix during the matrix exponential.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho_eq : ndarray or csc_array</span>
+<span class="sd">        Thermal equilibrium state vector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract the necessary information from the spin system</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Get the matrix exponential corresponding to the Boltzmann distribution</span>
+    <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">H_left</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+    <span class="c1"># Obtain the thermal equilibrium by propagating the unit state</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">rho_eq</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">unit</span>
+
+    <span class="c1"># Normalize such that the trace of the corresponding density matrix is one</span>
+    <span class="n">rho_eq</span> <span class="o">=</span> <span class="n">rho_eq</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho_eq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">rho_eq</span></div>
+
+
+<div class="viewcode-block" id="alpha_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.alpha_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">alpha_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the alpha state for a given spin-1/2 nucleus. Unit state is</span>
+<span class="sd">    assigned to the other spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    index : int</span>
+<span class="sd">        Index of the spin that has the alpha state.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the alpha state of the given spin index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate the dimension of the full Liouville space</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Get states</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Make the alpha state</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="beta_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.beta_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beta_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+               <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the beta state for a given spin-1/2 nucleus. Unit state is</span>
+<span class="sd">    assigned to the other spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    index : int</span>
+<span class="sd">        Index of the spin that has the beta state.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the beta state of the given spin index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate the dimension of the full Liouville space</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Get states</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Make the beta state</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="singlet_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.singlet_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">singlet_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                  <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                  <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the singlet state between two spin-1/2 nuclei. Unit state is</span>
+<span class="sd">    assigned to the other spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    index_1 : int</span>
+<span class="sd">        Index of the first spin in the singlet state.</span>
+<span class="sd">    index_2 : int</span>
+<span class="sd">        Index of the second spin in the singlet state.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the singlet state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate the dimension of the full Liouville space</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Get states</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Make the singlet</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="triplet_zero_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.triplet_zero_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">triplet_zero_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                       <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                       <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is</span>
+<span class="sd">    assigned to the other spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    index_1 : int</span>
+<span class="sd">        Index of the first spin in the triplet zero state.</span>
+<span class="sd">    index_2 : int</span>
+<span class="sd">        Index of the second spin in the triplet zero state.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the triplet zero state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate the dimension of the full Liouville space</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Get states</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Make the triplet zero</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="triplet_plus_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.triplet_plus_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">triplet_plus_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                       <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                       <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is</span>
+<span class="sd">    assigned to the other spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    index_1 : int</span>
+<span class="sd">        Index of the first spin in the triplet plus state.</span>
+<span class="sd">    index_2 : int</span>
+<span class="sd">        Index of the second spin in the triplet plus state.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the triplet plus state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate the dimension of the full Liouville space</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Get states</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Make the triplet plus</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzE</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">EIz</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="triplet_minus_state">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.triplet_minus_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">triplet_minus_state</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                        <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                        <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                        <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is</span>
+<span class="sd">    assigned to the other spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    index_1 : int</span>
+<span class="sd">        Index of the first spin in the triplet minus state.</span>
+<span class="sd">    index_2 : int</span>
+<span class="sd">        Index of the second spin in the triplet minus state.</span>
+<span class="sd">    sparse : bool, default=False</span>
+<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector corresponding to the triplet minus state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Calculate the dimension of the full Liouville space</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
+
+    <span class="c1"># Get states</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
+        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+
+    <span class="c1"># Make the triplet minus</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzE</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">EIz</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
+
+    <span class="k">return</span> <span class="n">rho</span></div>
+
+
+<div class="viewcode-block" id="measure">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.measure">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+            <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the expectation value of the specified operator for a given state</span>
+<span class="sd">    vector. Assumes that the state vector `rho` represents a trace-normalized</span>
+<span class="sd">    density matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
+<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
+<span class="sd">        tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector that describes the density matrix.</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        Defines the operator to be measured. The operator string must follow the</span>
+<span class="sd">        rules below:</span>
+
+<span class="sd">        - Cartesian and ladder operators: `I(component,index)` or</span>
+<span class="sd">          `I(component)`. Examples:</span>
+
+<span class="sd">            - `I(x,4)` --&gt; Creates x-operator for spin at index 4.</span>
+<span class="sd">            - `I(x)`--&gt; Creates x-operator for all spins.</span>
+
+<span class="sd">        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:</span>
+
+<span class="sd">            - `T(1,-1,3)` --&gt; \</span>
+<span class="sd">              Creates operator with `l=1`, `q=-1` for spin at index 3.</span>
+<span class="sd">            - `T(1, -1)` --&gt; \</span>
+<span class="sd">              Creates operator with `l=1`, `q=-1` for all spins.</span>
+<span class="sd">            </span>
+<span class="sd">        - Product operators have `*` in between the single-spin operators:</span>
+<span class="sd">          `I(z,0) * I(z,1)`</span>
+<span class="sd">        - Sums of operators have `+` in between the operators:</span>
+<span class="sd">          `I(x,0) + I(x,1)`</span>
+<span class="sd">        - Unit operators are ignored in the input. Interpretation of these</span>
+<span class="sd">          two is identical: `E * I(z,1)`, `I(z,1)`</span>
+<span class="sd">        </span>
+<span class="sd">        Special case: An empty `operator` string is considered as unit operator.</span>
+
+<span class="sd">        Whitespace will be ignored in the input.</span>
+
+<span class="sd">        NOTE: Indexing starts from 0!</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ex : complex</span>
+<span class="sd">        Expectation value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get the &quot;operator&quot; to be measured</span>
+    <span class="n">oper</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span>
+
+    <span class="c1"># Perform the measurement</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="p">(</span><span class="n">oper</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">rho</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">ex</span></div>
+
+
+<div class="viewcode-block" id="state_to_truncated_basis">
+<a class="viewcode-back" href="../../../spinguin.core.states.html#spinguin.core.states.state_to_truncated_basis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_to_truncated_basis</span><span class="p">(</span><span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                             <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+                             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms a state vector to a truncated basis using the `index_map`,</span>
+<span class="sd">    which contains indices that determine the elements that are retained</span>
+<span class="sd">    after the transformation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index_map : list</span>
+<span class="sd">        Index mapping from the original basis to the truncated basis.</span>
+<span class="sd">    rho : ndarray or csc_array</span>
+<span class="sd">        State vector to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho_transformed : ndarray or csc_array</span>
+<span class="sd">        State vector transformed into the truncated basis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transforming the state vector into the truncated basis.&quot;</span><span class="p">)</span>
+    <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Perform the transformation to truncated basis</span>
+    <span class="n">rho_transformed</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[</span><span class="n">index_map</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformation completed.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Elapsed time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">rho_transformed</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

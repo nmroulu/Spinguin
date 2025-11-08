@@ -1,0 +1,717 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>spinguin.core.superoperators &#8212; Spinguin 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=e645c8fa"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'spinguin.core.superoperators';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="spinguin.core.states" href="spinguin.core.states.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced usage</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="spinguin.html">Spinguin (Basic)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.api.html">Main functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.api.parameters.html">Global parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.api.basis.html">Basis set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.api.relaxation_properties.html">Relaxation properties</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="spinguin.core.html">Spinguin (Advanced)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.basis.html">spinguin.core.basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.chem.html">spinguin.core.chem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.data_io.html">spinguin.core.data_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.hamiltonian.html">spinguin.core.hamiltonian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.hide_prints.html">spinguin.core.hide_prints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.intersect_indices.html">spinguin.core.intersect_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.la.html">spinguin.core.la</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.liouvillian.html">spinguin.core.liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.nmr_isotopes.html">spinguin.core.nmr_isotopes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.operators.html">spinguin.core.operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.propagation.html">spinguin.core.propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.relaxation.html">spinguin.core.relaxation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.sparse_dot.html">spinguin.core.sparse_dot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.specutils.html">spinguin.core.specutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spinguin.core.states.html">spinguin.core.states</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">spinguin.core.superoperators</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/spinguin.core.superoperators.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>spinguin.core.superoperators</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_E"><code class="docutils literal notranslate"><span class="pre">sop_E()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_T_coupled"><code class="docutils literal notranslate"><span class="pre">sop_T_coupled()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_from_string"><code class="docutils literal notranslate"><span class="pre">sop_from_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_prod"><code class="docutils literal notranslate"><span class="pre">sop_prod()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_prod_ref"><code class="docutils literal notranslate"><span class="pre">sop_prod_ref()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_to_truncated_basis"><code class="docutils literal notranslate"><span class="pre">sop_to_truncated_basis()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.structure_coefficients"><code class="docutils literal notranslate"><span class="pre">structure_coefficients()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-spinguin.core.superoperators">
+<span id="spinguin-core-superoperators"></span><h1>spinguin.core.superoperators<a class="headerlink" href="#module-spinguin.core.superoperators" title="Link to this heading">#</a></h1>
+<p>This module provides functions for calculating Liouville-space superoperators
+either in full or truncated basis set.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.sop_E">
+<span class="sig-name descname"><span class="pre">sop_E</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#sop_E"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.sop_E" title="Link to this definition">#</a></dt>
+<dd><p>Returns the unit superoperator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim</strong> (<em>int</em>) – Dimension of the basis set.</p></li>
+<li><p><strong>sparse</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Specifies whether to return the operator as sparse or dense array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>unit</strong> – A sparse array corresponding to the unit operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.sop_T_coupled">
+<span class="sig-name descname"><span class="pre">sop_T_coupled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#sop_T_coupled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.sop_T_coupled" title="Link to this definition">#</a></dt>
+<dd><p>Computes the product superoperator corresponding to the coupled spherical
+tensor operator of rank <cite>l</cite> and projection <cite>q</cite>, derived from two spherical
+tensor operators of rank 1.</p>
+<p>This function is frequently called and is cached for high performance.</p>
+<p>TODO: Mieti, onko cache tarpeellinen. Nyt hyöty tulee vain, kun lasketaan R
+useaan kertaan samalle systeemille (esim. eri magneettikentissä). Voisi
+mahdollisesti olla asetus ohjelmassa (cachet päälle / pois).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basis</strong> (<em>ndarray</em>) – A two-dimensional array where each row contains integers that represent
+a Kronecker product of single-spin irreducible spherical tensors.</p></li>
+<li><p><strong>spins</strong> (<em>ndarray</em>) – A sequence of floats describing the spin quantum numbers of the spin
+system.</p></li>
+<li><p><strong>l</strong> (<em>int</em>) – Rank of the coupled operator.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Projection of the coupled operator.</p></li>
+<li><p><strong>spin_1</strong> (<em>int</em>) – Index of the first spin.</p></li>
+<li><p><strong>spin_2</strong> (<em>int</em><em>, </em><em>default=None</em>) – Index of the second spin. Leave empty for linear single-spin
+interactions (e.g., shielding).</p></li>
+<li><p><strong>sparse</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Specifies whether to return the operator as sparse or dense array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sop</strong> – Coupled spherical tensor superoperator of rank <cite>l</cite> and projection <cite>q</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.sop_from_string">
+<span class="sig-name descname"><span class="pre">sop_from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'comm'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#sop_from_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.sop_from_string" title="Link to this definition">#</a></dt>
+<dd><p>Generates a superoperator from the user-specified <cite>operators</cite> string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>operator</strong> (<em>str</em>) – <p>Defines the operator to be generated. The operator string must
+follow the rules below:</p>
+<ul>
+<li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
+<cite>I(component)</cite>. Examples:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>I(x,4)</cite> –&gt; Creates x-operator for spin at index 4.</p></li>
+<li><p><cite>I(x)</cite>–&gt; Creates x-operator for all spins.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for spin at index 3.</p></li>
+<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for all spins.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Product operators have <cite>*</cite> in between the single-spin operators:
+<cite>I(z,0) * I(z,1)</cite></p></li>
+<li><p>Sums of operators have <cite>+</cite> in between the operators:
+<cite>I(x,0) + I(x,1)</cite></p></li>
+<li><p>Unit operators are ignored in the input. Interpretation of these
+two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
+</ul>
+<p>Special case: An empty <cite>operator</cite> string is considered as unit operator.</p>
+<p>Whitespace will be ignored in the input.</p>
+<p>NOTE: Indexing starts from 0!</p>
+</p></li>
+<li><p><strong>basis</strong> (<em>ndarray</em>) – A two-dimensional array where each row contains integers that represent
+a Kronecker product of single-spin irreducible spherical tensors.</p></li>
+<li><p><strong>spins</strong> (<em>ndarray</em>) – A sequence of floats describing the spin quantum numbers of the spin
+system.</p></li>
+<li><p><strong>side</strong> (<em>{'comm'</em><em>, </em><em>'left'</em><em>, </em><em>'right'}</em>) – Specifies the type of superoperator:
+- ‘comm’ – commutation superoperator
+- ‘left’ – left superoperator
+- ‘right’ – right superoperator</p></li>
+<li><p><strong>sparse</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Specifies whether to return the operator as sparse or dense array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sop</strong> – The requested superoperator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.sop_prod">
+<span class="sig-name descname"><span class="pre">sop_prod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'comm'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#sop_prod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.sop_prod" title="Link to this definition">#</a></dt>
+<dd><p>Generates a product superoperator corresponding to the product operator
+defined by <cite>op_def</cite>.</p>
+<p>This function is called frequently and is cached for high performance.</p>
+<p>TODO: Vastaava cache pohdinta kuin sop_T_coupled() -funktion kanssa.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op_def</strong> (<em>ndarray</em>) – Specifies the product operator to be generated. For example,
+input <cite>np.array([0, 2, 0, 1])</cite> will generate <cite>E*T_10*E*T_11</cite>. The
+indices are given by <cite>N = l^2 + l - q</cite>, where <cite>l</cite> is the rank and <cite>q</cite> is
+the projection.</p></li>
+<li><p><strong>basis</strong> (<em>ndarray</em>) – A two-dimensional array where each row contains integers that represent
+a Kronecker product of single-spin irreducible spherical tensors.</p></li>
+<li><p><strong>spins</strong> (<em>ndarray</em>) – A sequence of floats describing the spin quantum numbers of the spin
+system.</p></li>
+<li><p><strong>side</strong> (<em>{'comm'</em><em>, </em><em>'left'</em><em>, </em><em>'right'}</em>) – Specifies the type of superoperator:
+- ‘comm’ – commutation superoperator
+- ‘left’ – left superoperator
+- ‘right’ – right superoperator</p></li>
+<li><p><strong>sparse</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Specifies whether to return the operator as sparse or dense array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sop</strong> – Superoperator defined by <cite>op_def</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.sop_prod_ref">
+<span class="sig-name descname"><span class="pre">sop_prod_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'comm'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#sop_prod_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.sop_prod_ref" title="Link to this definition">#</a></dt>
+<dd><p>A reference method for calculating the superoperator.</p>
+<p>NOTE:
+This implementation is very slow and should be used for testing purposes
+only.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op_def</strong> (<em>ndarray</em>) – Specifies the product operator to be generated. For example,
+input <cite>(0, 2, 0, 1)</cite> will generate <cite>E*T_10*E*T_11</cite>. The indices are
+given by <cite>N = l^2 + l - q</cite>, where <cite>l</cite> is the rank and <cite>q</cite> is the
+projection.</p></li>
+<li><p><strong>basis</strong> (<em>ndarray</em>) – A two-dimensional array where each row contains integers that represent
+a Kronecker product of single-spin irreducible spherical tensors.</p></li>
+<li><p><strong>spins</strong> (<em>ndarray</em>) – A sequence of floats describing the spin quantum numbers of the spin
+system.</p></li>
+<li><p><strong>side</strong> (<em>{'comm'</em><em>, </em><em>'left'</em><em>, </em><em>'right'}</em>) – Specifies the type of superoperator:
+- ‘comm’ – commutation superoperator
+- ‘left’ – left superoperator
+- ‘right’ – right superoperator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sop</strong> – Superoperator defined by <cite>op_def</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.sop_to_truncated_basis">
+<span class="sig-name descname"><span class="pre">sop_to_truncated_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#sop_to_truncated_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.sop_to_truncated_basis" title="Link to this definition">#</a></dt>
+<dd><p>Transforms a superoperator to a truncated basis using the <cite>index_map</cite>,
+which contains indices that determine the elements that are retained
+after the transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index_map</strong> (<em>list</em>) – Index mapping from the original basis to the truncated basis.</p></li>
+<li><p><strong>sop</strong> (<em>ndarray</em><em> or </em><em>csc_array</em>) – Superoperators to be transformed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sop_transformed</strong> – Superoperator transformed into the truncated basis.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.core.superoperators.structure_coefficients">
+<span class="sig-name descname"><span class="pre">structure_coefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/spinguin/core/superoperators.html#structure_coefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.core.superoperators.structure_coefficients" title="Link to this definition">#</a></dt>
+<dd><p>Computes the (normalized) structure coefficients of the operator algebra
+for a single spin. These coefficients are used in constructing product
+superoperators.</p>
+<p>Logic explained in the following paper (Eq. 24, calculate f_ijk):
+(The paper does not include the normalization)
+<a class="reference external" href="https://doi.org/10.1063/1.3398146">https://doi.org/10.1063/1.3398146</a></p>
+<p>This function is called frequently and is cached for high performance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spin</strong> (<em>float</em>) – Spin quantum number.</p></li>
+<li><p><strong>side</strong> (<em>{'left'</em><em>, </em><em>'right'}</em>) – Specifies the side of the multiplication.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>c</strong> – A 3-dimensional array containing all the structure coefficients.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="spinguin.core.states.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">spinguin.core.states</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_E"><code class="docutils literal notranslate"><span class="pre">sop_E()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_T_coupled"><code class="docutils literal notranslate"><span class="pre">sop_T_coupled()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_from_string"><code class="docutils literal notranslate"><span class="pre">sop_from_string()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_prod"><code class="docutils literal notranslate"><span class="pre">sop_prod()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_prod_ref"><code class="docutils literal notranslate"><span class="pre">sop_prod_ref()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.sop_to_truncated_basis"><code class="docutils literal notranslate"><span class="pre">sop_to_truncated_basis()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.core.superoperators.structure_coefficients"><code class="docutils literal notranslate"><span class="pre">structure_coefficients()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

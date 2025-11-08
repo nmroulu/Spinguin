@@ -1,0 +1,1246 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin.core.la &#8212; Spinguin 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=e645c8fa"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/core/la';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced.html">Advanced usage</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../spinguin.html">Spinguin (Basic)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.html">Main functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.parameters.html">Global parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.basis.html">Basis set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.api.relaxation_properties.html">Relaxation properties</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../spinguin.core.html">Spinguin (Advanced)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.basis.html">spinguin.core.basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.chem.html">spinguin.core.chem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.data_io.html">spinguin.core.data_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.hamiltonian.html">spinguin.core.hamiltonian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.hide_prints.html">spinguin.core.hide_prints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.intersect_indices.html">spinguin.core.intersect_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.la.html">spinguin.core.la</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.liouvillian.html">spinguin.core.liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.nmr_isotopes.html">spinguin.core.nmr_isotopes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.operators.html">spinguin.core.operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.propagation.html">spinguin.core.propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.relaxation.html">spinguin.core.relaxation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.sparse_dot.html">spinguin.core.sparse_dot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.specutils.html">spinguin.core.specutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.states.html">spinguin.core.states</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../spinguin.core.superoperators.html">spinguin.core.superoperators</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin.core.la</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides various linear algebra tools required for spin dynamics</span>
+<span class="sd">simulations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Imports</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">eye_array</span><span class="p">,</span> <span class="n">csc_array</span><span class="p">,</span> <span class="n">block_array</span><span class="p">,</span> <span class="n">issparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">mmwrite</span><span class="p">,</span> <span class="n">mmread</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sympy.physics.quantum.cg</span><span class="w"> </span><span class="kn">import</span> <span class="n">CG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.sparse_dot</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse_dot</span> <span class="k">as</span> <span class="n">_sparse_dot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.intersect_indices</span><span class="w"> </span><span class="kn">import</span> <span class="n">intersect_indices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin.core.nmr_isotopes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISOTOPES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing.shared_memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">SharedMemory</span>
+
+<div class="viewcode-block" id="write_shared_sparse">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.write_shared_sparse">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_shared_sparse</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">csc_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="nb">tuple</span><span class="p">[</span><span class="n">SharedMemory</span><span class="p">,</span> <span class="n">SharedMemory</span><span class="p">,</span> <span class="n">SharedMemory</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a shared memory representation of a sparse CSC array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : csc_array</span>
+<span class="sd">        Sparse array to be shared.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A_shared : dict</span>
+<span class="sd">        Dictionary containing shared memory names and metadata for the sparse</span>
+<span class="sd">        array&#39;s data, indices, and indptr, along with their shapes and dtypes.</span>
+<span class="sd">    A_shm : tuple</span>
+<span class="sd">        Tuple containing the shared memory objects for the sparse array&#39;s data,</span>
+<span class="sd">        indices, and indptr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a shared memory of the sparse array</span>
+    <span class="n">A_data_shm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+    <span class="n">A_indices_shm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+    <span class="n">A_indptr_shm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+    <span class="n">A_data_shared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                               <span class="n">buffer</span><span class="o">=</span><span class="n">A_data_shm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">A_indices_shared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                                  <span class="n">buffer</span><span class="o">=</span><span class="n">A_indices_shm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">A_indptr_shared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                                 <span class="n">buffer</span><span class="o">=</span><span class="n">A_indptr_shm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">A_data_shared</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span>
+    <span class="n">A_indices_shared</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="p">[:]</span>
+    <span class="n">A_indptr_shared</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="p">[:]</span>
+
+    <span class="c1"># Save the information of the memory to a dictionary</span>
+    <span class="n">A_shared</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;A_data_shm_name&#39;</span> <span class="p">:</span> <span class="n">A_data_shm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;A_indices_shm_name&#39;</span> <span class="p">:</span> <span class="n">A_indices_shm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;A_indptr_shm_name&#39;</span> <span class="p">:</span> <span class="n">A_indptr_shm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;A_data_shape&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="s1">&#39;A_indices_shape&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="s1">&#39;A_indptr_shape&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="s1">&#39;A_data_dtype&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="s1">&#39;A_indices_dtype&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="s1">&#39;A_indptr_dtype&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="s1">&#39;A_shape&#39;</span> <span class="p">:</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Combine the shared memories into one tuple</span>
+    <span class="n">A_shm</span> <span class="o">=</span> <span class="p">(</span><span class="n">A_data_shm</span><span class="p">,</span> <span class="n">A_indices_shm</span><span class="p">,</span> <span class="n">A_indptr_shm</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A_shared</span><span class="p">,</span> <span class="n">A_shm</span></div>
+
+
+<div class="viewcode-block" id="read_shared_sparse">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.read_shared_sparse">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_shared_sparse</span><span class="p">(</span><span class="n">A_shared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> \
+    <span class="nb">tuple</span><span class="p">[</span><span class="n">csc_array</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SharedMemory</span><span class="p">,</span> <span class="n">SharedMemory</span><span class="p">,</span> <span class="n">SharedMemory</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a shared memory representation of a sparse CSC array and reconstructs</span>
+<span class="sd">    it.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A_shared : dict</span>
+<span class="sd">        Dictionary containing shared memory names and metadata for the sparse</span>
+<span class="sd">        array&#39;s data, indices, and indptr, along with their shapes and dtypes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A : csc_array</span>
+<span class="sd">        Sparse array reconstructed from the shared memory.</span>
+<span class="sd">    A_shm : tuple</span>
+<span class="sd">        Tuple containing the shared memory objects for the sparse array&#39;s data,</span>
+<span class="sd">        indices, and indptr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Parse the dictionary</span>
+    <span class="n">A_data_shm_name</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_data_shm_name&#39;</span><span class="p">]</span>
+    <span class="n">A_indices_shm_name</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_indices_shm_name&#39;</span><span class="p">]</span>
+    <span class="n">A_indptr_shm_name</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_indptr_shm_name&#39;</span><span class="p">]</span>
+    <span class="n">A_data_shape</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_data_shape&#39;</span><span class="p">]</span>
+    <span class="n">A_indices_shape</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_indices_shape&#39;</span><span class="p">]</span>
+    <span class="n">A_indptr_shape</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_indptr_shape&#39;</span><span class="p">]</span>
+    <span class="n">A_data_dtype</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_data_dtype&#39;</span><span class="p">]</span>
+    <span class="n">A_indices_dtype</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_indices_dtype&#39;</span><span class="p">]</span>
+    <span class="n">A_indptr_dtype</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_indptr_dtype&#39;</span><span class="p">]</span>
+    <span class="n">A_shape</span> <span class="o">=</span> <span class="n">A_shared</span><span class="p">[</span><span class="s1">&#39;A_shape&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Obtain the shared memories</span>
+    <span class="n">A_data_shm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">A_data_shm_name</span><span class="p">)</span>
+    <span class="n">A_indices_shm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">A_indices_shm_name</span><span class="p">)</span>
+    <span class="n">A_indptr_shm</span> <span class="o">=</span> <span class="n">SharedMemory</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">A_indptr_shm_name</span><span class="p">)</span>
+
+    <span class="c1"># Obtain the previously shared array</span>
+    <span class="n">A_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">A_data_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A_data_dtype</span><span class="p">,</span>
+                        <span class="n">buffer</span><span class="o">=</span><span class="n">A_data_shm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">A_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">A_indices_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A_indices_dtype</span><span class="p">,</span>
+                           <span class="n">buffer</span><span class="o">=</span><span class="n">A_indices_shm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">A_indptr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">A_indptr_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A_indptr_dtype</span><span class="p">,</span>
+                          <span class="n">buffer</span><span class="o">=</span><span class="n">A_indptr_shm</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span>
+
+    <span class="c1"># Create the sparse array</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">A_data</span><span class="p">,</span> <span class="n">A_indices</span><span class="p">,</span> <span class="n">A_indptr</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="n">A_shape</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Combine the shared memories into one tuple</span>
+    <span class="n">A_shm</span> <span class="o">=</span> <span class="p">(</span><span class="n">A_data_shm</span><span class="p">,</span> <span class="n">A_indices_shm</span><span class="p">,</span> <span class="n">A_indptr_shm</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">A_shm</span></div>
+
+
+<div class="viewcode-block" id="isvector">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.isvector">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">isvector</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">csc_array</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">ord</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;col&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the given array is a vector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v : csc_array or ndarray</span>
+<span class="sd">        Array to be checked. Must be two-dimensional.</span>
+<span class="sd">    ord : str</span>
+<span class="sd">        Can be either &quot;col&quot; or &quot;row&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the array is a vector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check whether the array is two-dimensional</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input array must be two-dimensional.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Determine whether to check for row or column vector</span>
+    <span class="k">if</span> <span class="nb">ord</span> <span class="o">==</span> <span class="s2">&quot;col&quot;</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="nb">ord</span> <span class="o">==</span> <span class="s2">&quot;row&quot;</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for ord: </span><span class="si">{</span><span class="nb">ord</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check whether the array is a vector</span>
+    <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="norm_1">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.norm_1">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">norm_1</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">csc_array</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">ord</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the 1-norm of a matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : csc_array or ndarray</span>
+<span class="sd">        Array for which the norm is calculated.</span>
+<span class="sd">    ord : str, default=&#39;row&#39;</span>
+<span class="sd">        Either &#39;row&#39; or &#39;col&#39;, specifying the direction for the 1-norm</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    norm_1 : float</span>
+<span class="sd">        1-norm of the given array `A`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Process either row- or column-wise</span>
+    <span class="k">if</span> <span class="nb">ord</span> <span class="o">==</span> <span class="s1">&#39;row&#39;</span><span class="p">:</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="nb">ord</span> <span class="o">==</span> <span class="s1">&#39;col&#39;</span><span class="p">:</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for ord: </span><span class="si">{</span><span class="nb">ord</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate sums along rows or columns and get the maximum of them</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="expm">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.expm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">expm</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+         <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the matrix exponential of a SciPy sparse CSC array using the</span>
+<span class="sd">    scaling and squaring method with the Taylor series, shown to be the fastest</span>
+<span class="sd">    method in:</span>
+
+<span class="sd">    https://doi.org/10.1016/j.jmr.2010.12.004</span>
+
+<span class="sd">    This function uses a custom dot product implementation, which is more</span>
+<span class="sd">    memory-efficient and parallelized.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ndarray or csc_array</span>
+<span class="sd">        Array to be exponentiated.</span>
+<span class="sd">    zero_value : float</span>
+<span class="sd">        Values below this threshold are considered zero. Used to increase the</span>
+<span class="sd">        sparsity of the result and estimate the convergence of the Taylor</span>
+<span class="sd">        series.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    expm_A : ndarray or csc_array</span>
+<span class="sd">        Matrix exponential of `A`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating the matrix exponential...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the norm of A</span>
+    <span class="n">norm_A</span> <span class="o">=</span> <span class="n">norm_1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;col&#39;</span><span class="p">)</span>
+
+    <span class="c1"># If the norm of the matrix is too large, scale the matrix down</span>
+    <span class="k">if</span> <span class="n">norm_A</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+        <span class="c1"># Calculate the scaling factor for the matrix</span>
+        <span class="n">scaling_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">norm_A</span><span class="p">)))</span>
+        <span class="n">scaling_factor</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">scaling_count</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scaling the matrix down </span><span class="si">{</span><span class="n">scaling_count</span><span class="si">}</span><span class="s2"> times.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Scale the matrix down</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="n">scaling_factor</span>
+
+        <span class="c1"># Calculate the expm of the scaled matrix using the Taylor series</span>
+        <span class="n">expm_A</span> <span class="o">=</span> <span class="n">expm_taylor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+        <span class="c1"># Scale the matrix exponential back up by repeated squaring</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">scaling_count</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Squaring the matrix. Step </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">scaling_count</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">expm_A</span> <span class="o">=</span> <span class="n">custom_dot</span><span class="p">(</span><span class="n">expm_A</span><span class="p">,</span> <span class="n">expm_A</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+    
+    <span class="c1"># If the norm of the matrix is small, proceed without scaling</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">expm_A</span> <span class="o">=</span> <span class="n">expm_taylor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matrix exponential completed.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">expm_A</span></div>
+
+
+<div class="viewcode-block" id="expm_taylor">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.expm_taylor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">expm_taylor</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+                <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the matrix exponential using the Taylor series. This function is </span>
+<span class="sd">    adapted from an older SciPy version.</span>
+
+<span class="sd">    It uses a custom dot product implementation, which is more memory-efficient </span>
+<span class="sd">    and parallelized.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ndarray or csc_array</span>
+<span class="sd">        Matrix (N, N) to be exponentiated.</span>
+<span class="sd">    zero_value : float</span>
+<span class="sd">        Values below this threshold are considered zero. Used to increase</span>
+<span class="sd">        sparsity and check the convergence of the series.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eA : ndarray or csc_array</span>
+<span class="sd">        Matrix exponential of A.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating the matrix exponential using Taylor series.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Increase sparsity of A</span>
+    <span class="n">eliminate_small</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+    
+    <span class="c1"># Create a unit matrix for the first term</span>
+    <span class="n">eA</span> <span class="o">=</span> <span class="n">eye_array</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Make a copy for the terms</span>
+    <span class="n">trm</span> <span class="o">=</span> <span class="n">eA</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Calculate new terms until their significance becomes negligible</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">cont</span><span class="p">:</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Taylor series term: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the next term</span>
+        <span class="n">trm</span> <span class="o">=</span> <span class="n">custom_dot</span><span class="p">(</span><span class="n">trm</span><span class="p">,</span> <span class="n">A</span> <span class="o">/</span> <span class="n">k</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+        <span class="c1"># Add the term to the result</span>
+        <span class="n">eA</span> <span class="o">+=</span> <span class="n">trm</span>
+
+        <span class="c1"># Increment the counter</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Continue if the convergence criterion is not met</span>
+        <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+            <span class="n">cont</span> <span class="o">=</span> <span class="p">(</span><span class="n">trm</span><span class="o">.</span><span class="n">nnz</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cont</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">trm</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Taylor series converged.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eA</span></div>
+
+
+<div class="viewcode-block" id="eliminate_small">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.eliminate_small">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">eliminate_small</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Eliminates small values from the input matrix `A` by replacing values</span>
+<span class="sd">    smaller than `zero_value` with zeros. Modification happens inplace.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ndarray or csc_array</span>
+<span class="sd">        Array to be modified.</span>
+<span class="sd">    zero_value : float</span>
+<span class="sd">        Values smaller than this threshold are set to zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Identify values smaller than the threshold and set them to zero</span>
+    <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+        <span class="n">nonzero_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">zero_value</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">nonzero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nonzero_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">zero_value</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">nonzero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="sparse_to_bytes">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.sparse_to_bytes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sparse_to_bytes</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">csc_array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the given SciPy sparse array into a byte representation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : csc_array</span>
+<span class="sd">        Sparse matrix to be converted into bytes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A_bytes : bytes</span>
+<span class="sd">        Byte representation of the input matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Initialize a BytesIO object</span>
+    <span class="n">bytes_io</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+
+    <span class="c1"># Write the matrix A to bytes</span>
+    <span class="n">mmwrite</span><span class="p">(</span><span class="n">bytes_io</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+
+    <span class="c1"># Retrieve the bytes</span>
+    <span class="n">A_bytes</span> <span class="o">=</span> <span class="n">bytes_io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">A_bytes</span></div>
+
+
+<div class="viewcode-block" id="bytes_to_sparse">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.bytes_to_sparse">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bytes_to_sparse</span><span class="p">(</span><span class="n">A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a byte representation back to a SciPy sparse array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A_bytes : bytes</span>
+<span class="sd">        Byte representation of a SciPy sparse array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A : csc_array</span>
+<span class="sd">        Sparse array reconstructed from the byte representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialize a BytesIO object</span>
+    <span class="n">bytes_io</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">A_bytes</span><span class="p">)</span>
+
+    <span class="c1"># Read the SciPy sparse array from bytes</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">mmread</span><span class="p">(</span><span class="n">bytes_io</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A</span></div>
+
+
+<div class="viewcode-block" id="comm">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.comm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">comm</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">csc_array</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+         <span class="n">B</span><span class="p">:</span> <span class="n">csc_array</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the commutator [A, B] of two operators.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : csc_array or ndarray</span>
+<span class="sd">        First operator.</span>
+<span class="sd">    B : csc_array or ndarray</span>
+<span class="sd">        Second operator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    C : csc_array or ndarray</span>
+<span class="sd">        Commutator [A, B].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute the commutator</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">B</span> <span class="o">-</span> <span class="n">B</span> <span class="o">@</span> <span class="n">A</span>
+
+    <span class="k">return</span> <span class="n">C</span></div>
+
+
+<div class="viewcode-block" id="find_common_rows">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.find_common_rows">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_common_rows</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                     <span class="n">B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies the indices of common rows between two arrays, `A` and `B`.</span>
+<span class="sd">    Each row must appear only once in the arrays and they must be sorted</span>
+<span class="sd">    in lexicographical order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ndarray</span>
+<span class="sd">        First array to compare.</span>
+<span class="sd">    B : ndarray</span>
+<span class="sd">        Second array to compare.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A_ind : ndarray</span>
+<span class="sd">        Indices of the common rows in array `A`.</span>
+<span class="sd">    B_ind : ndarray</span>
+<span class="sd">        Indices of the common rows in array `B`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Handle special case where both arrays are empty</span>
+    <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">A_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">B_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">A_ind</span><span class="p">,</span> <span class="n">B_ind</span>
+    
+    <span class="c1"># Get the row length ensuring the correct data type</span>
+    <span class="n">row_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longlong</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Convert the arrays to 1D</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+    <span class="c1"># Ensure that the data types are correct</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">longlong</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">longlong</span><span class="p">)</span>
+
+    <span class="c1"># Find the common indices</span>
+    <span class="n">A_ind</span><span class="p">,</span> <span class="n">B_ind</span> <span class="o">=</span> <span class="n">intersect_indices</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">row_length</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A_ind</span><span class="p">,</span> <span class="n">B_ind</span></div>
+
+
+<div class="viewcode-block" id="auxiliary_matrix_expm">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.auxiliary_matrix_expm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">auxiliary_matrix_expm</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+                          <span class="n">B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+                          <span class="n">C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+                          <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                          <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>   
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the matrix exponential of an auxiliary matrix. This is used to </span>
+<span class="sd">    calculate the Redfield integral.</span>
+
+<span class="sd">    Based on Goodwin and Kuprov (Eq. 3): https://doi.org/10.1063/1.4928978</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ndarray or csc_array</span>
+<span class="sd">        Top-left block of the auxiliary matrix.</span>
+<span class="sd">    B : ndarray or csc_array</span>
+<span class="sd">        Top-right block of the auxiliary matrix.</span>
+<span class="sd">    C : ndarray or csc_array</span>
+<span class="sd">        Bottom-right block of the auxiliary matrix.</span>
+<span class="sd">    t : float</span>
+<span class="sd">        Integration time.</span>
+<span class="sd">    zero_value : float</span>
+<span class="sd">        Threshold below which values are considered zero when exponentiating the</span>
+<span class="sd">        auxiliary matrix using the Taylor series. This significantly impacts</span>
+<span class="sd">        performance. Use the largest value that still provides correct results.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    expm_aux : ndarray or csc_array</span>
+<span class="sd">        Matrix exponential of the auxiliary matrix. The output is sparse or</span>
+<span class="sd">        dense matching the sparsity of the input.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Ensure that the input arrays are all either sparse or dense</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">issparse</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="n">issparse</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">==</span> <span class="n">issparse</span><span class="p">(</span><span class="n">C</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All arrays A, B and C must be of same type.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Are we using sparse?</span>
+    <span class="n">sparse</span> <span class="o">=</span> <span class="n">issparse</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="c1"># Construct the auxiliary matrix</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">empty_array</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">block_array</span><span class="p">([[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">],</span>
+                        <span class="p">[</span><span class="n">empty_array</span><span class="p">,</span> <span class="n">C</span><span class="p">]],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">empty_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">],</span>
+                        <span class="p">[</span><span class="n">empty_array</span><span class="p">,</span> <span class="n">C</span><span class="p">]])</span>
+
+    <span class="c1"># Compute the matrix exponential of the auxiliary matrix</span>
+    <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+        <span class="n">expm_aux</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">aux</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">expm_aux</span></div>
+
+
+<div class="viewcode-block" id="angle_between_vectors">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.angle_between_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">angle_between_vectors</span><span class="p">(</span><span class="n">v1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">v2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the angle between two vectors in radians.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v1 : ndarray</span>
+<span class="sd">        First vector.</span>
+<span class="sd">    v2 : ndarray</span>
+<span class="sd">        Second vector.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    theta : float</span>
+<span class="sd">        Angle between the vectors in radians.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Handle the case where the vectors are identical</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v2</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">theta</span></div>
+
+
+<div class="viewcode-block" id="decompose_matrix">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.decompose_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">decompose_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> \
+    <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decomposes a matrix into three components:</span>
+
+<span class="sd">    - Isotropic part.</span>
+<span class="sd">    - Antisymmetric part.</span>
+<span class="sd">    - Symmetric traceless part.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    matrix : ndarray</span>
+<span class="sd">        Matrix to decompose.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    isotropic : ndarray</span>
+<span class="sd">        Isotropic part of the input matrix.</span>
+<span class="sd">    antisymmetric : ndarray</span>
+<span class="sd">        Antisymmetric part of the input matrix.</span>
+<span class="sd">    symmetric_traceless : ndarray</span>
+<span class="sd">        Symmetric traceless part of the input matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute the isotropic, antisymmetric, and symmetric traceless parts</span>
+    <span class="n">isotropic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">antisymmetric</span> <span class="o">=</span> <span class="p">(</span><span class="n">matrix</span> <span class="o">-</span> <span class="n">matrix</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">symmetric_traceless</span> <span class="o">=</span> <span class="p">(</span><span class="n">matrix</span> <span class="o">+</span> <span class="n">matrix</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">isotropic</span>
+    
+    <span class="k">return</span> <span class="n">isotropic</span><span class="p">,</span> <span class="n">antisymmetric</span><span class="p">,</span> <span class="n">symmetric_traceless</span></div>
+
+
+<div class="viewcode-block" id="principal_axis_system">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.principal_axis_system">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">principal_axis_system</span><span class="p">(</span><span class="n">tensor</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> \
+    <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines the principal axis system (PAS) of a Cartesian tensor</span>
+<span class="sd">    and transforms the tensor into the PAS.</span>
+
+<span class="sd">    The PAS is defined as the coordinate system that diagonalizes</span>
+<span class="sd">    the symmetric traceless part of the tensor.</span>
+
+<span class="sd">    The eigenvalues are ordered as `(|largest|, |middle|, |smallest|)`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tensor : np.ndarray</span>
+<span class="sd">        Cartesian tensor to transform.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eigenvalues : ndarray</span>
+<span class="sd">        Eigenvalues of the tensor in the PAS.</span>
+<span class="sd">    eigenvectors : ndarray</span>
+<span class="sd">        Two-dimensional array where rows contain the eigenvectors of the PAS.</span>
+<span class="sd">    tensor_PAS : ndarray</span>
+<span class="sd">        Tensor transformed into the PAS.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract the symmetric traceless part of the tensor</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">symmetric_traceless</span> <span class="o">=</span> <span class="n">decompose_matrix</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+
+    <span class="c1"># Diagonalize the symmetric traceless part</span>
+    <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">symmetric_traceless</span><span class="p">)</span>
+
+    <span class="c1"># Sort eigenvalues and eigenvectors by the absolute value of eigenvalues</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">eigenvalues</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">eigenvectors</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># Transform the tensor into the principal axis system</span>
+    <span class="n">tensor_PAS</span> <span class="o">=</span> <span class="n">eigenvectors</span> <span class="o">@</span> <span class="n">tensor</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">eigenvectors</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span><span class="p">,</span> <span class="n">tensor_PAS</span></div>
+
+
+<div class="viewcode-block" id="cartesian_tensor_to_spherical_tensor">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.cartesian_tensor_to_spherical_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cartesian_tensor_to_spherical_tensor</span><span class="p">(</span><span class="n">C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a rank-2 Cartesian tensor to a spherical tensor.</span>
+
+<span class="sd">    Uses the double outer product (DOP) convention from:</span>
+<span class="sd">    Eqs. 293-298 in Man: Cartesian and Spherical Tensors in NMR Hamiltonians</span>
+<span class="sd">    https://doi.org/10.1002/cmr.a.21289</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    C : ndarray</span>
+<span class="sd">        Rank-2 tensor in Cartesian coordinates.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spherical_tensor : dict</span>
+<span class="sd">        Keys specify the rank and the projection (l, q), and the values</span>
+<span class="sd">        are the components.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract the Cartesian components</span>
+    <span class="n">C_xx</span><span class="p">,</span> <span class="n">C_xy</span><span class="p">,</span> <span class="n">C_xz</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">C_yx</span><span class="p">,</span> <span class="n">C_yy</span><span class="p">,</span> <span class="n">C_yz</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">C_zx</span><span class="p">,</span> <span class="n">C_zy</span><span class="p">,</span> <span class="n">C_zz</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+    
+    <span class="c1"># Build the spherical tensor components</span>
+    <span class="n">spherical_tensor</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xx</span> <span class="o">+</span> <span class="n">C_yy</span> <span class="o">+</span> <span class="n">C_zz</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xy</span> <span class="o">-</span> <span class="n">C_yx</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_zx</span> <span class="o">-</span> <span class="n">C_xz</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_zy</span> <span class="o">-</span> <span class="n">C_yz</span><span class="p">)),</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_zx</span> <span class="o">-</span> <span class="n">C_xz</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_zy</span> <span class="o">-</span> <span class="n">C_yz</span><span class="p">)),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">C_xx</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">C_zz</span> <span class="o">-</span> <span class="n">C_yy</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xz</span> <span class="o">+</span> <span class="n">C_zx</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_yz</span> <span class="o">+</span> <span class="n">C_zy</span><span class="p">)),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xz</span> <span class="o">+</span> <span class="n">C_zx</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_yz</span> <span class="o">+</span> <span class="n">C_zy</span><span class="p">)),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xx</span> <span class="o">-</span> <span class="n">C_yy</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xy</span> <span class="o">+</span> <span class="n">C_yx</span><span class="p">)),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">):</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xx</span> <span class="o">-</span> <span class="n">C_yy</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">C_xy</span> <span class="o">+</span> <span class="n">C_yx</span><span class="p">))</span>
+    <span class="p">}</span>
+    
+    <span class="k">return</span> <span class="n">spherical_tensor</span></div>
+
+
+<div class="viewcode-block" id="vector_to_spherical_tensor">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.vector_to_spherical_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">vector_to_spherical_tensor</span><span class="p">(</span><span class="n">vector</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a Cartesian vector to a spherical tensor of rank 1.</span>
+
+<span class="sd">    Uses the covariant components.</span>
+<span class="sd">    Eq. 230 in Man: Cartesian and Spherical Tensors in NMR Hamiltonians</span>
+<span class="sd">    https://doi.org/10.1002/cmr.a.21289</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vector : ndarray</span>
+<span class="sd">        Vector in the format [x, y, z].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spherical_tensor : dict</span>
+<span class="sd">        Keys specify the rank and the projection (l, q), and the values</span>
+<span class="sd">        are the components.   </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Build the spherical tensor</span>
+    <span class="n">spherical_tensor</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">spherical_tensor</span></div>
+
+
+<div class="viewcode-block" id="CG_coeff">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.CG_coeff">[docs]</a>
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">32784</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">CG_coeff</span><span class="p">(</span><span class="n">j1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">m1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+             <span class="n">j2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">m2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+             <span class="n">j3</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">m3</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the Clebsch-Gordan coefficients.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    j1 : float</span>
+<span class="sd">        Angular momentum of state 1.</span>
+<span class="sd">    m1 : float</span>
+<span class="sd">        Magnetic quantum number of state 1.</span>
+<span class="sd">    j2 : float</span>
+<span class="sd">        Angular momentum of state 2.</span>
+<span class="sd">    m2 : float</span>
+<span class="sd">        Magnetic quantum number of state 2.</span>
+<span class="sd">    j3 : float</span>
+<span class="sd">        Total angular momentum of the coupled system.</span>
+<span class="sd">    m3 : float</span>
+<span class="sd">        Magnetic quantum number of the coupled system.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    coeff : float</span>
+<span class="sd">        Clebsch-Gordan coefficient.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get the coefficient</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">CG</span><span class="p">(</span><span class="n">j1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">j2</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">j3</span><span class="p">,</span> <span class="n">m3</span><span class="p">)</span><span class="o">.</span><span class="n">doit</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">coeff</span></div>
+
+
+<div class="viewcode-block" id="custom_dot">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.custom_dot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_dot</span><span class="p">(</span>
+        <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+        <span class="n">B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">,</span>
+        <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    User-friendly wrapper for the custom sparse matrix multiplication, which</span>
+<span class="sd">    saves memory usage by dropping values smaller than `zero_value` during the</span>
+<span class="sd">    calculation. The sparse multiplication is implemented with C++ / Cython and</span>
+<span class="sd">    is parallelized with OpenMP.</span>
+
+<span class="sd">    NOTE: If either of the input arrays is NumPy array, this function falls</span>
+<span class="sd">    back to the regular `@` multiplication.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ndarray or csc_array</span>
+<span class="sd">        First matrix in the multiplication.</span>
+<span class="sd">    B : ndarray or csc_array</span>
+<span class="sd">        Second matrix in the multiplication.</span>
+<span class="sd">    zero_value : float</span>
+<span class="sd">        Threshold under which the resulting matrix elements are considered as</span>
+<span class="sd">        zero.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    C : ndarray or csc_array</span>
+<span class="sd">        Result of matrix multiplication.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check input types</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">B</span>
+        <span class="n">eliminate_small</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">issparse</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="ow">and</span> <span class="n">issparse</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">_sparse_dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid input type for custom dot.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">C</span></div>
+
+
+<div class="viewcode-block" id="arraylike_to_tuple">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.arraylike_to_tuple">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">arraylike_to_tuple</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a 1-dimensional `ArrayLike` object into a Python tuple.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ArrayLike</span>
+<span class="sd">        An object that can be converted into NumPy array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A : tuple</span>
+<span class="sd">        The original object represented as Python tuple.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert to tuple</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">A</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+    <span class="k">elif</span> <span class="n">A</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot convert </span><span class="si">{</span><span class="n">A</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">-dimensional array into &quot;</span>
+                         <span class="s2">&quot;tuple.&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">A</span></div>
+
+
+<div class="viewcode-block" id="arraylike_to_array">
+<a class="viewcode-back" href="../../../spinguin.core.la.html#spinguin.core.la.arraylike_to_array">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">arraylike_to_array</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts an `ArrayLike` object into a NumPy array while ensuring</span>
+<span class="sd">    that at least one dimension is created.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : ArrayLike</span>
+<span class="sd">        An object that can be converted into NumPy array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A : ndarray</span>
+<span class="sd">        The original object converted into a NumPy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert to NumPy array and ensure at least one dimension</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
