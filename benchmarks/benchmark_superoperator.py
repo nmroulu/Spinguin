@@ -13,7 +13,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
 from spinguin._core._superoperators import sop_prod
-from spinguin._core._basis import make_basis, spin_order
+from spinguin._core._basis import make_basis
+from spinguin._core._utils import spin_order
 
 # Testing parameters
 max_nspins = 14
