@@ -8,6 +8,8 @@ class TestSpinguin(unittest.TestCase):
         """
         A test for creating Hilbert-space operators.
         """
+        # Reset parameters to defaults
+        sg.parameters.default()
 
         # Initialize two SpinSystem objects
         ss1 = sg.SpinSystem(['1H', '1H'])
@@ -24,6 +26,8 @@ class TestSpinguin(unittest.TestCase):
         """
         A test for creating Liouville-space superoperators.
         """
+        # Reset parameters to defaults
+        sg.parameters.default()
 
         # Initialize two SpinSystem objects
         ss1 = sg.SpinSystem(['1H', '1H'])
@@ -48,6 +52,8 @@ class TestSpinguin(unittest.TestCase):
         """
         A test for creating Hamiltonians.
         """
+        # Reset parameters to defaults
+        sg.parameters.default()
 
         # Initialize two SpinSystem objects
         ss1 = sg.SpinSystem(['1H', '1H'])
@@ -77,6 +83,8 @@ class TestSpinguin(unittest.TestCase):
         """
         Test creating the relaxation superoperator.
         """
+        # Reset parameters to defaults
+        sg.parameters.default()
 
         # Initialize two SpinSystem objects
         ss1 = sg.SpinSystem(['1H', '1H'])
