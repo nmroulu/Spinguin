@@ -186,3 +186,23 @@ class TestParameters(unittest.TestCase):
         sparse_pulse = False
         sg.parameters.sparse_pulse = sparse_pulse
         self.assertEqual(sg.parameters.sparse_pulse, sparse_pulse)
+
+    def test_zero_time_step(self):
+        """
+        Test setting the zero-value for one time step.
+        """
+        # Set the zero-value for time step
+        sg.parameters.default()
+        zero_time_step = 1e-10
+        sg.parameters.zero_time_step = zero_time_step
+        self.assertEqual(sg.parameters.zero_time_step, zero_time_step)
+
+    def test_zero_zte(self):
+        """
+        Test setting the zero-value for ZTE.
+        """
+        # Set the zero-value for ZTE
+        sg.parameters.default()
+        zero_zte = 1e-10
+        sg.parameters.zero_zte = zero_zte
+        self.assertEqual(sg.parameters.zero_zte, zero_zte)
