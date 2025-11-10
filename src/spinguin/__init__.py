@@ -65,7 +65,11 @@ from spinguin._core import (
     unit_state,
 
     # superoperators
-    superoperator
+    superoperator,
+
+    # utils
+    idx_to_lq,
+    lq_to_idx,
 )
 from spinguin import sequences
 
@@ -126,6 +130,10 @@ __all__ = [
     
     # core: superoperators
     "superoperator",
+
+    # core: utils
+    "idx_to_lq",
+    "lq_to_idx",
 
     # sequences
     "sequences",

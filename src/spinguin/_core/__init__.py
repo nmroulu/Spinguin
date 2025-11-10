@@ -50,6 +50,10 @@ from ._states import (
     unit_state,
 )
 from ._superoperators import superoperator
+from ._utils import (
+    idx_to_lq,
+    lq_to_idx
+)
 
 __all__ = [
     #chem
@@ -108,4 +112,8 @@ __all__ = [
     
     #superoperators
     "superoperator",
+
+    #utils
+    "idx_to_lq",
+    "lq_to_idx",
 ]
