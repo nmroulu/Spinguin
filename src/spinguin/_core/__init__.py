@@ -51,6 +51,7 @@ from ._states import (
 )
 from ._superoperators import superoperator
 from ._utils import (
+    coherence_order,
     idx_to_lq,
     lq_to_idx
 )
@@ -114,6 +115,7 @@ __all__ = [
     "superoperator",
 
     #utils
+    "coherence_order",
     "idx_to_lq",
     "lq_to_idx",
 ]

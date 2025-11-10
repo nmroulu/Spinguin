@@ -68,6 +68,7 @@ from spinguin._core import (
     superoperator,
 
     # utils
+    coherence_order,
     idx_to_lq,
     lq_to_idx,
 )
@@ -132,6 +133,7 @@ __all__ = [
     "superoperator",
 
     # core: utils
+    "coherence_order",
     "idx_to_lq",
     "lq_to_idx",
 
