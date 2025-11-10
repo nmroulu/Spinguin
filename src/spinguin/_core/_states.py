@@ -902,7 +902,7 @@ def state(spin_system: SpinSystem,
         raise ValueError("Please build the basis before constructing a state.")
     
     # Build the state
-    rho = _state_from_string(
+    rho = state_from_string(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         operator = operator,
