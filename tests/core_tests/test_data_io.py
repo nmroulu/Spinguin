@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import os
-from spinguin.core.data_io import read_array, read_tensors, read_xyz
+from spinguin._core._data_io import read_array, read_tensors, read_xyz
 
 class TestDataIOMethods(unittest.TestCase):
 

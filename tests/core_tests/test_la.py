@@ -3,9 +3,9 @@ import numpy as np
 import math
 from scipy.sparse.linalg import expm
 from scipy.sparse import csc_array, random_array
-from spinguin.core import la
-from spinguin.core.hide_prints import HidePrints
-from spinguin.core.operators import op_E, op_Sx, op_Sy, op_Sz, op_T_coupled
+from spinguin._core import _la
+from spinguin._core._hide_prints import HidePrints
+from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_T_coupled
 
 class TestLinearAlgebraMethods(unittest.TestCase):
 
@@ -23,26 +23,26 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         arr3 = np.array([1, 0, 0])
 
         # Check vectors with the correct order
-        self.assertEqual(la.isvector(row1, 'row'), True)
-        self.assertEqual(la.isvector(row2, 'row'), True)
-        self.assertEqual(la.isvector(col1, 'col'), True)
-        self.assertEqual(la.isvector(col2, 'col'), True)
+        self.assertEqual(_la.isvector(row1, 'row'), True)
+        self.assertEqual(_la.isvector(row2, 'row'), True)
+        self.assertEqual(_la.isvector(col1, 'col'), True)
+        self.assertEqual(_la.isvector(col2, 'col'), True)
 
         # Check vectors with the incorrect order
-        self.assertEqual(la.isvector(row1, 'col'), False)
-        self.assertEqual(la.isvector(row2, 'col'), False)
-        self.assertEqual(la.isvector(col1, 'row'), False)
-        self.assertEqual(la.isvector(col2, 'row'), False)
+        self.assertEqual(_la.isvector(row1, 'col'), False)
+        self.assertEqual(_la.isvector(row2, 'col'), False)
+        self.assertEqual(_la.isvector(col1, 'row'), False)
+        self.assertEqual(_la.isvector(col2, 'row'), False)
 
         # Check other 2D arrays
-        self.assertEqual(la.isvector(arr1, 'col'), False)
-        self.assertEqual(la.isvector(arr1, 'row'), False)
+        self.assertEqual(_la.isvector(arr1, 'col'), False)
+        self.assertEqual(_la.isvector(arr1, 'row'), False)
 
         # Check arrays with incorrect shapes
-        self.assertRaises(ValueError, la.isvector, arr2, 'col')
-        self.assertRaises(ValueError, la.isvector, arr2, 'row')
-        self.assertRaises(ValueError, la.isvector, arr3, 'col')
-        self.assertRaises(ValueError, la.isvector, arr3, 'row')
+        self.assertRaises(ValueError, _la.isvector, arr2, 'col')
+        self.assertRaises(ValueError, _la.isvector, arr2, 'row')
+        self.assertRaises(ValueError, _la.isvector, arr3, 'col')
+        self.assertRaises(ValueError, _la.isvector, arr3, 'row')
 
     def test_norm_1(self):
 
@@ -50,14 +50,14 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         A = np.random.rand(3, 3)
 
         # Test using NumPy arrays against the value given by NumPy
-        self.assertAlmostEqual(la.norm_1(A, 'row'),
+        self.assertAlmostEqual(_la.norm_1(A, 'row'),
                                np.linalg.norm(A, ord=np.inf))
-        self.assertAlmostEqual(la.norm_1(A, 'col'), np.linalg.norm(A, ord=1))
+        self.assertAlmostEqual(_la.norm_1(A, 'col'), np.linalg.norm(A, ord=1))
 
         # Test using sparse arrays against the value given by NumPy
-        self.assertAlmostEqual(la.norm_1(csc_array(A), 'row'),
+        self.assertAlmostEqual(_la.norm_1(csc_array(A), 'row'),
                                np.linalg.norm(A, ord=np.inf))
-        self.assertAlmostEqual(la.norm_1(csc_array(A), 'col'),
+        self.assertAlmostEqual(_la.norm_1(csc_array(A), 'col'),
                                np.linalg.norm(A, ord=1))
 
     def test_expm(self):
@@ -68,13 +68,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                       [7, 8, 9]])
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(la.expm(A, 1e-32), expm(A)))
+        self.assertTrue(np.allclose(_la.expm(A, 1e-32), expm(A)))
 
         # Perform the same test with a SciPy sparse array
         A = csc_array(A)
 
         # Compare against the value given by SciPy
-        self.assertTrue(np.allclose(la.expm(A, 1e-32).toarray(),
+        self.assertTrue(np.allclose(_la.expm(A, 1e-32).toarray(),
                                     expm(A).toarray()))
 
     def test_eliminate_small(self):
@@ -88,8 +88,8 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         A_np = A_sp.toarray()
         
         # Eliminate small values from the arrays
-        la.eliminate_small(A_sp, zero_value=5)
-        la.eliminate_small(A_np, zero_value=5)
+        _la.eliminate_small(A_sp, zero_value=5)
+        _la.eliminate_small(A_np, zero_value=5)
 
         # Create a comparison array
         B = np.array([[0, 0, 0],
@@ -107,10 +107,10 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         A = random_array((1000, 1000), density=0.5, format='csc')
 
         # Convert to byte representation
-        A_bytes = la.sparse_to_bytes(A)
+        A_bytes = _la.sparse_to_bytes(A)
         
         # Convert back to sparse representation
-        B = la.bytes_to_sparse(A_bytes)
+        B = _la.bytes_to_sparse(A_bytes)
 
         # Compare the arrays
         self.assertTrue(np.allclose(A.toarray(), B.toarray()))
@@ -121,10 +121,10 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         A = np.random.rand(3, 3)
 
         # Commutator with itself should be zero
-        self.assertTrue(np.allclose(la.comm(A, A), np.zeros_like(A)))
+        self.assertTrue(np.allclose(_la.comm(A, A), np.zeros_like(A)))
 
         # Commutator with the identity array should be zero
-        self.assertTrue(np.allclose(la.comm(A, np.eye(3)), np.zeros_like(A)))
+        self.assertTrue(np.allclose(_la.comm(A, np.eye(3)), np.zeros_like(A)))
 
     def test_find_common_rows(self):
 
@@ -138,7 +138,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                       [1, 0, 0]])
         
         # Find indices that should return common rows
-        A_ind, B_ind = la.find_common_rows(A, B)
+        A_ind, B_ind = _la.find_common_rows(A, B)
 
         # Check that the arrays are equal
         self.assertTrue(np.array_equal(A[A_ind], B[B_ind]))
@@ -165,9 +165,9 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         T = 1
         
         # Compute the auxiliary matrix exponential
-        expm_aux_sp = la.auxiliary_matrix_expm(
+        expm_aux_sp = _la.auxiliary_matrix_expm(
             A_sp, B_sp, C_sp, T, zero_value=1e-18)
-        expm_aux_dn = la.auxiliary_matrix_expm(
+        expm_aux_dn = _la.auxiliary_matrix_expm(
             A_dn, B_dn, C_dn, T, zero_value=1e-18)
 
         # Extract the sparse components
@@ -184,14 +184,14 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
         # Compute the components manually for reference
         with HidePrints():
-            top_l_ref = la.expm(A_dn*T, zero_value=1e-18)
+            top_l_ref = _la.expm(A_dn*T, zero_value=1e-18)
             top_r_ref = np.zeros(A_dn.shape, dtype=complex)
             for t in np.linspace(0, T, 1000):
-                top_r_ref += la.expm(-A_dn*t, zero_value=1e-18) @ B_dn @ \
-                             la.expm(C_dn*t, zero_value=1e-18) * (1/1000)
-            top_r_ref = (la.expm(A_dn*T, zero_value=1e-18) @ top_r_ref)
+                top_r_ref += _la.expm(-A_dn*t, zero_value=1e-18) @ B_dn @ \
+                             _la.expm(C_dn*t, zero_value=1e-18) * (1/1000)
+            top_r_ref = (_la.expm(A_dn*T, zero_value=1e-18) @ top_r_ref)
             bot_l_ref = np.zeros_like(bot_l_dn)
-            bot_r_ref = la.expm(C_dn*T, zero_value=1e-18)
+            bot_r_ref = _la.expm(C_dn*T, zero_value=1e-18)
 
         # Verify the sparse components
         self.assertTrue(np.allclose(top_l_sp.toarray(), top_l_ref))
@@ -213,10 +213,10 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         v3 = np.array([1, 1])
 
         # Compare with known results
-        self.assertAlmostEqual(la.angle_between_vectors(v1, v1), 0)
-        self.assertAlmostEqual(la.angle_between_vectors(v1, v2), np.pi/2)
-        self.assertAlmostEqual(la.angle_between_vectors(v1, -v1), np.pi)
-        self.assertAlmostEqual(la.angle_between_vectors(v1, v3), np.pi/4)
+        self.assertAlmostEqual(_la.angle_between_vectors(v1, v1), 0)
+        self.assertAlmostEqual(_la.angle_between_vectors(v1, v2), np.pi/2)
+        self.assertAlmostEqual(_la.angle_between_vectors(v1, -v1), np.pi)
+        self.assertAlmostEqual(_la.angle_between_vectors(v1, v3), np.pi/4)
 
     def test_decompose_matrix(self):
 
@@ -224,7 +224,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         A = np.random.rand(3, 3)
 
         # Decompose the matrix
-        iso, asym, sym = la.decompose_matrix(A)
+        iso, asym, sym = _la.decompose_matrix(A)
 
         # Use the matrix properties for checking
         self.assertTrue(np.allclose(A, iso+asym+sym))
@@ -235,9 +235,9 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
         # Generate a test array
         A = np.random.rand(3, 3)
-        _, _, A_sym = la.decompose_matrix(A)
+        _, _, A_sym = _la.decompose_matrix(A)
 
-        eigenvalues, eigenvectors, tensor_PAS = la.principal_axis_system(A)
+        eigenvalues, eigenvectors, tensor_PAS = _la.principal_axis_system(A)
 
         # Check that the eigenvectors diagonalize the symmetric part
         self.assertTrue(np.allclose(
@@ -259,7 +259,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
             for q in range(-l, l+1):
                 self.assertAlmostEqual(
                     (tensor @ spherical_tensor(l, q)).trace(),
-                    la.cartesian_tensor_to_spherical_tensor(tensor)[(l, q)])
+                    _la.cartesian_tensor_to_spherical_tensor(tensor)[(l, q)])
 
     def test_vector_to_spherical_tensor(self):
 
@@ -270,7 +270,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         for q in range(-1, 2):
             self.assertAlmostEqual(
                 np.inner(spherical_vector(1, q), vector),
-                la.vector_to_spherical_tensor(vector)[(1, q)])
+                _la.vector_to_spherical_tensor(vector)[(1, q)])
 
     def test_cartesian_to_spherical_tensor_conventions(self):
 
@@ -303,7 +303,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                 left += A[i, s] * I[0, i] @ S[s, 0]
 
         # Convert A to spherical tensors
-        A = la.cartesian_tensor_to_spherical_tensor(A)
+        A = _la.cartesian_tensor_to_spherical_tensor(A)
 
         # Use spherical tensors
         right = np.zeros_like(Ix)
@@ -318,24 +318,24 @@ class TestLinearAlgebraMethods(unittest.TestCase):
     def test_CG_coeff(self):
 
         # Test against known values
-        self.assertAlmostEqual(la.CG_coeff(1/2, 1/2, 1/2, 1/2, 1, 1), 1)
-        self.assertAlmostEqual(la.CG_coeff(1/2, -1/2, 1/2, -1/2, 1, -1), 1)
-        self.assertAlmostEqual(la.CG_coeff(1/2, 1/2, 1/2, -1/2, 1, 0),
+        self.assertAlmostEqual(_la.CG_coeff(1/2, 1/2, 1/2, 1/2, 1, 1), 1)
+        self.assertAlmostEqual(_la.CG_coeff(1/2, -1/2, 1/2, -1/2, 1, -1), 1)
+        self.assertAlmostEqual(_la.CG_coeff(1/2, 1/2, 1/2, -1/2, 1, 0),
                                math.sqrt(1/2))
-        self.assertAlmostEqual(la.CG_coeff(1/2, 1/2, 1/2, -1/2, 0, 0),
+        self.assertAlmostEqual(_la.CG_coeff(1/2, 1/2, 1/2, -1/2, 0, 0),
                                math.sqrt(1/2))
-        self.assertAlmostEqual(la.CG_coeff(1/2, -1/2, 1/2, 1/2, 1, 0),
+        self.assertAlmostEqual(_la.CG_coeff(1/2, -1/2, 1/2, 1/2, 1, 0),
                                math.sqrt(1/2))
-        self.assertAlmostEqual(la.CG_coeff(1/2, -1/2, 1/2, 1/2, 0, 0),
+        self.assertAlmostEqual(_la.CG_coeff(1/2, -1/2, 1/2, 1/2, 0, 0),
                                -math.sqrt(1/2))
-        self.assertAlmostEqual(la.CG_coeff(1, 1, 1/2, 1/2, 3/2, 3/2), 1)
-        self.assertAlmostEqual(la.CG_coeff(1, 1, 1/2, -1/2, 3/2, 1/2),
+        self.assertAlmostEqual(_la.CG_coeff(1, 1, 1/2, 1/2, 3/2, 3/2), 1)
+        self.assertAlmostEqual(_la.CG_coeff(1, 1, 1/2, -1/2, 3/2, 1/2),
                                math.sqrt(1/3))
-        self.assertAlmostEqual(la.CG_coeff(1, 1, 1/2, -1/2, 1/2, 1/2),
+        self.assertAlmostEqual(_la.CG_coeff(1, 1, 1/2, -1/2, 1/2, 1/2),
                                math.sqrt(2/3))
-        self.assertAlmostEqual(la.CG_coeff(1, 0, 1/2, 1/2, 3/2, 1/2),
+        self.assertAlmostEqual(_la.CG_coeff(1, 0, 1/2, 1/2, 3/2, 1/2),
                                math.sqrt(2/3))
-        self.assertAlmostEqual(la.CG_coeff(1, 0, 1/2, 1/2, 1/2, 1/2),
+        self.assertAlmostEqual(_la.CG_coeff(1, 0, 1/2, 1/2, 1/2, 1/2),
                                -math.sqrt(1/3))
 
     def test_custom_dot(self):
@@ -346,24 +346,24 @@ class TestLinearAlgebraMethods(unittest.TestCase):
 
         # Compare against SciPy
         C_SciPy = A @ B
-        C_custom = la.custom_dot(A, B, zero_value=1e-18)
+        C_custom = _la.custom_dot(A, B, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test empty @ non-empty
         A_empty = csc_array((200, 300))
         C_SciPy = A_empty @ B
-        C_custom = la.custom_dot(A_empty, B, zero_value=1e-18)
+        C_custom = _la.custom_dot(A_empty, B, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test non-empty @ empty
         B_empty = csc_array((300, 400))
         C_SciPy = A @ B_empty
-        C_custom = la.custom_dot(A, B_empty, zero_value=1e-18)
+        C_custom = _la.custom_dot(A, B_empty, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test empty @ empty
         C_SciPy = A_empty @ B_empty
-        C_custom = la.custom_dot(A_empty, B_empty, zero_value=1e-18)
+        C_custom = _la.custom_dot(A_empty, B_empty, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test with non-empty arrays where result will be empty
@@ -371,13 +371,13 @@ class TestLinearAlgebraMethods(unittest.TestCase):
             [0, 1],
             [0, 0]])
         C_SciPy = A @ A
-        C_custom = la.custom_dot(A, A, zero_value=1e-18)
+        C_custom = _la.custom_dot(A, A, zero_value=1e-18)
         self.assertTrue(np.allclose(C_SciPy.toarray(), C_custom.toarray()))
 
         # Test repeatedly using same array
         A = random_array((200, 200), density=0.2, format="csc", dtype=complex)
         for _ in range(10):
-            A = la.custom_dot(A, A, zero_value=1e-32)
+            A = _la.custom_dot(A, A, zero_value=1e-32)
 
         # Test varying dtypes
         dtypes_I = [np.int32, np.int64]
@@ -394,11 +394,62 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                         B.data = B.data.astype(dtype_BT)
                         B.indices = B.indices.astype(dtype_BI)
                         B.indptr = B.indptr.astype(dtype_BI)
-                        C_custom = la.custom_dot(A, B, zero_value=1e-18)
+                        C_custom = _la.custom_dot(A, B, zero_value=1e-18)
                         C_SciPy = A @ B
                         self.assertTrue(np.allclose(C_SciPy.toarray(),
                                                     C_custom.toarray()))
+                        
+    def test_expm_vec_taylor(self):
 
+        # Create a 3x3 array with large numbers
+        A = np.array([[1, 2, 3],
+                      [4, 5, 6],
+                      [7, 8, 9]])
+
+        # Create a column vector
+        v = np.array([[1], [2], [3]])
+
+        # Calculate the action of matrix exponential to the vector using
+        # sparse and dense matrices and vectors
+        eAv_dd = _la.expm_vec_taylor(A, v, 1e-18)
+        eAv_ds = _la.expm_vec_taylor(A, csc_array(v), 1e-18)
+        eAv_sd = _la.expm_vec_taylor(csc_array(A), v, 1e-18)
+        eAv_ss = _la.expm_vec_taylor(csc_array(A), csc_array(v), 1e-18)
+
+        # Calculate reference
+        eAv_ref = expm(A) @ v
+
+        # Should be equal
+        self.assertTrue(np.allclose(eAv_dd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ds, eAv_ref))
+        self.assertTrue(np.allclose(eAv_sd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ss.toarray(), eAv_ref))
+                        
+    def test_expm_vec(self):
+
+        # Create a 3x3 array with large numbers
+        A = np.array([[1, 2, 3],
+                      [4, 5, 6],
+                      [7, 8, 9]])
+
+        # Create a column vector
+        v = np.array([[1], [2], [3]])
+
+        # Calculate the action of matrix exponential to the vector using
+        # sparse and dense matrices and vectors
+        eAv_dd = _la.expm_vec(A, v, 1e-18)
+        eAv_ds = _la.expm_vec(A, csc_array(v), 1e-18)
+        eAv_sd = _la.expm_vec(csc_array(A), v, 1e-18)
+        eAv_ss = _la.expm_vec(csc_array(A), csc_array(v), 1e-18)
+
+        # Calculate reference
+        eAv_ref = expm(A) @ v
+
+        # Should be equal
+        self.assertTrue(np.allclose(eAv_dd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ds, eAv_ref))
+        self.assertTrue(np.allclose(eAv_sd, eAv_ref))
+        self.assertTrue(np.allclose(eAv_ss.toarray(), eAv_ref))
 
 def spherical_tensor(l, q):
     """
@@ -418,7 +469,7 @@ def spherical_tensor(l, q):
     # Coupling of angular momenta
     for q1 in range(-1, 2):
         for q2 in range(-1, 2):
-            t_lq += la.CG_coeff(1, q1, 1, q2, l, q) * \
+            t_lq += _la.CG_coeff(1, q1, 1, q2, l, q) * \
                     np.outer(spherical_vector(1, q1), spherical_vector(1, q2))
 
     return t_lq

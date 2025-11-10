@@ -1,9 +1,9 @@
 import unittest
 import numpy as np
 import itertools
-from spinguin.core.chem import dissociate, associate, permute_spins
-from spinguin.core.basis import make_basis
-from spinguin.core.states import triplet_plus_state, alpha_state
+from spinguin._core._chem import _dissociate, _associate, _permute_spins
+from spinguin._core._basis import make_basis
+from spinguin._core._states import _triplet_plus_state, _alpha_state
 
 class TestChemMethods(unittest.TestCase):
 
@@ -37,27 +37,27 @@ class TestChemMethods(unittest.TestCase):
                     basis3 = make_basis(spins3, max_spin_order3)
 
                     # Create alpha states for the spin systems
-                    rho1_dense = alpha_state(basis1, spins1, 0, sparse=False)
-                    rho1_sparse = alpha_state(basis1, spins1, 0, sparse=True)
-                    rho2_dense = alpha_state(basis2, spins2, 0, sparse=False)
-                    rho2_sparse = alpha_state(basis2, spins2, 0, sparse=True)
+                    rho1_dense = _alpha_state(basis1, spins1, 0, sparse=False)
+                    rho1_sparse = _alpha_state(basis1, spins1, 0, sparse=True)
+                    rho2_dense = _alpha_state(basis2, spins2, 0, sparse=False)
+                    rho2_sparse = _alpha_state(basis2, spins2, 0, sparse=True)
 
                     # Perform association
-                    rho3_dense_dense = associate(basis1, basis2, basis3,
+                    rho3_dense_dense = _associate(basis1, basis2, basis3,
                                                  rho1_dense, rho2_dense,
                                                  spinmap1, spinmap2)
-                    rho3_dense_sparse = associate(basis1, basis2, basis3,
+                    rho3_dense_sparse = _associate(basis1, basis2, basis3,
                                                   rho1_dense, rho2_sparse,
                                                   spinmap1, spinmap2)
-                    rho3_sparse_dense = associate(basis1, basis2, basis3,
+                    rho3_sparse_dense = _associate(basis1, basis2, basis3,
                                                   rho1_sparse, rho2_dense,
                                                   spinmap1, spinmap2)
-                    rho3_sparse_sparse = associate(basis1, basis2, basis3,
+                    rho3_sparse_sparse = _associate(basis1, basis2, basis3,
                                                    rho1_sparse, rho2_sparse,
                                                    spinmap1, spinmap2)
 
                     # Create the expected state directly
-                    rho3_ref = triplet_plus_state(basis3, spins3, 0, 1,
+                    rho3_ref = _triplet_plus_state(basis3, spins3, 0, 1,
                                                   sparse=False)
 
                     # Compare
@@ -97,22 +97,22 @@ class TestChemMethods(unittest.TestCase):
                     basis3 = make_basis(spins3, max_spin_order3)
 
                     # Create a triplet plus state for the combined system
-                    rho3_dense = triplet_plus_state(basis3, spins3, 0, 1,
+                    rho3_dense = _triplet_plus_state(basis3, spins3, 0, 1,
                                                     sparse=False)
-                    rho3_sparse = triplet_plus_state(basis3, spins3, 0, 1,
+                    rho3_sparse = _triplet_plus_state(basis3, spins3, 0, 1,
                                                      sparse=False)
 
                     # Perform dissociation
-                    rho1_dense, rho2_dense = dissociate(
+                    rho1_dense, rho2_dense = _dissociate(
                         basis1, basis2, basis3, spins1, spins2, rho3_dense,
                         spinmap1, spinmap2)
-                    rho1_sparse, rho2_sparse = dissociate(
+                    rho1_sparse, rho2_sparse = _dissociate(
                         basis1, basis2, basis3, spins1, spins2, rho3_sparse,
                         spinmap1, spinmap2)
 
                     # Create the expected states directly
-                    rho1_ref = alpha_state(basis1, spins1, 0, sparse=False)
-                    rho2_ref = alpha_state(basis2, spins2, 0, sparse=False)
+                    rho1_ref = _alpha_state(basis1, spins1, 0, sparse=False)
+                    rho2_ref = _alpha_state(basis2, spins2, 0, sparse=False)
 
                     # Compare
                     self.assertTrue(np.allclose(rho1_ref, rho1_dense))
@@ -131,7 +131,7 @@ class TestChemMethods(unittest.TestCase):
         basis = make_basis(spins, max_spin_order)
 
         # Create an alpha state for the first spin
-        rho = alpha_state(basis, spins, 0, sparse=False)
+        rho = _alpha_state(basis, spins, 0, sparse=False)
 
         # Get all possible permutations
         permutations = itertools.permutations([0, 1, 2])
@@ -143,13 +143,13 @@ class TestChemMethods(unittest.TestCase):
             perm = np.array(perm)
 
             # Permute the original state
-            rho_perm = permute_spins(basis, rho, perm)
+            rho_perm = _permute_spins(basis, rho, perm)
 
             # Find where the first spin is going to be mapped
             idx = perm[0]
 
             # Create reference state
-            rho_ref = alpha_state(basis, spins, idx, sparse=False)
+            rho_ref = _alpha_state(basis, spins, idx, sparse=False)
 
             # Compare
             self.assertTrue(np.allclose(rho_ref, rho_perm))

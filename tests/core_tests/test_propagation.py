@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
-from spinguin.core.basis import make_basis
-from spinguin.core.states import state_from_string
-from spinguin.core.propagation import sop_pulse
+from spinguin._core._basis import make_basis
+from spinguin._core._states import state_from_string
+from spinguin._core._propagation import _sop_pulse
 
 class TestPropagation(unittest.TestCase):
 
@@ -35,35 +35,35 @@ class TestPropagation(unittest.TestCase):
                                           sparse=True)
 
         # Create pulses in dense format
-        pul_90_x_dense = sop_pulse(basis, spins, "I(x,0)", angle=90,
+        pul_90_x_dense = _sop_pulse(basis, spins, "I(x,0)", angle=90,
                                    sparse=False)
-        pul_90_y_dense = sop_pulse(basis, spins, "I(y,0)", angle=90,
+        pul_90_y_dense = _sop_pulse(basis, spins, "I(y,0)", angle=90,
                                    sparse=False)
-        pul_90_z_dense = sop_pulse(basis, spins, "I(z,0)", angle=90,
+        pul_90_z_dense = _sop_pulse(basis, spins, "I(z,0)", angle=90,
                                    sparse=False)
-        pul_180_x_dense = sop_pulse(basis, spins, "I(x,0)", angle=180,
+        pul_180_x_dense = _sop_pulse(basis, spins, "I(x,0)", angle=180,
                                     sparse=False)
-        pul_180_y_dense = sop_pulse(basis, spins, "I(y,0)", angle=180,
+        pul_180_y_dense = _sop_pulse(basis, spins, "I(y,0)", angle=180,
                                     sparse=False)
-        pul_180_z_dense = sop_pulse(basis, spins, "I(z,0)", angle=180,
+        pul_180_z_dense = _sop_pulse(basis, spins, "I(z,0)", angle=180,
                                     sparse=False)
-        pul_180_zz_dense = sop_pulse(basis, spins, "I(z,0)*I(z,1)", angle=180,
+        pul_180_zz_dense = _sop_pulse(basis, spins, "I(z,0)*I(z,1)", angle=180,
                                      sparse=False)
 
         # Create pulses in sparse format
-        pul_90_x_sparse = sop_pulse(basis, spins, "I(x,0)", angle=90,
+        pul_90_x_sparse = _sop_pulse(basis, spins, "I(x,0)", angle=90,
                                     sparse=True)
-        pul_90_y_sparse = sop_pulse(basis, spins, "I(y,0)", angle=90,
+        pul_90_y_sparse = _sop_pulse(basis, spins, "I(y,0)", angle=90,
                                     sparse=True)
-        pul_90_z_sparse = sop_pulse(basis, spins, "I(z,0)", angle=90,
+        pul_90_z_sparse = _sop_pulse(basis, spins, "I(z,0)", angle=90,
                                     sparse=True)
-        pul_180_x_sparse = sop_pulse(basis, spins, "I(x,0)", angle=180,
+        pul_180_x_sparse = _sop_pulse(basis, spins, "I(x,0)", angle=180,
                                      sparse=True)
-        pul_180_y_sparse = sop_pulse(basis, spins, "I(y,0)", angle=180,
+        pul_180_y_sparse = _sop_pulse(basis, spins, "I(y,0)", angle=180,
                                      sparse=True)
-        pul_180_z_sparse = sop_pulse(basis, spins, "I(z,0)", angle=180,
+        pul_180_z_sparse = _sop_pulse(basis, spins, "I(z,0)", angle=180,
                                      sparse=True)
-        pul_180_zz_sparse = sop_pulse(basis, spins, "I(z,0)*I(z,1)", angle=180,
+        pul_180_zz_sparse = _sop_pulse(basis, spins, "I(z,0)*I(z,1)", angle=180,
                                       sparse=True)
 
         # Verify the results (dense@dense)

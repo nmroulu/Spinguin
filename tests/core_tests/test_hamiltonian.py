@@ -2,9 +2,9 @@ import unittest
 import numpy as np
 import os
 from scipy.sparse import load_npz
-from spinguin.core.hamiltonian import sop_H
-from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.core.basis import make_basis
+from spinguin._core._hamiltonian import sop_H
+from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._basis import make_basis
 
 class TestHamiltonian(unittest.TestCase):
     """

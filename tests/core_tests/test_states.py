@@ -1,14 +1,14 @@
 import unittest
 import numpy as np
 import scipy.constants as const
-from spinguin.core.operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
-from spinguin.core.states import \
-    alpha_state, beta_state, state_to_zeeman, singlet_state, \
-    triplet_zero_state, triplet_plus_state, triplet_minus_state, \
-    state_from_string, unit_state, measure, equilibrium_state
-from spinguin.core.basis import make_basis
-from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.core.hamiltonian import sop_H_Z
+from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
+from spinguin._core._states import \
+    _alpha_state, _beta_state, _state_to_zeeman, _singlet_state, \
+    _triplet_zero_state, _triplet_plus_state, _triplet_minus_state, \
+    state_from_string, _unit_state, _measure, _equilibrium_state
+from spinguin._core._basis import make_basis
+from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._hamiltonian import sop_H_Z
 
 class TestStates(unittest.TestCase):
 
@@ -33,23 +33,23 @@ class TestStates(unittest.TestCase):
         alpha2_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz)
 
         # Create alpha states in the spherical tensor basis
-        alpha1_sparse = alpha_state(basis, spins, 0, sparse=True)
-        alpha2_sparse = alpha_state(basis, spins, 1, sparse=True)
-        alpha1_dense = alpha_state(basis, spins, 0, sparse=False)
-        alpha2_dense = alpha_state(basis, spins, 1, sparse=False)
+        alpha1_sparse = _alpha_state(basis, spins, 0, sparse=True)
+        alpha2_sparse = _alpha_state(basis, spins, 1, sparse=True)
+        alpha1_dense = _alpha_state(basis, spins, 0, sparse=False)
+        alpha2_dense = _alpha_state(basis, spins, 1, sparse=False)
 
         # Compare
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, alpha1_sparse, sparse=False),
+            _state_to_zeeman(basis, spins, alpha1_sparse, sparse=False),
             alpha1_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, alpha2_sparse, sparse=False),
+            _state_to_zeeman(basis, spins, alpha2_sparse, sparse=False),
             alpha2_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, alpha1_dense, sparse=False),
+            _state_to_zeeman(basis, spins, alpha1_dense, sparse=False),
             alpha1_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, alpha2_dense, sparse=False),
+            _state_to_zeeman(basis, spins, alpha2_dense, sparse=False),
             alpha2_zeeman))
 
     def test_beta(self):
@@ -73,23 +73,23 @@ class TestStates(unittest.TestCase):
         beta2_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz)
 
         # Create beta states in the spherical tensor basis
-        beta1_sparse = beta_state(basis, spins, 0, sparse=True)
-        beta2_sparse = beta_state(basis, spins, 1, sparse=True)
-        beta1_dense = beta_state(basis, spins, 0, sparse=False)
-        beta2_dense = beta_state(basis, spins, 1, sparse=False)
+        beta1_sparse = _beta_state(basis, spins, 0, sparse=True)
+        beta2_sparse = _beta_state(basis, spins, 1, sparse=True)
+        beta1_dense = _beta_state(basis, spins, 0, sparse=False)
+        beta2_dense = _beta_state(basis, spins, 1, sparse=False)
 
         # Compare
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, beta1_sparse, sparse=False),
+            _state_to_zeeman(basis, spins, beta1_sparse, sparse=False),
             beta1_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, beta2_sparse, sparse=False),
+            _state_to_zeeman(basis, spins, beta2_sparse, sparse=False),
             beta2_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, beta1_dense, sparse=False),
+            _state_to_zeeman(basis, spins, beta1_dense, sparse=False),
             beta1_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, beta2_dense, sparse=False),
+            _state_to_zeeman(basis, spins, beta2_dense, sparse=False),
             beta2_zeeman))
 
     def test_singlet(self):
@@ -113,14 +113,14 @@ class TestStates(unittest.TestCase):
         # Create the singlet state in both bases and compare
         singlet_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - \
                          1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
-        singlet_sparse = singlet_state(basis, spins, 0, 1, sparse=True)
-        singlet_dense = singlet_state(basis, spins, 0, 1, sparse=False)
+        singlet_sparse = _singlet_state(basis, spins, 0, 1, sparse=True)
+        singlet_dense = _singlet_state(basis, spins, 0, 1, sparse=False)
         self.assertTrue(np.allclose(
             singlet_zeeman,
-            state_to_zeeman(basis, spins, singlet_sparse, sparse=False)))
+            _state_to_zeeman(basis, spins, singlet_sparse, sparse=False)))
         self.assertTrue(np.allclose(
             singlet_zeeman,
-            state_to_zeeman(basis, spins, singlet_dense, sparse=False)))
+            _state_to_zeeman(basis, spins, singlet_dense, sparse=False)))
 
     def test_triplet_zero(self):
         """
@@ -143,16 +143,16 @@ class TestStates(unittest.TestCase):
         # Create the triplet-zero state and compare
         triplet_zero_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + \
                               1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
-        triplet_zero_sparse = triplet_zero_state(basis, spins, 0, 1,
+        triplet_zero_sparse = _triplet_zero_state(basis, spins, 0, 1,
                                                  sparse=True)
-        triplet_zero_dense = triplet_zero_state(basis, spins, 0, 1,
+        triplet_zero_dense = _triplet_zero_state(basis, spins, 0, 1,
                                                 sparse=False)
         self.assertTrue(np.allclose(
             triplet_zero_zeeman,
-            state_to_zeeman(basis, spins, triplet_zero_sparse, sparse=False)))
+            _state_to_zeeman(basis, spins, triplet_zero_sparse, sparse=False)))
         self.assertTrue(np.allclose(
             triplet_zero_zeeman,
-            state_to_zeeman(basis, spins, triplet_zero_dense, sparse=False)))
+            _state_to_zeeman(basis, spins, triplet_zero_dense, sparse=False)))
 
     def test_triplet_plus(self):
         """
@@ -173,16 +173,16 @@ class TestStates(unittest.TestCase):
         # Create the triplet-plus state and compare
         triplet_plus_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + \
                               1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
-        triplet_plus_sparse = triplet_plus_state(basis, spins, 0, 1,
+        triplet_plus_sparse = _triplet_plus_state(basis, spins, 0, 1,
                                                  sparse=True)
-        triplet_plus_dense = triplet_plus_state(basis, spins, 0, 1,
+        triplet_plus_dense = _triplet_plus_state(basis, spins, 0, 1,
                                                 sparse=False)
         self.assertTrue(np.allclose(
             triplet_plus_zeeman,
-            state_to_zeeman(basis, spins, triplet_plus_sparse, sparse=False)))
+            _state_to_zeeman(basis, spins, triplet_plus_sparse, sparse=False)))
         self.assertTrue(np.allclose(
             triplet_plus_zeeman,
-            state_to_zeeman(basis, spins, triplet_plus_dense, sparse=False)))
+            _state_to_zeeman(basis, spins, triplet_plus_dense, sparse=False)))
 
     def test_triplet_minus(self):
         """
@@ -203,16 +203,16 @@ class TestStates(unittest.TestCase):
         # Create the triplet-minus state and compare
         triplet_minus_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - \
                                1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
-        triplet_minus_sparse = triplet_minus_state(basis, spins, 0, 1,
+        triplet_minus_sparse = _triplet_minus_state(basis, spins, 0, 1,
                                                    sparse=True)
-        triplet_minus_dense = triplet_minus_state(basis, spins, 0, 1,
+        triplet_minus_dense = _triplet_minus_state(basis, spins, 0, 1,
                                                   sparse=False)
         self.assertTrue(np.allclose(
             triplet_minus_zeeman,
-            state_to_zeeman(basis, spins, triplet_minus_sparse, sparse=False)))
+            _state_to_zeeman(basis, spins, triplet_minus_sparse, sparse=False)))
         self.assertTrue(np.allclose(
             triplet_minus_zeeman,
-            state_to_zeeman(basis, spins, triplet_minus_dense, sparse=False)))
+            _state_to_zeeman(basis, spins, triplet_minus_dense, sparse=False)))
 
     def test_state_from_string_and_rho_to_zeeman(self):
         """
@@ -271,13 +271,13 @@ class TestStates(unittest.TestCase):
                                                    opers[(k, 3/2)]))
 
                     # Test the conversion using all possible sparsity combinations
-                    state_sparse_to_zeeman_dense = state_to_zeeman(
+                    state_sparse_to_zeeman_dense = _state_to_zeeman(
                         basis, spins, state_sparse, sparse=False)
-                    state_sparse_to_zeeman_sparse = state_to_zeeman(
+                    state_sparse_to_zeeman_sparse = _state_to_zeeman(
                         basis, spins, state_sparse, sparse=True).toarray()
-                    state_dense_to_zeeman_dense = state_to_zeeman(
+                    state_dense_to_zeeman_dense = _state_to_zeeman(
                         basis, spins, state_dense, sparse=False)
-                    state_dense_to_zeeman_sparse = state_to_zeeman(
+                    state_dense_to_zeeman_sparse = _state_to_zeeman(
                         basis, spins, state_dense, sparse=True).toarray()
 
                     # Compare to the Zeeman reference
@@ -308,30 +308,30 @@ class TestStates(unittest.TestCase):
             unit_zeeman = np.kron(unit_zeeman, op_E(spin, sparse=False))
 
         # Create the non-normalized unit state in the spherical tensor basis
-        unit_sparse = unit_state(basis, spins, sparse=True, normalized=False)
-        unit_dense = unit_state(basis, spins, sparse=False, normalized=False)
+        unit_sparse = _unit_state(basis, spins, sparse=True, normalized=False)
+        unit_dense = _unit_state(basis, spins, sparse=False, normalized=False)
 
         # Compare
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, unit_sparse, sparse=False),
+            _state_to_zeeman(basis, spins, unit_sparse, sparse=False),
             unit_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, unit_dense, sparse=False),
+            _state_to_zeeman(basis, spins, unit_dense, sparse=False),
             unit_zeeman))
 
         # Create the trace-normalized unit state in the spherical tensor basis
-        unit_sparse = unit_state(basis, spins, sparse=True, normalized=True)
-        unit_dense = unit_state(basis, spins, sparse=False, normalized=True)
+        unit_sparse = _unit_state(basis, spins, sparse=True, normalized=True)
+        unit_dense = _unit_state(basis, spins, sparse=False, normalized=True)
 
         # Apply trace normalization to the unit state in the Zeeman eigenbasis
         unit_zeeman = unit_zeeman / unit_zeeman.trace()
 
         # Compare
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, unit_sparse, sparse=False),
+            _state_to_zeeman(basis, spins, unit_sparse, sparse=False),
             unit_zeeman))
         self.assertTrue(np.allclose(
-            state_to_zeeman(basis, spins, unit_dense, sparse=False),
+            _state_to_zeeman(basis, spins, unit_dense, sparse=False),
             unit_zeeman))
 
     def test_measure(self):
@@ -419,9 +419,9 @@ class TestStates(unittest.TestCase):
 
                                 # Measure using the inbuilt function
                                 op_string = f"{op_l} * {op_m} * {op_n}"
-                                result_sparse = measure(
+                                result_sparse = _measure(
                                     basis, spins, state_sparse, op_string)
-                                result_dense = measure(
+                                result_dense = _measure(
                                     basis, spins, state_dense, op_string)
 
                                 # Compare
@@ -458,18 +458,18 @@ class TestStates(unittest.TestCase):
         H_left = sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
 
         # Make the thermal equilibrium state
-        rho_eq_sparse = equilibrium_state(basis, spins, H_left, T, sparse=True,
+        rho_eq_sparse = _equilibrium_state(basis, spins, H_left, T, sparse=True,
                                           zero_value=1e-18)
-        rho_eq_dense = equilibrium_state(basis, spins, H_left, T, sparse=False,
+        rho_eq_dense = _equilibrium_state(basis, spins, H_left, T, sparse=False,
                                          zero_value=1e-18)
 
         # Test the thermal equilibrium for each spin
         for i in range(nspins):
 
             # Measure the z-magnetization
-            Mz_measured_sparse = measure(
+            Mz_measured_sparse = _measure(
                 basis, spins, rho_eq_sparse, f"I(z, {i})")
-            Mz_measured_dense = measure(
+            Mz_measured_dense = _measure(
                 basis, spins, rho_eq_dense, f"I(z, {i})")
 
             # Calculate the thermal magnetization directly using the Boltzmann
@@ -488,18 +488,18 @@ class TestStates(unittest.TestCase):
         H_left = sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
 
         # Make the thermal equilibrium state
-        rho_eq_sparse = equilibrium_state(basis, spins, H_left, T, sparse=True,
+        rho_eq_sparse = _equilibrium_state(basis, spins, H_left, T, sparse=True,
                                           zero_value=1e-18)
-        rho_eq_dense = equilibrium_state(basis, spins, H_left, T, sparse=False,
+        rho_eq_dense = _equilibrium_state(basis, spins, H_left, T, sparse=False,
                                          zero_value=1e-18)
 
         # Test the thermal equilibrium for each spin
         for i in range(nspins):
 
             # Measure the magnetization
-            Mz_measured_sparse = measure(
+            Mz_measured_sparse = _measure(
                 basis, spins, rho_eq_sparse, f"I(z, {i})")
-            Mz_measured_dense = measure(
+            Mz_measured_dense = _measure(
                 basis, spins, rho_eq_dense, f"I(z, {i})")
 
             # Calculate the thermal magnetization directly using the Boltzmann

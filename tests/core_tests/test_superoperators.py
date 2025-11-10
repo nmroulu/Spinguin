@@ -1,11 +1,11 @@
 import unittest
 import numpy as np
 import scipy.sparse as sp
-from spinguin.core.operators import op_prod
-from spinguin.core.basis import make_basis, truncate_basis_by_coherence
-from spinguin.core.superoperators import sop_prod, sop_prod_ref, \
+from spinguin._core._operators import op_prod
+from spinguin._core._basis import make_basis, truncate_basis_by_coherence
+from spinguin._core._superoperators import sop_prod, sop_prod_ref, \
     sop_from_string, sop_T_coupled, sop_to_truncated_basis
-from spinguin.core.la import cartesian_tensor_to_spherical_tensor
+from spinguin._core._la import cartesian_tensor_to_spherical_tensor
 
 class TestSuperoperators(unittest.TestCase):
 

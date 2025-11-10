@@ -1,57 +1,42 @@
 """
-Spinguin package is desined to be imported as `import spinguin as sg`, which
-reveals the main functionality of the package to the user in a user-friendly
-manner. For example, to create a SpinSystem object with one 1H nucleus, the user
-should::
+This module provides the core functionality of Spinguin. The module is not meant
+to be imported. The preferred way to use Spinguin is to use the functionality
+directly under `spinguin` namespace, using::
 
     import spinguin as sg
-    spin_system = sg.SpinSystem(["1H"])
-"""
 
-# Make the core functionality directly available under the spinguin namespace
-from spinguin._core import (
-    # chem
+If you still wish to import the _core module, continue with precaution!
+"""
+from ._chem import (
     associate,
     dissociate,
-    permute_spins,
-
-    # hamiltonian
-    hamiltonian,
-
-    # liouvillian
-    liouvillian,
-
-    # nmr_isotopes
+    permute_spins
+)
+from ._hamiltonian import hamiltonian
+from ._liouvillian import liouvillian
+from ._nmr_isotopes import (
     gamma,
     quadrupole_moment,
-    spin,
-
-    # operators
-    operator,
-
-    # parameters
-    parameters,
-
-    # propagation
+    spin
+)
+from ._operators import operator
+from ._parameters import parameters
+from ._propagation import (
     propagator,
     propagator_to_rotframe,
-    pulse,
-
-    # relaxation
-    relaxation,
-
-    # specutils
+    pulse
+)
+from ._relaxation import relaxation
+from ._specutils import (
     fourier_transform,
     frequency_to_chemical_shift,
     resonance_frequency,
     spectral_width_to_dwell_time,
     spectrum,
-    time_axis,
-
-    # spin_system
-    SpinSystem,
-
-    # states
+    time_axis
+)
+from ._spin_system import SpinSystem
+from ._states import (
     alpha_state,
     beta_state,
     equilibrium_state,
@@ -63,44 +48,41 @@ from spinguin._core import (
     triplet_plus_state,
     triplet_zero_state,
     unit_state,
-
-    # superoperators
-    superoperator
 )
-from spinguin import sequences
+from ._superoperators import superoperator
 
 __all__ = [
-    # core: chem
+    #chem
     "associate",
     "dissociate",
     "permute_spins",
 
-    # core: hamiltonian
+    #hamiltonian
     "hamiltonian",
 
-    # core: liouvillian
+    #liouvillian
     "liouvillian",
 
-    # core: nmr_isotopes
+    #nmr_isotopes
     "gamma",
     "quadrupole_moment",
     "spin",
 
-    # core: operators
+    #operators
     "operator",
 
-    # core: parameters 
+    #parameters 
     "parameters",
 
-    # core: propagation
+    #propagation
     "propagator",
     "propagator_to_rotframe",
     "pulse",
 
-    # core: relaxation
+    #relaxation
     "relaxation",
 
-    # core: specutils
+    #specutils
     "fourier_transform",
     "frequency_to_chemical_shift",
     "resonance_frequency",
@@ -108,10 +90,10 @@ __all__ = [
     "spectrum",
     "time_axis",
 
-    # core: spin_system
+    #spin_system
     "SpinSystem",
 
-    # core: states
+    #states
     "alpha_state",
     "beta_state",
     "equilibrium_state",
@@ -124,9 +106,6 @@ __all__ = [
     "triplet_zero_state",
     "unit_state",
     
-    # core: superoperators
+    #superoperators
     "superoperator",
-
-    # sequences
-    "sequences",
 ]

@@ -2,14 +2,14 @@ import unittest
 import numpy as np
 import scipy.sparse as sp
 import os
-from spinguin.core.hamiltonian import sop_H
-from spinguin.core.relaxation import sop_R_redfield, sop_R_sr2k, \
-    ldb_thermalization, dd_constant, sop_R_phenomenological
-from spinguin.core.propagation import sop_pulse, sop_propagator
-from spinguin.core.nmr_isotopes import ISOTOPES
-from spinguin.core.basis import make_basis, truncate_basis_by_coherence
-from spinguin.core.states import equilibrium_state, state_to_truncated_basis
-from spinguin.core.superoperators import sop_to_truncated_basis
+from spinguin._core._hamiltonian import sop_H
+from spinguin._core._relaxation import _sop_R_redfield, _sop_R_sr2k, \
+    _ldb_thermalization, dd_constant, _sop_R_phenomenological
+from spinguin._core._propagation import _sop_pulse, _sop_propagator
+from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._basis import make_basis, truncate_basis_by_coherence
+from spinguin._core._states import _equilibrium_state, state_to_truncated_basis
+from spinguin._core._superoperators import sop_to_truncated_basis
 
 class TestRelaxation(unittest.TestCase):
 
@@ -129,14 +129,14 @@ class TestRelaxation(unittest.TestCase):
         )
         
         # Get the relaxation superoperator components
-        R_redfield = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad,
+        R_redfield = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad,
                                     xyz, shielding, efg,
                                     include_antisymmetric=False,
                                     include_dynamic_frequency_shift=False,
                                     relative_error=1e-6, interaction_zero=1e-9,
                                     relaxation_zero=1e-12, parallel_dim=1000,
                                     sparse=True)
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
+        R_sr2k = _sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R_redfield, B, sparse=True)
 
         # Build the total relaxation superoperator and thermalize
@@ -153,18 +153,18 @@ class TestRelaxation(unittest.TestCase):
             zero_value = 1e-12,
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
-        R = ldb_thermalization(R, H_left, T, zero_value=1e-18)
+        R = _ldb_thermalization(R, H_left, T, zero_value=1e-18)
         
         # Construct the total Liouvillian
         L = -1j*H - R
 
         # Create the thermal equilibrium state
-        rho = equilibrium_state(basis, spins, H_left, T, sparse=False,
+        rho = _equilibrium_state(basis, spins, H_left, T, sparse=False,
                                 zero_value=1e-18)
 
         # Apply a 180-degree pulse (to all 1H)
         op_string = "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)"
-        pul_180 = sop_pulse(basis, spins, op_string, angle=180, sparse=True,
+        pul_180 = _sop_pulse(basis, spins, op_string, angle=180, sparse=True,
                             zero_value=1e-18)
         rho = pul_180 @ rho
 
@@ -175,7 +175,7 @@ class TestRelaxation(unittest.TestCase):
         rho = state_to_truncated_basis(ZQ_map, rho)
 
         # Get the propagator
-        P = sop_propagator(L, time_step, zero_value=1e-18,
+        P = _sop_propagator(L, time_step, zero_value=1e-18,
                            density_threshold=0.5)
         
         # Simulate the evolution of the spin system
@@ -195,7 +195,7 @@ class TestRelaxation(unittest.TestCase):
             zero_value = 1e-12,
             interactions = ["zeeman", "chemical_shift", "J_coupling"]
         )
-        rho_ref = equilibrium_state(ZQ_basis, spins, H_left_ZQ, T, sparse=False,
+        rho_ref = _equilibrium_state(ZQ_basis, spins, H_left_ZQ, T, sparse=False,
                                     zero_value=1e-18)
 
         # Verify that the final state matches the thermal equilibrium state
@@ -281,7 +281,7 @@ class TestRelaxation(unittest.TestCase):
         )
         
         # Get the Redfield relaxation superoperator
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+        R = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
@@ -289,7 +289,7 @@ class TestRelaxation(unittest.TestCase):
                            sparse=True)
         
         # Obtain R again (to check possible errors from caches etc.)
-        R = sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+        R = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
                            shielding, efg, include_antisymmetric=False,
                            include_dynamic_frequency_shift=False,
                            relative_error=1e-6, interaction_zero=1e-9,
@@ -304,6 +304,28 @@ class TestRelaxation(unittest.TestCase):
         # Assert that the generated Hamiltonian matches the reference
         self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
 
+        # Obtain R again after basis truncation that causes some operators to be
+        # zero
+        basis, _ = truncate_basis_by_coherence(basis, [0])
+        H = sop_H(
+            basis = basis,
+            gammas = gammas,
+            spins = spins,
+            chemical_shifts = chemical_shifts,
+            J_couplings = J_couplings,
+            B = B,
+            side = "comm",
+            sparse = True,
+            zero_value = 1e-12,
+            interactions = ["zeeman", "chemical_shift", "J_coupling"]
+        )
+        R = _sop_R_redfield(basis, H, tau_c, spins, B, gammas, quad, xyz,
+                           shielding, efg, include_antisymmetric=False,
+                           include_dynamic_frequency_shift=False,
+                           relative_error=1e-6, interaction_zero=1e-9,
+                           relaxation_zero=1e-12, parallel_dim=1000,
+                           sparse=True)
+
     def test_sop_R_phenomenological(self):
         """
         Test that creates the phenomenological relaxation superoperator and
@@ -317,10 +339,10 @@ class TestRelaxation(unittest.TestCase):
         
         # Get the relaxation superoperator
         R1 = R2 = np.array([0.2, 0.2, 0.2, 0.2, 0.2, 1000])
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = _sop_R_phenomenological(basis, R1, R2, sparse=True)
 
         # Obtain R again (check for cache errors etc.)
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = _sop_R_phenomenological(basis, R1, R2, sparse=True)
 
         # Load the previously calculated R for comparison
         test_dir = os.path.dirname(os.path.dirname(__file__))
@@ -365,14 +387,14 @@ class TestRelaxation(unittest.TestCase):
         
         # Get the relaxation superoperator
         R1 = R2 = np.array([0.2, 0.2, 0.2, 0.2, 0.2, 1000])
-        R = sop_R_phenomenological(basis, R1, R2, sparse=True)
+        R = _sop_R_phenomenological(basis, R1, R2, sparse=True)
 
         # Get the SR2K
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
+        R_sr2k = _sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R, B, sparse=True)
         
         # Get SR2K again to test cache errors etc.
-        R_sr2k = sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
+        R_sr2k = _sop_R_sr2k(basis, spins, gammas, chemical_shifts, J_couplings,
                             R, B, sparse=True)
         
         # Add SR2K to the relaxation superoperator

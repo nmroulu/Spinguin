@@ -18,16 +18,16 @@ elif sys.platform == "linux":
 
 ext_modules = [
     Extension(
-        name = "spinguin.core.sparse_dot",
-        sources = ["src/spinguin/core/sparse_dot.pyx"],
+        name = "spinguin._core._sparse_dot",
+        sources = ["src/spinguin/_core/_sparse_dot.pyx"],
         include_dirs = [np.get_include()],
         extra_compile_args = extra_compile_args,
         extra_link_args = extra_link_args,
         language = 'c++'
     ),
     Extension(
-        name = "spinguin.core.intersect_indices",
-        sources = ["src/spinguin/core/intersect_indices.pyx"],
+        name = "spinguin._core._intersect_indices",
+        sources = ["src/spinguin/_core/_intersect_indices.pyx"],
         extra_compile_args = extra_compile_args,
         extra_link_args = extra_link_args,
         language = 'c++'
