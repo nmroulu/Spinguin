@@ -12,6 +12,7 @@ import numpy as np
 import scipy.sparse as sp
 from functools import lru_cache
 from spinguin._core._la import arraylike_to_array
+from spinguin._core._parameters import parameters
 
 @lru_cache(maxsize=16)
 def _dissociate_index_map(basis_A_bytes: bytes,
@@ -172,6 +173,7 @@ def _dissociate(
     rho_C: np.ndarray | sp.csc_array,
     spin_map_A: list | tuple | np.ndarray,
     spin_map_B: list | tuple | np.ndarray,
+    sparse: bool
 ) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
     """
     Dissociates the density vector of composite system C into density vectors of
@@ -209,6 +211,8 @@ def _dissociate(
         Indices of spin system A within spin system C.
     spin_map_B : list or tuple or ndarray
         Indices of spin system B within spin system C.
+    sparse : bool
+        Decides whether to return dense or sparse arrays.
 
     Returns
     -------
@@ -229,9 +233,6 @@ def _dissociate(
     # Get spin multiplicities for normalization
     mults_A = (2*spins_A + 1).astype(int)
     mults_B = (2*spins_B + 1).astype(int)
-
-    # Find out whether to use sparses
-    sparse = sp.issparse(rho_C)
 
     # Get index mappings
     idx_A, idx_CA, idx_B, idx_CB = \
@@ -383,7 +384,8 @@ def _associate(
     rho_A: np.ndarray | sp.csc_array,
     rho_B: np.ndarray | sp.csc_array,
     spin_map_A: list | tuple | np.ndarray,
-    spin_map_B: list | tuple | np.ndarray
+    spin_map_B: list | tuple | np.ndarray,
+    sparse: bool
 ) -> np.ndarray | sp.csc_array:
     """
     Combines two state vectors when spin systems associate in a chemical
@@ -421,6 +423,8 @@ def _associate(
         Indices of spin system A within spin system C.
     spin_map_B : list or tuple or ndarray
         Indices of spin system B within spin system C.
+    sparse : bool
+        Decides whether to return a dense or a sparse array.
 
     Returns
     -------
@@ -438,9 +442,6 @@ def _associate(
     # Get the index mappings
     idx_A, idx_B, idx_C = \
         associate_index_map(basis_A, basis_B, basis_C, spin_map_A, spin_map_B)
-
-    # Check whether to use sparse arrays
-    sparse = (sp.issparse(rho_A) and sp.issparse(rho_B))
 
     # Initialize an empty state vector for the composite system
     if sparse:
@@ -548,7 +549,8 @@ def permutation_matrix(basis: np.ndarray,
 def _permute_spins(
     basis: np.ndarray,
     rho: np.ndarray | sp.csc_array,
-    spin_map: list | tuple | np.ndarray
+    spin_map: list | tuple | np.ndarray,
+    sparse: bool
 ) -> np.ndarray | sp.csc_array:
     """
     Permutes the state vector of a spin system to correspond to a reordering
@@ -575,6 +577,8 @@ def _permute_spins(
         State vector of the spin system.
     spin_map : list or tuple or ndarray
         Indices of the spins in the spin system after permutation.
+    sparse : bool
+        Specifies whether to return a dense or sparse array.
 
     Returns
     -------
@@ -589,6 +593,12 @@ def _permute_spins(
 
     # Apply the permutation to the density vector
     rho = perm @ rho
+
+    # Ensure the correct return type
+    if sparse and not sp.issparse(rho):
+        rho = sp.csc_array(rho)
+    if not sparse and sp.issparse(rho):
+        rho = rho.toarray()
 
     return rho
 
@@ -642,7 +652,8 @@ def dissociate(spin_system_A: SpinSystem,
         spins_B = spin_system_B.spins,
         rho_C = rho_C,
         spin_map_A = spin_map_A,
-        spin_map_B = spin_map_B
+        spin_map_B = spin_map_B,
+        sparse = parameters.sparse_state
     )
 
     return rho_A, rho_B
@@ -699,7 +710,8 @@ def associate(spin_system_A: SpinSystem,
         rho_A = rho_A,
         rho_B = rho_B,
         spin_map_A = spin_map_A,
-        spin_map_B = spin_map_B
+        spin_map_B = spin_map_B,
+        sparse = parameters.sparse_state
     )
 
     return rho_C
@@ -741,7 +753,8 @@ def permute_spins(spin_system: SpinSystem,
     rho = _permute_spins(
         basis = spin_system.basis.basis,
         rho = rho,
-        spin_map = spin_map
+        spin_map = spin_map,
+        sparse = parameters.sparse_state
     )
 
     return rho
