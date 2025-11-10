@@ -11,7 +11,7 @@ mark takes a minute to run with `nspins=12` and `max_spin_order=3`.
 import numpy as np
 from spinguin._core._nmr_isotopes import ISOTOPES
 from spinguin._core._hamiltonian import sop_H
-from spinguin._core._relaxation import sop_R_redfield
+from spinguin._core._relaxation import _sop_R_redfield
 from spinguin._core._basis import make_basis
 
 # Testing parameters
@@ -61,11 +61,13 @@ for i in range(nspins):
 H = sop_H(basis, spins, gammas, B, chemical_shifts, J_couplings)
 
 # Benchmark the Redfield superoperator
-sop_R_redfield(basis = basis,
-               sop_H = H,
-               tau_c = tau_c,
-               spins = spins,
-               B = B,
-               gammas = gammas,
-               xyz = xyz)
+_sop_R_redfield(
+    basis = basis,
+    sop_H = H,
+    tau_c = tau_c,
+    spins = spins,
+    B = B,
+    gammas = gammas,
+    xyz = xyz
+)
 
