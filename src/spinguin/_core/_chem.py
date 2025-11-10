@@ -15,13 +15,13 @@ from spinguin._core._la import arraylike_to_array
 from spinguin._core._parameters import parameters
 
 @lru_cache(maxsize=16)
-def _dissociate_index_map(basis_A_bytes: bytes,
-                          basis_B_bytes: bytes,
-                          basis_C_bytes: bytes,
-                          spin_map_A_bytes: bytes,
-                          spin_map_B_bytes: bytes
-                          ) -> tuple[np.ndarray, np.ndarray, np.ndarray,
-                                     np.ndarray]:
+def _dissociate_index_map(
+    basis_A_bytes: bytes,
+    basis_B_bytes: bytes,
+    basis_C_bytes: bytes,
+    spin_map_A_bytes: bytes,
+    spin_map_B_bytes: bytes
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     
     # Convert bytes back to arrays
     spin_map_A = np.frombuffer(spin_map_A_bytes, dtype=int)
@@ -92,13 +92,13 @@ def _dissociate_index_map(basis_A_bytes: bytes,
 
     return index_map_A, index_map_CA, index_map_B, index_map_CB
 
-def dissociate_index_map(basis_A: np.ndarray,
-                         basis_B: np.ndarray,
-                         basis_C: np.ndarray,
-                         spin_map_A: np.ndarray,
-                         spin_map_B: np.ndarray
-                         ) -> tuple[np.ndarray, np.ndarray, np.ndarray,
-                                    np.ndarray]:
+def dissociate_index_map(
+    basis_A: np.ndarray,
+    basis_B: np.ndarray,
+    basis_C: np.ndarray,
+    spin_map_A: np.ndarray,
+    spin_map_B: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Generates arrays that map the state indices from the basis set C to basis
     sets A and B. This function is used in `dissociate()`.
@@ -262,15 +262,15 @@ def _dissociate(
     return rho_A, rho_B
 
 @lru_cache(maxsize=16)
-def _associate_index_map(basis_A_bytes: bytes,
-                         basis_B_bytes: bytes,
-                         basis_C_bytes: bytes,
-                         spin_map_A_bytes: bytes,
-                         spin_map_B_bytes: bytes
-                         ) -> tuple[np.ndarray, np.ndarray, np.ndarray,
-                                    np.ndarray]:
+def _associate_index_map(
+    basis_A_bytes: bytes,
+    basis_B_bytes: bytes,
+    basis_C_bytes: bytes,
+    spin_map_A_bytes: bytes,
+    spin_map_B_bytes: bytes
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     
-     # Convert bytes back to arrays
+    # Convert bytes back to arrays
     spin_map_A = np.frombuffer(spin_map_A_bytes, dtype=int)
     spin_map_B = np.frombuffer(spin_map_B_bytes, dtype=int)
     nspins_A = spin_map_A.shape[0]
@@ -309,12 +309,13 @@ def _associate_index_map(basis_A_bytes: bytes,
 
     return index_map_A, index_map_B, index_map_C
 
-def associate_index_map(basis_A: np.ndarray,
-                        basis_B: np.ndarray,
-                        basis_C: np.ndarray,
-                        spin_map_A: np.ndarray,
-                        spin_map_B: np.ndarray
-                        ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def associate_index_map(
+    basis_A: np.ndarray,
+    basis_B: np.ndarray,
+    basis_C: np.ndarray,
+    spin_map_A: np.ndarray,
+    spin_map_B: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Generates arrays that map the state indices from spin systems A and B to the
     composite spin system C. This function is used in `associate()`.
@@ -459,8 +460,10 @@ def _associate(
     return rho_C
 
 @lru_cache(maxsize=16)
-def _permutation_matrix(basis_bytes: bytes,
-                        spin_map_bytes: bytes) -> sp.csc_array:
+def _permutation_matrix(
+    basis_bytes: bytes,
+    spin_map_bytes: bytes
+) -> sp.csc_array:
     
     # Convert bytes back to arrays
     spin_map = np.frombuffer(spin_map_bytes, dtype=int)
@@ -499,8 +502,9 @@ def _permutation_matrix(basis_bytes: bytes,
 
     return perm
 
-def permutation_matrix(basis: np.ndarray,
-                       spin_map: list | tuple | np.ndarray
+def permutation_matrix(
+    basis: np.ndarray,
+    spin_map: list | tuple | np.ndarray
 ) -> sp.csc_array:
     """
     Creates a permutation matrix to reorder the spins in the system.
@@ -602,13 +606,14 @@ def _permute_spins(
 
     return rho
 
-def dissociate(spin_system_A: SpinSystem,
-               spin_system_B: SpinSystem,
-               spin_system_C: SpinSystem,
-               rho_C: np.ndarray | sp.csc_array,
-               spin_map_A: list | tuple | np.ndarray,
-               spin_map_B: list | tuple | np.ndarray
-               ) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
+def dissociate(
+    spin_system_A: SpinSystem,
+    spin_system_B: SpinSystem,
+    spin_system_C: SpinSystem,
+    rho_C: np.ndarray | sp.csc_array,
+    spin_map_A: list | tuple | np.ndarray,
+    spin_map_B: list | tuple | np.ndarray
+) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
     """
     Dissociates the density vector of composite system C into density vectors of
     two subsystems A and B in a chemical reaction C -> A + B.
@@ -658,13 +663,14 @@ def dissociate(spin_system_A: SpinSystem,
 
     return rho_A, rho_B
 
-def associate(spin_system_A: SpinSystem,
-              spin_system_B: SpinSystem,
-              spin_system_C: SpinSystem,
-              rho_A: np.ndarray | sp.csc_array,
-              rho_B: np.ndarray | sp.csc_array,
-              spin_map_A: list | tuple | np.ndarray,
-              spin_map_B: list | tuple | np.ndarray
+def associate(
+    spin_system_A: SpinSystem,
+    spin_system_B: SpinSystem,
+    spin_system_C: SpinSystem,
+    rho_A: np.ndarray | sp.csc_array,
+    rho_B: np.ndarray | sp.csc_array,
+    spin_map_A: list | tuple | np.ndarray,
+    spin_map_B: list | tuple | np.ndarray
 ) -> np.ndarray | sp.csc_array:
     """
     Combines two state vectors when spin systems associate in a chemical
@@ -716,9 +722,10 @@ def associate(spin_system_A: SpinSystem,
 
     return rho_C
 
-def permute_spins(spin_system: SpinSystem,
-                  rho: np.ndarray | sp.csc_array,
-                  spin_map: list | tuple | np.ndarray
+def permute_spins(
+    spin_system: SpinSystem,
+    rho: np.ndarray | sp.csc_array,
+    spin_map: list | tuple | np.ndarray
 ) -> np.ndarray | sp.csc_array:
     """
     Permutes the state vector of a spin system to correspond to a reordering
