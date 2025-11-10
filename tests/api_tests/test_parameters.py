@@ -206,3 +206,57 @@ class TestParameters(unittest.TestCase):
         zero_zte = 1e-10
         sg.parameters.zero_zte = zero_zte
         self.assertEqual(sg.parameters.zero_zte, zero_zte)
+
+    def test_default(self):
+        """
+        Test that resetting to defaults works.
+        """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Change each parameter
+        sg.parameters.magnetic_field = "changed"
+        sg.parameters.temperature = "changed"
+        sg.parameters.parallel_dim = "changed"
+        sg.parameters.propagator_density = "changed"
+        sg.parameters.sparse_hamiltonian = "changed"
+        sg.parameters.sparse_operator = "changed"
+        sg.parameters.sparse_pulse = "changed"
+        sg.parameters.sparse_relaxation = "changed"
+        sg.parameters.sparse_state = "changed"
+        sg.parameters.sparse_superoperator = "changed"
+        sg.parameters.zero_aux = "changed"
+        sg.parameters.zero_equilibrium = "changed"
+        sg.parameters.zero_hamiltonian = "changed"
+        sg.parameters.zero_interaction = "changed"
+        sg.parameters.zero_propagator = "changed"
+        sg.parameters.zero_pulse = "changed"
+        sg.parameters.zero_relaxation = "changed"
+        sg.parameters.zero_thermalization = "changed"
+        sg.parameters.zero_time_step = "changed"
+        sg.parameters.zero_zte = "changed"
+
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Check that the default values have been set
+        self.assertEqual(sg.parameters.magnetic_field, None)
+        self.assertEqual(sg.parameters.temperature, None)
+        self.assertEqual(sg.parameters.parallel_dim, 1000)
+        self.assertEqual(sg.parameters.propagator_density, 0.5)
+        self.assertEqual(sg.parameters.sparse_hamiltonian, True)
+        self.assertEqual(sg.parameters.sparse_operator, True)
+        self.assertEqual(sg.parameters.sparse_pulse, True)
+        self.assertEqual(sg.parameters.sparse_relaxation, True)
+        self.assertEqual(sg.parameters.sparse_state, False)
+        self.assertEqual(sg.parameters.sparse_superoperator, True)
+        self.assertEqual(sg.parameters.zero_aux, 1e-18)
+        self.assertEqual(sg.parameters.zero_equilibrium, 1e-18)
+        self.assertEqual(sg.parameters.zero_hamiltonian, 1e-12)
+        self.assertEqual(sg.parameters.zero_interaction, 1e-9)
+        self.assertEqual(sg.parameters.zero_propagator, 1e-18)
+        self.assertEqual(sg.parameters.zero_pulse, 1e-18)
+        self.assertEqual(sg.parameters.zero_relaxation, 1e-12)
+        self.assertEqual(sg.parameters.zero_thermalization, 1e-18)
+        self.assertEqual(sg.parameters.zero_time_step, 1e-18)
+        self.assertEqual(sg.parameters.zero_zte, 1e-24)
