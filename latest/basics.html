@@ -49,7 +49,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Advanced usage" href="advanced.html" />
+    <link rel="next" title="Spinguin" href="spinguin.html" />
     <link rel="prev" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -189,36 +189,12 @@ document.write(`
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Basics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced usage</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="spinguin.html">Spinguin (Basic)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.api.html">Main functionality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.api.parameters.html">Global parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.api.basis.html">Basis set</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.api.relaxation_properties.html">Relaxation properties</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="spinguin.core.html">Spinguin (Advanced)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.basis.html">spinguin.core.basis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.chem.html">spinguin.core.chem</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.data_io.html">spinguin.core.data_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.hamiltonian.html">spinguin.core.hamiltonian</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.hide_prints.html">spinguin.core.hide_prints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.intersect_indices.html">spinguin.core.intersect_indices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.la.html">spinguin.core.la</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.liouvillian.html">spinguin.core.liouvillian</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.nmr_isotopes.html">spinguin.core.nmr_isotopes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.operators.html">spinguin.core.operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.propagation.html">spinguin.core.propagation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.relaxation.html">spinguin.core.relaxation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.sparse_dot.html">spinguin.core.sparse_dot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.specutils.html">spinguin.core.specutils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.states.html">spinguin.core.states</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spinguin.core.superoperators.html">spinguin.core.superoperators</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1"><a class="reference internal" href="spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal classes</a></li>
 </ul>
 
     </div>
@@ -371,7 +347,11 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-parameters">Global parameters</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-spin-system">Creating a spin system</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-a-basis-set">Building a basis set</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performing-the-simulations">Performing the simulations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-spin-system-properties">Defining spin system properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-relaxation-theory">Define the relaxation theory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performing-the-pulse-and-acquire-experiment">Performing the pulse-and-acquire experiment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualising-the-fid">Visualising the FID</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtaining-the-spectrum">Obtaining the spectrum</a></li>
 </ul>
             </nav>
         </div>
@@ -395,6 +375,8 @@ Spinguin are:</p>
 with more than 10 spins on consumer-level hardware.</p></li>
 <li><p>Simulation of coherent dynamics, relaxation, and chemical exchange processes.</p></li>
 </ul>
+<p>Below, the main functionality of Spinguin is introduced by simulating a simple
+NMR spectrum of a pyridine molecule.</p>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
 <p>Spinguin is designed to be used directly under the <code class="docutils literal notranslate"><span class="pre">spinguin</span></code> namespace. To
@@ -402,34 +384,33 @@ start, simply import the package:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">spinguin</span> <span class="k">as</span> <span class="nn">sg</span>
 </pre></div>
 </div>
-<p>You can then access its functionality through the <code class="docutils literal notranslate"><span class="pre">sg</span></code> namespace.</p>
+<p>You can then access its functionality through the <code class="docutils literal notranslate"><span class="pre">sg</span></code> namespace. For the
+available functionality, please refer to <a class="reference internal" href="spinguin.html#spinguin"><span class="std std-ref">Spinguin</span></a>.</p>
 </section>
 <section id="global-parameters">
 <h2>Global parameters<a class="headerlink" href="#global-parameters" title="Link to this heading">#</a></h2>
 <p>Spinguin makes use of global parameters that can be set to control the behavior
 of the simulations. These parameters can be set by calling
-<code class="docutils literal notranslate"><span class="pre">sg.parameters.PARAMETERNAME</span></code>. For example, to set the magnetic field and
-temperature, you can use the following commands:</p>
+<code class="docutils literal notranslate"><span class="pre">sg.parameters.PARAMETERNAME</span></code> after importing the package. For example, to set
+the magnetic field and temperature, you can use the following commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sg</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span> <span class="o">=</span> <span class="mf">9.4</span>
 <span class="n">sg</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="mi">295</span>
 </pre></div>
 </div>
+<p>Essentially, the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> is an instance of <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> class, and the
+behaviour of the Spinguin package can be managed by changing the attributes of
+the object. For the available parameters, please refer to the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code>
+class in <a class="reference internal" href="internals.html#internals"><span class="std std-ref">Internal classes</span></a>.</p>
 </section>
 <section id="creating-a-spin-system">
 <h2>Creating a spin system<a class="headerlink" href="#creating-a-spin-system" title="Link to this heading">#</a></h2>
 <p>A <code class="docutils literal notranslate"><span class="pre">SpinSystem</span></code> is the core of any spin dynamics simulation in Spinguin. It
-represents a collection of spins, to which properties such as chemical shifts,
+represents a collection of spins, to which properties, such as chemical shifts,
 <em>J</em>-coupling constants, and relaxation rates can be assigned.</p>
 <p>You can create a spin system by providing a list of spin types (e.g., ‘1H’,
 ‘13C’, etc.) to the <code class="docutils literal notranslate"><span class="pre">SpinSystem</span></code> class. The spin types are specified as
 strings, and you can include as many spins as needed:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">SpinSystem</span><span class="p">([</span><span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;14N&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>As an example, we are going to assign the chemical shifts to the spin system
-created above. The chemical shifts are specified as a list of floats in the
-units of ppm (parts per million):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.56</span><span class="p">,</span> <span class="mf">8.56</span><span class="p">,</span> <span class="mf">7.47</span><span class="p">,</span> <span class="mf">7.47</span><span class="p">,</span> <span class="mf">7.88</span><span class="p">,</span> <span class="mf">95.94</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -447,15 +428,128 @@ build the basis set:</p>
 <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">basis</span></code> is an instance of <code class="docutils literal notranslate"><span class="pre">Basis</span></code> class which is automatically assigned
+as an attribute to the <code class="docutils literal notranslate"><span class="pre">SpinSystem</span></code> object. Other functionality available in
+the <code class="docutils literal notranslate"><span class="pre">Basis</span></code> class is documented in <a class="reference internal" href="internals.html#internals"><span class="std std-ref">Internal classes</span></a>.</p>
 </section>
-<section id="performing-the-simulations">
-<h2>Performing the simulations<a class="headerlink" href="#performing-the-simulations" title="Link to this heading">#</a></h2>
-<p>Once the global parameters, spin system, and basis set have been defined, the
-simulations can be performed. The user can choose to create their own simulation
-by calculating the required superoperators, or by calculating the Hamiltonian
-and relaxation superoperator. Another option is to use the predefined simulation
-functions provided in Spinguin, such as the pulse and acquire and inversion
-recovery sequences.</p>
+<section id="defining-spin-system-properties">
+<h2>Defining spin system properties<a class="headerlink" href="#defining-spin-system-properties" title="Link to this heading">#</a></h2>
+<p>The properties of the spin system are assigned as attributes to the system.</p>
+<p>First, we are going to assign the chemical shifts to the spin system created
+above. The chemical shifts are specified as a list of floats in the units of ppm
+(parts per million):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.56</span><span class="p">,</span> <span class="mf">8.56</span><span class="p">,</span> <span class="mf">7.47</span><span class="p">,</span> <span class="mf">7.47</span><span class="p">,</span> <span class="mf">7.88</span><span class="p">,</span> <span class="mf">95.94</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Next, we assign the <em>J</em>-coupling constants. These are given as a two-dimensional
+list in the units of Hz:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mf">1.04</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span> <span class="mf">4.85</span><span class="p">,</span>  <span class="mf">1.05</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span> <span class="mf">1.05</span><span class="p">,</span>  <span class="mf">4.85</span><span class="p">,</span>   <span class="mf">0.71</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span> <span class="mf">1.24</span><span class="p">,</span>  <span class="mf">1.24</span><span class="p">,</span>   <span class="mf">7.55</span><span class="p">,</span>   <span class="mf">7.55</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span> <span class="mf">8.16</span><span class="p">,</span>  <span class="mf">8.16</span><span class="p">,</span>   <span class="mf">0.87</span><span class="p">,</span>   <span class="mf">0.87</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.19</span><span class="p">,</span>   <span class="mi">0</span><span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="define-the-relaxation-theory">
+<h2>Define the relaxation theory<a class="headerlink" href="#define-the-relaxation-theory" title="Link to this heading">#</a></h2>
+<p>The goal is to simulate the NMR spectrum of pyridine. Therefore, relaxation must
+be defined. We use the <cite>phenomenological</cite> relaxation here, <cite>i.e.</cite>, we give the
+relaxation times to the software.</p>
+<p>First, the relaxation theory must be defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">theory</span> <span class="o">=</span> <span class="s2">&quot;phenomenological&quot;</span>
+</pre></div>
+</div>
+<p>Then, the relaxation times in seconds can be given as a list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">T1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">17.5</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">17.5</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">]</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">T2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0002</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Here, the <code class="docutils literal notranslate"><span class="pre">relaxation</span></code> is an instance of <code class="docutils literal notranslate"><span class="pre">RelaxationProperties</span></code> class, which
+is used to store the relaxation-theory settigns. The other available settings
+are documented in the class description in <a class="reference internal" href="internals.html#internals"><span class="std std-ref">Internal classes</span></a>.</p>
+</section>
+<section id="performing-the-pulse-and-acquire-experiment">
+<h2>Performing the pulse-and-acquire experiment<a class="headerlink" href="#performing-the-pulse-and-acquire-experiment" title="Link to this heading">#</a></h2>
+<p>Once the global parameters, spin system, basis set, spin system properties, and
+relaxation theory have been defined, the simulations can be performed. We
+simulate the NMR spectrum using the pulse-and-acquire experiment. The available
+pulse sequences are documented in <a class="reference internal" href="sequences.html#sequences"><span class="std std-ref">Sequences</span></a> and are accessible by
+<code class="docutils literal notranslate"><span class="pre">sg.sequences.SEQUENCENAME</span></code>. The pulse-and-acquire experiment requires five
+additional parameters to be defined:</p>
+<ul class="simple">
+<li><p>isotope</p></li>
+<li><p>center frequency (ppm)</p></li>
+<li><p>number of points</p></li>
+<li><p>dwell time (s)</p></li>
+<li><p>pulse angle</p></li>
+</ul>
+<p>Next, we define these parameters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">isotope</span> <span class="o">=</span> <span class="s2">&quot;1H&quot;</span>
+<span class="n">center_frequency</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">npoints</span> <span class="o">=</span> <span class="mi">12500</span>
+<span class="n">dwell_time</span> <span class="o">=</span> <span class="mf">1e-3</span>
+<span class="n">angle</span> <span class="o">=</span> <span class="mi">90</span>
+</pre></div>
+</div>
+<p>Finally, we perform the experiment, which outputs the free induction decay:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fid</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">pulse_and_acquire</span><span class="p">(</span>
+    <span class="n">spin_system</span> <span class="o">=</span> <span class="n">spin_system</span><span class="p">,</span>
+    <span class="n">isotope</span> <span class="o">=</span> <span class="n">isotope</span><span class="p">,</span>
+    <span class="n">center_frequency</span> <span class="o">=</span> <span class="n">center_frequency</span><span class="p">,</span>
+    <span class="n">npoints</span> <span class="o">=</span> <span class="n">npoints</span><span class="p">,</span>
+    <span class="n">dwell_time</span> <span class="o">=</span> <span class="n">dwell_time</span><span class="p">,</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">angle</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Congratulations! You have now sucessfully performed a spin dynamics simulation
+using Spinguin.</p>
+</section>
+<section id="visualising-the-fid">
+<h2>Visualising the FID<a class="headerlink" href="#visualising-the-fid" title="Link to this heading">#</a></h2>
+<p>We plot the results using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>. First, make sure that <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>
+is installed and then import the package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+<p>Next, calculate the time axis using the number of points and dwell time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time_axis</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">time_axis</span><span class="p">(</span><span class="n">npoints</span><span class="p">,</span> <span class="n">dwell_time</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we can plot the FID:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity (arb. units)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="obtaining-the-spectrum">
+<h2>Obtaining the spectrum<a class="headerlink" href="#obtaining-the-spectrum" title="Link to this heading">#</a></h2>
+<p>The ultimate goal is to plot the NMR spectrum of pyridine, which is obtained by
+performing the Fourier transform. The Fourier transform returns the frequencies
+and their corresponding intensities. The frequencies are converted to the ppm
+scale:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">freqs</span><span class="p">,</span> <span class="n">spec</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">spectrum</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">dwell_time</span><span class="p">)</span>
+<span class="n">shift_axis</span> <span class="o">=</span> <span class="n">freqs</span><span class="o">/</span><span class="n">sg</span><span class="o">.</span><span class="n">resonance_frequency</span><span class="p">(</span><span class="n">isotope</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span> <span class="o">+</span> <span class="n">center_frequency</span>
+</pre></div>
+</div>
+<p>Finally, we plot the spectrum of pyridine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">shift_axis</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Chemical shift (ppm)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity (arb. units)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">8.8</span><span class="p">,</span> <span class="mf">7.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Congratulations! You have now successfully simulated and plotted the NMR
+spectrum of pyridine.</p>
 </section>
 </section>
 
@@ -480,11 +574,11 @@ recovery sequences.</p>
       </div>
     </a>
     <a class="right-next"
-       href="advanced.html"
+       href="spinguin.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Advanced usage</p>
+        <p class="prev-next-title">Spinguin</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -508,7 +602,11 @@ recovery sequences.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-parameters">Global parameters</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-spin-system">Creating a spin system</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-a-basis-set">Building a basis set</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performing-the-simulations">Performing the simulations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-spin-system-properties">Defining spin system properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-relaxation-theory">Define the relaxation theory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performing-the-pulse-and-acquire-experiment">Performing the pulse-and-acquire experiment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualising-the-fid">Visualising the FID</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtaining-the-spectrum">Obtaining the spectrum</a></li>
 </ul>
   </nav></div>
 
