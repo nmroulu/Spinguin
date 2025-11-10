@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.3
+- Add possibility to enquire the index of a state from the basis set.
+
 ## 0.0.2
 - Re-structure the program internally.
 - Improved documentation.

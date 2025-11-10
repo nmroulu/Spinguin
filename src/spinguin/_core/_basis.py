@@ -16,7 +16,7 @@ from itertools import product, combinations
 from typing import Iterator, Literal
 from spinguin._core._la import eliminate_small, expm_vec
 from spinguin._core._hide_prints import HidePrints
-from spinguin._core._utils import coherence_order
+from spinguin._core._utils import coherence_order, state_idx
 from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
 
 """
@@ -116,6 +116,37 @@ class Basis:
         # Build the basis
         self._basis = make_basis(spins = self._spin_system.spins,
                                  max_spin_order = self.max_spin_order)
+        
+    def indexof(self, op_def: np.ndarray | list | tuple):
+        """
+        Finds the index of the basis state defined by `op_def`.
+
+        Parameters
+        ----------
+        op_def : ndarray or list or tuple
+            A one-dimensional array, list or tuple that defines a basis state
+            using the integer indexing scheme. The indices are given by
+            `N = l^2 + l - q`, where `l` is the operator rank and `q` is the
+            projection. For example::
+
+                op_def = [0, 2, 0]
+
+        Returns
+        -------
+        idx : int
+            Index of the state in the basis set.
+        """
+        # Raise a warning if basis has not been built
+        if self.basis is None:
+            raise ValueError("Basis must be built before obtaining indices.")
+        
+        # Convert the input as array if not already
+        op_def = np.asarray(op_def)
+
+        # Obtain the index
+        idx = state_idx(self.basis, op_def)
+
+        return idx
         
     def truncate_by_coherence(
             self,
