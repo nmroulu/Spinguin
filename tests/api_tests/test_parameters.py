@@ -8,6 +8,7 @@ class TestParameters(unittest.TestCase):
         Test setting the magnetic field parameter.
         """
         # Set the magnetic field
+        sg.parameters.default()
         magnetic_field = 1
         sg.parameters.magnetic_field = magnetic_field
         self.assertEqual(sg.parameters.magnetic_field, magnetic_field)
@@ -17,6 +18,7 @@ class TestParameters(unittest.TestCase):
         Test setting the temperature parameter.
         """
         # Set the temperature
+        sg.parameters.default()
         temperature = 293
         sg.parameters.temperature = temperature
         self.assertEqual(sg.parameters.temperature, temperature)
@@ -26,6 +28,7 @@ class TestParameters(unittest.TestCase):
         Test setting the sparsity for operators.
         """
         # Set the sparsity for operator
+        sg.parameters.default()
         sparse_operator = False
         sg.parameters.sparse_operator = sparse_operator
         self.assertEqual(sg.parameters.sparse_operator, sparse_operator)
@@ -36,15 +39,20 @@ class TestParameters(unittest.TestCase):
         """
 
         # Set the sparsity for superoperator
+        sg.parameters.default()
         sparse_superoperator = False
         sg.parameters.sparse_superoperator = sparse_superoperator
-        self.assertEqual(sg.parameters.sparse_superoperator, sparse_superoperator)
+        self.assertEqual(
+            sg.parameters.sparse_superoperator,
+            sparse_superoperator
+        )
 
     def test_set_sparse_hamiltonian(self):
         """
         Test setting the sparsity for Hamiltonians.
         """
         # Set the sparsity for Hamiltonian
+        sg.parameters.default()
         sparse_hamiltonian = False
         sg.parameters.sparse_hamiltonian = sparse_hamiltonian
         self.assertEqual(sg.parameters.sparse_hamiltonian, sparse_hamiltonian)
@@ -54,6 +62,7 @@ class TestParameters(unittest.TestCase):
         Test setting the sparsity for relaxation superoperator.
         """
         # Set the sparsity for relaxation superoperator
+        sg.parameters.default()
         sparse_relaxation = False
         sg.parameters.sparse_relaxation = sparse_relaxation
         self.assertEqual(sg.parameters.sparse_relaxation, sparse_relaxation)
@@ -63,6 +72,7 @@ class TestParameters(unittest.TestCase):
         Test setting the threshold for propagator density.
         """
         # Set the density threshold for propagator
+        sg.parameters.default()
         propagator_density = 1.0
         sg.parameters.propagator_density = propagator_density
         self.assertEqual(sg.parameters.propagator_density, propagator_density)
@@ -72,6 +82,7 @@ class TestParameters(unittest.TestCase):
         Test setting the sparsity for state vectors.
         """
         # Set the sparsity for state vectors
+        sg.parameters.default()
         sparse_state = True
         sg.parameters.sparse_state = sparse_state
         self.assertEqual(sg.parameters.sparse_state, sparse_state)
@@ -81,6 +92,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for Hamiltonian.
         """
         # Set the zero-value threshold for Hamiltonian
+        sg.parameters.default()
         zero_hamiltonian = 1e-6
         sg.parameters.zero_hamiltonian = zero_hamiltonian
         self.assertEqual(sg.parameters.zero_hamiltonian, zero_hamiltonian)
@@ -90,6 +102,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for auxiliary matrix method.
         """
         # Set the zero-value threshold for auxiliary matrix method
+        sg.parameters.default()
         zero_aux = 1e-6
         sg.parameters.zero_aux = zero_aux
         self.assertEqual(sg.parameters.zero_aux, zero_aux)
@@ -99,6 +112,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for relaxation superoperator.
         """
         # Set the zero-value threshold for relaxation superoperator
+        sg.parameters.default()
         zero_relaxation = 1e-6
         sg.parameters.zero_relaxation = zero_relaxation
         self.assertEqual(sg.parameters.zero_relaxation, zero_relaxation)
@@ -108,6 +122,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for interaction tensors.
         """
         # Set the zero-value threshold for interaction tensors
+        sg.parameters.default()
         zero_interaction = 1e-6
         sg.parameters.zero_interaction = zero_interaction
         self.assertEqual(sg.parameters.zero_interaction, zero_interaction)
@@ -117,6 +132,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for propagator.
         """
         # Set the zero-value threshold for propagator
+        sg.parameters.default()
         zero_propagator = 1e-6
         sg.parameters.zero_propagator = zero_propagator
         self.assertEqual(sg.parameters.zero_propagator, zero_propagator)
@@ -126,6 +142,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for pulse.
         """
         # Set the zero-value threshold for pulse
+        sg.parameters.default()
         zero_pulse = 1e-6
         sg.parameters.zero_pulse = zero_pulse
         self.assertEqual(sg.parameters.zero_pulse, zero_pulse)
@@ -135,6 +152,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for thermalization.
         """
         # Set the zero-value threshold for thermalization
+        sg.parameters.default()
         zero_thermalization = 1e-6
         sg.parameters.zero_thermalization = zero_thermalization
         self.assertEqual(sg.parameters.zero_thermalization, zero_thermalization)
@@ -144,6 +162,7 @@ class TestParameters(unittest.TestCase):
         Test setting the zero-value threshold for equilibrium state.
         """
         # Set the zero-value threshold for equilibrium state
+        sg.parameters.default()
         zero_equilibrium = 1e-6
         sg.parameters.zero_equilibrium = zero_equilibrium
         self.assertEqual(sg.parameters.zero_equilibrium, zero_equilibrium)
@@ -153,6 +172,7 @@ class TestParameters(unittest.TestCase):
         Test setting the parallel dimension for calculations.
         """
         # Set the parallel dimension
+        sg.parameters.default()
         parallel_dim = 500
         sg.parameters.parallel_dim = parallel_dim
         self.assertEqual(sg.parameters.parallel_dim, parallel_dim)
@@ -162,6 +182,7 @@ class TestParameters(unittest.TestCase):
         Test setting the sparsity for pulse.
         """
         # Set the sparsity for pulse
+        sg.parameters.default()
         sparse_pulse = False
         sg.parameters.sparse_pulse = sparse_pulse
         self.assertEqual(sg.parameters.sparse_pulse, sparse_pulse)
