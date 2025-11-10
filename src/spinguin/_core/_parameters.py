@@ -12,33 +12,41 @@ class Parameters:
     Parameters class contains all the global settings for the Spinguin package.
     """
 
-    # Experimental conditions
-    _magnetic_field: float = None
-    _temperature: float = None
+    def __init__(self):
+        self.default()
 
-    # Parallelisation settings
-    _parallel_dim: int=1000
+    def default(self):
+        """
+        Set the parameters to the default settings.
+        """
 
-    # Sparsity settings
-    _propagator_density: float=0.5
-    _sparse_hamiltonian: bool=True
-    _sparse_operator: bool=True
-    _sparse_pulse: bool=True
-    _sparse_relaxation: bool=True
-    _sparse_state: bool=False
-    _sparse_superoperator: bool=True
-    
-    # Zero-value thresholds
-    _zero_aux: float = 1e-18
-    _zero_equilibrium: float = 1e-18
-    _zero_hamiltonian: float = 1e-12
-    _zero_interaction: float = 1e-9
-    _zero_propagator: float = 1e-18
-    _zero_pulse: float = 1e-18
-    _zero_relaxation: float = 1e-12
-    _zero_thermalization: float = 1e-18
-    _zero_time_step: float = 1e-18
-    _zero_zte: float = 1e-24
+        # Experimental conditions
+        self._magnetic_field: float = None
+        self._temperature: float = None
+
+        # Parallelisation settings
+        self._parallel_dim: int=1000
+
+        # Sparsity settings
+        self._propagator_density: float=0.5
+        self._sparse_hamiltonian: bool=True
+        self._sparse_operator: bool=True
+        self._sparse_pulse: bool=True
+        self._sparse_relaxation: bool=True
+        self._sparse_state: bool=False
+        self._sparse_superoperator: bool=True
+        
+        # Zero-value thresholds
+        self._zero_aux: float = 1e-18
+        self._zero_equilibrium: float = 1e-18
+        self._zero_hamiltonian: float = 1e-12
+        self._zero_interaction: float = 1e-9
+        self._zero_propagator: float = 1e-18
+        self._zero_pulse: float = 1e-18
+        self._zero_relaxation: float = 1e-12
+        self._zero_thermalization: float = 1e-18
+        self._zero_time_step: float = 1e-18
+        self._zero_zte: float = 1e-24
 
     @property
     def magnetic_field(self) -> float:
