@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 project = 'Spinguin'
 copyright = '2025, Joni Eronen, Perttu Hilla'
 author = 'Joni Eronen, Perttu Hilla'
-release = 'latest'
+release = '0.0.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
