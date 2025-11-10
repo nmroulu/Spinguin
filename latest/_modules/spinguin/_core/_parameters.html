@@ -313,33 +313,44 @@ document.write(`
 <span class="sd">    Parameters class contains all the global settings for the Spinguin package.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># Experimental conditions</span>
-    <span class="n">_magnetic_field</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
 
-    <span class="c1"># Parallelisation settings</span>
-    <span class="n">_parallel_dim</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1000</span>
+<div class="viewcode-block" id="Parameters.default">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._parameters.Parameters.default">[docs]</a>
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters to the default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="c1"># Sparsity settings</span>
-    <span class="n">_propagator_density</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.5</span>
-    <span class="n">_sparse_hamiltonian</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="n">_sparse_operator</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="n">_sparse_pulse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="n">_sparse_relaxation</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    <span class="n">_sparse_state</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
-    <span class="n">_sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-    
-    <span class="c1"># Zero-value thresholds</span>
-    <span class="n">_zero_aux</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="n">_zero_equilibrium</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="n">_zero_hamiltonian</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span>
-    <span class="n">_zero_interaction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span>
-    <span class="n">_zero_propagator</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="n">_zero_pulse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="n">_zero_relaxation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span>
-    <span class="n">_zero_thermalization</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="n">_zero_time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="n">_zero_zte</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-24</span>
+        <span class="c1"># Experimental conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_field</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Parallelisation settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_dim</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1000</span>
+
+        <span class="c1"># Sparsity settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_hamiltonian</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_pulse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_relaxation</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        
+        <span class="c1"># Zero-value thresholds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_aux</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_equilibrium</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_hamiltonian</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_interaction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_propagator</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pulse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_relaxation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_thermalization</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_zte</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-24</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
