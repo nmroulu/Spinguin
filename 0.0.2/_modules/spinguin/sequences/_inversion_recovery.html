@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin.sequences._inversion_recovery &#8212; Spinguin 0.0.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=f131489c"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/sequences/_inversion_recovery';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin.sequences._inversion_recovery</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Imports</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">spinguin._core</span> <span class="k">as</span> <span class="nn">sg</span>
+
+<div class="viewcode-block" id="inversion_recovery">
+<a class="viewcode-back" href="../../../sequences.html#spinguin.sequences.inversion_recovery">[docs]</a>
+<span class="k">def</span> <span class="nf">inversion_recovery</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">npoints</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the inversion-recovery experiment. The experiment differs slightly</span>
+<span class="sd">    from the actual inversion-recovery experiments performed on spectrometers.</span>
+<span class="sd">    In this experiment, the inversion is performed only once, and the</span>
+<span class="sd">    magnetization is detected at each step during the recovery (much faster).</span>
+<span class="sd">    </span>
+<span class="sd">    If the traditional inversion recovery is desired, use the function</span>
+<span class="sd">    `inversion_recovery_fid()`.</span>
+
+<span class="sd">    This experiment requires the following spin system properties to be defined:</span>
+
+<span class="sd">    - spin_system.basis : must be built</span>
+<span class="sd">    - spin_system.relaxation.theory</span>
+<span class="sd">    - spin_system.relaxation.thermalization : must be True</span>
+
+<span class="sd">    This experiment requires the following parameters to be defined:</span>
+
+<span class="sd">    - parameters.magnetic_field : magnetic field of the spectrometer in Tesla</span>
+<span class="sd">    - parameters.temperature : temperature of the sample in Kelvin</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        Spin system to which the inversion-recovery experiment is performed.</span>
+<span class="sd">    isotope : str</span>
+<span class="sd">        Specifies the isotope, for example &quot;1H&quot;, whose magnetization is inverted</span>
+<span class="sd">        and detected. This function applies hard pulses.</span>
+<span class="sd">    npoints : int</span>
+<span class="sd">        Number of points in the simulation. Defines the total simulation time</span>
+<span class="sd">        together with `time_step`.</span>
+<span class="sd">    time_step : float</span>
+<span class="sd">        Time step in the simulation (in seconds). Should be kept relatively</span>
+<span class="sd">        short (e.g. 1 ms).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    magnetizations : ndarray</span>
+<span class="sd">        Two-dimensional array of size (nspins, npoints) containing the</span>
+<span class="sd">        observed z-magnetizations for each spin at various times.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Operate on a copy of the SpinSystem object</span>
+    <span class="n">spin_system</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
+
+    <span class="c1"># Check that the required attributes have been set</span>
+    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before using &quot;</span>
+                         <span class="s2">&quot;inversion recovery.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">theory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set the relaxation theory before using &quot;</span>
+                         <span class="s2">&quot;inversion recovery.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">thermalization</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set thermalization to True before using &quot;</span>
+                         <span class="s2">&quot;inversion recovery.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sg</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set the magnetic field before using &quot;</span>
+                         <span class="s2">&quot;inversion recovery.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sg</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set the temperature before using &quot;</span>
+                         <span class="s2">&quot;inversion recovery.&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Obtain the Liouvillian</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">hamiltonian</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">relaxation</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">liouvillian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+
+    <span class="c1"># Obtain the equilibrium state</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">equilibrium_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
+
+    <span class="c1"># Find indices of the isotopes to be measured</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">isotopes</span> <span class="o">==</span> <span class="n">isotope</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Apply 180-degree pulse</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(x,</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span>
+    <span class="n">P180</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pulse</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">P180</span> <span class="o">@</span> <span class="n">rho</span>
+
+    <span class="c1"># Change to ZQ-basis to speed up the calculations</span>
+    <span class="n">L</span><span class="p">,</span> <span class="n">rho</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">truncate_by_coherence</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+
+    <span class="c1"># Construct the time propagator</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">propagator</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
+
+    <span class="c1"># Initialize an array for storing results</span>
+    <span class="n">magnetizations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nspins</span><span class="p">,</span> <span class="n">npoints</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Perform the time evolution</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npoints</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+            <span class="n">magnetizations</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">step</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">sg</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">rho</span>
+
+    <span class="k">return</span> <span class="n">magnetizations</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
