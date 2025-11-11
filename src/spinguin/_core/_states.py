@@ -1276,3 +1276,17 @@ def measure(spin_system: SpinSystem,
     )
 
     return ex
+
+def clear_cache_state_from_string():
+    """
+    Clears the cache of the `_state_from_string()` function.
+    """
+    # Clear the cache
+    _state_from_string.cache_clear()
+
+def clear_cache_state_from_op_def():
+    """
+    Clears the cache of the `_state_from_op_def()` function.
+    """
+    # Clear the cache
+    _state_from_op_def.cache_clear()

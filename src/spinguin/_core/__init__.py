@@ -7,6 +7,7 @@ directly under `spinguin` namespace, using::
 
 If you still wish to import the _core module, continue with precaution!
 """
+from ._cache import clear_cache
 from ._chem import (
     associate,
     dissociate,
@@ -67,6 +68,9 @@ from ._utils import (
 )
 
 __all__ = [
+    #cache
+    "clear_cache",
+
     #chem
     "associate",
     "dissociate",

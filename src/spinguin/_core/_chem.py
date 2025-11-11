@@ -765,3 +765,24 @@ def permute_spins(
     )
 
     return rho
+
+def clear_cache_associate_index_map():
+    """
+    This function clears the cache from the `_associate_index_map()` function.
+    """
+    # Clear the cache
+    _associate_index_map.cache_clear()
+
+def clear_cache_dissociate_index_map():
+    """
+    This function clears the cache from the `_dissociate_index_map()` function.
+    """
+    # Clear the cache
+    _dissociate_index_map.cache_clear()
+
+def clear_cache_permutation_matrix():
+    """
+    This function clears the cache from the `_permutation_matrix()` function.
+    """
+    # Clear the cache
+    _permutation_matrix.cache_clear()

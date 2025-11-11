@@ -640,3 +640,24 @@ def superoperator(spin_system: SpinSystem,
     )
         
     return sop
+
+def clear_cache_structure_coefficients():
+    """
+    Clears the cache of the `structure_coefficients()` function.
+    """
+    # Clear the cache
+    structure_coefficients.cache_clear()
+
+def clear_cache_sop_prod():
+    """
+    Clears the cache of the `_sop_prod()` function.
+    """
+    # Clear the cache
+    _sop_prod.cache_clear()
+
+def clear_cache_sop_T_coupled():
+    """
+    Clears the cache of the `_sop_T_coupled()` function.
+    """
+    # Clear the cache
+    _sop_T_coupled.cache_clear()

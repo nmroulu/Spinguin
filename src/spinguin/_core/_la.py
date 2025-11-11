@@ -896,3 +896,10 @@ def expm_vec(
         eAv = expm_vec_taylor(A, eAv, zero_value)
 
     return eAv
+
+def clear_cache_CG_coeff():
+    """
+    Clears the cache of the `CG_coeff` function.
+    """
+    # Clear the cache
+    CG_coeff.cache_clear()

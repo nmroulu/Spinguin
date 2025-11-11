@@ -10,6 +10,9 @@ should::
 
 # Make the core functionality directly available under the spinguin namespace
 from spinguin._core import (
+    # cache
+    clear_cache,
+
     # chem
     associate,
     dissociate,
@@ -83,6 +86,9 @@ from spinguin._core import (
 from spinguin import sequences
 
 __all__ = [
+    # core: cache
+    "clear_cache",
+
     # core: chem
     "associate",
     "dissociate",

@@ -499,3 +499,10 @@ def operator(
         raise ValueError("Invalid input type for 'operator'")
     
     return op
+
+def clear_cache_op_T():
+    """
+    Clears the cache of the `_op_T()` function.
+    """
+    # Clear the cache
+    _op_T.cache_clear()
