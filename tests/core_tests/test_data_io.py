@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import os
-from spinguin._core._data_io import read_array, read_tensors, read_xyz
+import spinguin as sg
 
 class TestDataIOMethods(unittest.TestCase):
 
@@ -11,29 +11,27 @@ class TestDataIOMethods(unittest.TestCase):
         """
 
         # Hard-code the values for comparison
-        isotopes_1 = np.array(['1H', '19F', '14N'])
-        chemical_shifts_1 = np.array([8.00, -127.5, 40.50])
-        J_couplings_1 = np.array([
+        ss1 = sg.SpinSystem(['1H', '19F', '14N'])
+        ss1.chemical_shifts = [8.00, -127.5, 40.50]
+        ss1.J_couplings = [
             [0,     0,     0],
             [1.05,  0,     0],
             [0.50,  9.17,  0]
-        ])
+        ]
 
         # Read values from .txt files
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        isotopes_2 = read_array(
-            os.path.join(test_dir, 'test_data', 'isotopes.txt'), data_type=str)
-        chemical_shifts_2 = read_array(
-            os.path.join(test_dir, 'test_data', 'chemical_shifts.txt'),
-            data_type=float)
-        J_couplings_2 = read_array(
-            os.path.join(test_dir, 'test_data', 'J_couplings.txt'),
-            data_type=float)
+        test_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'test_data'
+        )
+        ss2 = sg.SpinSystem(os.path.join(test_dir, 'isotopes.txt'))
+        ss2.chemical_shifts = os.path.join(test_dir, 'chemical_shifts.txt')
+        ss2.J_couplings = os.path.join(test_dir, 'J_couplings.txt')
 
         # Compare the hard-coded values with the read values
-        self.assertTrue((isotopes_1 == isotopes_2).all())
-        self.assertTrue((chemical_shifts_1 == chemical_shifts_2).all())
-        self.assertTrue((J_couplings_1 == J_couplings_2).all())
+        self.assertTrue((ss1.isotopes == ss2.isotopes).all())
+        self.assertTrue((ss1.chemical_shifts == ss2.chemical_shifts).all())
+        self.assertTrue((ss1.J_couplings == ss2.J_couplings).all())
 
     def test_read_xyz(self):
         """
@@ -48,11 +46,15 @@ class TestDataIOMethods(unittest.TestCase):
         ])
 
         # Read values from .txt files
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        xyz_2 = read_xyz(os.path.join(test_dir, 'test_data', 'xyz.txt'))
+        ss2 = sg.SpinSystem(['1H', '19F', '14N'])
+        test_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'test_data'
+        )
+        ss2.xyz = os.path.join(test_dir, 'xyz.txt')
 
         # Compare the hard-coded values with the read values
-        self.assertTrue((xyz_1 == xyz_2).all())
+        self.assertTrue((xyz_1 == ss2.xyz).all())
     
     def test_read_tensors(self):
         """
@@ -84,11 +86,14 @@ class TestDataIOMethods(unittest.TestCase):
         ])
 
         # Read values from .txt files
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        shielding_2 = read_tensors(
-            os.path.join(test_dir, 'test_data', 'shielding.txt'))
-        efg_2 = read_tensors(os.path.join(test_dir, 'test_data', 'efg.txt'))
+        ss2 = sg.SpinSystem(['1H', '19F', '14N'])
+        test_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'test_data'
+        )
+        ss2.shielding = os.path.join(test_dir, 'shielding.txt')
+        ss2.efg = os.path.join(test_dir, 'efg.txt')
 
         # Compare the hard-coded values with the read values
-        self.assertTrue((shielding_1 == shielding_2).all())
-        self.assertTrue((efg_1 == efg_2).all())
+        self.assertTrue((shielding_1 == ss2.shielding).all())
+        self.assertTrue((efg_1 == ss2.efg).all())
