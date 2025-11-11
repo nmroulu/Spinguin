@@ -19,7 +19,17 @@ from ._nmr_isotopes import (
     quadrupole_moment,
     spin
 )
-from ._operators import operator
+from ._operators import (
+    op_E,
+    op_Sm,
+    op_Sp,
+    op_Sx,
+    op_Sy,
+    op_Sz,
+    op_T,
+    op_T_coupled,
+    operator
+)
 from ._parameters import parameters
 from ._propagation import (
     propagator,
@@ -74,6 +84,14 @@ __all__ = [
     "spin",
 
     #operators
+    "op_E",
+    "op_Sm",
+    "op_Sp",
+    "op_Sx",
+    "op_Sy",
+    "op_Sz",
+    "op_T",
+    "op_T_coupled",
     "operator",
 
     #parameters 

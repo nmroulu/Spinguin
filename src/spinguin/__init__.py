@@ -27,6 +27,14 @@ from spinguin._core import (
     spin,
 
     # operators
+    op_E,
+    op_Sm,
+    op_Sp,
+    op_Sx,
+    op_Sy,
+    op_Sz,
+    op_T,
+    op_T_coupled,
     operator,
 
     # parameters
@@ -92,6 +100,14 @@ __all__ = [
     "spin",
 
     # core: operators
+    "op_E",
+    "op_Sm",
+    "op_Sp",
+    "op_Sx",
+    "op_Sy",
+    "op_Sz",
+    "op_T",
+    "op_T_coupled",
     "operator",
 
     # core: parameters 
