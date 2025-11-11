@@ -60,7 +60,10 @@ from ._states import (
     triplet_zero_state,
     unit_state,
 )
-from ._superoperators import superoperator
+from ._superoperators import (
+    sop_T_coupled,
+    superoperator
+)
 from ._utils import (
     coherence_order,
     idx_to_lq,
@@ -134,6 +137,7 @@ __all__ = [
     "unit_state",
     
     #superoperators
+    "sop_T_coupled",
     "superoperator",
 
     #utils

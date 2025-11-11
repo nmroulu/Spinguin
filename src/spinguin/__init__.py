@@ -76,6 +76,7 @@ from spinguin._core import (
     unit_state,
 
     # superoperators
+    sop_T_coupled,
     superoperator,
 
     # utils
@@ -152,6 +153,7 @@ __all__ = [
     "unit_state",
     
     # core: superoperators
+    "sop_T_coupled",
     "superoperator",
 
     # core: utils
