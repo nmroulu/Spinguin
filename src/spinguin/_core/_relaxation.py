@@ -22,7 +22,7 @@ from spinguin._core._la import \
 from spinguin._core._utils import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
-from spinguin._core._hamiltonian import sop_H
+from spinguin._core._hamiltonian import hamiltonian
 from typing import Literal
 
 def dd_constant(y1: float, y2: float) -> float:
@@ -269,19 +269,16 @@ def Q_intr_tensors(efg: np.ndarray,
 
     return Q_tensors
 
-def process_interactions(intrs: dict, zero_value: float) -> dict:
+def _process_interactions(spin_system: SpinSystem) -> dict:
     """
-    Processes all incoherent interactions and organizes them by rank. 
-    Disregards interactions below a specified threshold.
+    Obtains all interaction tensors from the spin system, and organizes them by
+    their interaction rank. Interaction tensors whose norm is below the
+    threshold specified in global parameters are disregarded.
 
     Parameters
     ----------
-    intrs : dict
-        A dictionary where the keys represent the interaction type, and the
-        values contain the interaction tensors and the ranks.
-    zero_value : float
-        If the eigenvalues of the interaction tensor, estimated using the
-        1-norm, are smaller than this threshold, the interaction is ignored.
+    spin_system : SpinSystem
+        SpinSystem whose interactions are to be processed.
 
     Returns
     -------
@@ -290,6 +287,8 @@ def process_interactions(intrs: dict, zero_value: float) -> dict:
         contain all interactions with meaningful strength. The interactions are
         tuples in the format ("interaction", spin_1, spin_2, tensor).
     """
+    # Obtain the threshold from the parameters
+    zv = parameters.zero_interaction
 
     # Initialize the lists of interaction descriptions for different ranks
     interactions = {
@@ -297,56 +296,96 @@ def process_interactions(intrs: dict, zero_value: float) -> dict:
         2: []
     }
 
-    # Iterate through the interactions
-    for interaction, properties in intrs.items():
+    # Process dipole-dipole couplings
+    if spin_system.xyz is not None:
 
-        # Extract the properties
-        tensors = properties[0]
-        ranks = properties[1]
+        # Interaction name and rank
+        interaction = "DD"
+        rank = 2
 
-        # Iterate through the ranks
-        for rank in ranks:
+        # Get the DD-coupling tensors
+        dd_tensors = dd_coupling_tensors(spin_system.xyz, spin_system.gammas)
 
-            # Process single-spin interactions
-            if interaction in ["CSA", "Q"]:
-                for spin_1 in range(tensors.shape[0]):
-                    if norm_1(tensors[spin_1], ord='row') > zero_value:
-                        interactions[rank].append(
-                            (interaction, spin_1, None, tensors[spin_1]))
+        # Go through the DD-coupling tensors
+        for spin_1 in range(spin_system.nspins):
+            for spin_2 in range(spin_system.nspins):
+                if norm_1(dd_tensors[spin_1, spin_2], ord='row') > zv:
+                    interactions[rank].append((
+                        interaction,
+                        spin_1,
+                        spin_2, 
+                        dd_tensors[spin_1, spin_2]
+                    ))
 
-            # Process two-spin interactions
-            if interaction == "DD":
-                for spin_1 in range(tensors.shape[0]):
-                    for spin_2 in range(tensors.shape[1]):
-                        if norm_1(
-                            tensors[spin_1, spin_2], ord='row') > zero_value:
-                            interactions[rank].append(
-                                (interaction, spin_1, spin_2, 
-                                 tensors[spin_1, spin_2]))
+    # Process nuclear shielding
+    if spin_system.shielding is not None:
+
+        # Interaction name
+        interaction = "CSA"
+
+        # Get the shielding tensors
+        sh_tensors = shielding_intr_tensors(
+            spin_system.shielding,
+            spin_system.gammas,
+            parameters.magnetic_field
+        )
+        
+        # Go through the shielding tensors
+        for spin_1 in range(spin_system.nspins):
+            if norm_1(sh_tensors[spin_1], ord='row') > zv:
+
+                # Add antisymmetric part if requested
+                if spin_system.relaxation.antisymmetric:
+                    rank = 1
+                    interactions[rank].append(
+                        (interaction, spin_1, None, sh_tensors[spin_1])
+                    )
+
+                # Always add the symmetric part
+                rank = 2
+                interactions[rank].append(
+                    (interaction, spin_1, None, sh_tensors[spin_1])
+                )
+
+    # Process quadrupolar coupling
+    if spin_system.efg is not None:
+
+        # Interaction name and rank
+        interaction = "Q"
+        rank = 2
+
+        # Get the quadrupole coupling tensors
+        q_tensors = Q_intr_tensors(
+            spin_system.efg,
+            spin_system.spins,
+            spin_system.quad
+        )
+
+        # Go through the quadrupole coupling tensors
+        for spin_1 in range(spin_system.nspins):
+            if norm_1(q_tensors[spin_1], ord='row') > zv:
+                interactions[rank].append(
+                    (interaction, spin_1, None, q_tensors[spin_1])
+                )
 
     return interactions
 
-def get_sop_T(basis: np.ndarray,
-              spins: np.ndarray,
-              l: int,
-              q: int,
-              interaction_type: Literal["CSA", "Q", "DD"],
-              spin_1: int,
-              spin_2: int = None,
-              sparse: bool=True) -> np.ndarray | sp.csc_array:
+def _get_sop_T(
+    spin_system: SpinSystem,
+    l: int,
+    q: int,
+    interaction_type: Literal["CSA", "Q", "DD"],
+    spin_1: int,
+    spin_2: int = None
+) -> np.ndarray | sp.csc_array:
     """
     Helper function for the relaxation module. Calculates the coupled product 
     superoperators for different interaction types.
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers for each spin
-        in the system.
+    spin_system : SpinSystem
+        SpinSystem object containing the basis and spins information.
     l : int
         Operator rank.
     q : int
@@ -360,9 +399,6 @@ def get_sop_T(basis: np.ndarray,
     spin_2 : int, optional
         Index of the second spin. Leave empty for single-spin interactions
         (e.g., CSA).
-    sparse : bool, default=True
-        Specifies whether to return the superoperator as a sparse or dense
-        array.
 
     Returns
     -------
@@ -372,18 +408,17 @@ def get_sop_T(basis: np.ndarray,
 
     # Single-spin linear interaction
     if interaction_type == "CSA":
-        sop = sop_T_coupled(basis, spins, l, q, spin_1, sparse=sparse)
+        sop = sop_T_coupled(spin_system, l, q, spin_1)
 
     # Single-spin quadratic interaction
     elif interaction_type == "Q":
-        nspins = spins.shape[0]
-        op_def = np.zeros(nspins, dtype=int)
+        op_def = np.zeros(spin_system.nspins, dtype=int)
         op_def[spin_1] = lq_to_idx(l, q)
-        sop = sop_prod(op_def, basis, spins, 'comm', sparse)
+        sop = sop_prod(op_def, spin_system.basis.basis, spin_system.spins, 'comm')
 
     # Two-spin bilinear interaction
     elif interaction_type == "DD":
-        sop = sop_T_coupled(basis, spins, l, q, spin_1, spin_2, sparse)
+        sop = sop_T_coupled(spin_system, l, q, spin_1, spin_2)
 
     # Raise an error for invalid interaction types
     else:
@@ -526,24 +561,7 @@ def sop_R_redfield_term(
     return l, q, type_r, spin_r1, spin_r2, sop_R_term
 
 def _sop_R_redfield(
-    basis: np.ndarray,
-    sop_H: sp.csc_array,
-    tau_c: float,
-    spins: np.ndarray,
-    B: float = None,
-    gammas: np.ndarray = None,
-    quad: np.ndarray = None,
-    xyz: np.ndarray = None,
-    shielding: np.ndarray = None,
-    efg: np.ndarray = None,
-    include_antisymmetric: bool=False,
-    include_dynamic_frequency_shift: bool=False,
-    relative_error: float=1e-6,
-    interaction_zero: float=1e-9,
-    aux_zero: float=1e-18,
-    relaxation_zero: float=1e-12,
-    parallel_dim: int=1000,
-    sparse: bool=True
+    spin_system: SpinSystem
 ) -> np.ndarray | sp.csc_array:
     """
     Calculates the relaxation superoperator using Redfield relaxation theory.
@@ -561,113 +579,38 @@ def _sop_R_redfield(
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    sop_H : ndarray or csc_array
-        Coherent part of the Hamiltonian superoperator.
-    tau_c : float
-        Rotational correlation time in seconds.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    B : float
-        External magnetic field in Tesla.
-    gammas : ndarray, default=None
-        A 1-dimensional array specifying the gyromagnetic ratios for each spin.
-        Must be defined in the units of rad/s/T.
-    quad : ndarray, default=None
-        A 1-dimensional array specifying the quadrupolar moments for each spin.
-        Must be defined in the units of m^2.
-    xyz : ndarray, default=None
-        A 2-dimensional array where the rows contain the Cartesian coordinates
-        for each spin in the units of Å.
-    shielding : ndarray, default=None
-        A 3-dimensional array where the shielding tensors are specified for each
-        spin in the units of Å.
-    efg : ndarray, default=None
-        A 3-dimensional array where the electric field gradient tensors are
-        specified for each spin in the units of Å.
-    include_antisymmetric : bool, default=False
-        Specifies whether the antisymmetric component of the CSA is included.
-        This is usually very small and can be neglected.
-    include_dynamic_frequency_shift : bool, default=False
-        Specifies whether the dynamic frequency shifts are included. This
-        corresponds to the imaginary part of the relaxation superoperator that
-        causes small shifts to the resonance frequencies. This effect is usually
-        very small and can be neglected.
-    relative_error : float=1e-6
-        Relative error for the Redfield integral that is calculated using
-        auxiliary matrix method. Smaller values correspond to more accurate
-        integrals.
-    interaction_zero : float=1e-9
-        If the eigenvalues of the interaction tensor, estimated using the
-        1-norm, are smaller than this threshold, the interaction is ignored.
-    aux_zero : float=1e-18
-        This threshold is used to estimate the convergence of the Taylor series
-        when exponentiating the auxiliary matrix, and also to eliminate small
-        values from the arrays in the matrix exponential squaring step.
-    relaxation_zero : float=1e-12
-        Smaller values than this threshold are eliminated from the relaxation
-        superoperator before returning the array.
-    parallel_dim : int=1000
-        If the basis set dimension is larger than this value, the Redfield
-        integrals are calculated in parallel. Otherwise, the integrals are
-        calculated in serial.
-    sparse : bool=True
-        Specifies whether to calculate the relaxation superoperator as sparse or
-        dense array.
+    spin_system : SpinSystem
+        SpinSystem for which the relaxation superoperator is to be calculated.
 
     Returns
     -------
-    sop_R : ndarray or csc_array
+    R : ndarray or csc_array
         Relaxation superoperator.
     """
 
     time_start = time.time()
     print('Constructing relaxation superoperator using Redfield theory...')
 
-    # Obtain the basis set dimension
-    dim = basis.shape[0]
-
-    # Initialize a list to hold all SharedMemories
-    shms = []
-
-    # Initialize a dictionary for incoherent interactions
-    interactions = {}
-
-    # Process dipole-dipole couplings
-    if xyz is not None:
-        dd_tensors = dd_coupling_tensors(xyz, gammas)
-        dd_ranks = [2]
-        interactions['DD'] = (dd_tensors, dd_ranks)
-
-    # Process nuclear shielding
-    if shielding is not None:
-        sh_tensors = shielding_intr_tensors(shielding, gammas, B)
-        if include_antisymmetric:
-            sh_ranks = [1, 2]
-        else:
-            sh_ranks = [2]
-        interactions['CSA'] = (sh_tensors, sh_ranks)
-
-    # Process quadrupolar coupling
-    if efg is not None:
-        q_tensors = Q_intr_tensors(efg, spins, quad)
-        q_ranks = [2]
-        interactions['Q'] = (q_tensors, q_ranks)
+    # Extract information from the spin system
+    dim = spin_system.basis.dim
+    tau_c = spin_system.relaxation.tau_c
+    relative_error = spin_system.relaxation.relative_error
 
     # Process the interactions
-    interactions = process_interactions(interactions, interaction_zero)
+    interactions = _process_interactions(spin_system)
 
-    # Initialize the relaxation superoperator
-    sop_R = sp.csc_array((dim, dim), dtype=complex)
+    # Build the coherent Hamiltonian superoperator
+    with HidePrints():
+        H = hamiltonian(spin_system)
 
     # Define the integration limit for the auxiliary matrix method
     t_max = np.log(1 / relative_error) * tau_c
 
-    # Top left array of auxiliary matrix
-    top_left = 1j * sop_H
+    # Initialize a list to hold all SharedMemories (for parallel processing)
+    shms = []
+
+    # Build the top left array of the auxiliary matrix
+    top_left = 1j * H
     top_left, top_left_shm = write_shared_sparse(top_left)
     shms.extend(top_left_shm)
 
@@ -682,11 +625,10 @@ def _sop_R_redfield(
     for l in [1, 2]:
 
         # Diagonal matrix of correlation time
-        tau_c_diagonal_l = 1 / tau_c_l(tau_c, l) * \
-                            sp.eye_array(sop_H.shape[0], format='csc')
+        tau_c_diagonal_l = 1/tau_c_l(tau_c, l) * sp.eye_array(dim, format='csc')
 
         # Bottom right array of auxiliary matrix
-        bottom_right = 1j * sop_H - tau_c_diagonal_l
+        bottom_right = 1j * H - tau_c_diagonal_l
         bottom_right, bottom_right_shm = write_shared_sparse(bottom_right)
         shms.extend(bottom_right_shm)
 
@@ -710,8 +652,7 @@ def _sop_R_redfield(
                     print(f"l: {l}, q: {q} - {itype} for spins {spin1}-{spin2}")
 
                 # Compute the coupled T superoperator
-                sop_T = \
-                    get_sop_T(basis, spins, l, q, itype, spin1, spin2, sparse)
+                sop_T = _get_sop_T(spin_system, l, q, itype, spin1, spin2)
                 
                 # Continue only if T is not empty
                 if sop_T.nnz != 0:
@@ -723,15 +664,27 @@ def _sop_R_redfield(
 
                     # Add to the list of tasks
                     tasks.append((
-                        l, q,                                   # Rank and projection
-                        itype, spin1, spin2, tensor,            # Right interaction
-                        top_left, sop_T_shared, bottom_right,   # Aux matrix
-                        t_max, aux_zero, relaxation_zero,       # Numerics
-                        sop_Ts, interactions                    # Left interaction
+                        l,                          # Interaction rank
+                        q,                          # Interaction projection
+                        itype,                      # Interaction type
+                        spin1,                      # Right interaction spin 1
+                        spin2,                      # Right interaction spin 2
+                        tensor,                     # Right interaction tensor
+                        top_left,                   # Aux matrix top left
+                        sop_T_shared,               # Aux matrix top right
+                        bottom_right,               # Aux matrix bottom right
+                        t_max,                      # Aux matrix integral limit
+                        parameters.zero_aux,        # Aux matrix expm zero
+                        parameters.zero_relaxation, # Relaxation zero element
+                        sop_Ts,                     # All coupled T
+                        interactions                # Left interaction
                     ))
 
-    # SECOND LOOP -- Iterate over the tasks in parallel
-    if dim > parallel_dim:
+    # Initialize the relaxation superoperator
+    R = sp.csc_array((dim, dim), dtype=complex)
+
+    # SECOND LOOP -- Iterate over the tasks in parallel and build the R
+    if dim > parameters.parallel_dim:
         print("Performing the Redfield integrals in parallel...")
 
         # Create the parallel tasks
@@ -744,8 +697,8 @@ def _sop_R_redfield(
         for result in output_generator:
 
             # Parse the result and add term to total relaxation superoperator
-            l, q, itype, spin1, spin2, sop_R_term = result
-            sop_R += sop_R_term
+            l, q, itype, spin1, spin2, R_term = result
+            R += R_term
 
             # Show current status
             if spin2 is None:
@@ -761,8 +714,8 @@ def _sop_R_redfield(
         for task in tasks:
 
             # Parse the result and add term to total relaxation superoperator
-            l, q, itype, spin1, spin2, sop_R_term = sop_R_redfield_term(*task)
-            sop_R += sop_R_term
+            l, q, itype, spin1, spin2, R_term = sop_R_redfield_term(*task)
+            R += R_term
 
             # Show current status
             if spin2 is None:
@@ -778,21 +731,21 @@ def _sop_R_redfield(
     print("Redfield integrals completed.")
 
     # Return only real values unless dynamic frequency shifts are requested
-    if not include_dynamic_frequency_shift:
+    if not spin_system.relaxation.dynamic_frequency_shift:
         print("Removing the dynamic frequency shifts...")
-        sop_R = sop_R.real
+        R = R.real
         print("Dynamic frequency shifts removed.")
     
     # Eliminate small values
     print("Eliminating small values from the relaxation superoperator...")
-    eliminate_small(sop_R, relaxation_zero)
+    eliminate_small(R, parameters.zero_relaxation)
     print("Small values eliminated.")
     
     print("Redfield relaxation superoperator constructed in "
           f"{time.time() - time_start:.4f} seconds.")
     print()
 
-    return sop_R
+    return R
 
 def sop_R_random_field():
     """
@@ -802,8 +755,7 @@ def sop_R_random_field():
 def _sop_R_phenomenological(
     basis: np.ndarray,
     R1: np.ndarray,
-    R2: np.ndarray,
-    sparse: bool=True
+    R2: np.ndarray
 ) -> np.ndarray | sp.csc_array:
     """
     Constructs the relaxation superoperator from given `R1` and `R2` values
@@ -821,9 +773,6 @@ def _sop_R_phenomenological(
     R2 : ndarray
         A one dimensional array containing the transverse relaxation rates
         in 1/s for each spin. For example: `np.array([2.0, 4.0, 5.0])`
-    sparse : bool, default=True
-        Specifies whether to construct the relaxation superoperator as sparse or
-        dense array.
 
     Returns
     -------
@@ -838,7 +787,7 @@ def _sop_R_phenomenological(
     dim = basis.shape[0]
 
     # Create an empty array for the relaxation superoperator
-    if sparse:
+    if parameters.sparse_superoperator:
         sop_R = sp.lil_array((dim, dim))
     else:
         sop_R = np.zeros((dim, dim))
@@ -874,7 +823,7 @@ def _sop_R_phenomenological(
         sop_R[idx, idx] = R_state
 
     # Convert to CSC array if using sparse
-    if sparse:
+    if parameters.sparse_superoperator:
         sop_R = sop_R.tocsc()
 
     print("Phenomenological relaxation superoperator constructed in "
@@ -884,14 +833,8 @@ def _sop_R_phenomenological(
     return sop_R
 
 def _sop_R_sr2k(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    gammas: np.ndarray,
-    chemical_shifts: np.ndarray,
-    J_couplings: np.ndarray,
-    sop_R: sp.csc_array,
-    B: float,
-    sparse: bool=True
+    spin_system: SpinSystem,
+    R: sp.csc_array,
 ) -> np.ndarray | sp.csc_array:
     """
     Calculates the scalar relaxation of the second kind (SR2K) based on 
@@ -899,54 +842,34 @@ def _sop_R_sr2k(
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers for each spin
-        in the system.
-    gammas : ndarray
-        A 1-dimensional array specifying the gyromagnetic ratios for
-        each nucleus in the spin system. Must be given in the units
-        of rad/s/T.
-    chemical_shifts : ndarray
-        A 1-dimensional array containing the chemical shifts of each spin in the
-        units of ppm.
-    J_couplings : ndarray
-        A 2-dimensional array containing the scalar J-couplings between each
-        spin in the units of Hz. Only the bottom triangle is considered.
-    sop_R : ndarray or csc_array
+    spin_system : SpinSystem
+        SpinSystem for which the SR2K contribution is to be calculated.
+    R : ndarray or csc_array
         Relaxation superoperator without scalar relaxation of the second kind.
-    B : float
-        Magnetic field in units of T.
-    sparse: bool, default=True
-        Specifies whether to return the relaxation superoperator as dense or
-        sparse array.
 
     Returns
     -------
-    sop_R : ndarray or csc_array
-        Relaxation superoperator containing the contribution from scalar
+    R : ndarray or csc_array
+        Relaxation superoperator containing only the contribution from scalar
         relaxation of the second kind.
     """
 
     print("Processing scalar relaxation of the second kind...")
     time_start = time.time()
 
-    # Obtain the number of spins
-    nspins = spins.shape[0]
-
     # Make a dictionary of the basis for fast lookup
-    basis_lookup = {tuple(row): idx for idx, row in enumerate(basis)}
+    basis_lookup = {
+        tuple(row): idx
+        for idx, row in enumerate(spin_system.basis.basis)
+    }
 
     # Initialize arrays for the relaxation rates
-    R1 = np.zeros(nspins)
-    R2 = np.zeros(nspins)
+    R1 = np.zeros(spin_system.nspins)
+    R2 = np.zeros(spin_system.nspins)
 
     # Obtain indices of quadrupolar nuclei in the system
     quadrupolar = []
-    for i, spin in enumerate(spins):
+    for i, spin in enumerate(spin_system.spins):
         if spin > 0.5:
             quadrupolar.append(i)
     
@@ -955,8 +878,8 @@ def _sop_R_sr2k(
 
         # Find the operator definitions of the longitudinal and transverse
         # states
-        op_def_z, _ = parse_operator_string(f"I(z, {quad})", nspins)
-        op_def_p, _ = parse_operator_string(f"I(+, {quad})", nspins)
+        op_def_z, _ = parse_operator_string(f"I(z, {quad})", spin_system.nspins)
+        op_def_p, _ = parse_operator_string(f"I(+, {quad})", spin_system.nspins)
 
         # Convert operator definitions to tuple for searching the basis
         op_def_z = tuple(op_def_z[0])
@@ -967,31 +890,34 @@ def _sop_R_sr2k(
         idx_trans = basis_lookup[op_def_p]
 
         # Find the relaxation times of the quadrupolar nucleus
-        T1 = 1 / sop_R[idx_long, idx_long]
-        T2 = 1 / sop_R[idx_trans, idx_trans]
+        T1 = 1 / R[idx_long, idx_long]
+        T2 = 1 / R[idx_trans, idx_trans]
 
         # Convert to real values
         T1 = np.real(T1)
         T2 = np.real(T2)
 
         # Find the Larmor frequency of the quadrupolar nucleus
-        omega_quad = gammas[quad] * B * (1 + chemical_shifts[quad] * 1e-6)
+        omega_quad = spin_system.gammas[quad] \
+                   * parameters.magnetic_field \
+                   * (1 + spin_system.chemical_shifts[quad] * 1e-6)
 
         # Find the spin quantum number of the quadrupolar nucleus
-        S = spins[quad]
+        S = spin_system.spins[quad]
 
         # Loop over all spins
-        for target, gamma in enumerate(gammas):
+        for target, gamma in enumerate(spin_system.gammas):
 
             # Proceed only if the gyromagnetic ratios are different
-            if not gammas[quad] == gamma:
+            if not spin_system.gammas[quad] == gamma:
 
                 # Find the Larmor frequency of the target spin
-                omega_target = gammas[target] * B * \
-                               (1 + chemical_shifts[target] * 1e-6)
+                omega_target = spin_system.gammas[target] \
+                             * parameters.magnetic_field \
+                             * (1 + spin_system.chemical_shifts[target] * 1e-6)
 
                 # Find the scalar coupling between spins in rad/s
-                J = 2 * np.pi * J_couplings[quad][target]
+                J = 2 * np.pi * spin_system.J_couplings[quad][target]
 
                 # Calculate the relaxation rates
                 R1[target] += ((J**2) * S * (S + 1)) / 3 * \
@@ -1001,7 +927,7 @@ def _sop_R_sr2k(
 
     # Get relaxation superoperator corresponding to SR2K
     with HidePrints():
-        sop_R = _sop_R_phenomenological(basis, R1, R2, sparse)
+        sop_R = _sop_R_phenomenological(spin_system.basis.basis, R1, R2)
 
     print(f"SR2K superoperator constructed in {time.time() - time_start:.4f} "
           "seconds.")
@@ -1012,8 +938,7 @@ def _sop_R_sr2k(
 def _ldb_thermalization(
     R: np.ndarray | sp.csc_array,
     H_left: np.ndarray |sp.csc_array,
-    T: float,
-    zero_value: float=1e-18
+    T: float
 ) -> np.ndarray | sp.csc_array:
     """
     Applies the Levitt-Di Bari thermalization to the relaxation superoperator.
@@ -1026,9 +951,6 @@ def _ldb_thermalization(
         Left-side coherent Hamiltonian superoperator.
     T : float
         Temperature of the spin bath in Kelvin.
-    zero_value : float, default=1e-18
-        This threshold is used to estimate the convergence in the matrix
-        exponential and to eliminate small values from the array.
     
     Returns
     -------
@@ -1040,7 +962,7 @@ def _ldb_thermalization(
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
     with HidePrints():
-        P = expm(const.hbar / (const.k * T) * H_left, zero_value)
+        P = expm(const.hbar/(const.k*T)*H_left, parameters.zero_thermalization)
 
     # Calculate the thermalized relaxation superoperator
     R = R @ P
@@ -1131,83 +1053,28 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             basis = spin_system.basis.basis,
             R1 = spin_system.relaxation.R1,
             R2 = spin_system.relaxation.R2,
-            sparse = parameters.sparse_relaxation)
+        )
 
     # Make relaxation superoperator using Redfield theory
     elif spin_system.relaxation.theory == "redfield":
-        
-        # Build the coherent hamiltonian
-        with HidePrints():
-            H = sop_H(
-                basis = spin_system.basis.basis,
-                spins = spin_system.spins,
-                gammas = spin_system.gammas,
-                B = parameters.magnetic_field,
-                chemical_shifts = spin_system.chemical_shifts,
-                J_couplings = spin_system.J_couplings,
-                side = "comm",
-                sparse = parameters.sparse_hamiltonian,
-                zero_value = parameters.zero_hamiltonian
-            )
-
-        # Build the Redfield relaxation superoperator
-        R = _sop_R_redfield(
-            basis = spin_system.basis.basis,
-            sop_H = H,
-            tau_c = spin_system.relaxation.tau_c,
-            spins = spin_system.spins,
-            B = parameters.magnetic_field,
-            gammas = spin_system.gammas,
-            quad = spin_system.quad,
-            xyz = spin_system.xyz,
-            shielding = spin_system.shielding,
-            efg = spin_system.efg,
-            include_antisymmetric = spin_system.relaxation.antisymmetric,
-            include_dynamic_frequency_shift = \
-                spin_system.relaxation.dynamic_frequency_shift,
-            relative_error = spin_system.relaxation.relative_error,
-            interaction_zero = parameters.zero_interaction,
-            aux_zero = parameters.zero_aux,
-            relaxation_zero = parameters.zero_relaxation,
-            parallel_dim = parameters.parallel_dim,
-            sparse = parameters.sparse_relaxation
-        )
+        R = _sop_R_redfield(spin_system)
     
     # Apply scalar relaxation of the second kind if requested
     if spin_system.relaxation.sr2k:
-        R += _sop_R_sr2k(
-            basis = spin_system.basis.basis,
-            spins = spin_system.spins,
-            gammas = spin_system.gammas,
-            chemical_shifts = spin_system.chemical_shifts,
-            J_couplings = spin_system.J_couplings,
-            sop_R = R,
-            B = parameters.magnetic_field,
-            sparse = parameters.sparse_relaxation
-        )
+        R += _sop_R_sr2k(spin_system, R)
         
     # Apply thermalization if requested
     if spin_system.relaxation.thermalization:
         
         # Build the left Hamiltonian superopertor
         with HidePrints():
-            H_left = sop_H(
-                basis = spin_system.basis.basis,
-                spins = spin_system.spins,
-                gammas = spin_system.gammas,
-                B = parameters.magnetic_field,
-                chemical_shifts = spin_system.chemical_shifts,
-                J_couplings = spin_system.J_couplings,
-                side = "left",
-                sparse = parameters.sparse_hamiltonian,
-                zero_value = parameters.zero_hamiltonian
-            )
+            H_left = hamiltonian(spin_system, side="left")
             
         # Perform the thermalization
         R = _ldb_thermalization(
             R = R,
             H_left = H_left,
-            T = parameters.temperature,
-            zero_value = parameters.zero_thermalization)
+            T = parameters.temperature
+        )
 
     return R
