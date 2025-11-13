@@ -23,7 +23,6 @@ from spinguin._core._hamiltonian import sop_H
 def _unit_state(
     basis: np.ndarray,
     spins: np.ndarray,
-    sparse: bool=False,
     normalized: bool=True
 ) -> np.ndarray | sp.csc_array:
     """
@@ -40,8 +39,6 @@ def _unit_state(
         tensors.
     spins : ndarray
         A 1-dimensional array specifying the spin quantum numbers of the system.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
     normalized : bool, default=True
         If set to True, the function will return a state vector that represents
         the trace-normalized density matrix. If False, returns a state vector
@@ -60,7 +57,7 @@ def _unit_state(
     mults = np.array([int(2 * S + 1) for S in spins], dtype=int)
 
     # Initialize the state vector
-    if sparse:
+    if parameters.sparse_state:
         rho = sp.lil_array((dim, 1), dtype=complex)
     else:
         rho = np.zeros((dim, 1), dtype=complex)
@@ -72,7 +69,7 @@ def _unit_state(
         rho[0, 0] = np.sqrt(np.prod(mults))
 
     # Convert to csc_array if requesting sparse
-    if sparse:
+    if parameters.sparse_state:
         rho = rho.tocsc()
 
     return rho
@@ -82,7 +79,7 @@ def _state_from_op_def(
     basis_bytes : bytes,
     spins_bytes : bytes,
     op_def_bytes : bytes,
-    sparse: bool=False
+    sparse: bool
 ) -> np.ndarray | sp.csc_array:
     
     # Obtain the hashed elements
@@ -110,10 +107,14 @@ def _state_from_op_def(
     # Calculate the norm of the active operator part if there are active
     # spins
     if len(idx_active) != 0:
-        # TODO: Benchmark sparse vs dense implementation
-        op_norm = np.linalg.norm(
-            op_prod(op_def, spins, include_unit=False, sparse=False),
-            ord='fro')
+        if parameters.sparse_operator:
+            op_norm = sp.linalg.norm(
+                op_prod(op_def, spins, include_unit=False), ord='fro'
+            )
+        else:
+            op_norm = np.linalg.norm(
+                op_prod(op_def, spins, include_unit=False), ord='fro'
+            )
 
     # Otherwise set it to one
     else:
@@ -135,10 +136,9 @@ def _state_from_op_def(
     return rho
 
 def state_from_op_def(
-        basis : np.ndarray,
-        spins : np.ndarray,
-        op_def : np.ndarray,
-        sparse : bool=False
+    basis : np.ndarray,
+    spins : np.ndarray,
+    op_def : np.ndarray,
 ) -> np.ndarray | sp.csc_array:
     """
     Generates a state from the given operator definition. The output of this
@@ -164,8 +164,6 @@ def state_from_op_def(
         A 1-dimensional array specifying the spin quantum numbers of the system.
     op_def : ndarray
         An array of integers that specify the product operator.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -178,17 +176,23 @@ def state_from_op_def(
     spins_bytes = spins.tobytes()
     op_def_bytes = op_def.tobytes()
 
-    # Ensure that a different instance is returned
-    rho = _state_from_op_def(basis_bytes, spins_bytes, op_def_bytes,
-                             sparse).copy()
+    # Create the state and ensure that a different instance is returned
+    rho = _state_from_op_def(
+        basis_bytes,
+        spins_bytes,
+        op_def_bytes,
+        parameters.sparse_state
+    ).copy()
 
     return rho
 
 @lru_cache(maxsize=128)
-def _state_from_string(basis_bytes: bytes,
-                       spins_bytes: bytes,
-                       operator: str,
-                       sparse: bool=False) -> np.ndarray | sp.csc_array:
+def _state_from_string(
+    basis_bytes: bytes,
+    spins_bytes: bytes,
+    operator: str,
+    sparse: bool
+) -> np.ndarray | sp.csc_array:
 
     # Obtain the hashed elements
     spins = np.frombuffer(spins_bytes, dtype=float)
@@ -221,10 +225,14 @@ def _state_from_string(basis_bytes: bytes,
         # Calculate the norm of the active operator part if there are active
         # spins
         if len(idx_active) != 0:
-            # TODO: Benchmark sparse vs dense implementation
-            op_norm = np.linalg.norm(
-                op_prod(op_def, spins, include_unit=False, sparse=False),
-                ord='fro')
+            if parameters.sparse_operator:
+                op_norm = sp.linalg.norm(
+                    op_prod(op_def, spins, include_unit=False), ord='fro'
+                )
+            else:
+                op_norm = np.linalg.norm(
+                    op_prod(op_def, spins, include_unit=False), ord='fro'
+                )
 
         # Otherwise set it to one
         else:
@@ -245,10 +253,11 @@ def _state_from_string(basis_bytes: bytes,
 
     return rho
 
-def state_from_string(basis: np.ndarray,
-                      spins: np.ndarray,
-                      operator: str,
-                      sparse: bool=False) -> np.ndarray | sp.csc_array:
+def state_from_string(
+    basis: np.ndarray,
+    spins: np.ndarray,
+    operator: str
+) -> np.ndarray | sp.csc_array:
     """
     This function returns a column vector representing the density matrix as a
     linear combination of spin operators. Each element of the vector corresponds
@@ -300,8 +309,6 @@ def state_from_string(basis: np.ndarray,
         Whitespace will be ignored in the input.
 
         NOTE: Indexing starts from 0!
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -313,16 +320,20 @@ def state_from_string(basis: np.ndarray,
     basis_bytes = basis.tobytes()
     spins_bytes = spins.tobytes()
 
-    # Ensure that a different instance is returned
-    rho = _state_from_string(basis_bytes, spins_bytes, operator, sparse).copy()
+    # Create the state and ensure that a different instance is returned
+    rho = _state_from_string(
+        basis_bytes,
+        spins_bytes,
+        operator,
+        parameters.sparse_state
+    ).copy()
 
     return rho
 
 def _state_to_zeeman(
     basis: np.ndarray,
     spins: np.ndarray,
-    rho: np.ndarray | sp.csc_array,
-    sparse: bool=True
+    rho: np.ndarray | sp.csc_array
 ) -> np.ndarray | sp.csc_array:
     """
     Takes the state vector defined in the normalized spherical tensor basis
@@ -338,8 +349,6 @@ def _state_to_zeeman(
         A 1-dimensional array specifying the spin quantum numbers of the system.
     rho : ndarray or csc_array
         State vector defined in the normalized spherical tensor basis.
-    sparse : bool, default=True
-        Specifies whether to return the density matrix as sparse or dense array.
 
     Returns
     -------
@@ -354,7 +363,7 @@ def _state_to_zeeman(
     dim = np.prod(mults)
 
     # Initialize the spin density matrix
-    if sparse:
+    if parameters.sparse_operator:
         rho_zeeman = sp.csc_array((dim, dim), dtype=complex)
     else:
         rho_zeeman = np.zeros((dim, dim), dtype=complex)
@@ -370,8 +379,8 @@ def _state_to_zeeman(
 
         # Get the normalized product operator in the Zeeman eigenbasis with
         # normalization
-        oper = op_prod(op_def, spins, include_unit=True, sparse=sparse)
-        if sparse:
+        oper = op_prod(op_def, spins, include_unit=True)
+        if parameters.sparse_operator:
             oper = oper / sp.linalg.norm(oper, ord='fro')
         else:
             oper = oper / np.linalg.norm(oper, ord='fro')
@@ -386,7 +395,6 @@ def _equilibrium_state(
     spins: np.ndarray,
     H_left: np.ndarray | sp.csc_array,
     T : float,
-    sparse: bool = False,
     zero_value: float=1e-18
 ) -> np.ndarray | sp.csc_array:
     """
@@ -404,8 +412,6 @@ def _equilibrium_state(
         Left-side coherent Hamiltonian superoperator.
     T : float
         Temperature of the spin bath in Kelvin.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
     zero_value : float, default=1e-18
         This threshold value is used to estimate the convergence of Taylor
         series in matrix exponential, and to eliminate value smaller than this
@@ -425,8 +431,12 @@ def _equilibrium_state(
         P = expm(-const.hbar / (const.k * T) * H_left, zero_value)
 
     # Obtain the thermal equilibrium by propagating the unit state
-    unit = _unit_state(basis, spins, sparse=sparse, normalized=False)
+    unit = _unit_state(basis, spins, normalized=False)
     rho_eq = P @ unit
+
+    # Ensure the correct sparsity (might have changed during multiplication)
+    if parameters.sparse_state and not sp.issparse(rho_eq):
+        rho_eq = sp.csc_array(rho_eq)
 
     # Normalize such that the trace of the corresponding density matrix is one
     rho_eq = rho_eq / (rho_eq[0, 0] * np.sqrt(np.prod(mults)))
@@ -436,8 +446,7 @@ def _equilibrium_state(
 def _alpha_state(
     basis: np.ndarray,
     spins: np.ndarray,
-    index: int,
-    sparse: bool = False
+    index: int
 ) -> np.ndarray | sp.csc_array:
     """
     Generates the alpha state for a given spin-1/2 nucleus. Unit state is
@@ -453,8 +462,6 @@ def _alpha_state(
         A 1-dimensional array specifying the spin quantum numbers of the system.
     index : int
         Index of the spin that has the alpha state.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -467,8 +474,8 @@ def _alpha_state(
     dim = np.prod(mults)
 
     # Get states
-    E = _unit_state(basis, spins, sparse=sparse, normalized=False)
-    I_z = state_from_string(basis, spins, f"I(z, {index})", sparse=sparse)
+    E = _unit_state(basis, spins, normalized=False)
+    I_z = state_from_string(basis, spins, f"I(z, {index})")
 
     # Make the alpha state
     rho = 1 / dim * E + 2 / dim * I_z
@@ -478,8 +485,7 @@ def _alpha_state(
 def _beta_state(
     basis: np.ndarray,
     spins: np.ndarray,
-    index: int,
-    sparse: bool = False
+    index: int
 ) -> np.ndarray | sp.csc_array:
     """
     Generates the beta state for a given spin-1/2 nucleus. Unit state is
@@ -495,8 +501,6 @@ def _beta_state(
         A 1-dimensional array specifying the spin quantum numbers of the system.
     index : int
         Index of the spin that has the beta state.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -509,8 +513,8 @@ def _beta_state(
     dim = np.prod(mults)
 
     # Get states
-    E = _unit_state(basis, spins, sparse=sparse, normalized=False)
-    I_z = state_from_string(basis, spins, f"I(z, {index})", sparse=sparse)
+    E = _unit_state(basis, spins, normalized=False)
+    I_z = state_from_string(basis, spins, f"I(z, {index})")
 
     # Make the beta state
     rho = 1 / dim * E - 2 / dim * I_z
@@ -521,8 +525,7 @@ def _singlet_state(
     basis: np.ndarray,
     spins: np.ndarray,
     index_1: int,
-    index_2: int,
-    sparse: bool = False
+    index_2: int
 ) -> np.ndarray | sp.csc_array:
     """
     Generates the singlet state between two spin-1/2 nuclei. Unit state is
@@ -540,8 +543,6 @@ def _singlet_state(
         Index of the first spin in the singlet state.
     index_2 : int
         Index of the second spin in the singlet state.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -554,13 +555,10 @@ def _singlet_state(
     dim = np.prod(mults)
 
     # Get states
-    E = _unit_state(basis, spins, sparse=sparse, normalized=False)
-    IzIz = state_from_string(
-        basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
-    IpIm = state_from_string(
-        basis, spins, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
-    ImIp = state_from_string(
-        basis, spins, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
+    E = _unit_state(basis, spins, normalized=False)
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
+    IpIm = state_from_string(basis, spins, f"I(+,{index_1}) * I(-, {index_2})")
+    ImIp = state_from_string(basis, spins, f"I(-,{index_1}) * I(+, {index_2})")
 
     # Make the singlet
     rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
@@ -571,8 +569,7 @@ def _triplet_zero_state(
     basis: np.ndarray,
     spins: np.ndarray,
     index_1: int,
-    index_2: int,
-    sparse: bool = False
+    index_2: int
 ) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet zero state between two spin-1/2 nuclei. Unit state is
@@ -590,8 +587,6 @@ def _triplet_zero_state(
         Index of the first spin in the triplet zero state.
     index_2 : int
         Index of the second spin in the triplet zero state.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -604,13 +599,10 @@ def _triplet_zero_state(
     dim = np.prod(mults)
 
     # Get states
-    E = _unit_state(basis, spins, sparse=sparse, normalized=False)
-    IzIz = state_from_string(
-        basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
-    IpIm = state_from_string(
-        basis, spins, f"I(+,{index_1}) * I(-, {index_2})", sparse=sparse)
-    ImIp = state_from_string(
-        basis, spins, f"I(-,{index_1}) * I(+, {index_2})", sparse=sparse)
+    E = _unit_state(basis, spins, normalized=False)
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
+    IpIm = state_from_string(basis, spins, f"I(+,{index_1}) * I(-, {index_2})")
+    ImIp = state_from_string(basis, spins, f"I(-,{index_1}) * I(+, {index_2})")
 
     # Make the triplet zero
     rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
@@ -621,8 +613,7 @@ def _triplet_plus_state(
     basis: np.ndarray,
     spins: np.ndarray,
     index_1: int,
-    index_2: int,
-    sparse: bool = False
+    index_2: int
 ) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet plus state between two spin-1/2 nuclei. Unit state is
@@ -640,8 +631,6 @@ def _triplet_plus_state(
         Index of the first spin in the triplet plus state.
     index_2 : int
         Index of the second spin in the triplet plus state.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -654,11 +643,10 @@ def _triplet_plus_state(
     dim = np.prod(mults)
 
     # Get states
-    E = _unit_state(basis, spins, sparse=sparse, normalized=False)
-    IzE = state_from_string(basis, spins, f"I(z, {index_1})", sparse=sparse)
-    EIz = state_from_string(basis, spins, f"I(z, {index_2})", sparse=sparse)
-    IzIz = state_from_string(
-        basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    E = _unit_state(basis, spins, normalized=False)
+    IzE = state_from_string(basis, spins, f"I(z, {index_1})")
+    EIz = state_from_string(basis, spins, f"I(z, {index_2})")
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
 
     # Make the triplet plus
     rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
@@ -669,8 +657,7 @@ def _triplet_minus_state(
     basis: np.ndarray,
     spins: np.ndarray,
     index_1: int,
-    index_2: int,
-    sparse: bool = False
+    index_2: int
 ) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet minus state between two spin-1/2 nuclei. Unit state is
@@ -688,8 +675,6 @@ def _triplet_minus_state(
         Index of the first spin in the triplet minus state.
     index_2 : int
         Index of the second spin in the triplet minus state.
-    sparse : bool, default=False
-        If False, returns a NumPy array. If True, returns a SciPy csc_array.
 
     Returns
     -------
@@ -702,11 +687,10 @@ def _triplet_minus_state(
     dim = np.prod(mults)
 
     # Get states
-    E = _unit_state(basis, spins, sparse=sparse, normalized=False)
-    IzE = state_from_string(basis, spins, f"I(z, {index_1})", sparse=sparse)
-    EIz = state_from_string(basis, spins, f"I(z, {index_2})", sparse=sparse)
-    IzIz = state_from_string(
-        basis, spins, f"I(z,{index_1}) * I(z, {index_2})", sparse=sparse)
+    E = _unit_state(basis, spins, normalized=False)
+    IzE = state_from_string(basis, spins, f"I(z, {index_1})")
+    EIz = state_from_string(basis, spins, f"I(z, {index_2})")
+    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
 
     # Make the triplet minus
     rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
@@ -771,16 +755,17 @@ def _measure(
     """
 
     # Get the "operator" to be measured
-    oper = state_from_string(basis, spins, operator, sparse=sp.issparse(rho))
+    oper = state_from_string(basis, spins, operator)
 
     # Perform the measurement
     ex = (oper.conj().T @ rho).trace()
 
     return ex
 
-def state_to_truncated_basis(index_map: list,
-                             rho: np.ndarray | sp.csc_array
-                             ) -> np.ndarray | sp.csc_array:
+def state_to_truncated_basis(
+    index_map: list,
+    rho: np.ndarray | sp.csc_array
+) -> np.ndarray | sp.csc_array:
     """
     Transforms a state vector to a truncated basis using the `index_map`,
     which contains indices that determine the elements that are retained
@@ -811,8 +796,10 @@ def state_to_truncated_basis(index_map: list,
 
     return rho_transformed
 
-def unit_state(spin_system: SpinSystem,
-               normalized: bool=True) -> np.ndarray | sp.csc_array:
+def unit_state(
+    spin_system: SpinSystem,
+    normalized: bool=True
+) -> np.ndarray | sp.csc_array:
     """
     Returns a unit state vector, which represents the identity operator. The
     output can be either normalised (trace equal to one) or unnormalised (raw
@@ -836,14 +823,15 @@ def unit_state(spin_system: SpinSystem,
     rho = _unit_state(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
-        sparse = parameters.sparse_state,
         normalized = normalized
     )
 
     return rho
 
-def state(spin_system: SpinSystem,
-          operator: str) -> np.ndarray | sp.csc_array:
+def state(
+    spin_system: SpinSystem,
+    operator: str
+) -> np.ndarray | sp.csc_array:
     """
     This function returns a column vector representing the density matrix as a
     linear combination of spin operators. Each element of the vector corresponds
@@ -905,16 +893,15 @@ def state(spin_system: SpinSystem,
     rho = state_from_string(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
-        operator = operator,
-        sparse = parameters.sparse_state
+        operator = operator
     )
 
     return rho
 
 def state_to_zeeman(
-        spin_system: SpinSystem,
-        rho: np.ndarray | sp.csc_array
-        ) -> np.ndarray | sp.csc_array:
+    spin_system: SpinSystem,
+    rho: np.ndarray | sp.csc_array
+) -> np.ndarray | sp.csc_array:
     """
     Takes the state vector defined in the normalized spherical tensor basis
     and converts it into the Zeeman eigenbasis. Useful for error checking.
@@ -941,14 +928,15 @@ def state_to_zeeman(
     rho_zeeman = _state_to_zeeman(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
-        rho = rho,
-        sparse = parameters.sparse_state
+        rho = rho
     )
     
     return rho_zeeman
 
-def alpha_state(spin_system: SpinSystem,
-                index: int) -> np.ndarray | sp.csc_array:
+def alpha_state(
+    spin_system: SpinSystem,
+    index: int
+) -> np.ndarray | sp.csc_array:
     """
     Generates the alpha state for a given spin-1/2 nucleus. Unit state is
     assigned to the other spins.
@@ -974,14 +962,15 @@ def alpha_state(spin_system: SpinSystem,
     rho = _alpha_state(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
-        index = index,
-        sparse = parameters.sparse_state
+        index = index
     )
 
     return rho
 
-def beta_state(spin_system: SpinSystem,
-               index: int) -> np.ndarray | sp.csc_array:
+def beta_state(
+    spin_system: SpinSystem,
+    index: int
+) -> np.ndarray | sp.csc_array:
     """
     Generates the beta state for a given spin-1/2 nucleus. Unit state is
     assigned to the other spins.
@@ -1007,8 +996,7 @@ def beta_state(spin_system: SpinSystem,
     rho = _beta_state(
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
-        index = index,
-        sparse = parameters.sparse_state
+        index = index
     )
 
     return rho
@@ -1027,7 +1015,6 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     rho : ndarray or csc_array
         Equilibrium state vector.
     """
-
     # Check that the required attributes are set
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before constructing the "
@@ -1049,7 +1036,6 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             chemical_shifts = spin_system.chemical_shifts,
             J_couplings = spin_system.J_couplings,
             side = "left",
-            sparse = parameters.sparse_hamiltonian,
             zero_value = parameters.zero_hamiltonian
         )
 
@@ -1059,15 +1045,16 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
         spins = spin_system.spins,
         H_left = H_left,
         T = parameters.temperature,
-        sparse = parameters.sparse_state,
         zero_value = parameters.zero_equilibrium
     )
 
     return rho
 
-def singlet_state(spin_system: SpinSystem,
-                  index_1 : int,
-                  index_2 : int) -> np.ndarray | sp.csc_array:
+def singlet_state(
+    spin_system: SpinSystem,
+    index_1 : int,
+    index_2 : int
+) -> np.ndarray | sp.csc_array:
     """
     Generates the singlet state between two spin-1/2 nuclei. Unit state is
     assigned to the other spins.
@@ -1096,15 +1083,16 @@ def singlet_state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index_1 = index_1,
-        index_2 = index_2,
-        sparse = parameters.sparse_state
+        index_2 = index_2
     )
 
     return rho
 
-def triplet_zero_state(spin_system: SpinSystem,
-                       index_1: int,
-                       index_2: int) -> np.ndarray | sp.csc_array:
+def triplet_zero_state(
+    spin_system: SpinSystem,
+    index_1: int,
+    index_2: int
+) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet zero state between two spin-1/2 nuclei. Unit state is
     assigned to the other spins.
@@ -1133,15 +1121,16 @@ def triplet_zero_state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index_1 = index_1,
-        index_2 = index_2,
-        sparse = parameters.sparse_state
+        index_2 = index_2
     )
 
     return rho
 
-def triplet_plus_state(spin_system: SpinSystem,
-                       index_1: int,
-                       index_2: int) -> np.ndarray | sp.csc_array:
+def triplet_plus_state(
+    spin_system: SpinSystem,
+    index_1: int,
+    index_2: int
+) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet plus state between two spin-1/2 nuclei. Unit state is
     assigned to the other spins.
@@ -1170,15 +1159,16 @@ def triplet_plus_state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index_1 = index_1,
-        index_2 = index_2,
-        sparse = parameters.sparse_state
+        index_2 = index_2
     )
 
     return rho
 
-def triplet_minus_state(spin_system: SpinSystem,
-                        index_1: int,
-                        index_2: int) -> np.ndarray | sp.csc_array:
+def triplet_minus_state(
+    spin_system: SpinSystem,
+    index_1: int,
+    index_2: int
+) -> np.ndarray | sp.csc_array:
     """
     Generates the triplet minus state between two spin-1/2 nuclei. Unit state is
     assigned to the other spins.
@@ -1207,15 +1197,16 @@ def triplet_minus_state(spin_system: SpinSystem,
         basis = spin_system.basis.basis,
         spins = spin_system.spins,
         index_1 = index_1,
-        index_2 = index_2,
-        sparse = parameters.sparse_state
+        index_2 = index_2
     )
 
     return rho
 
-def measure(spin_system: SpinSystem,
-            rho: np.ndarray | sp.csc_array,
-            operator: str) -> complex:
+def measure(
+    spin_system: SpinSystem,
+    rho: np.ndarray | sp.csc_array,
+    operator: str
+) -> complex:
     """
     Computes the expectation value of the specified operator for a given state
     vector. Assumes that the state vector `rho` represents a trace-normalized
