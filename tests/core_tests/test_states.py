@@ -1,14 +1,7 @@
 import unittest
 import numpy as np
 import scipy.constants as const
-from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_Sp, op_Sm
-from spinguin._core._states import \
-    _alpha_state, _beta_state, _state_to_zeeman, _singlet_state, \
-    _triplet_zero_state, _triplet_plus_state, _triplet_minus_state, \
-    state_from_string, _unit_state, _measure, _equilibrium_state
-from spinguin._core._basis import make_basis
-from spinguin._core._nmr_isotopes import ISOTOPES
-from spinguin._core._hamiltonian import sop_H_Z
+import spinguin as sg
 
 class TestStates(unittest.TestCase):
 
@@ -18,39 +11,48 @@ class TestStates(unittest.TestCase):
         basis, converting that to Zeeman basis and compare with reference
         result.
         """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Use dense format for operators
+        sg.parameters.sparse_operator = False
 
         # Create an example spin system
-        spins = np.array([1/2, 1/2])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H"])
 
-        # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        # Create a basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
 
-        # Create Zeeman alpha states for reference
-        alpha1_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(Iz, E)
-        alpha2_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz)
+        # Create Hilbert-space spin operators
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
-        # Create alpha states in the spherical tensor basis
-        alpha1_sparse = _alpha_state(basis, spins, 0, sparse=True)
-        alpha2_sparse = _alpha_state(basis, spins, 1, sparse=True)
-        alpha1_dense = _alpha_state(basis, spins, 0, sparse=False)
-        alpha2_dense = _alpha_state(basis, spins, 1, sparse=False)
+        # Create density matrices for alpha states for reference
+        alpha1_ref = 1/4 * np.kron(E, E) + 1/2 * np.kron(Iz, E)
+        alpha2_ref = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz)
+
+        # Create alpha states using the inbuilt function (dense format)
+        sg.parameters.sparse_state = False
+        alpha1_dense = sg.alpha_state(ss, 0)
+        alpha2_dense = sg.alpha_state(ss, 1)
+
+        # Create alpha states using the inbuilt function (sparse format)
+        sg.parameters.sparse_state = True
+        alpha1_sparse = sg.alpha_state(ss, 0)
+        alpha2_sparse = sg.alpha_state(ss, 1)
+
+        # Convert the states to density matrices (to dense format)
+        alpha1_dense = sg.state_to_zeeman(ss, alpha1_dense)
+        alpha2_dense = sg.state_to_zeeman(ss, alpha2_dense)
+        alpha1_sparse = sg.state_to_zeeman(ss, alpha1_sparse)
+        alpha2_sparse = sg.state_to_zeeman(ss, alpha2_sparse)
 
         # Compare
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, alpha1_sparse, sparse=False),
-            alpha1_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, alpha2_sparse, sparse=False),
-            alpha2_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, alpha1_dense, sparse=False),
-            alpha1_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, alpha2_dense, sparse=False),
-            alpha2_zeeman))
+        self.assertTrue(np.allclose(alpha1_dense, alpha1_ref))
+        self.assertTrue(np.allclose(alpha2_dense, alpha2_ref))
+        self.assertTrue(np.allclose(alpha1_sparse, alpha1_ref))
+        self.assertTrue(np.allclose(alpha2_sparse, alpha2_ref))
 
     def test_beta(self):
         """
@@ -58,39 +60,48 @@ class TestStates(unittest.TestCase):
         basis, converting that to Zeeman basis and compare with reference
         result.
         """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Use dense format for operators
+        sg.parameters.sparse_operator = False
 
         # Create an example spin system
-        spins = np.array([1/2, 1/2])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H"])
 
-        # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        # Create a basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
+
+        # Create Hilbert-space spin operators
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
         # Create Zeeman beta states
-        beta1_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(Iz, E)
-        beta2_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz)
+        beta1_ref = 1/4 * np.kron(E, E) - 1/2 * np.kron(Iz, E)
+        beta2_ref = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz)
 
-        # Create beta states in the spherical tensor basis
-        beta1_sparse = _beta_state(basis, spins, 0, sparse=True)
-        beta2_sparse = _beta_state(basis, spins, 1, sparse=True)
-        beta1_dense = _beta_state(basis, spins, 0, sparse=False)
-        beta2_dense = _beta_state(basis, spins, 1, sparse=False)
+        # Create beta states using the inbuilt funtion (dense format)
+        sg.parameters.sparse_state = False
+        beta1_dense = sg.beta_state(ss, 0)
+        beta2_dense = sg.beta_state(ss, 1)
+
+        # Create beta states using the inbuilt funtion (sparse format)
+        sg.parameters.sparse_state = True
+        beta1_sparse = sg.beta_state(ss, 0)
+        beta2_sparse = sg.beta_state(ss, 1)
+
+        # Convert the states to density matrices (to dense format)
+        beta1_dense = sg.state_to_zeeman(ss, beta1_dense)
+        beta2_dense = sg.state_to_zeeman(ss, beta2_dense)
+        beta1_sparse = sg.state_to_zeeman(ss, beta1_sparse)
+        beta2_sparse = sg.state_to_zeeman(ss, beta2_sparse)
 
         # Compare
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, beta1_sparse, sparse=False),
-            beta1_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, beta2_sparse, sparse=False),
-            beta2_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, beta1_dense, sparse=False),
-            beta1_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, beta2_dense, sparse=False),
-            beta2_zeeman))
+        self.assertTrue(np.allclose(beta1_dense, beta1_ref))
+        self.assertTrue(np.allclose(beta2_dense, beta2_ref))
+        self.assertTrue(np.allclose(beta1_sparse, beta1_ref))
+        self.assertTrue(np.allclose(beta2_sparse, beta2_ref))
 
     def test_singlet(self):
         """
@@ -98,29 +109,44 @@ class TestStates(unittest.TestCase):
         basis, converting that to Zeeman basis and compare with reference
         result.
         """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Use dense format for operators
+        sg.parameters.sparse_operator = False
 
         # Create an example spin system
-        spins = np.array([1/2, 1/2])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H"])
 
-        # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
-        Ip = op_Sp(1/2, sparse=False)
-        Im = op_Sm(1/2, sparse=False)
+        # Create a basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
 
-        # Create the singlet state in both bases and compare
-        singlet_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - \
-                         1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
-        singlet_sparse = _singlet_state(basis, spins, 0, 1, sparse=True)
-        singlet_dense = _singlet_state(basis, spins, 0, 1, sparse=False)
-        self.assertTrue(np.allclose(
-            singlet_zeeman,
-            _state_to_zeeman(basis, spins, singlet_sparse, sparse=False)))
-        self.assertTrue(np.allclose(
-            singlet_zeeman,
-            _state_to_zeeman(basis, spins, singlet_dense, sparse=False)))
+        # Create Hilbert-space spin operators
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
+        Ip = sg.op_Sp(1/2)
+        Im = sg.op_Sm(1/2)
+
+        # Create the singlet state density matrix for reference
+        singlet_ref = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - \
+                      1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
+        
+        # Create the singlet state using the inbuilt function (dense format)
+        sg.parameters.sparse_state = False
+        singlet_dense = sg.singlet_state(ss, 0, 1)
+
+        # Create the singlet state using the inbuilt function (sparse format)
+        sg.parameters.sparse_state = True
+        singlet_sparse = sg.singlet_state(ss, 0, 1)
+
+        # Convert the states to density matrices
+        singlet_dense = sg.state_to_zeeman(ss, singlet_dense)
+        singlet_sparse = sg.state_to_zeeman(ss, singlet_sparse)
+
+        # Compare
+        self.assertTrue(np.allclose(singlet_ref, singlet_dense))
+        self.assertTrue(np.allclose(singlet_ref, singlet_sparse))
 
     def test_triplet_zero(self):
         """
@@ -128,31 +154,44 @@ class TestStates(unittest.TestCase):
         basis, converting that to Zeeman basis and compare with reference
         result.
         """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Use dense format for operators
+        sg.parameters.sparse_operator = False
 
         # Create an example spin system
-        spins = np.array([1/2, 1/2])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H"])
 
-        # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
-        Ip = op_Sp(1/2, sparse=False)
-        Im = op_Sm(1/2, sparse=False)
+        # Create a basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
 
-        # Create the triplet-zero state and compare
-        triplet_zero_zeeman = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + \
-                              1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
-        triplet_zero_sparse = _triplet_zero_state(basis, spins, 0, 1,
-                                                 sparse=True)
-        triplet_zero_dense = _triplet_zero_state(basis, spins, 0, 1,
-                                                sparse=False)
-        self.assertTrue(np.allclose(
-            triplet_zero_zeeman,
-            _state_to_zeeman(basis, spins, triplet_zero_sparse, sparse=False)))
-        self.assertTrue(np.allclose(
-            triplet_zero_zeeman,
-            _state_to_zeeman(basis, spins, triplet_zero_dense, sparse=False)))
+        # Create Hilbert-space spin operators
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
+        Ip = sg.op_Sp(1/2)
+        Im = sg.op_Sm(1/2)
+
+        # Create the triplet-zero density matrix for reference
+        triplet_zero_ref = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + \
+                           1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
+        
+        # Create the triplet-zero state using the inbuilt function (dense)
+        sg.parameters.sparse_state = False
+        triplet_zero_dense = sg.triplet_zero_state(ss, 0, 1)
+
+        # Create the triplet-zero state using the inbuilt function (sparse)
+        sg.parameters.sparse_state = True
+        triplet_zero_sparse = sg.triplet_zero_state(ss, 0, 1)
+
+        # Convert the states to density matrices
+        triplet_zero_dense = sg.state_to_zeeman(ss, triplet_zero_dense)
+        triplet_zero_sparse = sg.state_to_zeeman(ss, triplet_zero_sparse)
+
+        # Compare
+        self.assertTrue(np.allclose(triplet_zero_ref, triplet_zero_dense))
+        self.assertTrue(np.allclose(triplet_zero_ref, triplet_zero_sparse))
 
     def test_triplet_plus(self):
         """
@@ -160,29 +199,42 @@ class TestStates(unittest.TestCase):
         basis, converting that to Zeeman basis and compare with reference
         result.
         """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Use dense format for operators
+        sg.parameters.sparse_operator = False
 
         # Create an example spin system
-        spins = np.array([1/2, 1/2])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H"])
 
-        # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        # Create a basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
 
-        # Create the triplet-plus state and compare
-        triplet_plus_zeeman = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + \
-                              1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
-        triplet_plus_sparse = _triplet_plus_state(basis, spins, 0, 1,
-                                                 sparse=True)
-        triplet_plus_dense = _triplet_plus_state(basis, spins, 0, 1,
-                                                sparse=False)
-        self.assertTrue(np.allclose(
-            triplet_plus_zeeman,
-            _state_to_zeeman(basis, spins, triplet_plus_sparse, sparse=False)))
-        self.assertTrue(np.allclose(
-            triplet_plus_zeeman,
-            _state_to_zeeman(basis, spins, triplet_plus_dense, sparse=False)))
+        # Create Hilbert-space spin operators
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
+
+        # Create density matrix for the triplet-plus state for reference
+        triplet_plus_ref = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + \
+                           1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
+        
+        # Create the triplet-plus state using the inbuilt function (dense)
+        sg.parameters.sparse_state = False
+        triplet_plus_dense = sg.triplet_plus_state(ss, 0, 1)
+
+        # Create the triplet-plus state using the inbuilt function (sparse)
+        sg.parameters.sparse_state = True
+        triplet_plus_sparse = sg.triplet_plus_state(ss, 0, 1)
+
+        # Convert the states to density matrices
+        triplet_plus_dense = sg.state_to_zeeman(ss, triplet_plus_dense)
+        triplet_plus_sparse = sg.state_to_zeeman(ss, triplet_plus_sparse)
+
+        # Compare
+        self.assertTrue(np.allclose(triplet_plus_ref, triplet_plus_dense))
+        self.assertTrue(np.allclose(triplet_plus_ref, triplet_plus_sparse))
 
     def test_triplet_minus(self):
         """
@@ -190,56 +242,59 @@ class TestStates(unittest.TestCase):
         basis, converting that to Zeeman basis and compare with reference
         result.
         """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Use dense format for operators
+        sg.parameters.sparse_operator = False
 
         # Create an example spin system
-        spins = np.array([1/2, 1/2])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H"])
 
-        # Create Zeeman operators
-        E = op_E(1/2, sparse=False)
-        Iz = op_Sz(1/2, sparse=False)
+        # Create a basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
 
-        # Create the triplet-minus state and compare
-        triplet_minus_zeeman = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - \
-                               1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
-        triplet_minus_sparse = _triplet_minus_state(basis, spins, 0, 1,
-                                                   sparse=True)
-        triplet_minus_dense = _triplet_minus_state(basis, spins, 0, 1,
-                                                  sparse=False)
-        self.assertTrue(np.allclose(
-            triplet_minus_zeeman,
-            _state_to_zeeman(basis, spins, triplet_minus_sparse, sparse=False)))
-        self.assertTrue(np.allclose(
-            triplet_minus_zeeman,
-            _state_to_zeeman(basis, spins, triplet_minus_dense, sparse=False)))
+        # Create Hilbert-space spin operators
+        E = sg.op_E(1/2)
+        Iz = sg.op_Sz(1/2)
 
-    def test_state_from_string_and_rho_to_zeeman(self):
+        # Create the triplet-minus density matrix for reference
+        triplet_minus_ref = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - \
+                            1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
+        
+        # Create the triplet-minus state using the inbuilt function (dense)
+        sg.parameters.sparse_state = False
+        triplet_minus_dense = sg.triplet_minus_state(ss, 0, 1)
+
+        # Create the triplet-minus state using the inbuilt function (sparse)
+        sg.parameters.sparse_state = True
+        triplet_minus_sparse = sg.triplet_minus_state(ss, 0, 1)
+
+        # Convert to density matrices
+        triplet_minus_dense = sg.state_to_zeeman(ss, triplet_minus_dense)
+        triplet_minus_sparse = sg.state_to_zeeman(ss, triplet_minus_sparse)
+
+        # Compare
+        self.assertTrue(np.allclose(triplet_minus_ref, triplet_minus_dense))
+        self.assertTrue(np.allclose(triplet_minus_ref, triplet_minus_sparse))
+
+    def _test_state(
+        self,
+        ss: sg.SpinSystem,
+        opers: dict,
+        test_states: list,
+        sparse_operator: bool,
+        sparse_state: bool
+    ):
         """
-        A test that creates various states for a spin system using the
-        operator string. These states are converted to Zeeman eigenbasis
-        and compared with reference.
+        Helper method for test_state().
         """
+        # Set the sparsity
+        sg.parameters.sparse_operator = sparse_operator
+        sg.parameters.sparse_state = sparse_state
 
-        # Create an example spin system with different spin quantum numbers
-        spins = np.array([1/2, 1, 3/2])
-        max_spin_order = 3
-        basis = make_basis(spins, max_spin_order)
-
-        # States to test
-        test_states = ['E', 'x', 'y', 'z', '+', '-']
-
-        # Get the Zeeman eigenbasis operators
-        opers = {}
-        for spin in spins:
-            opers[('E', spin)] = op_E(spin, sparse=False)
-            opers[('x', spin)] = op_Sx(spin, sparse=False)
-            opers[('y', spin)] = op_Sy(spin, sparse=False)
-            opers[('z', spin)] = op_Sz(spin, sparse=False)
-            opers[('+', spin)] = op_Sp(spin, sparse=False)
-            opers[('-', spin)] = op_Sm(spin, sparse=False)
-
-        # Try all possible state combinations
+        # Test the creation of states with all possible combinations
         for i in test_states:
             if i == "E":
                 op_i = "E"
@@ -260,35 +315,59 @@ class TestStates(unittest.TestCase):
 
                     # Create the state vector in the spherical tensor basis
                     op_string = f"{op_i} * {op_j} * {op_k}"
-                    state_sparse = state_from_string(basis, spins, op_string,
-                                                     sparse=True)
-                    state_dense = state_from_string(basis, spins, op_string,
-                                                    sparse=False)
+                    state = sg.state(ss, op_string)
 
-                    # Create the density matrix in the Zeeman eigenbasis
-                    state_zeeman = np.kron(opers[(i, 1/2)],
-                                           np.kron(opers[(j, 1)],
-                                                   opers[(k, 3/2)]))
+                    # Create the reference density matrix
+                    state_ref = np.kron(
+                        opers[(i, 1/2)], np.kron(opers[(j, 1)], opers[(k, 3/2)])
+                    )
 
-                    # Test the conversion using all possible sparsity combinations
-                    state_sparse_to_zeeman_dense = _state_to_zeeman(
-                        basis, spins, state_sparse, sparse=False)
-                    state_sparse_to_zeeman_sparse = _state_to_zeeman(
-                        basis, spins, state_sparse, sparse=True).toarray()
-                    state_dense_to_zeeman_dense = _state_to_zeeman(
-                        basis, spins, state_dense, sparse=False)
-                    state_dense_to_zeeman_sparse = _state_to_zeeman(
-                        basis, spins, state_dense, sparse=True).toarray()
+                    # Convert the state to density matrix
+                    state = sg.state_to_zeeman(ss, state)
 
-                    # Compare to the Zeeman reference
-                    self.assertTrue(np.allclose(state_sparse_to_zeeman_dense,
-                                                state_zeeman))
-                    self.assertTrue(np.allclose(state_sparse_to_zeeman_sparse,
-                                                state_zeeman))
-                    self.assertTrue(np.allclose(state_dense_to_zeeman_dense,
-                                                state_zeeman))
-                    self.assertTrue(np.allclose(state_dense_to_zeeman_sparse,
-                                                state_zeeman))
+                    # Convert the state to dense if necessary
+                    if sparse_operator:
+                        state = state.toarray()
+
+                    # Compare to the reference
+                    self.assertTrue(np.allclose(state, state_ref))
+
+
+    def test_state(self):
+        """
+        A test that creates various states for a spin system using the
+        operator string. These states are converted to Zeeman eigenbasis
+        and compared with reference.
+        """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Create an example spin system
+        ss = sg.SpinSystem(["1H", "14N", "23Na"])
+
+        # Build the basis set
+        ss.basis.max_spin_order = 3
+        ss.basis.build()
+
+        # States to test
+        test_states = ['E', 'x', 'y', 'z', '+', '-']
+
+        # Get the Zeeman eigenbasis operators (as dense matrices)
+        sg.parameters.sparse_operator = False
+        opers = {}
+        for spin in ss.spins:
+            opers[('E', spin)] = sg.op_E(spin)
+            opers[('x', spin)] = sg.op_Sx(spin)
+            opers[('y', spin)] = sg.op_Sy(spin)
+            opers[('z', spin)] = sg.op_Sz(spin)
+            opers[('+', spin)] = sg.op_Sp(spin)
+            opers[('-', spin)] = sg.op_Sm(spin)
+
+        # Use the helper method to test all possible state combinations
+        self._test_state(ss, opers, test_states, True, True)
+        self._test_state(ss, opers, test_states, True, False)
+        self._test_state(ss, opers, test_states, False, True)
+        self._test_state(ss, opers, test_states, False, False)
 
     def test_unit_state(self):
         """
@@ -296,68 +375,65 @@ class TestStates(unittest.TestCase):
         with the two normalization conventions and compares them to the
         expected reference values.
         """
+        # Reset to default parameters
+        sg.parameters.default()
 
-        # Create an example spin system with different spin quantum numbers
-        spins = np.array([1/2, 1, 3/2])
-        max_spin_order = 3
-        basis = make_basis(spins, max_spin_order)
+        # Create an example spin system
+        ss = sg.SpinSystem(["1H", "14N", "23Na"])
+
+        # Build a basis set
+        ss.basis.max_spin_order = 3
+        ss.basis.build()
 
         # Create the unit state in the Zeeman eigenbasis
+        sg.parameters.sparse_operator = False
         unit_zeeman = np.array([[1]])
-        for spin in spins:
-            unit_zeeman = np.kron(unit_zeeman, op_E(spin, sparse=False))
+        for spin in ss.spins:
+            unit_zeeman = np.kron(unit_zeeman, sg.op_E(spin))
 
         # Create the non-normalized unit state in the spherical tensor basis
-        unit_sparse = _unit_state(basis, spins, sparse=True, normalized=False)
-        unit_dense = _unit_state(basis, spins, sparse=False, normalized=False)
+        sg.parameters.sparse_state = False
+        unit_dense = sg.unit_state(ss, normalized=False)
+        sg.parameters.sparse_state = True
+        unit_sparse = sg.unit_state(ss, normalized=False)
 
+        # Convert to density matrices
+        unit_dense = sg.state_to_zeeman(ss, unit_dense)
+        unit_sparse = sg.state_to_zeeman(ss, unit_sparse)
+        
         # Compare
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, unit_sparse, sparse=False),
-            unit_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, unit_dense, sparse=False),
-            unit_zeeman))
+        self.assertTrue(np.allclose(unit_dense, unit_zeeman))
+        self.assertTrue(np.allclose(unit_sparse, unit_zeeman))
 
         # Create the trace-normalized unit state in the spherical tensor basis
-        unit_sparse = _unit_state(basis, spins, sparse=True, normalized=True)
-        unit_dense = _unit_state(basis, spins, sparse=False, normalized=True)
+        sg.parameters.sparse_state = False
+        unit_dense = sg.unit_state(ss, normalized=True)
+        sg.parameters.sparse_state = True
+        unit_sparse = sg.unit_state(ss, normalized=True)
+
+        # Convert to density matrices
+        unit_dense = sg.state_to_zeeman(ss, unit_dense)
+        unit_sparse = sg.state_to_zeeman(ss, unit_sparse)
 
         # Apply trace normalization to the unit state in the Zeeman eigenbasis
         unit_zeeman = unit_zeeman / unit_zeeman.trace()
 
         # Compare
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, unit_sparse, sparse=False),
-            unit_zeeman))
-        self.assertTrue(np.allclose(
-            _state_to_zeeman(basis, spins, unit_dense, sparse=False),
-            unit_zeeman))
+        self.assertTrue(np.allclose(unit_dense, unit_zeeman))
+        self.assertTrue(np.allclose(unit_sparse, unit_zeeman))
 
-    def test_measure(self):
+    def _test_measure(
+        self,
+        ss: sg.SpinSystem,
+        test_states: list,
+        opers: dict,
+        sparse_state: bool
+    ):
         """
-        Different states are created for a spin system using both
-        the Zeeman eigenbasis and spherical tensor basis, and the
-        expectation values for varying operators are compared.
+        Helper method for test_measure().
         """
-
-        # Create an example spin system with different spin quantum numbers
-        spins = np.array([1/2, 1, 3/2])
-        max_spin_order = 3
-        basis = make_basis(spins, max_spin_order)
-
-        # States to test
-        test_states = ['E', 'x', 'y', 'z', '+', '-']
-
-        # Get the Zeeman eigenbasis operators
-        opers = {}
-        for spin in spins:
-            opers[('E', spin)] = op_E(spin, sparse=False)
-            opers[('x', spin)] = op_Sx(spin, sparse=False)
-            opers[('y', spin)] = op_Sy(spin, sparse=False)
-            opers[('z', spin)] = op_Sz(spin, sparse=False)
-            opers[('+', spin)] = op_Sp(spin, sparse=False)
-            opers[('-', spin)] = op_Sm(spin, sparse=False)
+        # Change the state sparsity
+        sg.parameters.sparse_state = sparse_state
 
         # Try all possible state combinations
         for i in test_states:
@@ -380,10 +456,7 @@ class TestStates(unittest.TestCase):
 
                     # Create the state vector in the spherical tensor basis
                     op_string = f"{op_i} * {op_j} * {op_k}"
-                    state_sparse = state_from_string(basis, spins, op_string,
-                                                     sparse=True)
-                    state_dense = state_from_string(basis, spins, op_string,
-                                                    sparse=False)
+                    state = sg.state(ss, op_string)
 
                     # Create the density matrices in the Zeeman eigenbasis
                     op1, op2, op3 = \
@@ -415,20 +488,85 @@ class TestStates(unittest.TestCase):
                                                 opers[(n, 3/2)]
                                 oper_zeeman = np.kron(op1, np.kron(op2, op3))
                                 result_zeeman = (
-                                    state_zeeman @ oper_zeeman.conj().T).trace()
+                                    state_zeeman @ oper_zeeman.conj().T
+                                ).trace()
 
                                 # Measure using the inbuilt function
                                 op_string = f"{op_l} * {op_m} * {op_n}"
-                                result_sparse = _measure(
-                                    basis, spins, state_sparse, op_string)
-                                result_dense = _measure(
-                                    basis, spins, state_dense, op_string)
+                                result = sg.measure(ss, state, op_string)
 
                                 # Compare
-                                self.assertAlmostEqual(result_zeeman,
-                                                       result_sparse)
-                                self.assertAlmostEqual(result_zeeman,
-                                                       result_dense)
+                                self.assertAlmostEqual(result_zeeman, result)
+
+    def test_measure(self):
+        """
+        Different states are created for a spin system using both
+        the Zeeman eigenbasis and spherical tensor basis, and the
+        expectation values for varying operators are compared.
+        """
+        # Reset to defaults
+        sg.parameters.default()
+
+        # Create an example spin system with different spin quantum numbers
+        ss = sg.SpinSystem(["1H", "14N", "23Na"])
+        ss.basis.max_spin_order = 3
+        ss.basis.build()
+
+        # States to test
+        test_states = ['E', 'x', 'y', 'z', '+', '-']
+
+        # Get the Zeeman eigenbasis operators in dense format
+        sg.parameters.sparse_operator = False
+        opers = {}
+        for spin in ss.spins:
+            opers[('E', spin)] = sg.op_E(spin)
+            opers[('x', spin)] = sg.op_Sx(spin)
+            opers[('y', spin)] = sg.op_Sy(spin)
+            opers[('z', spin)] = sg.op_Sz(spin)
+            opers[('+', spin)] = sg.op_Sp(spin)
+            opers[('-', spin)] = sg.op_Sm(spin)
+        
+        # Test with the helper method using dense and sparse states
+        self._test_measure(ss, test_states, opers, False)
+        self._test_measure(ss, test_states, opers, True)
+
+    def _test_equilibrium_state(
+        self,
+        ss: sg.SpinSystem,
+        magnetic_field: float,
+        temperature: float
+    ):
+        """
+        Helper method for testing the equilibrium state.
+        """
+        # Set the experimental conditions
+        sg.parameters.magnetic_field = magnetic_field
+        sg.parameters.temperature = temperature
+        
+        # Construct the equilibrium state
+        sg.parameters.sparse_state = False
+        rho_eq_dense = sg.equilibrium_state(ss)
+        sg.parameters.sparse_state = True
+        rho_eq_sparse = sg.equilibrium_state(ss)
+
+        # Test the thermal equilibrium for each spin
+        for i in range(ss.nspins):
+
+            # Measure the z-magnetization
+            Mz_measured_dense = sg.measure(ss, rho_eq_dense, f"I(z, {i})")
+            Mz_measured_sparse = sg.measure(ss, rho_eq_sparse, f"I(z, {i})")
+
+            # Calculate a reference value for the magnetisation in equilibrium
+            Mz_ref = _thermal_magnetization(
+                gamma = ss.gammas[i],
+                S = ss.spins[i],
+                B = sg.parameters.magnetic_field,
+                T = sg.parameters.temperature
+            )
+
+            # Compare
+            self.assertAlmostEqual(Mz_measured_sparse, Mz_ref)
+            self.assertAlmostEqual(Mz_measured_dense, Mz_ref)
 
     def test_equilibrium_state(self):
         """
@@ -436,81 +574,21 @@ class TestStates(unittest.TestCase):
         state against the reference value calculated from Boltzmann
         distribution.
         """
+        # Reset parameters
+        sg.parameters.default()
 
-        # Create an example spin system with different spin quantum numbers
-        spins = np.array([1/2, 1, 3/2, 5/2])
-        nspins = spins.shape[0]
-        max_spin_order = nspins
-        basis = make_basis(spins, max_spin_order)
+        # Create an example spin system
+        ss = sg.SpinSystem(["1H", "14N", "23Na", "17O"])
 
-        # Obtain the gyromagnetic ratios
-        y_1H = 2*np.pi * ISOTOPES['1H'][1] * 1e6
-        y_14N = 2*np.pi * ISOTOPES['14N'][1] * 1e6
-        y_23Na = 2*np.pi * ISOTOPES['23Na'][1] * 1e6
-        y_17O = 2*np.pi * ISOTOPES['17O'][1] * 1e6
-        gammas = np.array([y_1H, y_14N, y_23Na, y_17O])
+        # Create a basis set
+        ss.basis.max_spin_order = 4
+        ss.basis.build()
 
-        # Conditions
-        B = 14.1
-        T = 273
-        
-        # Construct the left Hamiltonian superoperator (only Zeeman)
-        H_left = sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
+        # Test the equilibrium state using helper method
+        self._test_equilibrium_state(ss, magnetic_field=9.4, temperature=293)
+        self._test_equilibrium_state(ss, magnetic_field=100, temperature=1)
 
-        # Make the thermal equilibrium state
-        rho_eq_sparse = _equilibrium_state(basis, spins, H_left, T, sparse=True,
-                                          zero_value=1e-18)
-        rho_eq_dense = _equilibrium_state(basis, spins, H_left, T, sparse=False,
-                                         zero_value=1e-18)
-
-        # Test the thermal equilibrium for each spin
-        for i in range(nspins):
-
-            # Measure the z-magnetization
-            Mz_measured_sparse = _measure(
-                basis, spins, rho_eq_sparse, f"I(z, {i})")
-            Mz_measured_dense = _measure(
-                basis, spins, rho_eq_dense, f"I(z, {i})")
-
-            # Calculate the thermal magnetization directly using the Boltzmann
-            # distribution
-            Mz_calculated = thermal_magnetization(gammas[i], spins[i], B, T)
-
-            # Compare
-            self.assertAlmostEqual(Mz_measured_sparse, Mz_calculated)
-            self.assertAlmostEqual(Mz_measured_dense, Mz_calculated)
-
-        # Test that the code is future-proof (extreme conditions)
-        B = 1000
-        T = 1
-
-        # Construct the left Hamiltonian superoperator (only Zeeman)
-        H_left = sop_H_Z(basis, gammas, spins, B, side="left", sparse=True)
-
-        # Make the thermal equilibrium state
-        rho_eq_sparse = _equilibrium_state(basis, spins, H_left, T, sparse=True,
-                                          zero_value=1e-18)
-        rho_eq_dense = _equilibrium_state(basis, spins, H_left, T, sparse=False,
-                                         zero_value=1e-18)
-
-        # Test the thermal equilibrium for each spin
-        for i in range(nspins):
-
-            # Measure the magnetization
-            Mz_measured_sparse = _measure(
-                basis, spins, rho_eq_sparse, f"I(z, {i})")
-            Mz_measured_dense = _measure(
-                basis, spins, rho_eq_dense, f"I(z, {i})")
-
-            # Calculate the thermal magnetization directly using the Boltzmann
-            # distribution
-            Mz_calculated = thermal_magnetization(gammas[i], spins[i], B, T)
-
-            # Compare
-            self.assertAlmostEqual(Mz_measured_sparse, Mz_calculated)
-            self.assertAlmostEqual(Mz_measured_dense, Mz_calculated)
-
-def thermal_magnetization(gamma: float, S: float, B: float, T: float) -> float:
+def _thermal_magnetization(gamma: float, S: float, B: float, T: float) -> float:
     """
     Calculates the magnetization at thermal equilibrium. Helper function for
     testing.
