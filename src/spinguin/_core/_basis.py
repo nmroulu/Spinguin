@@ -1,5 +1,13 @@
 """
-This module provides functionality for constructing a basis set.
+This module provides the Basis class which is assigned as a part of `SpinSystem`
+object upon its instantiation. It provides functionality for constructing and
+truncating the basis set. The basis set functionality is designed to be accessed
+through the `SpinSystem` object. Example::
+
+    import spinguin as sg                   # Import the package
+    spin_system = sg.SpinSystem(["1H"])     # Create an example spin system
+    spin_system.basis.max_spin_order = 1    # Set the maximum spin order
+    spin_system.basis.build()               # Build the basis set
 """
 # Referencing SpinSystem class
 from __future__ import annotations
@@ -12,29 +20,13 @@ import numpy as np
 import scipy.sparse as sp
 import time
 import math
+import warnings
 from itertools import product, combinations
 from typing import Iterator, Literal
+from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
 from spinguin._core._la import eliminate_small, expm_vec
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._utils import coherence_order, state_idx
-from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
-
-"""
-This module provides the Basis class which is assigned as a part of `SpinSystem`
-object upon its instantiation. Here is an example of accessing the most
-important functionality of the class::
-
-    import spinguin as sg                   # Import the package
-    spin_system = sg.SpinSystem(["1H"])     # Create an example spin system
-    spin_system.basis.max_spin_order = 1    # Set the maximum spin order
-    spin_system.basis.build()               # Build the basis set
-"""
-
-# Imports
-import numpy as np
-import scipy.sparse as sp
-import warnings
-from typing import Literal
 from spinguin._core._states import state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 from spinguin._core._la import isvector
@@ -45,6 +37,14 @@ class Basis:
     Basis class manages the basis set of a spin system. Most importantly, the
     basis set contains the information on the truncation of the basis set and is
     responsible for building and making changes to the basis set.
+
+    The `Basis` instance is designed to be created and accessed through the
+    `SpinSystem` object. For example::
+
+        import spinguin as sg                   # Import the package
+        spin_system = sg.SpinSystem(["1H"])     # Create an example spin system
+        spin_system.basis.max_spin_order = 1    # Set the maximum spin order
+        spin_system.basis.build()               # Build the basis set
     """
 
     # Basis set properties
@@ -67,7 +67,7 @@ class Basis:
     @property
     def max_spin_order(self) -> int:
         """
-        Specifies the maximum number of a active spins that are included in the
+        Specifies the maximum number of active spins that are included in the
         product operators that constitute the basis set. Must be at least 1 and
         not larger than the number of spins in the system.
         """
