@@ -121,7 +121,7 @@ class TestRelaxation(unittest.TestCase):
         rho = pul_180 @ rho
 
         # Switch to the zero-quantum (ZQ) subspace
-        L = ss.basis.truncate_by_coherence([0], L)
+        L, rho = ss.basis.truncate_by_coherence([0], L, rho)
 
         # Get the propagator
         P = sg.propagator(L, time_step)
