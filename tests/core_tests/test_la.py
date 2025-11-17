@@ -1,13 +1,13 @@
 import unittest
 import numpy as np
 import math
+import spinguin as sg
 from scipy.sparse.linalg import expm
 from scipy.sparse import csc_array, random_array
 from spinguin._core import _la
 from spinguin._core._hide_prints import HidePrints
-from spinguin._core._operators import op_E, op_Sx, op_Sy, op_Sz, op_T_coupled
 
-class TestLinearAlgebraMethods(unittest.TestCase):
+class TestLinearAlgebra(unittest.TestCase):
 
     def test_isvector(self):
 
@@ -273,22 +273,25 @@ class TestLinearAlgebraMethods(unittest.TestCase):
                 _la.vector_to_spherical_tensor(vector)[(1, q)])
 
     def test_cartesian_to_spherical_tensor_conventions(self):
+        # Set global parameters
+        sg.parameters.default()
+        sg.parameters.sparse_operator = False
 
         # Create a random Cartesian interaction tensor
         A = np.random.rand(3, 3)
 
         # Single-spin unit operator
-        E = op_E(1/2, sparse=False)
+        E = sg.op_E(1/2)
 
         # Spin operators for I
-        Ix = np.kron(op_Sx(1/2, sparse=False), E)
-        Iy = np.kron(op_Sy(1/2, sparse=False), E)
-        Iz = np.kron(op_Sz(1/2, sparse=False), E)
+        Ix = np.kron(sg.op_Sx(1/2), E)
+        Iy = np.kron(sg.op_Sy(1/2), E)
+        Iz = np.kron(sg.op_Sz(1/2), E)
 
         # Spin operators for S
-        Sx = np.kron(E, op_Sx(1/2, sparse=False))
-        Sy = np.kron(E, op_Sy(1/2, sparse=False))
-        Sz = np.kron(E, op_Sz(1/2, sparse=False))
+        Sx = np.kron(E, sg.op_Sx(1/2))
+        Sy = np.kron(E, sg.op_Sy(1/2))
+        Sz = np.kron(E, sg.op_Sz(1/2))
 
         # Construct the Cartesian spin vectors
         I = np.array([[Ix, Iy, Iz]], dtype=complex)
@@ -310,7 +313,7 @@ class TestLinearAlgebraMethods(unittest.TestCase):
         for l in range(0, 3):
             for q in range(-l, l+1):
                 right += (-1)**(q) * A[(l, q)] * \
-                         op_T_coupled(l, -q, 1, 1/2, 1, 1/2)
+                         sg.op_T_coupled(l, -q, 1, 1/2, 1, 1/2)
 
         # Both conventions should give the same result
         self.assertTrue(np.allclose(left, right))
