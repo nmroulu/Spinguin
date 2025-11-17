@@ -43,7 +43,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'spinguin';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -357,14 +357,26 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.alpha_state"><code class="docutils literal notranslate"><span class="pre">alpha_state()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.associate"><code class="docutils literal notranslate"><span class="pre">associate()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.beta_state"><code class="docutils literal notranslate"><span class="pre">beta_state()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.clear_cache"><code class="docutils literal notranslate"><span class="pre">clear_cache()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.coherence_order"><code class="docutils literal notranslate"><span class="pre">coherence_order()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.dissociate"><code class="docutils literal notranslate"><span class="pre">dissociate()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.equilibrium_state"><code class="docutils literal notranslate"><span class="pre">equilibrium_state()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.fourier_transform"><code class="docutils literal notranslate"><span class="pre">fourier_transform()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.frequency_to_chemical_shift"><code class="docutils literal notranslate"><span class="pre">frequency_to_chemical_shift()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.gamma"><code class="docutils literal notranslate"><span class="pre">gamma()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.hamiltonian"><code class="docutils literal notranslate"><span class="pre">hamiltonian()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.idx_to_lq"><code class="docutils literal notranslate"><span class="pre">idx_to_lq()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.liouvillian"><code class="docutils literal notranslate"><span class="pre">liouvillian()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.lq_to_idx"><code class="docutils literal notranslate"><span class="pre">lq_to_idx()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_E"><code class="docutils literal notranslate"><span class="pre">op_E()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sm"><code class="docutils literal notranslate"><span class="pre">op_Sm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sp"><code class="docutils literal notranslate"><span class="pre">op_Sp()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sx"><code class="docutils literal notranslate"><span class="pre">op_Sx()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sy"><code class="docutils literal notranslate"><span class="pre">op_Sy()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sz"><code class="docutils literal notranslate"><span class="pre">op_Sz()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_T"><code class="docutils literal notranslate"><span class="pre">op_T()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_T_coupled"><code class="docutils literal notranslate"><span class="pre">op_T_coupled()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.operator"><code class="docutils literal notranslate"><span class="pre">operator()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.permute_spins"><code class="docutils literal notranslate"><span class="pre">permute_spins()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.propagator"><code class="docutils literal notranslate"><span class="pre">propagator()</span></code></a></li>
@@ -374,6 +386,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.relaxation"><code class="docutils literal notranslate"><span class="pre">relaxation()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.resonance_frequency"><code class="docutils literal notranslate"><span class="pre">resonance_frequency()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.singlet_state"><code class="docutils literal notranslate"><span class="pre">singlet_state()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.sop_T_coupled"><code class="docutils literal notranslate"><span class="pre">sop_T_coupled()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spectral_width_to_dwell_time"><code class="docutils literal notranslate"><span class="pre">spectral_width_to_dwell_time()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spectrum"><code class="docutils literal notranslate"><span class="pre">spectrum()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spin"><code class="docutils literal notranslate"><span class="pre">spin()</span></code></a></li>
@@ -568,6 +581,30 @@ assigned to the other spins.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="spinguin.clear_cache">
+<span class="sig-name descname"><span class="pre">clear_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_cache.html#clear_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.clear_cache" title="Link to this definition">#</a></dt>
+<dd><p>Clears the cache.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.coherence_order">
+<span class="sig-name descname"><span class="pre">coherence_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_utils.html#coherence_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.coherence_order" title="Link to this definition">#</a></dt>
+<dd><p>Determines the coherence order of a given product operator in the basis set,
+defined by an array of integers <cite>op_def</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>op_def</strong> (<em>ndarray</em>) – Contains the indices that describe the product operator.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>order</strong> – Coherence order of the operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="spinguin.dissociate">
 <span class="sig-name descname"><span class="pre">dissociate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_system_B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_system_C</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho_C</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_map_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_map_B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/spinguin/_core/_chem.html#dissociate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.dissociate" title="Link to this definition">#</a></dt>
 <dd><p>Dissociates the density vector of composite system C into density vectors of
@@ -721,6 +758,24 @@ frequency.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="spinguin.idx_to_lq">
+<span class="sig-name descname"><span class="pre">idx_to_lq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/spinguin/_core/_utils.html#idx_to_lq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.idx_to_lq" title="Link to this definition">#</a></dt>
+<dd><p>Converts the given operator index to rank <cite>l</cite> and projection <cite>q</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – Index that describes the irreducible spherical tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>l</strong> (<em>int</em>) – Operator rank.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Operator projection.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="spinguin.liouvillian">
 <span class="sig-name descname"><span class="pre">liouvillian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_liouvillian.html#liouvillian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.liouvillian" title="Link to this definition">#</a></dt>
 <dd><p>Constructs the Liouvillian superoperator from the Hamiltonian, relaxation
@@ -738,6 +793,27 @@ superoperator, and exchange superoperator.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.lq_to_idx">
+<span class="sig-name descname"><span class="pre">lq_to_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_utils.html#lq_to_idx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.lq_to_idx" title="Link to this definition">#</a></dt>
+<dd><p>Returns the index of a single-spin irreducible spherical tensor operator
+determined by rank <cite>l</cite> and projection <cite>q</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> (<em>int</em>) – Operator rank.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Operator projection.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>idx</strong> – Index of the operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -796,31 +872,189 @@ two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_E">
+<span class="sig-name descname"><span class="pre">op_E</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_E"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_E" title="Link to this definition">#</a></dt>
+<dd><p>Generates the unit operator for a given spin quantum number <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>E</strong> – An array representing the unit operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_Sm">
+<span class="sig-name descname"><span class="pre">op_Sm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_Sm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_Sm" title="Link to this definition">#</a></dt>
+<dd><p>Generates the spin lowering operator for a given spin quantum number <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Sm</strong> – An array representing the lowering operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_Sp">
+<span class="sig-name descname"><span class="pre">op_Sp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_Sp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_Sp" title="Link to this definition">#</a></dt>
+<dd><p>Generates the spin raising operator for a given spin quantum number <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Sp</strong> – An array representing the raising operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_Sx">
+<span class="sig-name descname"><span class="pre">op_Sx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_Sx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_Sx" title="Link to this definition">#</a></dt>
+<dd><p>Generates the spin operator Sx for a given spin quantum number <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Sx</strong> – An array representing the x-component spin operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_Sy">
+<span class="sig-name descname"><span class="pre">op_Sy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_Sy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_Sy" title="Link to this definition">#</a></dt>
+<dd><p>Generates the spin operator Sy for a given spin quantum number <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Sy</strong> – An array representing the y-component spin operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_Sz">
+<span class="sig-name descname"><span class="pre">op_Sz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_Sz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_Sz" title="Link to this definition">#</a></dt>
+<dd><p>Generates the spin operator Sz for a given spin quantum number <cite>S</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Sz</strong> – An array representing the z-component spin operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_T">
+<span class="sig-name descname"><span class="pre">op_T</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_T"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_T" title="Link to this definition">#</a></dt>
+<dd><p>Generates the numerical spherical tensor operator for a given spin quantum
+number <cite>S</cite>, rank <cite>l</cite>, and projection <cite>q</cite>. The operator is obtained by
+sequential lowering of the maximum projection operator.</p>
+<p>Source: Kuprov (2023) - Spin: From Basic Symmetries to Quantum Optimal
+Control, page 94.</p>
+<p>This function is called frequently and is cached for high performance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>float</em>) – Spin quantum number.</p></li>
+<li><p><strong>l</strong> (<em>int</em>) – Operator rank.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Operator projection.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>T</strong> – An array representing the spherical tensor operator.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.op_T_coupled">
+<span class="sig-name descname"><span class="pre">op_T_coupled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#op_T_coupled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.op_T_coupled" title="Link to this definition">#</a></dt>
+<dd><p>Computes the coupled irreducible spherical tensor of rank <cite>l</cite> and projection
+<cite>q</cite> from two irreducible spherical tensors of ranks <cite>l1</cite> and <cite>l2</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> (<em>int</em>) – Rank of the coupled operator.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Projection of the coupled operator.</p></li>
+<li><p><strong>l1</strong> (<em>int</em>) – Rank of the first operator to be coupled.</p></li>
+<li><p><strong>s1</strong> (<em>float</em>) – Spin quantum number of the first spin.</p></li>
+<li><p><strong>l2</strong> (<em>int</em>) – Rank of the second operator to be coupled.</p></li>
+<li><p><strong>s2</strong> (<em>float</em>) – Spin quantum number of the second spin.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>T</strong> – Coupled spherical tensor operator of rank <cite>l</cite> and projection <cite>q</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="spinguin.operator">
-<span class="sig-name descname"><span class="pre">operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.operator" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_operators.html#operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.operator" title="Link to this definition">#</a></dt>
 <dd><p>Generates an operator for the <cite>spin_system</cite> in Hilbert space from the
 user-specified <cite>operator</cite> string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spin_system</strong> (<a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><em>SpinSystem</em></a>) – Spin system for which the operator is going to be generated.</p></li>
-<li><p><strong>operator</strong> (<em>str</em>) – <p>Defines the operator to be generated. The operator string must
-follow the rules below:</p>
+<li><p><strong>operator</strong> (<em>str</em><em> or </em><em>list</em><em> or </em><em>ndarray</em><em> or </em><em>tuple</em>) – <p>Defines the operator to be generated.</p>
+<p><strong>The operator can be defined with two different approaches:</strong></p>
+<ul>
+<li><p>A string. Example: <cite>I(z,0) * I(z,1)</cite></p></li>
+<li><p>An array of integers. Example: <cite>[2, 2]</cite></p></li>
+</ul>
+<p><strong>The string input must follow the rules below:</strong></p>
 <ul>
 <li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
-<cite>I(component)</cite>. Examples:</p>
+<cite>I(component)</cite>, with the indexing starting from zero. Examples:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>I(x,4)</cite> –&gt; Creates x-operator for spin at index 4.</p></li>
-<li><p><cite>I(x)</cite>–&gt; Creates x-operator for all spins.</p></li>
+<li><p><cite>I(x,4)</cite> –&gt; Creates <em>x</em>-operator for spin at index 4.</p></li>
+<li><p><cite>I(x)</cite>–&gt; Creates <em>x</em>-operator for all spins.</p></li>
 </ul>
 </div></blockquote>
 </li>
 <li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for spin at index 3.</p></li>
-<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for all spins.</p></li>
+<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <a href="#id2"><span class="problematic" id="id3">*</span></a>l*=1, <a href="#id4"><span class="problematic" id="id5">*</span></a>q*=-1 for spin at index 3.</p></li>
+<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <a href="#id6"><span class="problematic" id="id7">*</span></a>l*=1, <a href="#id8"><span class="problematic" id="id9">*</span></a>q*=-1 for all spins.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -829,12 +1063,17 @@ follow the rules below:</p>
 <li><p>Sums of operators have <cite>+</cite> in between the operators:
 <cite>I(x,0) + I(x,1)</cite></p></li>
 <li><p>Unit operators are ignored in the input. Interpretation of these
-two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
+two is identical: <cite>E * I(z,1)</cite> and <cite>I(z,1)</cite></p></li>
 </ul>
 <p>Special case: An empty <cite>operator</cite> string is considered as unit
 operator.</p>
 <p>Whitespace will be ignored in the input.</p>
-<p>NOTE: Indexing starts from 0!</p>
+<p><strong>The array input is defined as follows:</strong></p>
+<ul>
+<li><p>Each spin is given an integer <em>N</em> in the array.</p></li>
+<li><p>Each integer corresponds to a spherical tensor operator of rank <em>l</em>
+and projection <em>q</em>: <em>N</em> = <em>l*^2 + *l</em> - <em>q</em></p></li>
+</ul>
 </p></li>
 </ul>
 </dd>
@@ -887,12 +1126,12 @@ want to perform the following permulation:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>L</strong> (<em>csc_array</em>) – Liouvillian superoperator, L = -iH - R + K.</p></li>
+<li><p><strong>L</strong> (<em>ndarray</em><em> or </em><em>csc_array</em>) – Liouvillian superoperator, L = -iH - R + K.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time step of the simulation in seconds.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>expm_Lt</strong> – Time propagator exp(L*t).</p>
+<dd class="field-even"><p><strong>P</strong> – Time propagator exp(L*t).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>csc_array or ndarray</p>
@@ -909,7 +1148,7 @@ want to perform the following permulation:</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spin_system</strong> (<a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><em>SpinSystem</em></a>) – Spin system whose time propagator is going to be transformed.</p></li>
 <li><p><strong>P</strong> (<em>ndarray</em><em> or </em><em>csc_array</em>) – Time propagator in the laboratory frame.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Time step of the simulation in seconds.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time step of the propagator in seconds.</p></li>
 <li><p><strong>center_frequencies</strong> (<em>dict</em>) – Dictionary that describes the center frequencies for each isotope in the
 units of ppm.</p></li>
 </ul>
@@ -1082,6 +1321,37 @@ assigned to the other spins.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="spinguin.sop_T_coupled">
+<span class="sig-name descname"><span class="pre">sop_T_coupled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_superoperators.html#sop_T_coupled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.sop_T_coupled" title="Link to this definition">#</a></dt>
+<dd><p>Computes the product superoperator corresponding to the coupled spherical
+tensor operator of rank <cite>l</cite> and projection <cite>q</cite>, derived from two spherical
+tensor operators of rank 1.</p>
+<p>This function is frequently called and is cached for high performance.</p>
+<p>TODO: Mieti, onko cache tarpeellinen. Nyt hyöty tulee vain, kun lasketaan R
+useaan kertaan samalle systeemille (esim. eri magneettikentissä). Voisi
+mahdollisesti olla asetus ohjelmassa (cachet päälle / pois).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spin_system</strong> (<a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><em>SpinSystem</em></a>) – The spin system for which the coupled T superoperator is going to be
+generated.</p></li>
+<li><p><strong>l</strong> (<em>int</em>) – Rank of the coupled operator.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Projection of the coupled operator.</p></li>
+<li><p><strong>spin_1</strong> (<em>int</em>) – Index of the first spin.</p></li>
+<li><p><strong>spin_2</strong> (<em>int</em><em>, </em><em>default=None</em>) – Index of the second spin. Leave empty for linear single-spin
+interactions (e.g., shielding).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sop</strong> – Coupled spherical tensor superoperator of rank <cite>l</cite> and projection <cite>q</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="spinguin.spectral_width_to_dwell_time">
 <span class="sig-name descname"><span class="pre">spectral_width_to_dwell_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectral_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_specutils.html#spectral_width_to_dwell_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.spectral_width_to_dwell_time" title="Link to this definition">#</a></dt>
 <dd><p>Calculates the dwell time (in seconds) from the spectral width given in ppm.</p>
@@ -1231,30 +1501,35 @@ matrix.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spinguin.superoperator">
-<span class="sig-name descname"><span class="pre">superoperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'comm'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'comm'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_superoperators.html#superoperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.superoperator" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">superoperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'comm'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'comm'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_superoperators.html#superoperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.superoperator" title="Link to this definition">#</a></dt>
 <dd><p>Generates a Liouville-space superoperator for the <cite>spin_system</cite> from the
 user-specified <cite>operator</cite> string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spin_system</strong> (<a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><em>SpinSystem</em></a>) – Spin system for which the superoperator is going to be generated.</p></li>
-<li><p><strong>operator</strong> (<em>str</em>) – <p>Defines the superoperator to be generated. The operator string must
-follow the rules below:</p>
+<li><p><strong>operator</strong> (<em>str</em><em> or </em><em>list</em><em> or </em><em>ndarray</em><em> or </em><em>tuple</em>) – <p>Defines the superoperator to be generated.</p>
+<p><strong>The operator can be defined with two different approaches:</strong></p>
+<ul>
+<li><p>A string. Example: <cite>I(z,0) * I(z,1)</cite></p></li>
+<li><p>An array of integers. Example: <cite>[2, 2]</cite></p></li>
+</ul>
+<p><strong>The string input must follow the rules below:</strong></p>
 <ul>
 <li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
-<cite>I(component)</cite>. Examples:</p>
+<cite>I(component)</cite>, with the indexing starting from zero. Examples:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>I(x,4)</cite> –&gt; Creates x-operator for spin at index 4.</p></li>
-<li><p><cite>I(x)</cite>–&gt; Creates x-operator for all spins.</p></li>
+<li><p><cite>I(x,4)</cite> –&gt; Creates <em>x</em>-operator for spin at index 4.</p></li>
+<li><p><cite>I(x)</cite>–&gt; Creates <em>x</em>-operator for all spins.</p></li>
 </ul>
 </div></blockquote>
 </li>
 <li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for spin at index 3.</p></li>
-<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for all spins.</p></li>
+<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <a href="#id10"><span class="problematic" id="id11">*</span></a>l*=1, <a href="#id12"><span class="problematic" id="id13">*</span></a>q*=-1 for spin at index 3.</p></li>
+<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <a href="#id14"><span class="problematic" id="id15">*</span></a>l*=1, <a href="#id16"><span class="problematic" id="id17">*</span></a>q*=-1 for all spins.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -1263,12 +1538,17 @@ follow the rules below:</p>
 <li><p>Sums of operators have <cite>+</cite> in between the operators:
 <cite>I(x,0) + I(x,1)</cite></p></li>
 <li><p>Unit operators are ignored in the input. Interpretation of these
-two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
+two is identical: <cite>E * I(z,1)</cite> and <cite>I(z,1)</cite></p></li>
 </ul>
 <p>Special case: An empty <cite>operator</cite> string is considered as unit
 operator.</p>
 <p>Whitespace will be ignored in the input.</p>
-<p>NOTE: Indexing starts from 0!</p>
+<p><strong>The array input is defined as follows:</strong></p>
+<ul>
+<li><p>Each spin is given an integer <em>N</em> in the array.</p></li>
+<li><p>Each integer corresponds to a spherical tensor operator of rank <em>l</em>
+and projection <em>q</em>: <em>N</em> = <em>l*^2 + *l</em> - <em>q</em></p></li>
+</ul>
 </p></li>
 <li><p><strong>side</strong> (<em>{'comm'</em><em>, </em><em>'left'</em><em>, </em><em>'right'}</em>) – The type of superoperator:
 - ‘comm’ – commutation superoperator (default)
@@ -1450,14 +1730,26 @@ that corresponds to the identity operator.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.alpha_state"><code class="docutils literal notranslate"><span class="pre">alpha_state()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.associate"><code class="docutils literal notranslate"><span class="pre">associate()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.beta_state"><code class="docutils literal notranslate"><span class="pre">beta_state()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.clear_cache"><code class="docutils literal notranslate"><span class="pre">clear_cache()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.coherence_order"><code class="docutils literal notranslate"><span class="pre">coherence_order()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.dissociate"><code class="docutils literal notranslate"><span class="pre">dissociate()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.equilibrium_state"><code class="docutils literal notranslate"><span class="pre">equilibrium_state()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.fourier_transform"><code class="docutils literal notranslate"><span class="pre">fourier_transform()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.frequency_to_chemical_shift"><code class="docutils literal notranslate"><span class="pre">frequency_to_chemical_shift()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.gamma"><code class="docutils literal notranslate"><span class="pre">gamma()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.hamiltonian"><code class="docutils literal notranslate"><span class="pre">hamiltonian()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.idx_to_lq"><code class="docutils literal notranslate"><span class="pre">idx_to_lq()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.liouvillian"><code class="docutils literal notranslate"><span class="pre">liouvillian()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.lq_to_idx"><code class="docutils literal notranslate"><span class="pre">lq_to_idx()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_E"><code class="docutils literal notranslate"><span class="pre">op_E()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sm"><code class="docutils literal notranslate"><span class="pre">op_Sm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sp"><code class="docutils literal notranslate"><span class="pre">op_Sp()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sx"><code class="docutils literal notranslate"><span class="pre">op_Sx()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sy"><code class="docutils literal notranslate"><span class="pre">op_Sy()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_Sz"><code class="docutils literal notranslate"><span class="pre">op_Sz()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_T"><code class="docutils literal notranslate"><span class="pre">op_T()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.op_T_coupled"><code class="docutils literal notranslate"><span class="pre">op_T_coupled()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.operator"><code class="docutils literal notranslate"><span class="pre">operator()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.permute_spins"><code class="docutils literal notranslate"><span class="pre">permute_spins()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.propagator"><code class="docutils literal notranslate"><span class="pre">propagator()</span></code></a></li>
@@ -1467,6 +1759,7 @@ that corresponds to the identity operator.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.relaxation"><code class="docutils literal notranslate"><span class="pre">relaxation()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.resonance_frequency"><code class="docutils literal notranslate"><span class="pre">resonance_frequency()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.singlet_state"><code class="docutils literal notranslate"><span class="pre">singlet_state()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.sop_T_coupled"><code class="docutils literal notranslate"><span class="pre">sop_T_coupled()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spectral_width_to_dwell_time"><code class="docutils literal notranslate"><span class="pre">spectral_width_to_dwell_time()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spectrum"><code class="docutils literal notranslate"><span class="pre">spectrum()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spin"><code class="docutils literal notranslate"><span class="pre">spin()</span></code></a></li>

@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_parameters';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -332,10 +332,7 @@ document.write(`
 
         <span class="c1"># Sparsity settings</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.5</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_hamiltonian</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_pulse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_relaxation</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
         
@@ -404,19 +401,6 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparity setting of operator set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_operator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies whether to return pulse superoperators as sparse or dense</span>
-<span class="sd">        arrays.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_pulse</span>
-    
-    <span class="nd">@sparse_pulse</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_pulse</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_pulse</span> <span class="o">=</span> <span class="n">sparse_pulse</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparsity setting of pulses set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_pulse</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return the superoperators as sparse or dense</span>
@@ -429,33 +413,6 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span> <span class="o">=</span> <span class="n">sparse_superoperator</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparity setting of superoperator set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies whether to return the Hamiltonian as sparse or dense array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_hamiltonian</span>
-    
-    <span class="nd">@sparse_hamiltonian</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_hamiltonian</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_hamiltonian</span> <span class="o">=</span> <span class="n">sparse_hamiltonian</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparity setting of Hamiltonian set to: &quot;</span>
-              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_hamiltonian</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies whether to return the relaxation superoperator as sparse or</span>
-<span class="sd">        dense array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_relaxation</span>
-    
-    <span class="nd">@sparse_relaxation</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_relaxation</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_relaxation</span> <span class="o">=</span> <span class="n">sparse_relaxation</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparity setting of relaxation set to: &quot;</span>
-              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_relaxation</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>

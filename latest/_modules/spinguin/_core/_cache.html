@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>spinguin._core._liouvillian &#8212; Spinguin latest documentation</title>
+    <title>spinguin._core._cache &#8212; Spinguin latest documentation</title>
   
   
   
@@ -39,7 +39,7 @@
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_liouvillian';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_cache';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
@@ -296,57 +296,45 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for spinguin._core._liouvillian</h1><div class="highlight"><pre>
+  <h1>Source code for spinguin._core._cache</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides a function for calculating the Liouvillian.</span>
+<span class="sd">This module provides functionality to clear the caches of the functions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._chem</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clear_cache_associate_index_map</span><span class="p">,</span>
+    <span class="n">clear_cache_dissociate_index_map</span><span class="p">,</span>
+    <span class="n">clear_cache_permutation_matrix</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">clear_cache_CG_coeff</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._operators</span> <span class="kn">import</span> <span class="n">clear_cache_op_T</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._states</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clear_cache_state_from_op_def</span><span class="p">,</span>
+    <span class="n">clear_cache_state_from_string</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._superoperators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clear_cache_sop_prod</span><span class="p">,</span>
+    <span class="n">clear_cache_sop_T_coupled</span><span class="p">,</span>
+    <span class="n">clear_cache_structure_coefficients</span>
+<span class="p">)</span>
 
-<div class="viewcode-block" id="liouvillian">
-<a class="viewcode-back" href="../../../spinguin.html#spinguin.liouvillian">[docs]</a>
-<span class="k">def</span> <span class="nf">liouvillian</span><span class="p">(</span>
-    <span class="n">H</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">R</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">K</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<div class="viewcode-block" id="clear_cache">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.clear_cache">[docs]</a>
+<span class="k">def</span> <span class="nf">clear_cache</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation</span>
-<span class="sd">    superoperator, and exchange superoperator.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    H : ndarray or csc_array</span>
-<span class="sd">        Hamiltonian superoperator.</span>
-<span class="sd">    R : ndarray or csc_array</span>
-<span class="sd">        Relaxation superoperator</span>
-<span class="sd">    K : ndarray or csc_array</span>
-<span class="sd">        Exchange superoperator.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    L : ndarray or csc_array</span>
-<span class="sd">        Liouvillian superoperator.</span>
+<span class="sd">    Clears the cache.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># Check for totally empty input</span>
-    <span class="k">if</span> <span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">K</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;H, R and K cannot all be None simultaneously.&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Assign zeroes if None</span>
-    <span class="k">if</span> <span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">R</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">K</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">K</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="c1"># Construct the Liouvillian</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">H</span> <span class="o">-</span> <span class="n">R</span> <span class="o">+</span> <span class="n">K</span>
-
-    <span class="k">return</span> <span class="n">L</span></div>
+    <span class="c1"># Clear caches from various modules</span>
+    <span class="n">clear_cache_associate_index_map</span><span class="p">()</span>
+    <span class="n">clear_cache_dissociate_index_map</span><span class="p">()</span>
+    <span class="n">clear_cache_permutation_matrix</span><span class="p">()</span>
+    <span class="n">clear_cache_CG_coeff</span><span class="p">()</span>
+    <span class="n">clear_cache_op_T</span><span class="p">()</span>
+    <span class="n">clear_cache_state_from_op_def</span><span class="p">()</span>
+    <span class="n">clear_cache_state_from_string</span><span class="p">()</span>
+    <span class="n">clear_cache_sop_prod</span><span class="p">()</span>
+    <span class="n">clear_cache_sop_T_coupled</span><span class="p">()</span>
+    <span class="n">clear_cache_structure_coefficients</span><span class="p">()</span></div>
 
 </pre></div>
 

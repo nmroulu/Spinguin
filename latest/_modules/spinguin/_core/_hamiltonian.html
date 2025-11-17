@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_hamiltonian';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -315,12 +315,13 @@ document.write(`
 <span class="kn">from</span> <span class="nn">spinguin._core._superoperators</span> <span class="kn">import</span> <span class="n">sop_prod</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
 
-<span class="k">def</span> <span class="nf">sop_H_Z</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-            <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
-            <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">sop_H_Z</span><span class="p">(</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the Hamiltonian superoperator for the Zeeman interaction.</span>
 
@@ -342,8 +343,6 @@ document.write(`
 <span class="sd">        - &#39;comm&#39; -- commutation superoperator (default)</span>
 <span class="sd">        - &#39;left&#39; -- left superoperator</span>
 <span class="sd">        - &#39;right&#39; -- right superoperator</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to construct the Hamiltonian as sparse or dense array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -356,7 +355,7 @@ document.write(`
     <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Initialize the Hamiltonian</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
         <span class="n">sop_Hz</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sop_Hz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -368,18 +367,18 @@ document.write(`
         <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">n</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">)])</span>
 
         <span class="c1"># Compute the Zeeman interaction for the current spin</span>
-        <span class="n">sop_Hz</span> <span class="o">=</span> <span class="n">sop_Hz</span> <span class="o">-</span> <span class="n">gammas</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span>
-                                                   <span class="n">sparse</span><span class="p">)</span>
+        <span class="n">sop_Hz</span> <span class="o">=</span> <span class="n">sop_Hz</span> <span class="o">-</span> <span class="n">gammas</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">sop_Hz</span>
 
-<span class="k">def</span> <span class="nf">sop_H_CS</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-             <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-             <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-             <span class="n">chemical_shifts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-             <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-             <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
-             <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">sop_H_CS</span><span class="p">(</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">chemical_shifts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the Hamiltonian superoperator for the chemical shift.</span>
 
@@ -404,8 +403,6 @@ document.write(`
 <span class="sd">        - &#39;comm&#39; -- commutation superoperator (default)</span>
 <span class="sd">        - &#39;left&#39; -- left superoperator</span>
 <span class="sd">        - &#39;right&#39; -- right superoperator</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to construct the Hamiltonian as sparse or dense array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -418,7 +415,7 @@ document.write(`
     <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Initialize the Hamiltonian</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
         <span class="n">sop_Hcs</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sop_Hcs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -431,15 +428,16 @@ document.write(`
 
         <span class="c1"># Compute the contribution from chemical shift for the current spin</span>
         <span class="n">sop_Hcs</span> <span class="o">=</span> <span class="n">sop_Hcs</span> <span class="o">-</span> <span class="n">gammas</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="n">chemical_shifts</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-6</span> <span class="o">*</span> \
-            <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+            <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">sop_Hcs</span>
 
-<span class="k">def</span> <span class="nf">sop_H_J</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
-            <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">sop_H_J</span><span class="p">(</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the J-coupling term of the Hamiltonian.</span>
 
@@ -459,8 +457,6 @@ document.write(`
 <span class="sd">        - &#39;comm&#39; -- commutation superoperator (default)</span>
 <span class="sd">        - &#39;left&#39; -- left superoperator</span>
 <span class="sd">        - &#39;right&#39; -- right superoperator</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to construct the Hamiltonian as sparse or dense array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -473,7 +469,7 @@ document.write(`
     <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Initialize the Hamiltonian</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
         <span class="n">sop_Hj</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sop_Hj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -499,25 +495,24 @@ document.write(`
 
                 <span class="c1"># Compute the J-coupling term</span>
                 <span class="n">sop_Hj</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">J_couplings</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
-                    <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def_00</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span> \
-                        <span class="o">-</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def_p1m1</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span> \
-                        <span class="o">-</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def_m1p1</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">sparse</span><span class="p">))</span>
+                    <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def_00</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span> \
+                        <span class="o">-</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def_p1m1</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span> \
+                        <span class="o">-</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def_m1p1</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">sop_Hj</span>
 
 <span class="n">INTERACTIONTYPE</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;zeeman&quot;</span><span class="p">,</span> <span class="s2">&quot;chemical_shift&quot;</span><span class="p">,</span> <span class="s2">&quot;J_coupling&quot;</span><span class="p">]</span>
 <span class="n">INTERACTIONDEFAULT</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;zeeman&quot;</span><span class="p">,</span> <span class="s2">&quot;chemical_shift&quot;</span><span class="p">,</span> <span class="s2">&quot;J_coupling&quot;</span><span class="p">]</span>
 <span class="k">def</span> <span class="nf">sop_H</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">chemical_shifts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">INTERACTIONTYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">INTERACTIONDEFAULT</span><span class="p">,</span>
-        <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
-        <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-12</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chemical_shifts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">INTERACTIONTYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">INTERACTIONDEFAULT</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
+    <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-12</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the coherent part of the Hamiltonian superoperator, including the</span>
@@ -552,8 +547,6 @@ document.write(`
 <span class="sd">        - &#39;comm&#39; -- commutation superoperator (default)</span>
 <span class="sd">        - &#39;left&#39; -- left superoperator</span>
 <span class="sd">        - &#39;right&#39; -- right superoperator</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to construct the Hamiltonian as sparse or dense array.</span>
 <span class="sd">    zero_value : float, default=1e-12</span>
 <span class="sd">        Smaller values than this threshold are made equal to zero after</span>
 <span class="sd">        calculating the Hamiltonian. When using sparse arrays, larger values</span>
@@ -582,7 +575,7 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Initialize the Hamiltonian</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
         <span class="n">sop_H</span> <span class="o">=</span> <span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sop_H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -590,12 +583,11 @@ document.write(`
     <span class="c1"># Compute the Zeeman and J-coupling Hamiltonians</span>
     <span class="k">for</span> <span class="n">interaction</span> <span class="ow">in</span> <span class="n">interactions</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">interaction</span> <span class="o">==</span> <span class="s2">&quot;zeeman&quot;</span><span class="p">:</span>
-            <span class="n">sop_H</span> <span class="o">+=</span> <span class="n">sop_H_Z</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">gammas</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+            <span class="n">sop_H</span> <span class="o">+=</span> <span class="n">sop_H_Z</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">gammas</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">interaction</span> <span class="o">==</span> <span class="s2">&quot;chemical_shift&quot;</span><span class="p">:</span>
-            <span class="n">sop_H</span> <span class="o">+=</span> <span class="n">sop_H_CS</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">gammas</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">chemical_shifts</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> 
-                              <span class="n">sparse</span><span class="p">)</span>
+            <span class="n">sop_H</span> <span class="o">+=</span> <span class="n">sop_H_CS</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">gammas</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">chemical_shifts</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">interaction</span> <span class="o">==</span> <span class="s2">&quot;J_coupling&quot;</span><span class="p">:</span>
-            <span class="n">sop_H</span> <span class="o">+=</span> <span class="n">sop_H_J</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">J_couplings</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+            <span class="n">sop_H</span> <span class="o">+=</span> <span class="n">sop_H_J</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">J_couplings</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported interaction type: </span><span class="si">{</span><span class="n">interaction</span><span class="si">}</span><span class="s2">. &quot;</span>
                              <span class="sa">f</span><span class="s2">&quot;The possible options are: </span><span class="si">{</span><span class="n">INTERACTIONDEFAULT</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
@@ -611,9 +603,9 @@ document.write(`
 <div class="viewcode-block" id="hamiltonian">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.hamiltonian">[docs]</a>
 <span class="k">def</span> <span class="nf">hamiltonian</span><span class="p">(</span>
-        <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-        <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">INTERACTIONTYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">INTERACTIONDEFAULT</span><span class="p">,</span>
-        <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">INTERACTIONTYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">INTERACTIONDEFAULT</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the requested Hamiltonian superoperator for the spin system.</span>
@@ -664,7 +656,6 @@ document.write(`
         <span class="n">J_couplings</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">,</span>
         <span class="n">interactions</span> <span class="o">=</span> <span class="n">interactions</span><span class="p">,</span>
         <span class="n">side</span> <span class="o">=</span> <span class="n">side</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_hamiltonian</span><span class="p">,</span>
         <span class="n">zero_value</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_hamiltonian</span>
     <span class="p">)</span>
 

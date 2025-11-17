@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_states';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -322,7 +322,6 @@ document.write(`
 <span class="k">def</span> <span class="nf">_unit_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -339,8 +338,6 @@ document.write(`
 <span class="sd">        tensors.</span>
 <span class="sd">    spins : ndarray</span>
 <span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 <span class="sd">    normalized : bool, default=True</span>
 <span class="sd">        If set to True, the function will return a state vector that represents</span>
 <span class="sd">        the trace-normalized density matrix. If False, returns a state vector</span>
@@ -359,7 +356,7 @@ document.write(`
     <span class="n">mults</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="c1"># Initialize the state vector</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -371,7 +368,7 @@ document.write(`
         <span class="n">rho</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">))</span>
 
     <span class="c1"># Convert to csc_array if requesting sparse</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">rho</span>
@@ -381,7 +378,7 @@ document.write(`
     <span class="n">basis_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">spins_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">op_def_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
     
     <span class="c1"># Obtain the hashed elements</span>
@@ -409,10 +406,14 @@ document.write(`
     <span class="c1"># Calculate the norm of the active operator part if there are active</span>
     <span class="c1"># spins</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_active</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># TODO: Benchmark sparse vs dense implementation</span>
-        <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
-            <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-            <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+            <span class="n">op_norm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span>
+            <span class="p">)</span>
 
     <span class="c1"># Otherwise set it to one</span>
     <span class="k">else</span><span class="p">:</span>
@@ -434,10 +435,9 @@ document.write(`
     <span class="k">return</span> <span class="n">rho</span>
 
 <span class="k">def</span> <span class="nf">state_from_op_def</span><span class="p">(</span>
-        <span class="n">basis</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">spins</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">op_def</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">basis</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">op_def</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a state from the given operator definition. The output of this</span>
@@ -463,8 +463,6 @@ document.write(`
 <span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
 <span class="sd">    op_def : ndarray</span>
 <span class="sd">        An array of integers that specify the product operator.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -477,17 +475,23 @@ document.write(`
     <span class="n">spins_bytes</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
     <span class="n">op_def_bytes</span> <span class="o">=</span> <span class="n">op_def</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 
-    <span class="c1"># Ensure that a different instance is returned</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_op_def</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spins_bytes</span><span class="p">,</span> <span class="n">op_def_bytes</span><span class="p">,</span>
-                             <span class="n">sparse</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># Create the state and ensure that a different instance is returned</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_op_def</span><span class="p">(</span>
+        <span class="n">basis_bytes</span><span class="p">,</span>
+        <span class="n">spins_bytes</span><span class="p">,</span>
+        <span class="n">op_def_bytes</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">rho</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_state_from_string</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                       <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                       <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                       <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_state_from_string</span><span class="p">(</span>
+    <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 
     <span class="c1"># Obtain the hashed elements</span>
     <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spins_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -520,10 +524,14 @@ document.write(`
         <span class="c1"># Calculate the norm of the active operator part if there are active</span>
         <span class="c1"># spins</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_active</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># TODO: Benchmark sparse vs dense implementation</span>
-            <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
-                <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+                <span class="n">op_norm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                    <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                    <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span>
+                <span class="p">)</span>
 
         <span class="c1"># Otherwise set it to one</span>
         <span class="k">else</span><span class="p">:</span>
@@ -544,10 +552,11 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                      <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                      <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                      <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">state_from_string</span><span class="p">(</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function returns a column vector representing the density matrix as a</span>
 <span class="sd">    linear combination of spin operators. Each element of the vector corresponds</span>
@@ -599,8 +608,6 @@ document.write(`
 <span class="sd">        Whitespace will be ignored in the input.</span>
 
 <span class="sd">        NOTE: Indexing starts from 0!</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -612,16 +619,20 @@ document.write(`
     <span class="n">basis_bytes</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
     <span class="n">spins_bytes</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 
-    <span class="c1"># Ensure that a different instance is returned</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_string</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spins_bytes</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># Create the state and ensure that a different instance is returned</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_string</span><span class="p">(</span>
+        <span class="n">basis_bytes</span><span class="p">,</span>
+        <span class="n">spins_bytes</span><span class="p">,</span>
+        <span class="n">operator</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">rho</span>
 
 <span class="k">def</span> <span class="nf">_state_to_zeeman</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Takes the state vector defined in the normalized spherical tensor basis</span>
@@ -637,8 +648,6 @@ document.write(`
 <span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector defined in the normalized spherical tensor basis.</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to return the density matrix as sparse or dense array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -653,7 +662,7 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Initialize the spin density matrix</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
         <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -669,8 +678,8 @@ document.write(`
 
         <span class="c1"># Get the normalized product operator in the Zeeman eigenbasis with</span>
         <span class="c1"># normalization</span>
-        <span class="n">oper</span> <span class="o">=</span> <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">oper</span> <span class="o">=</span> <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
@@ -685,7 +694,6 @@ document.write(`
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">H_left</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">T</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -703,8 +711,6 @@ document.write(`
 <span class="sd">        Left-side coherent Hamiltonian superoperator.</span>
 <span class="sd">    T : float</span>
 <span class="sd">        Temperature of the spin bath in Kelvin.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 <span class="sd">    zero_value : float, default=1e-18</span>
 <span class="sd">        This threshold value is used to estimate the convergence of Taylor</span>
 <span class="sd">        series in matrix exponential, and to eliminate value smaller than this</span>
@@ -724,8 +730,12 @@ document.write(`
         <span class="n">P</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">H_left</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
 
     <span class="c1"># Obtain the thermal equilibrium by propagating the unit state</span>
-    <span class="n">unit</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">rho_eq</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">unit</span>
+
+    <span class="c1"># Ensure the correct sparsity (might have changed during multiplication)</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho_eq</span><span class="p">):</span>
+        <span class="n">rho_eq</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">(</span><span class="n">rho_eq</span><span class="p">)</span>
 
     <span class="c1"># Normalize such that the trace of the corresponding density matrix is one</span>
     <span class="n">rho_eq</span> <span class="o">=</span> <span class="n">rho_eq</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho_eq</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)))</span>
@@ -735,8 +745,7 @@ document.write(`
 <span class="k">def</span> <span class="nf">_alpha_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the alpha state for a given spin-1/2 nucleus. Unit state is</span>
@@ -752,8 +761,6 @@ document.write(`
 <span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
 <span class="sd">    index : int</span>
 <span class="sd">        Index of the spin that has the alpha state.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -766,8 +773,8 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Make the alpha state</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
@@ -777,8 +784,7 @@ document.write(`
 <span class="k">def</span> <span class="nf">_beta_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the beta state for a given spin-1/2 nucleus. Unit state is</span>
@@ -794,8 +800,6 @@ document.write(`
 <span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
 <span class="sd">    index : int</span>
 <span class="sd">        Index of the spin that has the beta state.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -808,8 +812,8 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Make the beta state</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
@@ -820,8 +824,7 @@ document.write(`
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the singlet state between two spin-1/2 nuclei. Unit state is</span>
@@ -839,8 +842,6 @@ document.write(`
 <span class="sd">        Index of the first spin in the singlet state.</span>
 <span class="sd">    index_2 : int</span>
 <span class="sd">        Index of the second spin in the singlet state.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -853,13 +854,10 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Make the singlet</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
@@ -870,8 +868,7 @@ document.write(`
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is</span>
@@ -889,8 +886,6 @@ document.write(`
 <span class="sd">        Index of the first spin in the triplet zero state.</span>
 <span class="sd">    index_2 : int</span>
 <span class="sd">        Index of the second spin in the triplet zero state.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -903,13 +898,10 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Make the triplet zero</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
@@ -920,8 +912,7 @@ document.write(`
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is</span>
@@ -939,8 +930,6 @@ document.write(`
 <span class="sd">        Index of the first spin in the triplet plus state.</span>
 <span class="sd">    index_2 : int</span>
 <span class="sd">        Index of the second spin in the triplet plus state.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -953,11 +942,10 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Make the triplet plus</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzE</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">EIz</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
@@ -968,8 +956,7 @@ document.write(`
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is</span>
@@ -987,8 +974,6 @@ document.write(`
 <span class="sd">        Index of the first spin in the triplet minus state.</span>
 <span class="sd">    index_2 : int</span>
 <span class="sd">        Index of the second spin in the triplet minus state.</span>
-<span class="sd">    sparse : bool, default=False</span>
-<span class="sd">        If False, returns a NumPy array. If True, returns a SciPy csc_array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1001,11 +986,10 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mults</span><span class="p">)</span>
 
     <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
-        <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="c1"># Make the triplet minus</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzE</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">EIz</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
@@ -1070,16 +1054,17 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Get the &quot;operator&quot; to be measured</span>
-    <span class="n">oper</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span>
+    <span class="n">oper</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">operator</span><span class="p">)</span>
 
     <span class="c1"># Perform the measurement</span>
     <span class="n">ex</span> <span class="o">=</span> <span class="p">(</span><span class="n">oper</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">rho</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">ex</span>
 
-<span class="k">def</span> <span class="nf">state_to_truncated_basis</span><span class="p">(</span><span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-                             <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
-                             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">state_to_truncated_basis</span><span class="p">(</span>
+    <span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Transforms a state vector to a truncated basis using the `index_map`,</span>
 <span class="sd">    which contains indices that determine the elements that are retained</span>
@@ -1112,8 +1097,10 @@ document.write(`
 
 <div class="viewcode-block" id="unit_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.unit_state">[docs]</a>
-<span class="k">def</span> <span class="nf">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-               <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">unit_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a unit state vector, which represents the identity operator. The</span>
 <span class="sd">    output can be either normalised (trace equal to one) or unnormalised (raw</span>
@@ -1137,7 +1124,6 @@ document.write(`
     <span class="n">rho</span> <span class="o">=</span> <span class="n">_unit_state</span><span class="p">(</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">,</span>
         <span class="n">normalized</span> <span class="o">=</span> <span class="n">normalized</span>
     <span class="p">)</span>
 
@@ -1146,8 +1132,10 @@ document.write(`
 
 <div class="viewcode-block" id="state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.state">[docs]</a>
-<span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-          <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function returns a column vector representing the density matrix as a</span>
 <span class="sd">    linear combination of spin operators. Each element of the vector corresponds</span>
@@ -1206,11 +1194,10 @@ document.write(`
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing a state.&quot;</span><span class="p">)</span>
     
     <span class="c1"># Build the state</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="n">_state_from_string</span><span class="p">(</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">state_from_string</span><span class="p">(</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-        <span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1219,9 +1206,9 @@ document.write(`
 <div class="viewcode-block" id="state_to_zeeman">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.state_to_zeeman">[docs]</a>
 <span class="k">def</span> <span class="nf">state_to_zeeman</span><span class="p">(</span>
-        <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-        <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
-        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Takes the state vector defined in the normalized spherical tensor basis</span>
 <span class="sd">    and converts it into the Zeeman eigenbasis. Useful for error checking.</span>
@@ -1248,8 +1235,7 @@ document.write(`
     <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">_state_to_zeeman</span><span class="p">(</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span>
     <span class="p">)</span>
     
     <span class="k">return</span> <span class="n">rho_zeeman</span></div>
@@ -1257,8 +1243,10 @@ document.write(`
 
 <div class="viewcode-block" id="alpha_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.alpha_state">[docs]</a>
-<span class="k">def</span> <span class="nf">alpha_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-                <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">alpha_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the alpha state for a given spin-1/2 nucleus. Unit state is</span>
 <span class="sd">    assigned to the other spins.</span>
@@ -1284,8 +1272,7 @@ document.write(`
     <span class="n">rho</span> <span class="o">=</span> <span class="n">_alpha_state</span><span class="p">(</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1293,8 +1280,10 @@ document.write(`
 
 <div class="viewcode-block" id="beta_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.beta_state">[docs]</a>
-<span class="k">def</span> <span class="nf">beta_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-               <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">beta_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the beta state for a given spin-1/2 nucleus. Unit state is</span>
 <span class="sd">    assigned to the other spins.</span>
@@ -1320,8 +1309,7 @@ document.write(`
     <span class="n">rho</span> <span class="o">=</span> <span class="n">_beta_state</span><span class="p">(</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1343,7 +1331,6 @@ document.write(`
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        Equilibrium state vector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># Check that the required attributes are set</span>
     <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
@@ -1365,7 +1352,6 @@ document.write(`
             <span class="n">chemical_shifts</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">,</span>
             <span class="n">J_couplings</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">,</span>
             <span class="n">side</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-            <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_hamiltonian</span><span class="p">,</span>
             <span class="n">zero_value</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_hamiltonian</span>
         <span class="p">)</span>
 
@@ -1375,7 +1361,6 @@ document.write(`
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
         <span class="n">H_left</span> <span class="o">=</span> <span class="n">H_left</span><span class="p">,</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">,</span>
         <span class="n">zero_value</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_equilibrium</span>
     <span class="p">)</span>
 
@@ -1384,9 +1369,11 @@ document.write(`
 
 <div class="viewcode-block" id="singlet_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.singlet_state">[docs]</a>
-<span class="k">def</span> <span class="nf">singlet_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-                  <span class="n">index_1</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                  <span class="n">index_2</span> <span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">singlet_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">index_1</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">index_2</span> <span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the singlet state between two spin-1/2 nuclei. Unit state is</span>
 <span class="sd">    assigned to the other spins.</span>
@@ -1415,8 +1402,7 @@ document.write(`
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
         <span class="n">index_1</span> <span class="o">=</span> <span class="n">index_1</span><span class="p">,</span>
-        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1424,9 +1410,11 @@ document.write(`
 
 <div class="viewcode-block" id="triplet_zero_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.triplet_zero_state">[docs]</a>
-<span class="k">def</span> <span class="nf">triplet_zero_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-                       <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                       <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">triplet_zero_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is</span>
 <span class="sd">    assigned to the other spins.</span>
@@ -1455,8 +1443,7 @@ document.write(`
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
         <span class="n">index_1</span> <span class="o">=</span> <span class="n">index_1</span><span class="p">,</span>
-        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1464,9 +1451,11 @@ document.write(`
 
 <div class="viewcode-block" id="triplet_plus_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.triplet_plus_state">[docs]</a>
-<span class="k">def</span> <span class="nf">triplet_plus_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-                       <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                       <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">triplet_plus_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is</span>
 <span class="sd">    assigned to the other spins.</span>
@@ -1495,8 +1484,7 @@ document.write(`
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
         <span class="n">index_1</span> <span class="o">=</span> <span class="n">index_1</span><span class="p">,</span>
-        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1504,9 +1492,11 @@ document.write(`
 
 <div class="viewcode-block" id="triplet_minus_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.triplet_minus_state">[docs]</a>
-<span class="k">def</span> <span class="nf">triplet_minus_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-                        <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                        <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">triplet_minus_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is</span>
 <span class="sd">    assigned to the other spins.</span>
@@ -1535,8 +1525,7 @@ document.write(`
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
         <span class="n">index_1</span> <span class="o">=</span> <span class="n">index_1</span><span class="p">,</span>
-        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span><span class="p">,</span>
-        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
+        <span class="n">index_2</span> <span class="o">=</span> <span class="n">index_2</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
@@ -1544,9 +1533,11 @@ document.write(`
 
 <div class="viewcode-block" id="measure">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.measure">[docs]</a>
-<span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-            <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-            <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">measure</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the expectation value of the specified operator for a given state</span>
 <span class="sd">    vector. Assumes that the state vector `rho` represents a trace-normalized</span>
@@ -1608,6 +1599,20 @@ document.write(`
 
     <span class="k">return</span> <span class="n">ex</span></div>
 
+
+<span class="k">def</span> <span class="nf">clear_cache_state_from_string</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clears the cache of the `_state_from_string()` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Clear the cache</span>
+    <span class="n">_state_from_string</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">clear_cache_state_from_op_def</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clears the cache of the `_state_from_op_def()` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Clear the cache</span>
+    <span class="n">_state_from_op_def</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 </pre></div>
 
                 </article>

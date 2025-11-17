@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_relaxation';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -321,7 +321,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">lq_to_idx</span><span class="p">,</span> <span class="n">parse_operator_string</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._hide_prints</span> <span class="kn">import</span> <span class="n">HidePrints</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._hamiltonian</span> <span class="kn">import</span> <span class="n">sop_H</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._hamiltonian</span> <span class="kn">import</span> <span class="n">hamiltonian</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="k">def</span> <span class="nf">dd_constant</span><span class="p">(</span><span class="n">y1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -568,19 +568,16 @@ document.write(`
 
     <span class="k">return</span> <span class="n">Q_tensors</span>
 
-<span class="k">def</span> <span class="nf">process_interactions</span><span class="p">(</span><span class="n">intrs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_process_interactions</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Processes all incoherent interactions and organizes them by rank. </span>
-<span class="sd">    Disregards interactions below a specified threshold.</span>
+<span class="sd">    Obtains all interaction tensors from the spin system, and organizes them by</span>
+<span class="sd">    their interaction rank. Interaction tensors whose norm is below the</span>
+<span class="sd">    threshold specified in global parameters are disregarded.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    intrs : dict</span>
-<span class="sd">        A dictionary where the keys represent the interaction type, and the</span>
-<span class="sd">        values contain the interaction tensors and the ranks.</span>
-<span class="sd">    zero_value : float</span>
-<span class="sd">        If the eigenvalues of the interaction tensor, estimated using the</span>
-<span class="sd">        1-norm, are smaller than this threshold, the interaction is ignored.</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        SpinSystem whose interactions are to be processed.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -589,6 +586,8 @@ document.write(`
 <span class="sd">        contain all interactions with meaningful strength. The interactions are</span>
 <span class="sd">        tuples in the format (&quot;interaction&quot;, spin_1, spin_2, tensor).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Obtain the threshold from the parameters</span>
+    <span class="n">zv</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_interaction</span>
 
     <span class="c1"># Initialize the lists of interaction descriptions for different ranks</span>
     <span class="n">interactions</span> <span class="o">=</span> <span class="p">{</span>
@@ -596,56 +595,96 @@ document.write(`
         <span class="mi">2</span><span class="p">:</span> <span class="p">[]</span>
     <span class="p">}</span>
 
-    <span class="c1"># Iterate through the interactions</span>
-    <span class="k">for</span> <span class="n">interaction</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="n">intrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="c1"># Process dipole-dipole couplings</span>
+    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
-        <span class="c1"># Extract the properties</span>
-        <span class="n">tensors</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">ranks</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># Interaction name and rank</span>
+        <span class="n">interaction</span> <span class="o">=</span> <span class="s2">&quot;DD&quot;</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="mi">2</span>
 
-        <span class="c1"># Iterate through the ranks</span>
-        <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">ranks</span><span class="p">:</span>
+        <span class="c1"># Get the DD-coupling tensors</span>
+        <span class="n">dd_tensors</span> <span class="o">=</span> <span class="n">dd_coupling_tensors</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">)</span>
 
-            <span class="c1"># Process single-spin interactions</span>
-            <span class="k">if</span> <span class="n">interaction</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;CSA&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">spin_1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tensors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">norm_1</span><span class="p">(</span><span class="n">tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">],</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">zero_value</span><span class="p">:</span>
-                        <span class="n">interactions</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">]))</span>
+        <span class="c1"># Go through the DD-coupling tensors</span>
+        <span class="k">for</span> <span class="n">spin_1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">spin_2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">norm_1</span><span class="p">(</span><span class="n">dd_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">],</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">zv</span><span class="p">:</span>
+                    <span class="n">interactions</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+                        <span class="n">interaction</span><span class="p">,</span>
+                        <span class="n">spin_1</span><span class="p">,</span>
+                        <span class="n">spin_2</span><span class="p">,</span> 
+                        <span class="n">dd_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">]</span>
+                    <span class="p">))</span>
 
-            <span class="c1"># Process two-spin interactions</span>
-            <span class="k">if</span> <span class="n">interaction</span> <span class="o">==</span> <span class="s2">&quot;DD&quot;</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">spin_1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tensors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                    <span class="k">for</span> <span class="n">spin_2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tensors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                        <span class="k">if</span> <span class="n">norm_1</span><span class="p">(</span>
-                            <span class="n">tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">],</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">zero_value</span><span class="p">:</span>
-                            <span class="n">interactions</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">,</span> 
-                                 <span class="n">tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">]))</span>
+    <span class="c1"># Process nuclear shielding</span>
+    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">shielding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Interaction name</span>
+        <span class="n">interaction</span> <span class="o">=</span> <span class="s2">&quot;CSA&quot;</span>
+
+        <span class="c1"># Get the shielding tensors</span>
+        <span class="n">sh_tensors</span> <span class="o">=</span> <span class="n">shielding_intr_tensors</span><span class="p">(</span>
+            <span class="n">spin_system</span><span class="o">.</span><span class="n">shielding</span><span class="p">,</span>
+            <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Go through the shielding tensors</span>
+        <span class="k">for</span> <span class="n">spin_1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">norm_1</span><span class="p">(</span><span class="n">sh_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">],</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">zv</span><span class="p">:</span>
+
+                <span class="c1"># Add antisymmetric part if requested</span>
+                <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">antisymmetric</span><span class="p">:</span>
+                    <span class="n">rank</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">interactions</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sh_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">])</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Always add the symmetric part</span>
+                <span class="n">rank</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">interactions</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sh_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">])</span>
+                <span class="p">)</span>
+
+    <span class="c1"># Process quadrupolar coupling</span>
+    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">efg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Interaction name and rank</span>
+        <span class="n">interaction</span> <span class="o">=</span> <span class="s2">&quot;Q&quot;</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="c1"># Get the quadrupole coupling tensors</span>
+        <span class="n">q_tensors</span> <span class="o">=</span> <span class="n">Q_intr_tensors</span><span class="p">(</span>
+            <span class="n">spin_system</span><span class="o">.</span><span class="n">efg</span><span class="p">,</span>
+            <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+            <span class="n">spin_system</span><span class="o">.</span><span class="n">quad</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Go through the quadrupole coupling tensors</span>
+        <span class="k">for</span> <span class="n">spin_1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">norm_1</span><span class="p">(</span><span class="n">q_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">],</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">zv</span><span class="p">:</span>
+                <span class="n">interactions</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">q_tensors</span><span class="p">[</span><span class="n">spin_1</span><span class="p">])</span>
+                <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">interactions</span>
 
-<span class="k">def</span> <span class="nf">get_sop_T</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-              <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-              <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-              <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-              <span class="n">interaction_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;CSA&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;DD&quot;</span><span class="p">],</span>
-              <span class="n">spin_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-              <span class="n">spin_2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_get_sop_T</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">interaction_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;CSA&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;DD&quot;</span><span class="p">],</span>
+    <span class="n">spin_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spin_2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function for the relaxation module. Calculates the coupled product </span>
 <span class="sd">    superoperators for different interaction types.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    basis : ndarray</span>
-<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
-<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
-<span class="sd">        tensors.</span>
-<span class="sd">    spins : ndarray</span>
-<span class="sd">        A 1-dimensional array specifying the spin quantum numbers for each spin</span>
-<span class="sd">        in the system.</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        SpinSystem object containing the basis and spins information.</span>
 <span class="sd">    l : int</span>
 <span class="sd">        Operator rank.</span>
 <span class="sd">    q : int</span>
@@ -659,9 +698,6 @@ document.write(`
 <span class="sd">    spin_2 : int, optional</span>
 <span class="sd">        Index of the second spin. Leave empty for single-spin interactions</span>
 <span class="sd">        (e.g., CSA).</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to return the superoperator as a sparse or dense</span>
-<span class="sd">        array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -671,18 +707,17 @@ document.write(`
 
     <span class="c1"># Single-spin linear interaction</span>
     <span class="k">if</span> <span class="n">interaction_type</span> <span class="o">==</span> <span class="s2">&quot;CSA&quot;</span><span class="p">:</span>
-        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_T_coupled</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="n">sparse</span><span class="p">)</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_T_coupled</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">)</span>
 
     <span class="c1"># Single-spin quadratic interaction</span>
     <span class="k">elif</span> <span class="n">interaction_type</span> <span class="o">==</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span>
-        <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">op_def</span><span class="p">[</span><span class="n">spin_1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lq_to_idx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">)</span>
 
     <span class="c1"># Two-spin bilinear interaction</span>
     <span class="k">elif</span> <span class="n">interaction_type</span> <span class="o">==</span> <span class="s2">&quot;DD&quot;</span><span class="p">:</span>
-        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_T_coupled</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_T_coupled</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span><span class="p">)</span>
 
     <span class="c1"># Raise an error for invalid interaction types</span>
     <span class="k">else</span><span class="p">:</span>
@@ -825,24 +860,7 @@ document.write(`
     <span class="k">return</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">type_r</span><span class="p">,</span> <span class="n">spin_r1</span><span class="p">,</span> <span class="n">spin_r2</span><span class="p">,</span> <span class="n">sop_R_term</span>
 
 <span class="k">def</span> <span class="nf">_sop_R_redfield</span><span class="p">(</span>
-    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">sop_H</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">tau_c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">quad</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">xyz</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">shielding</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">efg</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">include_antisymmetric</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">include_dynamic_frequency_shift</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">relative_error</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
-    <span class="n">interaction_zero</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span>
-    <span class="n">aux_zero</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span><span class="p">,</span>
-    <span class="n">relaxation_zero</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
-    <span class="n">parallel_dim</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the relaxation superoperator using Redfield relaxation theory.</span>
@@ -860,113 +878,38 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    basis : ndarray</span>
-<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
-<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
-<span class="sd">        tensors.</span>
-<span class="sd">    sop_H : ndarray or csc_array</span>
-<span class="sd">        Coherent part of the Hamiltonian superoperator.</span>
-<span class="sd">    tau_c : float</span>
-<span class="sd">        Rotational correlation time in seconds.</span>
-<span class="sd">    spins : ndarray</span>
-<span class="sd">        A 1-dimensional array specifying the spin quantum numbers of the system.</span>
-<span class="sd">    B : float</span>
-<span class="sd">        External magnetic field in Tesla.</span>
-<span class="sd">    gammas : ndarray, default=None</span>
-<span class="sd">        A 1-dimensional array specifying the gyromagnetic ratios for each spin.</span>
-<span class="sd">        Must be defined in the units of rad/s/T.</span>
-<span class="sd">    quad : ndarray, default=None</span>
-<span class="sd">        A 1-dimensional array specifying the quadrupolar moments for each spin.</span>
-<span class="sd">        Must be defined in the units of m^2.</span>
-<span class="sd">    xyz : ndarray, default=None</span>
-<span class="sd">        A 2-dimensional array where the rows contain the Cartesian coordinates</span>
-<span class="sd">        for each spin in the units of Å.</span>
-<span class="sd">    shielding : ndarray, default=None</span>
-<span class="sd">        A 3-dimensional array where the shielding tensors are specified for each</span>
-<span class="sd">        spin in the units of Å.</span>
-<span class="sd">    efg : ndarray, default=None</span>
-<span class="sd">        A 3-dimensional array where the electric field gradient tensors are</span>
-<span class="sd">        specified for each spin in the units of Å.</span>
-<span class="sd">    include_antisymmetric : bool, default=False</span>
-<span class="sd">        Specifies whether the antisymmetric component of the CSA is included.</span>
-<span class="sd">        This is usually very small and can be neglected.</span>
-<span class="sd">    include_dynamic_frequency_shift : bool, default=False</span>
-<span class="sd">        Specifies whether the dynamic frequency shifts are included. This</span>
-<span class="sd">        corresponds to the imaginary part of the relaxation superoperator that</span>
-<span class="sd">        causes small shifts to the resonance frequencies. This effect is usually</span>
-<span class="sd">        very small and can be neglected.</span>
-<span class="sd">    relative_error : float=1e-6</span>
-<span class="sd">        Relative error for the Redfield integral that is calculated using</span>
-<span class="sd">        auxiliary matrix method. Smaller values correspond to more accurate</span>
-<span class="sd">        integrals.</span>
-<span class="sd">    interaction_zero : float=1e-9</span>
-<span class="sd">        If the eigenvalues of the interaction tensor, estimated using the</span>
-<span class="sd">        1-norm, are smaller than this threshold, the interaction is ignored.</span>
-<span class="sd">    aux_zero : float=1e-18</span>
-<span class="sd">        This threshold is used to estimate the convergence of the Taylor series</span>
-<span class="sd">        when exponentiating the auxiliary matrix, and also to eliminate small</span>
-<span class="sd">        values from the arrays in the matrix exponential squaring step.</span>
-<span class="sd">    relaxation_zero : float=1e-12</span>
-<span class="sd">        Smaller values than this threshold are eliminated from the relaxation</span>
-<span class="sd">        superoperator before returning the array.</span>
-<span class="sd">    parallel_dim : int=1000</span>
-<span class="sd">        If the basis set dimension is larger than this value, the Redfield</span>
-<span class="sd">        integrals are calculated in parallel. Otherwise, the integrals are</span>
-<span class="sd">        calculated in serial.</span>
-<span class="sd">    sparse : bool=True</span>
-<span class="sd">        Specifies whether to calculate the relaxation superoperator as sparse or</span>
-<span class="sd">        dense array.</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        SpinSystem for which the relaxation superoperator is to be calculated.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    sop_R : ndarray or csc_array</span>
+<span class="sd">    R : ndarray or csc_array</span>
 <span class="sd">        Relaxation superoperator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Constructing relaxation superoperator using Redfield theory...&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Obtain the basis set dimension</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="c1"># Initialize a list to hold all SharedMemories</span>
-    <span class="n">shms</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="c1"># Initialize a dictionary for incoherent interactions</span>
-    <span class="n">interactions</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="c1"># Process dipole-dipole couplings</span>
-    <span class="k">if</span> <span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dd_tensors</span> <span class="o">=</span> <span class="n">dd_coupling_tensors</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">gammas</span><span class="p">)</span>
-        <span class="n">dd_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">interactions</span><span class="p">[</span><span class="s1">&#39;DD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dd_tensors</span><span class="p">,</span> <span class="n">dd_ranks</span><span class="p">)</span>
-
-    <span class="c1"># Process nuclear shielding</span>
-    <span class="k">if</span> <span class="n">shielding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">sh_tensors</span> <span class="o">=</span> <span class="n">shielding_intr_tensors</span><span class="p">(</span><span class="n">shielding</span><span class="p">,</span> <span class="n">gammas</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">include_antisymmetric</span><span class="p">:</span>
-            <span class="n">sh_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sh_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">interactions</span><span class="p">[</span><span class="s1">&#39;CSA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sh_tensors</span><span class="p">,</span> <span class="n">sh_ranks</span><span class="p">)</span>
-
-    <span class="c1"># Process quadrupolar coupling</span>
-    <span class="k">if</span> <span class="n">efg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">q_tensors</span> <span class="o">=</span> <span class="n">Q_intr_tensors</span><span class="p">(</span><span class="n">efg</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">quad</span><span class="p">)</span>
-        <span class="n">q_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">interactions</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">q_tensors</span><span class="p">,</span> <span class="n">q_ranks</span><span class="p">)</span>
+    <span class="c1"># Extract information from the spin system</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span>
+    <span class="n">tau_c</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">tau_c</span>
+    <span class="n">relative_error</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">relative_error</span>
 
     <span class="c1"># Process the interactions</span>
-    <span class="n">interactions</span> <span class="o">=</span> <span class="n">process_interactions</span><span class="p">(</span><span class="n">interactions</span><span class="p">,</span> <span class="n">interaction_zero</span><span class="p">)</span>
+    <span class="n">interactions</span> <span class="o">=</span> <span class="n">_process_interactions</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
 
-    <span class="c1"># Initialize the relaxation superoperator</span>
-    <span class="n">sop_R</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="c1"># Build the coherent Hamiltonian superoperator</span>
+    <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">hamiltonian</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
 
     <span class="c1"># Define the integration limit for the auxiliary matrix method</span>
     <span class="n">t_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">relative_error</span><span class="p">)</span> <span class="o">*</span> <span class="n">tau_c</span>
 
-    <span class="c1"># Top left array of auxiliary matrix</span>
-    <span class="n">top_left</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">sop_H</span>
+    <span class="c1"># Initialize a list to hold all SharedMemories (for parallel processing)</span>
+    <span class="n">shms</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Build the top left array of the auxiliary matrix</span>
+    <span class="n">top_left</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">H</span>
     <span class="n">top_left</span><span class="p">,</span> <span class="n">top_left_shm</span> <span class="o">=</span> <span class="n">write_shared_sparse</span><span class="p">(</span><span class="n">top_left</span><span class="p">)</span>
     <span class="n">shms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">top_left_shm</span><span class="p">)</span>
 
@@ -981,11 +924,10 @@ document.write(`
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
 
         <span class="c1"># Diagonal matrix of correlation time</span>
-        <span class="n">tau_c_diagonal_l</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">tau_c_l</span><span class="p">(</span><span class="n">tau_c</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="o">*</span> \
-                            <span class="n">sp</span><span class="o">.</span><span class="n">eye_array</span><span class="p">(</span><span class="n">sop_H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+        <span class="n">tau_c_diagonal_l</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">tau_c_l</span><span class="p">(</span><span class="n">tau_c</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye_array</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
 
         <span class="c1"># Bottom right array of auxiliary matrix</span>
-        <span class="n">bottom_right</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">sop_H</span> <span class="o">-</span> <span class="n">tau_c_diagonal_l</span>
+        <span class="n">bottom_right</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">H</span> <span class="o">-</span> <span class="n">tau_c_diagonal_l</span>
         <span class="n">bottom_right</span><span class="p">,</span> <span class="n">bottom_right_shm</span> <span class="o">=</span> <span class="n">write_shared_sparse</span><span class="p">(</span><span class="n">bottom_right</span><span class="p">)</span>
         <span class="n">shms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">bottom_right_shm</span><span class="p">)</span>
 
@@ -1009,8 +951,7 @@ document.write(`
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;l: </span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2">, q: </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">itype</span><span class="si">}</span><span class="s2"> for spins </span><span class="si">{</span><span class="n">spin1</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">spin2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="c1"># Compute the coupled T superoperator</span>
-                <span class="n">sop_T</span> <span class="o">=</span> \
-                    <span class="n">get_sop_T</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+                <span class="n">sop_T</span> <span class="o">=</span> <span class="n">_get_sop_T</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">)</span>
                 
                 <span class="c1"># Continue only if T is not empty</span>
                 <span class="k">if</span> <span class="n">sop_T</span><span class="o">.</span><span class="n">nnz</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -1022,15 +963,27 @@ document.write(`
 
                     <span class="c1"># Add to the list of tasks</span>
                     <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
-                        <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span>                                   <span class="c1"># Rank and projection</span>
-                        <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span>            <span class="c1"># Right interaction</span>
-                        <span class="n">top_left</span><span class="p">,</span> <span class="n">sop_T_shared</span><span class="p">,</span> <span class="n">bottom_right</span><span class="p">,</span>   <span class="c1"># Aux matrix</span>
-                        <span class="n">t_max</span><span class="p">,</span> <span class="n">aux_zero</span><span class="p">,</span> <span class="n">relaxation_zero</span><span class="p">,</span>       <span class="c1"># Numerics</span>
-                        <span class="n">sop_Ts</span><span class="p">,</span> <span class="n">interactions</span>                    <span class="c1"># Left interaction</span>
+                        <span class="n">l</span><span class="p">,</span>                          <span class="c1"># Interaction rank</span>
+                        <span class="n">q</span><span class="p">,</span>                          <span class="c1"># Interaction projection</span>
+                        <span class="n">itype</span><span class="p">,</span>                      <span class="c1"># Interaction type</span>
+                        <span class="n">spin1</span><span class="p">,</span>                      <span class="c1"># Right interaction spin 1</span>
+                        <span class="n">spin2</span><span class="p">,</span>                      <span class="c1"># Right interaction spin 2</span>
+                        <span class="n">tensor</span><span class="p">,</span>                     <span class="c1"># Right interaction tensor</span>
+                        <span class="n">top_left</span><span class="p">,</span>                   <span class="c1"># Aux matrix top left</span>
+                        <span class="n">sop_T_shared</span><span class="p">,</span>               <span class="c1"># Aux matrix top right</span>
+                        <span class="n">bottom_right</span><span class="p">,</span>               <span class="c1"># Aux matrix bottom right</span>
+                        <span class="n">t_max</span><span class="p">,</span>                      <span class="c1"># Aux matrix integral limit</span>
+                        <span class="n">parameters</span><span class="o">.</span><span class="n">zero_aux</span><span class="p">,</span>        <span class="c1"># Aux matrix expm zero</span>
+                        <span class="n">parameters</span><span class="o">.</span><span class="n">zero_relaxation</span><span class="p">,</span> <span class="c1"># Relaxation zero element</span>
+                        <span class="n">sop_Ts</span><span class="p">,</span>                     <span class="c1"># All coupled T</span>
+                        <span class="n">interactions</span>                <span class="c1"># Left interaction</span>
                     <span class="p">))</span>
 
-    <span class="c1"># SECOND LOOP -- Iterate over the tasks in parallel</span>
-    <span class="k">if</span> <span class="n">dim</span> <span class="o">&gt;</span> <span class="n">parallel_dim</span><span class="p">:</span>
+    <span class="c1"># Initialize the relaxation superoperator</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># SECOND LOOP -- Iterate over the tasks in parallel and build the R</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">&gt;</span> <span class="n">parameters</span><span class="o">.</span><span class="n">parallel_dim</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Performing the Redfield integrals in parallel...&quot;</span><span class="p">)</span>
 
         <span class="c1"># Create the parallel tasks</span>
@@ -1043,8 +996,8 @@ document.write(`
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">output_generator</span><span class="p">:</span>
 
             <span class="c1"># Parse the result and add term to total relaxation superoperator</span>
-            <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">sop_R_term</span> <span class="o">=</span> <span class="n">result</span>
-            <span class="n">sop_R</span> <span class="o">+=</span> <span class="n">sop_R_term</span>
+            <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">R_term</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="n">R</span> <span class="o">+=</span> <span class="n">R_term</span>
 
             <span class="c1"># Show current status</span>
             <span class="k">if</span> <span class="n">spin2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1060,8 +1013,8 @@ document.write(`
         <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
 
             <span class="c1"># Parse the result and add term to total relaxation superoperator</span>
-            <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">sop_R_term</span> <span class="o">=</span> <span class="n">sop_R_redfield_term</span><span class="p">(</span><span class="o">*</span><span class="n">task</span><span class="p">)</span>
-            <span class="n">sop_R</span> <span class="o">+=</span> <span class="n">sop_R_term</span>
+            <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">R_term</span> <span class="o">=</span> <span class="n">sop_R_redfield_term</span><span class="p">(</span><span class="o">*</span><span class="n">task</span><span class="p">)</span>
+            <span class="n">R</span> <span class="o">+=</span> <span class="n">R_term</span>
 
             <span class="c1"># Show current status</span>
             <span class="k">if</span> <span class="n">spin2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1077,21 +1030,21 @@ document.write(`
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Redfield integrals completed.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Return only real values unless dynamic frequency shifts are requested</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">include_dynamic_frequency_shift</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">dynamic_frequency_shift</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Removing the dynamic frequency shifts...&quot;</span><span class="p">)</span>
-        <span class="n">sop_R</span> <span class="o">=</span> <span class="n">sop_R</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">real</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dynamic frequency shifts removed.&quot;</span><span class="p">)</span>
     
     <span class="c1"># Eliminate small values</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Eliminating small values from the relaxation superoperator...&quot;</span><span class="p">)</span>
-    <span class="n">eliminate_small</span><span class="p">(</span><span class="n">sop_R</span><span class="p">,</span> <span class="n">relaxation_zero</span><span class="p">)</span>
+    <span class="n">eliminate_small</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_relaxation</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Small values eliminated.&quot;</span><span class="p">)</span>
     
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Redfield relaxation superoperator constructed in &quot;</span>
           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">sop_R</span>
+    <span class="k">return</span> <span class="n">R</span>
 
 <span class="k">def</span> <span class="nf">sop_R_random_field</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1101,8 +1054,7 @@ document.write(`
 <span class="k">def</span> <span class="nf">_sop_R_phenomenological</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">R1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">R2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">R2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs the relaxation superoperator from given `R1` and `R2` values</span>
@@ -1120,9 +1072,6 @@ document.write(`
 <span class="sd">    R2 : ndarray</span>
 <span class="sd">        A one dimensional array containing the transverse relaxation rates</span>
 <span class="sd">        in 1/s for each spin. For example: `np.array([2.0, 4.0, 5.0])`</span>
-<span class="sd">    sparse : bool, default=True</span>
-<span class="sd">        Specifies whether to construct the relaxation superoperator as sparse or</span>
-<span class="sd">        dense array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1137,7 +1086,7 @@ document.write(`
     <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Create an empty array for the relaxation superoperator</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
         <span class="n">sop_R</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sop_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
@@ -1173,7 +1122,7 @@ document.write(`
         <span class="n">sop_R</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">R_state</span>
 
     <span class="c1"># Convert to CSC array if using sparse</span>
-    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
         <span class="n">sop_R</span> <span class="o">=</span> <span class="n">sop_R</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Phenomenological relaxation superoperator constructed in &quot;</span>
@@ -1183,14 +1132,8 @@ document.write(`
     <span class="k">return</span> <span class="n">sop_R</span>
 
 <span class="k">def</span> <span class="nf">_sop_R_sr2k</span><span class="p">(</span>
-    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">chemical_shifts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">sop_R</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">R</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the scalar relaxation of the second kind (SR2K) based on </span>
@@ -1198,54 +1141,34 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    basis : ndarray</span>
-<span class="sd">        A 2-dimensional array containing the basis set that contains sequences</span>
-<span class="sd">        of integers describing the Kronecker products of irreducible spherical</span>
-<span class="sd">        tensors.</span>
-<span class="sd">    spins : ndarray</span>
-<span class="sd">        A 1-dimensional array specifying the spin quantum numbers for each spin</span>
-<span class="sd">        in the system.</span>
-<span class="sd">    gammas : ndarray</span>
-<span class="sd">        A 1-dimensional array specifying the gyromagnetic ratios for</span>
-<span class="sd">        each nucleus in the spin system. Must be given in the units</span>
-<span class="sd">        of rad/s/T.</span>
-<span class="sd">    chemical_shifts : ndarray</span>
-<span class="sd">        A 1-dimensional array containing the chemical shifts of each spin in the</span>
-<span class="sd">        units of ppm.</span>
-<span class="sd">    J_couplings : ndarray</span>
-<span class="sd">        A 2-dimensional array containing the scalar J-couplings between each</span>
-<span class="sd">        spin in the units of Hz. Only the bottom triangle is considered.</span>
-<span class="sd">    sop_R : ndarray or csc_array</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        SpinSystem for which the SR2K contribution is to be calculated.</span>
+<span class="sd">    R : ndarray or csc_array</span>
 <span class="sd">        Relaxation superoperator without scalar relaxation of the second kind.</span>
-<span class="sd">    B : float</span>
-<span class="sd">        Magnetic field in units of T.</span>
-<span class="sd">    sparse: bool, default=True</span>
-<span class="sd">        Specifies whether to return the relaxation superoperator as dense or</span>
-<span class="sd">        sparse array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    sop_R : ndarray or csc_array</span>
-<span class="sd">        Relaxation superoperator containing the contribution from scalar</span>
+<span class="sd">    R : ndarray or csc_array</span>
+<span class="sd">        Relaxation superoperator containing only the contribution from scalar</span>
 <span class="sd">        relaxation of the second kind.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing scalar relaxation of the second kind...&quot;</span><span class="p">)</span>
     <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="c1"># Obtain the number of spins</span>
-    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
     <span class="c1"># Make a dictionary of the basis for fast lookup</span>
-    <span class="n">basis_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis</span><span class="p">)}</span>
+    <span class="n">basis_lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">)</span>
+    <span class="p">}</span>
 
     <span class="c1"># Initialize arrays for the relaxation rates</span>
-    <span class="n">R1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins</span><span class="p">)</span>
-    <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins</span><span class="p">)</span>
+    <span class="n">R1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+    <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
 
     <span class="c1"># Obtain indices of quadrupolar nuclei in the system</span>
     <span class="n">quadrupolar</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spins</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">spin</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
             <span class="n">quadrupolar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
     
@@ -1254,8 +1177,8 @@ document.write(`
 
         <span class="c1"># Find the operator definitions of the longitudinal and transverse</span>
         <span class="c1"># states</span>
-        <span class="n">op_def_z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">quad</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
-        <span class="n">op_def_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(+, </span><span class="si">{</span><span class="n">quad</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+        <span class="n">op_def_z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">quad</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+        <span class="n">op_def_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(+, </span><span class="si">{</span><span class="n">quad</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
 
         <span class="c1"># Convert operator definitions to tuple for searching the basis</span>
         <span class="n">op_def_z</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">op_def_z</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1266,31 +1189,34 @@ document.write(`
         <span class="n">idx_trans</span> <span class="o">=</span> <span class="n">basis_lookup</span><span class="p">[</span><span class="n">op_def_p</span><span class="p">]</span>
 
         <span class="c1"># Find the relaxation times of the quadrupolar nucleus</span>
-        <span class="n">T1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sop_R</span><span class="p">[</span><span class="n">idx_long</span><span class="p">,</span> <span class="n">idx_long</span><span class="p">]</span>
-        <span class="n">T2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sop_R</span><span class="p">[</span><span class="n">idx_trans</span><span class="p">,</span> <span class="n">idx_trans</span><span class="p">]</span>
+        <span class="n">T1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">R</span><span class="p">[</span><span class="n">idx_long</span><span class="p">,</span> <span class="n">idx_long</span><span class="p">]</span>
+        <span class="n">T2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">R</span><span class="p">[</span><span class="n">idx_trans</span><span class="p">,</span> <span class="n">idx_trans</span><span class="p">]</span>
 
         <span class="c1"># Convert to real values</span>
         <span class="n">T1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">T1</span><span class="p">)</span>
         <span class="n">T2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">T2</span><span class="p">)</span>
 
         <span class="c1"># Find the Larmor frequency of the quadrupolar nucleus</span>
-        <span class="n">omega_quad</span> <span class="o">=</span> <span class="n">gammas</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">chemical_shifts</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">)</span>
+        <span class="n">omega_quad</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span> \
+                   <span class="o">*</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span> \
+                   <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">)</span>
 
         <span class="c1"># Find the spin quantum number of the quadrupolar nucleus</span>
-        <span class="n">S</span> <span class="o">=</span> <span class="n">spins</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span>
 
         <span class="c1"># Loop over all spins</span>
-        <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">gamma</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gammas</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">gamma</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">):</span>
 
             <span class="c1"># Proceed only if the gyromagnetic ratios are different</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">gammas</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span> <span class="o">==</span> <span class="n">gamma</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">[</span><span class="n">quad</span><span class="p">]</span> <span class="o">==</span> <span class="n">gamma</span><span class="p">:</span>
 
                 <span class="c1"># Find the Larmor frequency of the target spin</span>
-                <span class="n">omega_target</span> <span class="o">=</span> <span class="n">gammas</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> \
-                               <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">chemical_shifts</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">)</span>
+                <span class="n">omega_target</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> \
+                             <span class="o">*</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span> \
+                             <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">)</span>
 
                 <span class="c1"># Find the scalar coupling between spins in rad/s</span>
-                <span class="n">J</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">J_couplings</span><span class="p">[</span><span class="n">quad</span><span class="p">][</span><span class="n">target</span><span class="p">]</span>
+                <span class="n">J</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">[</span><span class="n">quad</span><span class="p">][</span><span class="n">target</span><span class="p">]</span>
 
                 <span class="c1"># Calculate the relaxation rates</span>
                 <span class="n">R1</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">+=</span> <span class="p">((</span><span class="n">J</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">S</span> <span class="o">*</span> <span class="p">(</span><span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> \
@@ -1300,7 +1226,7 @@ document.write(`
 
     <span class="c1"># Get relaxation superoperator corresponding to SR2K</span>
     <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
-        <span class="n">sop_R</span> <span class="o">=</span> <span class="n">_sop_R_phenomenological</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">R1</span><span class="p">,</span> <span class="n">R2</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+        <span class="n">sop_R</span> <span class="o">=</span> <span class="n">_sop_R_phenomenological</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span> <span class="n">R1</span><span class="p">,</span> <span class="n">R2</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SR2K superoperator constructed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> &quot;</span>
           <span class="s2">&quot;seconds.&quot;</span><span class="p">)</span>
@@ -1311,8 +1237,7 @@ document.write(`
 <span class="k">def</span> <span class="nf">_ldb_thermalization</span><span class="p">(</span>
     <span class="n">R</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">H_left</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span><span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">T</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">zero_value</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">1e-18</span>
+    <span class="n">T</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Applies the Levitt-Di Bari thermalization to the relaxation superoperator.</span>
@@ -1325,9 +1250,6 @@ document.write(`
 <span class="sd">        Left-side coherent Hamiltonian superoperator.</span>
 <span class="sd">    T : float</span>
 <span class="sd">        Temperature of the spin bath in Kelvin.</span>
-<span class="sd">    zero_value : float, default=1e-18</span>
-<span class="sd">        This threshold is used to estimate the convergence in the matrix</span>
-<span class="sd">        exponential and to eliminate small values from the array.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1339,7 +1261,7 @@ document.write(`
 
     <span class="c1"># Get the matrix exponential corresponding to the Boltzmann distribution</span>
     <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">H_left</span><span class="p">,</span> <span class="n">zero_value</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">hbar</span><span class="o">/</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">k</span><span class="o">*</span><span class="n">T</span><span class="p">)</span><span class="o">*</span><span class="n">H_left</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_thermalization</span><span class="p">)</span>
 
     <span class="c1"># Calculate the thermalized relaxation superoperator</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">R</span> <span class="o">@</span> <span class="n">P</span>
@@ -1432,84 +1354,29 @@ document.write(`
             <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
             <span class="n">R1</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">R1</span><span class="p">,</span>
             <span class="n">R2</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">R2</span><span class="p">,</span>
-            <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_relaxation</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="c1"># Make relaxation superoperator using Redfield theory</span>
     <span class="k">elif</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">theory</span> <span class="o">==</span> <span class="s2">&quot;redfield&quot;</span><span class="p">:</span>
-        
-        <span class="c1"># Build the coherent hamiltonian</span>
-        <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
-            <span class="n">H</span> <span class="o">=</span> <span class="n">sop_H</span><span class="p">(</span>
-                <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
-                <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-                <span class="n">gammas</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">,</span>
-                <span class="n">B</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">,</span>
-                <span class="n">chemical_shifts</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">,</span>
-                <span class="n">J_couplings</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">,</span>
-                <span class="n">side</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
-                <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_hamiltonian</span><span class="p">,</span>
-                <span class="n">zero_value</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_hamiltonian</span>
-            <span class="p">)</span>
-
-        <span class="c1"># Build the Redfield relaxation superoperator</span>
-        <span class="n">R</span> <span class="o">=</span> <span class="n">_sop_R_redfield</span><span class="p">(</span>
-            <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
-            <span class="n">sop_H</span> <span class="o">=</span> <span class="n">H</span><span class="p">,</span>
-            <span class="n">tau_c</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">tau_c</span><span class="p">,</span>
-            <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-            <span class="n">B</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">,</span>
-            <span class="n">gammas</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">,</span>
-            <span class="n">quad</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">quad</span><span class="p">,</span>
-            <span class="n">xyz</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span>
-            <span class="n">shielding</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">shielding</span><span class="p">,</span>
-            <span class="n">efg</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">efg</span><span class="p">,</span>
-            <span class="n">include_antisymmetric</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">antisymmetric</span><span class="p">,</span>
-            <span class="n">include_dynamic_frequency_shift</span> <span class="o">=</span> \
-                <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">dynamic_frequency_shift</span><span class="p">,</span>
-            <span class="n">relative_error</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">relative_error</span><span class="p">,</span>
-            <span class="n">interaction_zero</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_interaction</span><span class="p">,</span>
-            <span class="n">aux_zero</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_aux</span><span class="p">,</span>
-            <span class="n">relaxation_zero</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_relaxation</span><span class="p">,</span>
-            <span class="n">parallel_dim</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">parallel_dim</span><span class="p">,</span>
-            <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_relaxation</span>
-        <span class="p">)</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">_sop_R_redfield</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
     
     <span class="c1"># Apply scalar relaxation of the second kind if requested</span>
     <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">sr2k</span><span class="p">:</span>
-        <span class="n">R</span> <span class="o">+=</span> <span class="n">_sop_R_sr2k</span><span class="p">(</span>
-            <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
-            <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-            <span class="n">gammas</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">,</span>
-            <span class="n">chemical_shifts</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">,</span>
-            <span class="n">J_couplings</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">,</span>
-            <span class="n">sop_R</span> <span class="o">=</span> <span class="n">R</span><span class="p">,</span>
-            <span class="n">B</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">,</span>
-            <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_relaxation</span>
-        <span class="p">)</span>
+        <span class="n">R</span> <span class="o">+=</span> <span class="n">_sop_R_sr2k</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
         
     <span class="c1"># Apply thermalization if requested</span>
     <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">thermalization</span><span class="p">:</span>
         
         <span class="c1"># Build the left Hamiltonian superopertor</span>
         <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
-            <span class="n">H_left</span> <span class="o">=</span> <span class="n">sop_H</span><span class="p">(</span>
-                <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
-                <span class="n">spins</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
-                <span class="n">gammas</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">gammas</span><span class="p">,</span>
-                <span class="n">B</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">,</span>
-                <span class="n">chemical_shifts</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">,</span>
-                <span class="n">J_couplings</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">,</span>
-                <span class="n">side</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-                <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_hamiltonian</span><span class="p">,</span>
-                <span class="n">zero_value</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_hamiltonian</span>
-            <span class="p">)</span>
+            <span class="n">H_left</span> <span class="o">=</span> <span class="n">hamiltonian</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
             
         <span class="c1"># Perform the thermalization</span>
         <span class="n">R</span> <span class="o">=</span> <span class="n">_ldb_thermalization</span><span class="p">(</span>
             <span class="n">R</span> <span class="o">=</span> <span class="n">R</span><span class="p">,</span>
             <span class="n">H_left</span> <span class="o">=</span> <span class="n">H_left</span><span class="p">,</span>
-            <span class="n">T</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
-            <span class="n">zero_value</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_thermalization</span><span class="p">)</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">R</span></div>
 

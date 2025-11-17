@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_chem';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -311,15 +311,16 @@ document.write(`
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">arraylike_to_array</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_dissociate_index_map</span><span class="p">(</span><span class="n">basis_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                          <span class="n">basis_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                          <span class="n">basis_C_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                          <span class="n">spin_map_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                          <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
-                          <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                                     <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_dissociate_index_map</span><span class="p">(</span>
+    <span class="n">basis_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">basis_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">basis_C_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spin_map_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     
     <span class="c1"># Convert bytes back to arrays</span>
     <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_A_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
@@ -390,13 +391,13 @@ document.write(`
 
     <span class="k">return</span> <span class="n">index_map_A</span><span class="p">,</span> <span class="n">index_map_CA</span><span class="p">,</span> <span class="n">index_map_B</span><span class="p">,</span> <span class="n">index_map_CB</span>
 
-<span class="k">def</span> <span class="nf">dissociate_index_map</span><span class="p">(</span><span class="n">basis_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                         <span class="n">basis_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                         <span class="n">basis_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                         <span class="n">spin_map_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                         <span class="n">spin_map_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-                         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                                    <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">dissociate_index_map</span><span class="p">(</span>
+    <span class="n">basis_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">basis_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">basis_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates arrays that map the state indices from the basis set C to basis</span>
 <span class="sd">    sets A and B. This function is used in `dissociate()`.</span>
@@ -471,6 +472,7 @@ document.write(`
     <span class="n">rho_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dissociates the density vector of composite system C into density vectors of</span>
@@ -508,6 +510,8 @@ document.write(`
 <span class="sd">        Indices of spin system A within spin system C.</span>
 <span class="sd">    spin_map_B : list or tuple or ndarray</span>
 <span class="sd">        Indices of spin system B within spin system C.</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        Decides whether to return dense or sparse arrays.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -528,9 +532,6 @@ document.write(`
     <span class="c1"># Get spin multiplicities for normalization</span>
     <span class="n">mults_A</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins_A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">mults_B</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins_B</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
-    <span class="c1"># Find out whether to use sparses</span>
-    <span class="n">sparse</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho_C</span><span class="p">)</span>
 
     <span class="c1"># Get index mappings</span>
     <span class="n">idx_A</span><span class="p">,</span> <span class="n">idx_CA</span><span class="p">,</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">idx_CB</span> <span class="o">=</span> \
@@ -560,15 +561,15 @@ document.write(`
     <span class="k">return</span> <span class="n">rho_A</span><span class="p">,</span> <span class="n">rho_B</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_associate_index_map</span><span class="p">(</span><span class="n">basis_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                         <span class="n">basis_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                         <span class="n">basis_C_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                         <span class="n">spin_map_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                         <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
-                         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                                    <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">_associate_index_map</span><span class="p">(</span>
+    <span class="n">basis_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">basis_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">basis_C_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spin_map_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     
-     <span class="c1"># Convert bytes back to arrays</span>
+    <span class="c1"># Convert bytes back to arrays</span>
     <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_A_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_B_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">nspins_A</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -607,12 +608,13 @@ document.write(`
 
     <span class="k">return</span> <span class="n">index_map_A</span><span class="p">,</span> <span class="n">index_map_B</span><span class="p">,</span> <span class="n">index_map_C</span>
 
-<span class="k">def</span> <span class="nf">associate_index_map</span><span class="p">(</span><span class="n">basis_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                        <span class="n">basis_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                        <span class="n">basis_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                        <span class="n">spin_map_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                        <span class="n">spin_map_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">associate_index_map</span><span class="p">(</span>
+    <span class="n">basis_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">basis_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">basis_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates arrays that map the state indices from spin systems A and B to the</span>
 <span class="sd">    composite spin system C. This function is used in `associate()`.</span>
@@ -682,7 +684,8 @@ document.write(`
     <span class="n">rho_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">rho_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Combines two state vectors when spin systems associate in a chemical</span>
@@ -720,6 +723,8 @@ document.write(`
 <span class="sd">        Indices of spin system A within spin system C.</span>
 <span class="sd">    spin_map_B : list or tuple or ndarray</span>
 <span class="sd">        Indices of spin system B within spin system C.</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        Decides whether to return a dense or a sparse array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -738,9 +743,6 @@ document.write(`
     <span class="n">idx_A</span><span class="p">,</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">idx_C</span> <span class="o">=</span> \
         <span class="n">associate_index_map</span><span class="p">(</span><span class="n">basis_A</span><span class="p">,</span> <span class="n">basis_B</span><span class="p">,</span> <span class="n">basis_C</span><span class="p">,</span> <span class="n">spin_map_A</span><span class="p">,</span> <span class="n">spin_map_B</span><span class="p">)</span>
 
-    <span class="c1"># Check whether to use sparse arrays</span>
-    <span class="n">sparse</span> <span class="o">=</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho_A</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho_B</span><span class="p">))</span>
-
     <span class="c1"># Initialize an empty state vector for the composite system</span>
     <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
         <span class="n">rho_C</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim_C</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -757,8 +759,10 @@ document.write(`
     <span class="k">return</span> <span class="n">rho_C</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_permutation_matrix</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-                        <span class="n">spin_map_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_permutation_matrix</span><span class="p">(</span>
+    <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spin_map_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
     
     <span class="c1"># Convert bytes back to arrays</span>
     <span class="n">spin_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
@@ -797,8 +801,9 @@ document.write(`
 
     <span class="k">return</span> <span class="n">perm</span>
 
-<span class="k">def</span> <span class="nf">permutation_matrix</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                       <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="k">def</span> <span class="nf">permutation_matrix</span><span class="p">(</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a permutation matrix to reorder the spins in the system.</span>
@@ -847,7 +852,8 @@ document.write(`
 <span class="k">def</span> <span class="nf">_permute_spins</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Permutes the state vector of a spin system to correspond to a reordering</span>
@@ -874,6 +880,8 @@ document.write(`
 <span class="sd">        State vector of the spin system.</span>
 <span class="sd">    spin_map : list or tuple or ndarray</span>
 <span class="sd">        Indices of the spins in the spin system after permutation.</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        Specifies whether to return a dense or sparse array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -889,17 +897,24 @@ document.write(`
     <span class="c1"># Apply the permutation to the density vector</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="n">perm</span> <span class="o">@</span> <span class="n">rho</span>
 
+    <span class="c1"># Ensure the correct return type</span>
+    <span class="k">if</span> <span class="n">sparse</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">):</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sparse</span> <span class="ow">and</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">):</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
     <span class="k">return</span> <span class="n">rho</span>
 
 <div class="viewcode-block" id="dissociate">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.dissociate">[docs]</a>
-<span class="k">def</span> <span class="nf">dissociate</span><span class="p">(</span><span class="n">spin_system_A</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-               <span class="n">spin_system_B</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-               <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-               <span class="n">rho_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-               <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-               <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-               <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">dissociate</span><span class="p">(</span>
+    <span class="n">spin_system_A</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_system_B</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">rho_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dissociates the density vector of composite system C into density vectors of</span>
 <span class="sd">    two subsystems A and B in a chemical reaction C -&gt; A + B.</span>
@@ -943,7 +958,8 @@ document.write(`
         <span class="n">spins_B</span> <span class="o">=</span> <span class="n">spin_system_B</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
         <span class="n">rho_C</span> <span class="o">=</span> <span class="n">rho_C</span><span class="p">,</span>
         <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="p">,</span>
-        <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">spin_map_B</span>
+        <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">spin_map_B</span><span class="p">,</span>
+        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho_A</span><span class="p">,</span> <span class="n">rho_B</span></div>
@@ -951,13 +967,14 @@ document.write(`
 
 <div class="viewcode-block" id="associate">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.associate">[docs]</a>
-<span class="k">def</span> <span class="nf">associate</span><span class="p">(</span><span class="n">spin_system_A</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-              <span class="n">spin_system_B</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-              <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-              <span class="n">rho_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-              <span class="n">rho_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-              <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-              <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="k">def</span> <span class="nf">associate</span><span class="p">(</span>
+    <span class="n">spin_system_A</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_system_B</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">rho_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="n">rho_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Combines two state vectors when spin systems associate in a chemical</span>
@@ -1003,7 +1020,8 @@ document.write(`
         <span class="n">rho_A</span> <span class="o">=</span> <span class="n">rho_A</span><span class="p">,</span>
         <span class="n">rho_B</span> <span class="o">=</span> <span class="n">rho_B</span><span class="p">,</span>
         <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="p">,</span>
-        <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">spin_map_B</span>
+        <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">spin_map_B</span><span class="p">,</span>
+        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho_C</span></div>
@@ -1011,9 +1029,10 @@ document.write(`
 
 <div class="viewcode-block" id="permute_spins">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.permute_spins">[docs]</a>
-<span class="k">def</span> <span class="nf">permute_spins</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-                  <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-                  <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="k">def</span> <span class="nf">permute_spins</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Permutes the state vector of a spin system to correspond to a reordering</span>
@@ -1048,11 +1067,33 @@ document.write(`
     <span class="n">rho</span> <span class="o">=</span> <span class="n">_permute_spins</span><span class="p">(</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="p">,</span>
-        <span class="n">spin_map</span> <span class="o">=</span> <span class="n">spin_map</span>
+        <span class="n">spin_map</span> <span class="o">=</span> <span class="n">spin_map</span><span class="p">,</span>
+        <span class="n">sparse</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
 
+
+<span class="k">def</span> <span class="nf">clear_cache_associate_index_map</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function clears the cache from the `_associate_index_map()` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Clear the cache</span>
+    <span class="n">_associate_index_map</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">clear_cache_dissociate_index_map</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function clears the cache from the `_dissociate_index_map()` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Clear the cache</span>
+    <span class="n">_dissociate_index_map</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">clear_cache_permutation_matrix</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function clears the cache from the `_permutation_matrix()` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Clear the cache</span>
+    <span class="n">_permutation_matrix</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 </pre></div>
 
                 </article>

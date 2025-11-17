@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_basis';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -298,7 +298,15 @@ document.write(`
                   
   <h1>Source code for spinguin._core._basis</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides functionality for constructing a basis set.</span>
+<span class="sd">This module provides the Basis class which is assigned as a part of `SpinSystem`</span>
+<span class="sd">object upon its instantiation. It provides functionality for constructing and</span>
+<span class="sd">truncating the basis set. The basis set functionality is designed to be accessed</span>
+<span class="sd">through the `SpinSystem` object. Example::</span>
+
+<span class="sd">    import spinguin as sg                   # Import the package</span>
+<span class="sd">    spin_system = sg.SpinSystem([&quot;1H&quot;])     # Create an example spin system</span>
+<span class="sd">    spin_system.basis.max_spin_order = 1    # Set the maximum spin order</span>
+<span class="sd">    spin_system.basis.build()               # Build the basis set</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Referencing SpinSystem class</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -311,29 +319,13 @@ document.write(`
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span><span class="p">,</span> <span class="n">minimum_spanning_tree</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">eliminate_small</span><span class="p">,</span> <span class="n">expm_vec</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._hide_prints</span> <span class="kn">import</span> <span class="n">HidePrints</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">coherence_order</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span><span class="p">,</span> <span class="n">minimum_spanning_tree</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides the Basis class which is assigned as a part of `SpinSystem`</span>
-<span class="sd">object upon its instantiation. Here is an example of accessing the most</span>
-<span class="sd">important functionality of the class::</span>
-
-<span class="sd">    import spinguin as sg                   # Import the package</span>
-<span class="sd">    spin_system = sg.SpinSystem([&quot;1H&quot;])     # Create an example spin system</span>
-<span class="sd">    spin_system.basis.max_spin_order = 1    # Set the maximum spin order</span>
-<span class="sd">    spin_system.basis.build()               # Build the basis set</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">coherence_order</span><span class="p">,</span> <span class="n">state_idx</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._states</span> <span class="kn">import</span> <span class="n">state_to_truncated_basis</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._superoperators</span> <span class="kn">import</span> <span class="n">sop_to_truncated_basis</span>
 <span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">isvector</span>
@@ -346,6 +338,14 @@ document.write(`
 <span class="sd">    Basis class manages the basis set of a spin system. Most importantly, the</span>
 <span class="sd">    basis set contains the information on the truncation of the basis set and is</span>
 <span class="sd">    responsible for building and making changes to the basis set.</span>
+
+<span class="sd">    The `Basis` instance is designed to be created and accessed through the</span>
+<span class="sd">    `SpinSystem` object. For example::</span>
+
+<span class="sd">        import spinguin as sg                   # Import the package</span>
+<span class="sd">        spin_system = sg.SpinSystem([&quot;1H&quot;])     # Create an example spin system</span>
+<span class="sd">        spin_system.basis.max_spin_order = 1    # Set the maximum spin order</span>
+<span class="sd">        spin_system.basis.build()               # Build the basis set</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Basis set properties</span>
@@ -368,7 +368,7 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies the maximum number of a active spins that are included in the</span>
+<span class="sd">        Specifies the maximum number of active spins that are included in the</span>
 <span class="sd">        product operators that constitute the basis set. Must be at least 1 and</span>
 <span class="sd">        not larger than the number of spins in the system.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -419,6 +419,40 @@ document.write(`
         <span class="c1"># Build the basis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span> <span class="o">=</span> <span class="n">make_basis</span><span class="p">(</span><span class="n">spins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
                                  <span class="n">max_spin_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_spin_order</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Basis.indexof">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.indexof">[docs]</a>
+    <span class="k">def</span> <span class="nf">indexof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the index of the basis state defined by `op_def`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        op_def : ndarray or list or tuple</span>
+<span class="sd">            A one-dimensional array, list or tuple that defines a basis state</span>
+<span class="sd">            using the integer indexing scheme. The indices are given by</span>
+<span class="sd">            `N = l^2 + l - q`, where `l` is the operator rank and `q` is the</span>
+<span class="sd">            projection. For example::</span>
+
+<span class="sd">                op_def = [0, 2, 0]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            Index of the state in the basis set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Raise a warning if basis has not been built</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Basis must be built before obtaining indices.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Convert the input as array if not already</span>
+        <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span>
+
+        <span class="c1"># Obtain the index</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">state_idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span> <span class="n">op_def</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">idx</span></div>
 
         
 <div class="viewcode-block" id="Basis.truncate_by_coherence">

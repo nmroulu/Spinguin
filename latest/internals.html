@@ -43,7 +43,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'internals';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -346,6 +346,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.basis"><code class="docutils literal notranslate"><span class="pre">Basis.basis</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.build"><code class="docutils literal notranslate"><span class="pre">Basis.build()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.dim"><code class="docutils literal notranslate"><span class="pre">Basis.dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.indexof"><code class="docutils literal notranslate"><span class="pre">Basis.indexof()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.max_spin_order"><code class="docutils literal notranslate"><span class="pre">Basis.max_spin_order</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.truncate_by_coherence"><code class="docutils literal notranslate"><span class="pre">Basis.truncate_by_coherence()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.truncate_by_coupling"><code class="docutils literal notranslate"><span class="pre">Basis.truncate_by_coupling()</span></code></a></li>
@@ -358,10 +359,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.magnetic_field"><code class="docutils literal notranslate"><span class="pre">Parameters.magnetic_field</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.parallel_dim"><code class="docutils literal notranslate"><span class="pre">Parameters.parallel_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.propagator_density"><code class="docutils literal notranslate"><span class="pre">Parameters.propagator_density</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_hamiltonian"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_hamiltonian</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_operator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_operator</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_pulse"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_pulse</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_relaxation"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_relaxation</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_state"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_superoperator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_superoperator</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.temperature"><code class="docutils literal notranslate"><span class="pre">Parameters.temperature</span></code></a></li>
@@ -415,6 +413,14 @@ interface.</p>
 <dd><p>Basis class manages the basis set of a spin system. Most importantly, the
 basis set contains the information on the truncation of the basis set and is
 responsible for building and making changes to the basis set.</p>
+<p>The <cite>Basis</cite> instance is designed to be created and accessed through the
+<cite>SpinSystem</cite> object. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">spinguin</span> <span class="k">as</span> <span class="nn">sg</span>                   <span class="c1"># Import the package</span>
+<span class="n">spin_system</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">SpinSystem</span><span class="p">([</span><span class="s2">&quot;1H&quot;</span><span class="p">])</span>     <span class="c1"># Create an example spin system</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">max_spin_order</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c1"># Set the maximum spin order</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>               <span class="c1"># Build the basis set</span>
+</pre></div>
+</div>
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.basis">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin._core._basis.Basis.basis" title="Link to this definition">#</a></dt>
@@ -445,10 +451,34 @@ set equal to the number of spins in the system (may be very slow)!</p>
 <dd><p>Dimension of the basis set.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="spinguin._core._basis.Basis.indexof">
+<span class="sig-name descname"><span class="pre">indexof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.indexof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.indexof" title="Link to this definition">#</a></dt>
+<dd><p>Finds the index of the basis state defined by <cite>op_def</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>op_def</strong> (<em>ndarray</em><em> or </em><em>list</em><em> or </em><em>tuple</em>) – <p>A one-dimensional array, list or tuple that defines a basis state
+using the integer indexing scheme. The indices are given by
+<cite>N = l^2 + l - q</cite>, where <cite>l</cite> is the operator rank and <cite>q</cite> is the
+projection. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">op_def</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>idx</strong> – Index of the state in the basis set.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.max_spin_order">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_spin_order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#spinguin._core._basis.Basis.max_spin_order" title="Link to this definition">#</a></dt>
-<dd><p>Specifies the maximum number of a active spins that are included in the
+<dd><p>Specifies the maximum number of active spins that are included in the
 product operators that constitute the basis set. Must be at least 1 and
 not larger than the number of spins in the system.</p>
 </dd></dl>
@@ -594,30 +624,10 @@ dense array is returned. Otherwise, sparse array is returned.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_hamiltonian">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_hamiltonian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_hamiltonian" title="Link to this definition">#</a></dt>
-<dd><p>Specifies whether to return the Hamiltonian as sparse or dense array.</p>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_operator">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_operator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_operator" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to return the Hilbert-space operators as sparse or
 dense arrays.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_pulse">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_pulse</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_pulse" title="Link to this definition">#</a></dt>
-<dd><p>Specifies whether to return pulse superoperators as sparse or dense
-arrays.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_relaxation">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_relaxation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_relaxation" title="Link to this definition">#</a></dt>
-<dd><p>Specifies whether to return the relaxation superoperator as sparse or
-dense array.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -866,6 +876,7 @@ relaxation superoperator.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.basis"><code class="docutils literal notranslate"><span class="pre">Basis.basis</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.build"><code class="docutils literal notranslate"><span class="pre">Basis.build()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.dim"><code class="docutils literal notranslate"><span class="pre">Basis.dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.indexof"><code class="docutils literal notranslate"><span class="pre">Basis.indexof()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.max_spin_order"><code class="docutils literal notranslate"><span class="pre">Basis.max_spin_order</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.truncate_by_coherence"><code class="docutils literal notranslate"><span class="pre">Basis.truncate_by_coherence()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.truncate_by_coupling"><code class="docutils literal notranslate"><span class="pre">Basis.truncate_by_coupling()</span></code></a></li>
@@ -878,10 +889,7 @@ relaxation superoperator.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.magnetic_field"><code class="docutils literal notranslate"><span class="pre">Parameters.magnetic_field</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.parallel_dim"><code class="docutils literal notranslate"><span class="pre">Parameters.parallel_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.propagator_density"><code class="docutils literal notranslate"><span class="pre">Parameters.propagator_density</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_hamiltonian"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_hamiltonian</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_operator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_operator</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_pulse"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_pulse</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_relaxation"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_relaxation</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_state"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_superoperator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_superoperator</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.temperature"><code class="docutils literal notranslate"><span class="pre">Parameters.temperature</span></code></a></li>
