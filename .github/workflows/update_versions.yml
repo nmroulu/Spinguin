@@ -1,0 +1,58 @@
+name: update versions
+
+# Run this workflow after the generation of documents completes successfully
+on:
+  workflow_run:
+    workflows: ["documentation"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  build-json:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Generate version_switcher.json
+      - id: build_json
+        run: |
+          mkdir -p json_deploy_dir
+
+          BASE_URL="https://nmroulu.github.io/Spinguin"
+          
+          FOLDERS=$(find . -mindepth 1 -maxdepth 1 -type d \
+            -not -name ".git" -not -name "json_deploy_dir" \
+            | sed 's|^\./||' | sort -rV)
+          
+          JSON_PATH="json_deploy_dir/version_switcher.json"
+          
+          echo '[' > $JSON_PATH
+
+          FIRST=true
+          for FOLDER in $FOLDERS; do
+            if [ "$FIRST" = "false" ]; then
+              echo ',' >> $JSON_PATH;
+            fi
+            echo "  {\
+              \"version\": \"$FOLDER\", \
+              \"url\": \"$BASE_URL/$FOLDER\" \
+            }" >> $JSON_PATH
+            FIRST=false
+          done
+
+          echo ']' >> $JSON_PATH
+          
+          echo "publish_dir=json_deploy_dir" >> $GITHUB_OUTPUT
+
+      - name: Deploy to GitHub pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ steps.build_json.outputs.publish_dir }}
+          destination_dir: .
+          keep_files: true
+          commit_message: "Update version_switcher.json"
