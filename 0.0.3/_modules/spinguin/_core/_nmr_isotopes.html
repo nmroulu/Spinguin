@@ -1,0 +1,587 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._nmr_isotopes &#8212; Spinguin 0.0.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=4acdca81"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_nmr_isotopes';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.3';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._nmr_isotopes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a dictionary of NMR isotopes with the following properties:</span>
+
+<span class="sd">- Spin quantum number</span>
+<span class="sd">- Gyromagnetic ratio (gamma) in MHz/T</span>
+<span class="sd">- Quadrupole moment (Q) in barns</span>
+
+<span class="sd">Source: https://www.kherb.io/docs/nmr_table.html</span>
+
+<span class="sd">If your isotope is not listed, you can add it by following the format of the</span>
+<span class="sd">existing entries.</span>
+
+<span class="sd">TODO: Mahdollista oman isotoopin lisääminen suoraan paketista?</span>
+<span class="sd">TODO: Tarkista kvadrupolimomentit?</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="n">ISOTOPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;1H&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">42.577478615342585</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;2D&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">6.5359028540009305</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;3T&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">45.41483815473964</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;3He&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">32.43604456417949</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;6Li&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">6.266099405837534</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;7Li&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">16.548177299618295</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;9Be&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.983379963834242</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;10B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.57473388220653</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;11B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">13.66160796005943</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;13C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">10.707746367473971</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;14N&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.076272817251739</span><span class="p">,</span> <span class="mf">20.44e-3</span><span class="p">],</span>
+    <span class="s1">&#39;15N&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.3152552187859134</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;17O&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.7734832203316975</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;19F&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">40.06924371705693</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;21Ne&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.362579959801532</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;22Na&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.436349259342206</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;23Na&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">11.268733657034751</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;25Mg&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.607933066661972</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;26Al&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">4.273225764239245</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;27Al&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">11.100630067688776</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;29Si&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.461871234008282</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;31P&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">17.241162495263175</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;33S&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">3.2688220630834754</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;35Cl&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">4.175656570906633</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;37Cl&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">3.4759025124743057</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;39Ar&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.462835209795831</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;39K&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.9893443809332112</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;41K&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.091921234883595</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;43Ca&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.868991639572541</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;45Sc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">10.35365948891156</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;53Mn&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">10.961289063460638</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;60Co&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.7916463354780205</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;63Ni&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">7.561612483277437</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;69Ga&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">10.23978520568125</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;71Ga&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">13.010902748192017</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;73Ge&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4876591727852992</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;77Se&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">8.134221686648205</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;79Se&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.21708568778123</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;81Kr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.9753405882294452</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;83Kr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.6443288722876133</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;85Kr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.703226109304539</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;85Rb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.125530397832004</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;87Rb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">13.981309683545954</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;87Sr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.851714225407608</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;89Y&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0931336103407774</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;91Nb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">11.032433266932337</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;92Nb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">5.58627189504799</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;97Tc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">9.858553909649345</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;99Ru&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.954432903943886</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;101Ru&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.189208775400484</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;102Rh&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">5.094433141455396</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;108Ag&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">4.548147293369158</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;111Cd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.05564075618306</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;113Cd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5083033111346835</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;113In&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">9.351736155393834</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;115In&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">9.371724288750167</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;121Sn&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.920754901131635</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;125Sb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.727834340731468</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;129Xe&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.860160502223788</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;131Xe&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">3.5157686750625525</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;133Cs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.614148807428737</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;134Cs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.69655448494487</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;135Cs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.941920316280481</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;137Cs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">6.179527436650749</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;133Ba&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">11.767759427100511</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;135Ba&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">4.258996923544905</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;137Ba&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">4.7641207681939495</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;137La&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.871574670194692</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;138La&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.653524946166542</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;139La&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">6.052556812291568</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;141Pr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">13.00719308615385</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;143Nd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.319446225429283</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;145Nd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4286917595132482</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;145Pm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">11.586341708247684</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;147Pm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.618940151744178</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;147Sm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.7619079778143567</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;149Sm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.454172999736274</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;151Sm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.099177943637708</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;150Eu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">4.119249381011216</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;151Eu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">10.560340659609436</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;152Eu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.917588978540037</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;153Eu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.663197633840536</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;154Eu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.081728819406879</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;155Eu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.622340534132499</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;155Gd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.3166759371083223</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;157Gd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.726771452834457</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;157Tb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">10.315909503395964</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;158Tb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.4541353102101295</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;159Tb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">10.20919319818842</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;161Dy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4604888626975372</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;163Dy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.04590402269321</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;163Ho&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">9.190669550527298</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;165Ho&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">9.059996523742551</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;166Ho&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">3.941969641339908</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;167Er&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.2246240493510665</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;169Tm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.5216380718489675</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;171Tm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.506392885390747</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;171Yb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">7.505205293382021</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;173Yb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.067247283734719</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;173Lu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.950329831362216</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;174Lu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">15.107979780096652</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;175Lu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.847315928580239</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;176Lu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">3.4410563719983727</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;177Hf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">1.7227060697789325</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;178Hf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">3.8732301845416814</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;179Hf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0822388475730185</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;179Ta&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.978642320498912</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;180Ta&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">4.077240422770786</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;191Ir&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.7632756686749131</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;193Ir&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.8283217975633214</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;193Pt&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.162357061390605</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;197Au&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.7378670245778789</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;199Hg&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">7.68204945629738</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;201Hg&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8356046812290385</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;204Tl&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.3430166953099643</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;205Pb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.162987054692344</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;207Pb&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">9.00380712222511</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;207Bi&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">6.899124436187426</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;208Bi&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.970099248698476</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;210Bi&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">2.303717064797785</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;209Po&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">10.366726791590036</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;229Th&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">1.402557154156299</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;231Pa&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">10.11264035061969</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;233U&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.7989320020700357</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;235U&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.827595836303406</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;239Pu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">3.079527664560569</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;241Pu&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.067247283734719</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;241Am&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.878459666630606</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;242Am&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">1.524518645822064</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;243Am&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.634536683299075</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;243Cm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">1.2196149166576515</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;245Cm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">1.0889418898729026</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;247Cm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">0.6098074583288254</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="spin">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.spin">[docs]</a>
+<span class="k">def</span> <span class="nf">spin</span><span class="p">(</span><span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the spin quantum number of the requested isotope.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    isotope : str</span>
+<span class="sd">        Nucleus symbol (e.g. `&#39;1H&#39;`) used to select the spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spin : float</span>
+<span class="sd">        Spin quantum number.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="gamma">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.gamma">[docs]</a>
+<span class="k">def</span> <span class="nf">gamma</span><span class="p">(</span><span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Hz&quot;</span><span class="p">,</span> <span class="s2">&quot;rad/s&quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the gyromagnetic ratio of the requested isotope.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    isotope : str</span>
+<span class="sd">        Nucleus symbol (e.g. `&#39;1H&#39;`) used to select the gyromagnetic ratio.</span>
+<span class="sd">    unit : {&#39;Hz&#39;, &#39;rad/s&#39;}</span>
+<span class="sd">        Specifies in which unit the gyromagnetic ratio is returned.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gamma : float</span>
+<span class="sd">        Gyromagnetic ratio in the requested units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;Hz&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e6</span>
+    <span class="k">elif</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;rad/s&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e6</span> <span class="o">*</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incorrect units: </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="quadrupole_moment">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.quadrupole_moment">[docs]</a>
+<span class="k">def</span> <span class="nf">quadrupole_moment</span><span class="p">(</span><span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the quadrupole moments in the units of m^2.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    isotope : str</span>
+<span class="sd">        Nucleus symbol (e.g. `&#39;1H&#39;`) used to select the quadrupole moment.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    quadrupole_moment : float</span>
+<span class="sd">        Quadrupole moment in the units of m^2.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-28</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
