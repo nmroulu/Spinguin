@@ -33,7 +33,7 @@ add_module_names = False
 html_theme = 'sphinx_book_theme'
 html_theme_options = {
     "switcher": {
-        "json_url": "https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json",
+        "json_url": "https://nmroulu.github.io/Spinguin/version_switcher.json",
         "version_match": release
     },
     "logo": {
