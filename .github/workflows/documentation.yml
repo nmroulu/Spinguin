@@ -18,14 +18,11 @@ jobs:
       - name: Determine output folder
         id: vars
         run: |
-          if [[ "${GITHUB_REF}" == refs/heads/main ]]; then
-            echo "folder=latest" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             tag="${GITHUB_REF#refs/tags/}"
             echo "folder=${tag}" >> $GITHUB_OUTPUT
           else
-            echo "This workflow can only be run on the 'main' branch or a tag."
-            exit 1
+            echo "folder=latest" >> $GITHUB_OUTPUT
           fi
 
       - name: Set-up Python
