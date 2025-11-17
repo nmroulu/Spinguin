@@ -1,4 +1,4 @@
-name: Build wheels
+name: build wheels and sdist
 
 on:
   workflow_dispatch:
@@ -12,12 +12,38 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.0.0
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build sdist (tar.gz)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tool
+        run: pip install build
+
+      - name: Build sdist
+        run: python -m build --sdist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
