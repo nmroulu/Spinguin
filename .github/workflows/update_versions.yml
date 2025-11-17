@@ -22,6 +22,11 @@ jobs:
       || github.event_name == 'workflow_dispatch'
 
     steps:
+      - name: Check out gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
       - name: Generate version_switcher.json
         id: build_json
         run: |
