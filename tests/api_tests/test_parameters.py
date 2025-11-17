@@ -157,16 +157,6 @@ class TestParameters(unittest.TestCase):
         sg.parameters.parallel_dim = parallel_dim
         self.assertEqual(sg.parameters.parallel_dim, parallel_dim)
 
-    def test_set_sparse_pulse(self):
-        """
-        Test setting the sparsity for pulse.
-        """
-        # Set the sparsity for pulse
-        sg.parameters.default()
-        sparse_pulse = False
-        sg.parameters.sparse_pulse = sparse_pulse
-        self.assertEqual(sg.parameters.sparse_pulse, sparse_pulse)
-
     def test_zero_time_step(self):
         """
         Test setting the zero-value for one time step.
@@ -200,7 +190,6 @@ class TestParameters(unittest.TestCase):
         sg.parameters.parallel_dim = "changed"
         sg.parameters.propagator_density = "changed"
         sg.parameters.sparse_operator = "changed"
-        sg.parameters.sparse_pulse = "changed"
         sg.parameters.sparse_state = "changed"
         sg.parameters.sparse_superoperator = "changed"
         sg.parameters.zero_aux = "changed"
@@ -223,7 +212,6 @@ class TestParameters(unittest.TestCase):
         self.assertEqual(sg.parameters.parallel_dim, 1000)
         self.assertEqual(sg.parameters.propagator_density, 0.5)
         self.assertEqual(sg.parameters.sparse_operator, True)
-        self.assertEqual(sg.parameters.sparse_pulse, True)
         self.assertEqual(sg.parameters.sparse_state, False)
         self.assertEqual(sg.parameters.sparse_superoperator, True)
         self.assertEqual(sg.parameters.zero_aux, 1e-18)

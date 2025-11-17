@@ -30,7 +30,6 @@ class Parameters:
         # Sparsity settings
         self._propagator_density: float=0.5
         self._sparse_operator: bool=True
-        self._sparse_pulse: bool=True
         self._sparse_state: bool=False
         self._sparse_superoperator: bool=True
         
@@ -96,19 +95,6 @@ class Parameters:
     def sparse_operator(self, sparse_operator: bool):
         self._sparse_operator = sparse_operator
         print(f"Sparity setting of operator set to: {self.sparse_operator}\n")
-
-    @property
-    def sparse_pulse(self) -> bool:
-        """
-        Specifies whether to return pulse superoperators as sparse or dense
-        arrays.
-        """
-        return self._sparse_pulse
-    
-    @sparse_pulse.setter
-    def sparse_pulse(self, sparse_pulse: bool):
-        self._sparse_pulse = sparse_pulse
-        print(f"Sparsity setting of pulses set to: {self.sparse_pulse}\n")
 
     @property
     def sparse_superoperator(self) -> bool:
