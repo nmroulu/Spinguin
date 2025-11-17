@@ -48,8 +48,8 @@ jobs:
               echo ',' >> $JSON_PATH;
             fi
             echo "  {\
-              \"version\": \"$FOLDER\", \
-              \"url\": \"$BASE_URL/$FOLDER\" \
+            \"version\": \"$FOLDER\", \
+            \"url\": \"$BASE_URL/$FOLDER/\" \
             }" >> $JSON_PATH
             FIRST=false
           done
