@@ -6,6 +6,7 @@
 # Add path to the package
 import os
 import sys
+import tomllib
 sys.path.insert(0, os.path.abspath('../../src'))
 
 # -- Project information -----------------------------------------------------
@@ -14,7 +15,27 @@ sys.path.insert(0, os.path.abspath('../../src'))
 project = 'Spinguin'
 copyright = '2025, Joni Eronen, Perttu Hilla'
 author = 'Joni Eronen, Perttu Hilla'
-release = 'latest'
+
+# Find out whether GitHub Actions is used
+gh_actions = os.environ.get("GITHUB_ACTIONS") == "true"
+
+# Find out whether the build is from a branch
+if gh_actions and os.environ.get("GITHUB_REF", "").startswith("refs/heads/"):
+    branch_build = True
+else:
+    branch_build = False
+
+# If branch build, use the "latest" release
+if branch_build:
+    release = "latest"
+
+# Otherwise determine the release from pyproject.toml
+else:
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    toml_dir = os.path.join(root_dir, "pyproject.toml")
+    with open(toml_dir, "rb") as toml_file:
+        toml = tomllib.load(toml_file)
+    release = str(toml["project"]["version"])
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
