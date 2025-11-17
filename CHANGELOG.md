@@ -7,6 +7,11 @@
 - Fix bug when creating a state
 - Functions obey the dense/sparse rule faithfully irrespective of the input
 type.
+- Removed sparsity options for Hamiltonian, relaxation superoperator and pulse.
+These use the sparsity option of the superoperator.
+- Better tests.
+- Add cache clear functionality.
+- Add possibility to create single-spin and coupled spherical tensor operators.
 
 ## 0.0.2
 - Re-structure the program internally.
