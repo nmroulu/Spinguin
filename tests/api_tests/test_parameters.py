@@ -47,16 +47,6 @@ class TestParameters(unittest.TestCase):
             sparse_superoperator
         )
 
-    def test_set_sparse_hamiltonian(self):
-        """
-        Test setting the sparsity for Hamiltonians.
-        """
-        # Set the sparsity for Hamiltonian
-        sg.parameters.default()
-        sparse_hamiltonian = False
-        sg.parameters.sparse_hamiltonian = sparse_hamiltonian
-        self.assertEqual(sg.parameters.sparse_hamiltonian, sparse_hamiltonian)
-
     def test_set_sparse_relaxation(self):
         """
         Test setting the sparsity for relaxation superoperator.
@@ -219,7 +209,6 @@ class TestParameters(unittest.TestCase):
         sg.parameters.temperature = "changed"
         sg.parameters.parallel_dim = "changed"
         sg.parameters.propagator_density = "changed"
-        sg.parameters.sparse_hamiltonian = "changed"
         sg.parameters.sparse_operator = "changed"
         sg.parameters.sparse_pulse = "changed"
         sg.parameters.sparse_relaxation = "changed"
@@ -244,7 +233,6 @@ class TestParameters(unittest.TestCase):
         self.assertEqual(sg.parameters.temperature, None)
         self.assertEqual(sg.parameters.parallel_dim, 1000)
         self.assertEqual(sg.parameters.propagator_density, 0.5)
-        self.assertEqual(sg.parameters.sparse_hamiltonian, True)
         self.assertEqual(sg.parameters.sparse_operator, True)
         self.assertEqual(sg.parameters.sparse_pulse, True)
         self.assertEqual(sg.parameters.sparse_relaxation, True)

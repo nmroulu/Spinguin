@@ -29,7 +29,6 @@ class Parameters:
 
         # Sparsity settings
         self._propagator_density: float=0.5
-        self._sparse_hamiltonian: bool=True
         self._sparse_operator: bool=True
         self._sparse_pulse: bool=True
         self._sparse_relaxation: bool=True
@@ -125,19 +124,6 @@ class Parameters:
         self._sparse_superoperator = sparse_superoperator
         print("Sparity setting of superoperator set to: "
               f"{self.sparse_superoperator}\n")
-
-    @property
-    def sparse_hamiltonian(self) -> bool:
-        """
-        Specifies whether to return the Hamiltonian as sparse or dense array.
-        """
-        return self._sparse_hamiltonian
-    
-    @sparse_hamiltonian.setter
-    def sparse_hamiltonian(self, sparse_hamiltonian: bool):
-        self._sparse_hamiltonian = sparse_hamiltonian
-        print("Sparity setting of Hamiltonian set to: "
-              f"{self.sparse_hamiltonian}\n")
 
     @property
     def sparse_relaxation(self) -> bool:

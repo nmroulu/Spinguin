@@ -47,41 +47,41 @@ class TestHamiltonian(unittest.TestCase):
         )
         
         # Generate the Hamiltonian using sparse and dense formalisms and compare
-        sg.parameters.sparse_hamiltonian = True
+        sg.parameters.sparse_superoperator = True
         H_comm = sg.hamiltonian(ss)
         self.assertTrue(np.allclose(H_comm.toarray(), H_previous.toarray()))
-        # sg.parameters.sparse_hamiltonian = False
+        # sg.parameters.sparse_superoperator = False
         # H_comm = sg.hamiltonian(ss)
         # self.assertTrue(np.allclose(H_comm, H_previous.toarray()))
 
         # Perform the same test again (check for cache errors etc.)
-        sg.parameters.sparse_hamiltonian = True
+        sg.parameters.sparse_superoperator = True
         H_comm = sg.hamiltonian(ss)
         self.assertTrue(np.allclose(H_comm.toarray(), H_previous.toarray()))
-        # sg.parameters.sparse_hamiltonian = False
+        # sg.parameters.sparse_superoperator = False
         # H_comm = sg.hamiltonian(ss)
         # self.assertTrue(np.allclose(H_comm, H_previous.toarray()))
 
         # Perform the same test again but by building left and right separately
-        sg.parameters.sparse_hamiltonian = True
+        sg.parameters.sparse_superoperator = True
         H_left = sg.hamiltonian(ss, side='left')
         H_right = sg.hamiltonian(ss, side='right')
         H_comm = H_left - H_right
         self.assertTrue(np.allclose(H_comm.toarray(), H_previous.toarray()))
-        # sg.parameters.sparse_hamiltonian = False
+        # sg.parameters.sparse_superoperator = False
         # H_left = sg.hamiltonian(ss, side='left')
         # H_right = sg.hamiltonian(ss, side='right')
         # H_comm = H_left - H_right
         # self.assertTrue(np.allclose(H_comm, H_previous.toarray()))
 
         # Perform the same test again but build each interaction separately
-        sg.parameters.sparse_hamiltonian = True
+        sg.parameters.sparse_superoperator = True
         H_comm_Z = sg.hamiltonian(ss, ["zeeman"])
         H_comm_CS = sg.hamiltonian(ss, ["chemical_shift"])
         H_comm_J = sg.hamiltonian(ss, ["J_coupling"])
         H_comm = H_comm_Z + H_comm_CS + H_comm_J
         self.assertTrue(np.allclose(H_comm.toarray(), H_previous.toarray()))
-        # sg.parameters.sparse_hamiltonian = False
+        # sg.parameters.sparse_superoperator = False
         # H_comm_Z = sg.hamiltonian(ss, ["zeeman"])
         # H_comm_CS = sg.hamiltonian(ss, ["chemical_shift"])
         # H_comm_J = sg.hamiltonian(ss, ["J_coupling"])
