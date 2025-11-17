@@ -47,16 +47,6 @@ class TestParameters(unittest.TestCase):
             sparse_superoperator
         )
 
-    def test_set_sparse_relaxation(self):
-        """
-        Test setting the sparsity for relaxation superoperator.
-        """
-        # Set the sparsity for relaxation superoperator
-        sg.parameters.default()
-        sparse_relaxation = False
-        sg.parameters.sparse_relaxation = sparse_relaxation
-        self.assertEqual(sg.parameters.sparse_relaxation, sparse_relaxation)
-
     def test_set_propagator_density(self):
         """
         Test setting the threshold for propagator density.
@@ -211,7 +201,6 @@ class TestParameters(unittest.TestCase):
         sg.parameters.propagator_density = "changed"
         sg.parameters.sparse_operator = "changed"
         sg.parameters.sparse_pulse = "changed"
-        sg.parameters.sparse_relaxation = "changed"
         sg.parameters.sparse_state = "changed"
         sg.parameters.sparse_superoperator = "changed"
         sg.parameters.zero_aux = "changed"
@@ -235,7 +224,6 @@ class TestParameters(unittest.TestCase):
         self.assertEqual(sg.parameters.propagator_density, 0.5)
         self.assertEqual(sg.parameters.sparse_operator, True)
         self.assertEqual(sg.parameters.sparse_pulse, True)
-        self.assertEqual(sg.parameters.sparse_relaxation, True)
         self.assertEqual(sg.parameters.sparse_state, False)
         self.assertEqual(sg.parameters.sparse_superoperator, True)
         self.assertEqual(sg.parameters.zero_aux, 1e-18)

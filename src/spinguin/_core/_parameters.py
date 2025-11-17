@@ -31,7 +31,6 @@ class Parameters:
         self._propagator_density: float=0.5
         self._sparse_operator: bool=True
         self._sparse_pulse: bool=True
-        self._sparse_relaxation: bool=True
         self._sparse_state: bool=False
         self._sparse_superoperator: bool=True
         
@@ -124,20 +123,6 @@ class Parameters:
         self._sparse_superoperator = sparse_superoperator
         print("Sparity setting of superoperator set to: "
               f"{self.sparse_superoperator}\n")
-
-    @property
-    def sparse_relaxation(self) -> bool:
-        """
-        Specifies whether to return the relaxation superoperator as sparse or
-        dense array.
-        """
-        return self._sparse_relaxation
-    
-    @sparse_relaxation.setter
-    def sparse_relaxation(self, sparse_relaxation: bool):
-        self._sparse_relaxation = sparse_relaxation
-        print("Sparity setting of relaxation set to: "
-              f"{self.sparse_relaxation}\n")
 
     @property
     def sparse_state(self) -> bool:
