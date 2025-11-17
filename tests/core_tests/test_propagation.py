@@ -1,179 +1,80 @@
 import unittest
 import numpy as np
-from spinguin._core._basis import make_basis
-from spinguin._core._states import state_from_string
-from spinguin._core._propagation import _sop_pulse
+import spinguin as sg
 
 class TestPropagation(unittest.TestCase):
 
-    def test_pulses(self):
+    def test_pulse(self):
         """
         Test the behavior of pulses on spin states.
         """
+        # Reset parameters to defaults
+        sg.parameters.default()
 
         # Define the spin system
-        spins = np.array([1/2, 1/2, 1])
-        max_spin_order = 2
-        basis = make_basis(spins, max_spin_order)
+        ss = sg.SpinSystem(["1H", "1H", "14N"])
 
-        # Create initial states in dense format
-        rho_x_dense = state_from_string(basis, spins, "I(x,0)", sparse=False)
-        rho_y_dense = state_from_string(basis, spins, "I(y,0)", sparse=False)
-        rho_z_dense = state_from_string(basis, spins, "I(z,0)", sparse=False)
-        rho_xz_dense = state_from_string(basis, spins, "I(x,0)*I(z,1)",
-                                         sparse=False)
-        rho_yz_dense = state_from_string(basis, spins, "I(y,0)*I(z,1)",
-                                         sparse=False)
+        # Create the basis set
+        ss.basis.max_spin_order = 2
+        ss.basis.build()
 
-        # Create initial states in sparse format
-        rho_x_sparse = state_from_string(basis, spins, "I(x,0)", sparse=True)
-        rho_y_sparse = state_from_string(basis, spins, "I(y,0)", sparse=True)
-        rho_z_sparse = state_from_string(basis, spins, "I(z,0)", sparse=True)
-        rho_xz_sparse = state_from_string(basis, spins, "I(x,0)*I(z,1)",
-                                          sparse=True)
-        rho_yz_sparse = state_from_string(basis, spins, "I(y,0)*I(z,1)",
-                                          sparse=True)
+        # Create initial states
+        rho_x = sg.state(ss, "I(x,0)")
+        rho_y = sg.state(ss, "I(y,0)")
+        rho_z = sg.state(ss, "I(z,0)")
+        rho_xz = sg.state(ss, "I(x,0)*I(z,1)")
+        rho_yz = sg.state(ss, "I(y,0)*I(z,1)")
 
         # Create pulses in dense format
-        pul_90_x_dense = _sop_pulse(basis, spins, "I(x,0)", angle=90,
-                                   sparse=False)
-        pul_90_y_dense = _sop_pulse(basis, spins, "I(y,0)", angle=90,
-                                   sparse=False)
-        pul_90_z_dense = _sop_pulse(basis, spins, "I(z,0)", angle=90,
-                                   sparse=False)
-        pul_180_x_dense = _sop_pulse(basis, spins, "I(x,0)", angle=180,
-                                    sparse=False)
-        pul_180_y_dense = _sop_pulse(basis, spins, "I(y,0)", angle=180,
-                                    sparse=False)
-        pul_180_z_dense = _sop_pulse(basis, spins, "I(z,0)", angle=180,
-                                    sparse=False)
-        pul_180_zz_dense = _sop_pulse(basis, spins, "I(z,0)*I(z,1)", angle=180,
-                                     sparse=False)
+        sg.parameters.sparse_superoperator = False
+        pul_90_x_dense = sg.pulse(ss, "I(x,0)", angle=90)
+        pul_90_y_dense = sg.pulse(ss, "I(y,0)", angle=90)
+        pul_90_z_dense = sg.pulse(ss, "I(z,0)", angle=90)
+        pul_180_x_dense = sg.pulse(ss, "I(x,0)", angle=180)
+        pul_180_y_dense = sg.pulse(ss, "I(y,0)", angle=180)
+        pul_180_z_dense = sg.pulse(ss, "I(z,0)", angle=180)
+        with self.assertWarns(Warning):
+            pul_180_zz_dense = sg.pulse(ss, "I(z,0)*I(z,1)", angle=180)
 
         # Create pulses in sparse format
-        pul_90_x_sparse = _sop_pulse(basis, spins, "I(x,0)", angle=90,
-                                    sparse=True)
-        pul_90_y_sparse = _sop_pulse(basis, spins, "I(y,0)", angle=90,
-                                    sparse=True)
-        pul_90_z_sparse = _sop_pulse(basis, spins, "I(z,0)", angle=90,
-                                    sparse=True)
-        pul_180_x_sparse = _sop_pulse(basis, spins, "I(x,0)", angle=180,
-                                     sparse=True)
-        pul_180_y_sparse = _sop_pulse(basis, spins, "I(y,0)", angle=180,
-                                     sparse=True)
-        pul_180_z_sparse = _sop_pulse(basis, spins, "I(z,0)", angle=180,
-                                     sparse=True)
-        pul_180_zz_sparse = _sop_pulse(basis, spins, "I(z,0)*I(z,1)", angle=180,
-                                      sparse=True)
+        sg.parameters.sparse_superoperator = True
+        pul_90_x_sparse = sg.pulse(ss, "I(x,0)", angle=90)
+        pul_90_y_sparse = sg.pulse(ss, "I(y,0)", angle=90)
+        pul_90_z_sparse = sg.pulse(ss, "I(z,0)", angle=90)
+        pul_180_x_sparse = sg.pulse(ss, "I(x,0)", angle=180)
+        pul_180_y_sparse = sg.pulse(ss, "I(y,0)", angle=180)
+        pul_180_z_sparse = sg.pulse(ss, "I(z,0)", angle=180)
+        with self.assertWarns(Warning):
+            pul_180_zz_sparse = sg.pulse(ss, "I(z,0)*I(z,1)", angle=180)
 
-        # Verify the results (dense@dense)
-        self.assertTrue(np.allclose(-rho_y_dense, pul_90_x_dense @ rho_z_dense))
-        self.assertTrue(np.allclose(rho_x_dense, pul_90_y_dense @ rho_z_dense))
-        self.assertTrue(np.allclose(rho_z_dense, pul_90_z_dense @ rho_z_dense))
-        self.assertTrue(np.allclose(-rho_z_dense,
-                                    pul_180_x_dense @ rho_z_dense))
-        self.assertTrue(np.allclose(-rho_z_dense,
-                                    pul_180_y_dense @ rho_z_dense))
-        self.assertTrue(np.allclose(rho_z_dense, pul_180_z_dense @ rho_z_dense))
-        self.assertTrue(np.allclose(2 * rho_yz_dense,
-                                    pul_180_zz_dense @ rho_x_dense))
-        self.assertTrue(np.allclose(-rho_x_dense,
-                                    pul_180_zz_dense @ (2 * rho_yz_dense)))
-        self.assertTrue(np.allclose(-2 * rho_yz_dense,
-                                    pul_180_zz_dense @ (-rho_x_dense)))
-        self.assertTrue(np.allclose(rho_x_dense,
-                                    pul_180_zz_dense @ (-2 * rho_yz_dense)))
-        self.assertTrue(np.allclose(-2 * rho_xz_dense,
-                                    pul_180_zz_dense @ rho_y_dense))
-        self.assertTrue(np.allclose(-rho_y_dense,
-                                    pul_180_zz_dense @ (-2 * rho_xz_dense)))
-        self.assertTrue(np.allclose(2 * rho_xz_dense,
-                                    pul_180_zz_dense @ (-rho_y_dense)))
-        self.assertTrue(np.allclose(rho_y_dense,
-                                    pul_180_zz_dense @ (2 * rho_xz_dense)))
+        # Verify the results (dense)
+        self.assertTrue(np.allclose(-rho_y, pul_90_x_dense @ rho_z))
+        self.assertTrue(np.allclose(rho_x, pul_90_y_dense @ rho_z))
+        self.assertTrue(np.allclose(rho_z, pul_90_z_dense @ rho_z))
+        self.assertTrue(np.allclose(-rho_z, pul_180_x_dense @ rho_z))
+        self.assertTrue(np.allclose(-rho_z, pul_180_y_dense @ rho_z))
+        self.assertTrue(np.allclose(rho_z, pul_180_z_dense @ rho_z))
+        self.assertTrue(np.allclose(2 * rho_yz, pul_180_zz_dense @ rho_x))
+        self.assertTrue(np.allclose(-rho_x, pul_180_zz_dense @ (2 * rho_yz)))
+        self.assertTrue(np.allclose(-2 * rho_yz, pul_180_zz_dense @ (-rho_x)))
+        self.assertTrue(np.allclose(rho_x, pul_180_zz_dense @ (-2 * rho_yz)))
+        self.assertTrue(np.allclose(-2 * rho_xz, pul_180_zz_dense @ rho_y))
+        self.assertTrue(np.allclose(-rho_y, pul_180_zz_dense @ (-2 * rho_xz)))
+        self.assertTrue(np.allclose(2 * rho_xz, pul_180_zz_dense @ (-rho_y)))
+        self.assertTrue(np.allclose(rho_y, pul_180_zz_dense @ (2 * rho_xz)))
 
-        # Verify the results (sparse@dense)
-        self.assertTrue(np.allclose(-rho_y_dense,
-                                    pul_90_x_sparse @ rho_z_dense))
-        self.assertTrue(np.allclose(rho_x_dense, pul_90_y_sparse @ rho_z_dense))
-        self.assertTrue(np.allclose(rho_z_dense, pul_90_z_sparse @ rho_z_dense))
-        self.assertTrue(np.allclose(-rho_z_dense,
-                                    pul_180_x_sparse @ rho_z_dense))
-        self.assertTrue(np.allclose(-rho_z_dense,
-                                    pul_180_y_sparse @ rho_z_dense))
-        self.assertTrue(np.allclose(rho_z_dense,
-                                    pul_180_z_sparse @ rho_z_dense))
-        self.assertTrue(np.allclose(2 * rho_yz_dense,
-                                    pul_180_zz_sparse @ rho_x_dense))
-        self.assertTrue(np.allclose(-rho_x_dense,
-                                    pul_180_zz_sparse @ (2 * rho_yz_dense)))
-        self.assertTrue(np.allclose(-2 * rho_yz_dense,
-                                    pul_180_zz_sparse @ (-rho_x_dense)))
-        self.assertTrue(np.allclose(rho_x_dense,
-                                    pul_180_zz_sparse @ (-2 * rho_yz_dense)))
-        self.assertTrue(np.allclose(-2 * rho_xz_dense,
-                                    pul_180_zz_sparse @ rho_y_dense))
-        self.assertTrue(np.allclose(-rho_y_dense,
-                                    pul_180_zz_sparse @ (-2 * rho_xz_dense)))
-        self.assertTrue(np.allclose(2 * rho_xz_dense,
-                                    pul_180_zz_sparse @ (-rho_y_dense)))
-        self.assertTrue(np.allclose(rho_y_dense,
-                                    pul_180_zz_sparse @ (2 * rho_xz_dense)))
-
-        # Verify the results (dense@sparse)
-        self.assertTrue(np.allclose(-rho_y_dense,
-                                    pul_90_x_dense @ rho_z_sparse))
-        self.assertTrue(np.allclose(rho_x_dense, pul_90_y_dense @ rho_z_sparse))
-        self.assertTrue(np.allclose(rho_z_dense, pul_90_z_dense @ rho_z_sparse))
-        self.assertTrue(np.allclose(-rho_z_dense,
-                                    pul_180_x_dense @ rho_z_sparse))
-        self.assertTrue(np.allclose(-rho_z_dense,
-                                    pul_180_y_dense @ rho_z_sparse))
-        self.assertTrue(np.allclose(rho_z_dense,
-                                    pul_180_z_dense @ rho_z_sparse))
-        self.assertTrue(np.allclose(2 * rho_yz_dense,
-                                    pul_180_zz_dense @ rho_x_sparse))
-        self.assertTrue(np.allclose(-rho_x_dense,
-                                    pul_180_zz_dense @ (2 * rho_yz_sparse)))
-        self.assertTrue(np.allclose(-2 * rho_yz_dense,
-                                    pul_180_zz_dense @ (-rho_x_sparse)))
-        self.assertTrue(np.allclose(rho_x_dense,
-                                    pul_180_zz_dense @ (-2 * rho_yz_sparse)))
-        self.assertTrue(np.allclose(-2 * rho_xz_dense,
-                                    pul_180_zz_dense @ rho_y_sparse))
-        self.assertTrue(np.allclose(-rho_y_dense,
-                                    pul_180_zz_dense @ (-2 * rho_xz_sparse)))
-        self.assertTrue(np.allclose(2 * rho_xz_dense,
-                                    pul_180_zz_dense @ (-rho_y_sparse)))
-        self.assertTrue(np.allclose(rho_y_dense,
-                                    pul_180_zz_dense @ (2 * rho_xz_sparse)))
-
-        # Verify the results (sparse@sparse)
-        self.assertTrue(np.allclose(
-            -rho_y_dense, (pul_90_x_sparse @ rho_z_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            rho_x_dense, (pul_90_y_sparse @ rho_z_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            rho_z_dense, (pul_90_z_sparse @ rho_z_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            -rho_z_dense, (pul_180_x_sparse @ rho_z_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            -rho_z_dense, (pul_180_y_sparse @ rho_z_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            rho_z_dense, (pul_180_z_sparse @ rho_z_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            2 * rho_yz_dense, (pul_180_zz_sparse @ rho_x_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            -rho_x_dense, (pul_180_zz_sparse @ (2 * rho_yz_sparse)).toarray()))
-        self.assertTrue(np.allclose(
-            -2 * rho_yz_dense, (pul_180_zz_sparse @ (-rho_x_sparse)).toarray()))
-        self.assertTrue(np.allclose(
-            rho_x_dense, (pul_180_zz_sparse @ (-2 * rho_yz_sparse)).toarray()))
-        self.assertTrue(np.allclose(
-            -2 * rho_xz_dense, (pul_180_zz_sparse @ rho_y_sparse).toarray()))
-        self.assertTrue(np.allclose(
-            -rho_y_dense, (pul_180_zz_sparse @ (-2 * rho_xz_sparse)).toarray()))
-        self.assertTrue(np.allclose(
-            2 * rho_xz_dense, (pul_180_zz_sparse @ (-rho_y_sparse)).toarray()))
-        self.assertTrue(np.allclose(
-            rho_y_dense, (pul_180_zz_sparse @ (2 * rho_xz_sparse)).toarray()))
+        # Verify the results (sparse)
+        self.assertTrue(np.allclose(-rho_y, pul_90_x_sparse @ rho_z))
+        self.assertTrue(np.allclose(rho_x, pul_90_y_sparse @ rho_z))
+        self.assertTrue(np.allclose(rho_z, pul_90_z_sparse @ rho_z))
+        self.assertTrue(np.allclose(-rho_z, pul_180_x_sparse @ rho_z))
+        self.assertTrue(np.allclose(-rho_z, pul_180_y_sparse @ rho_z))
+        self.assertTrue(np.allclose(rho_z, pul_180_z_sparse @ rho_z))
+        self.assertTrue(np.allclose(2 * rho_yz, pul_180_zz_sparse @ rho_x))
+        self.assertTrue(np.allclose(-rho_x, pul_180_zz_sparse @ (2 * rho_yz)))
+        self.assertTrue(np.allclose(-2 * rho_yz, pul_180_zz_sparse @ (-rho_x)))
+        self.assertTrue(np.allclose(rho_x, pul_180_zz_sparse @ (-2 * rho_yz)))
+        self.assertTrue(np.allclose(-2 * rho_xz, pul_180_zz_sparse @ rho_y))
+        self.assertTrue(np.allclose(-rho_y, pul_180_zz_sparse @ (-2 * rho_xz)))
+        self.assertTrue(np.allclose(2 * rho_xz, pul_180_zz_sparse @ (-rho_y)))
+        self.assertTrue(np.allclose(rho_y, pul_180_zz_sparse @ (2 * rho_xz)))
