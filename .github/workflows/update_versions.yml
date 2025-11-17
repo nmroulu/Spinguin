@@ -1,11 +1,14 @@
 name: update versions
 
-# Run this workflow after the generation of documents completes successfully
 on:
+  # Run this workflow after the generation of documents completes successfully
   workflow_run:
     workflows: ["documentation"]
     types:
       - completed
+
+  # Allow the workflow to be run manually
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,7 +16,10 @@ permissions:
 jobs:
   build-json:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: >
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success')
+      || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Generate version_switcher.json
