@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_states';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -301,25 +301,25 @@ document.write(`
 <span class="sd">This module provides functions for creating state vectors.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Referencing SpinSystem class</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">spinguin._core._spin_system</span> <span class="kn">import</span> <span class="n">SpinSystem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">expm</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._operators</span> <span class="kn">import</span> <span class="n">op_prod</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">parse_operator_string</span><span class="p">,</span> <span class="n">state_idx</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._hide_prints</span> <span class="kn">import</span> <span class="n">HidePrints</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._hamiltonian</span> <span class="kn">import</span> <span class="n">sop_H</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">const</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">expm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">op_prod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_operator_string</span><span class="p">,</span> <span class="n">state_idx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_H</span>
 
-<span class="k">def</span> <span class="nf">_unit_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unit_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -377,7 +377,7 @@ document.write(`
     <span class="k">return</span> <span class="n">rho</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">8192</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_state_from_op_def</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_state_from_op_def</span><span class="p">(</span>
     <span class="n">basis_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">spins_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">op_def_bytes</span> <span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
@@ -433,7 +433,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">state_from_op_def</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_from_op_def</span><span class="p">(</span>
         <span class="n">basis</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">spins</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">op_def</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -484,7 +484,7 @@ document.write(`
     <span class="k">return</span> <span class="n">rho</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_state_from_string</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_state_from_string</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
                        <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
                        <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                        <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -544,7 +544,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_from_string</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                       <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                       <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                       <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -617,7 +617,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_state_to_zeeman</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_state_to_zeeman</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
@@ -680,7 +680,7 @@ document.write(`
     
     <span class="k">return</span> <span class="n">rho_zeeman</span>
 
-<span class="k">def</span> <span class="nf">_equilibrium_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_equilibrium_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">H_left</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
@@ -732,7 +732,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho_eq</span>
 
-<span class="k">def</span> <span class="nf">_alpha_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_alpha_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -774,7 +774,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_beta_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_beta_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -816,7 +816,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_singlet_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_singlet_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -866,7 +866,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_triplet_zero_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_triplet_zero_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -916,7 +916,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_triplet_plus_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_triplet_plus_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -964,7 +964,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_triplet_minus_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_triplet_minus_state</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1012,7 +1012,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">rho</span>
 
-<span class="k">def</span> <span class="nf">_measure</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_measure</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
@@ -1077,7 +1077,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">ex</span>
 
-<span class="k">def</span> <span class="nf">state_to_truncated_basis</span><span class="p">(</span><span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_to_truncated_basis</span><span class="p">(</span><span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
                              <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
                              <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1112,7 +1112,7 @@ document.write(`
 
 <div class="viewcode-block" id="unit_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.unit_state">[docs]</a>
-<span class="k">def</span> <span class="nf">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a unit state vector, which represents the identity operator. The</span>
@@ -1146,7 +1146,7 @@ document.write(`
 
 <div class="viewcode-block" id="state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.state">[docs]</a>
-<span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
           <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function returns a column vector representing the density matrix as a</span>
@@ -1218,7 +1218,7 @@ document.write(`
 
 <div class="viewcode-block" id="state_to_zeeman">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.state_to_zeeman">[docs]</a>
-<span class="k">def</span> <span class="nf">state_to_zeeman</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_to_zeeman</span><span class="p">(</span>
         <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
         <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -1257,7 +1257,7 @@ document.write(`
 
 <div class="viewcode-block" id="alpha_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.alpha_state">[docs]</a>
-<span class="k">def</span> <span class="nf">alpha_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">alpha_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                 <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the alpha state for a given spin-1/2 nucleus. Unit state is</span>
@@ -1293,7 +1293,7 @@ document.write(`
 
 <div class="viewcode-block" id="beta_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.beta_state">[docs]</a>
-<span class="k">def</span> <span class="nf">beta_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">beta_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the beta state for a given spin-1/2 nucleus. Unit state is</span>
@@ -1329,7 +1329,7 @@ document.write(`
 
 <div class="viewcode-block" id="equilibrium_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.equilibrium_state">[docs]</a>
-<span class="k">def</span> <span class="nf">equilibrium_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">equilibrium_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the thermal equilibrium state for the spin system.</span>
 
@@ -1384,7 +1384,7 @@ document.write(`
 
 <div class="viewcode-block" id="singlet_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.singlet_state">[docs]</a>
-<span class="k">def</span> <span class="nf">singlet_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">singlet_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                   <span class="n">index_1</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                   <span class="n">index_2</span> <span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1424,7 +1424,7 @@ document.write(`
 
 <div class="viewcode-block" id="triplet_zero_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.triplet_zero_state">[docs]</a>
-<span class="k">def</span> <span class="nf">triplet_zero_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">triplet_zero_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                        <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                        <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1464,7 +1464,7 @@ document.write(`
 
 <div class="viewcode-block" id="triplet_plus_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.triplet_plus_state">[docs]</a>
-<span class="k">def</span> <span class="nf">triplet_plus_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">triplet_plus_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                        <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                        <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1504,7 +1504,7 @@ document.write(`
 
 <div class="viewcode-block" id="triplet_minus_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.triplet_minus_state">[docs]</a>
-<span class="k">def</span> <span class="nf">triplet_minus_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">triplet_minus_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
                         <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                         <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1544,7 +1544,7 @@ document.write(`
 
 <div class="viewcode-block" id="measure">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.measure">[docs]</a>
-<span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
             <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
             <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

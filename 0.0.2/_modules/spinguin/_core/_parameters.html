@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_parameters';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -308,17 +308,17 @@ document.write(`
 
 <div class="viewcode-block" id="Parameters">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._parameters.Parameters">[docs]</a>
-<span class="k">class</span> <span class="nc">Parameters</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Parameters</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters class contains all the global settings for the Spinguin package.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Parameters.default">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._parameters.Parameters.default">[docs]</a>
-    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the parameters to the default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -353,31 +353,31 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        External magnetic field (in Tesla).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_field</span>
 
     <span class="nd">@magnetic_field</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">magnetic_field</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">magnetic_field</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_field</span> <span class="o">=</span> <span class="n">magnetic_field</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Magnetic field set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">magnetic_field</span><span class="si">}</span><span class="s2"> T</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Temperature of the sample (in Kelvin).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span>
     
     <span class="nd">@temperature</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span> <span class="o">=</span> <span class="n">temperature</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Temperature set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">parallel_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parallel_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If the number of items in the basis is larger than this value,</span>
 <span class="sd">        parallelization is used to speed up the calculation of the Redfield</span>
@@ -386,12 +386,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_dim</span>
     
     <span class="nd">@parallel_dim</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">parallel_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallel_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parallel_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallel_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_dim</span> <span class="o">=</span> <span class="n">parallel_dim</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Threshold for parallel Redfield set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_dim</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return the Hilbert-space operators as sparse or</span>
 <span class="sd">        dense arrays.</span>
@@ -399,12 +399,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span>
     
     <span class="nd">@sparse_operator</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_operator</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_operator</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span> <span class="o">=</span> <span class="n">sparse_operator</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparity setting of operator set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_operator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return pulse superoperators as sparse or dense</span>
 <span class="sd">        arrays.</span>
@@ -412,12 +412,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_pulse</span>
     
     <span class="nd">@sparse_pulse</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_pulse</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_pulse</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_pulse</span> <span class="o">=</span> <span class="n">sparse_pulse</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparsity setting of pulses set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_pulse</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return the superoperators as sparse or dense</span>
 <span class="sd">        arrays.</span>
@@ -425,26 +425,26 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span>
     
     <span class="nd">@sparse_superoperator</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span> <span class="o">=</span> <span class="n">sparse_superoperator</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparity setting of superoperator set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return the Hamiltonian as sparse or dense array.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_hamiltonian</span>
     
     <span class="nd">@sparse_hamiltonian</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_hamiltonian</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_hamiltonian</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_hamiltonian</span> <span class="o">=</span> <span class="n">sparse_hamiltonian</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparity setting of Hamiltonian set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_hamiltonian</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return the relaxation superoperator as sparse or</span>
 <span class="sd">        dense array.</span>
@@ -452,25 +452,25 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_relaxation</span>
     
     <span class="nd">@sparse_relaxation</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_relaxation</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_relaxation</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_relaxation</span> <span class="o">=</span> <span class="n">sparse_relaxation</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparity setting of relaxation set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_relaxation</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies whether to return the state vectors as sparse or dense arrays.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span>
     
     <span class="nd">@sparse_state</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_state</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_state</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span> <span class="o">=</span> <span class="n">sparse_state</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparity setting of state set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_state</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">propagator_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">propagator_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold (between 0 and 1) that specifies the array type of the time</span>
 <span class="sd">        propagator. If the density of the progagator is greater than this value,</span>
@@ -479,26 +479,26 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span>
     
     <span class="nd">@propagator_density</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">propagator_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">propagator_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">propagator_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">propagator_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span> <span class="o">=</span> <span class="n">propagator_density</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Propagator density threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">propagator_density</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero in Hamiltonian.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_hamiltonian</span>
     
     <span class="nd">@zero_hamiltonian</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_hamiltonian</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_hamiltonian</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_hamiltonian</span> <span class="o">=</span> <span class="n">zero_hamiltonian</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hamiltonian zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_hamiltonian</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero in auxiliary</span>
 <span class="sd">        matrix method which is used in the Redfield relaxation theory.</span>
@@ -506,12 +506,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_aux</span>
     
     <span class="nd">@zero_aux</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_aux</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_aux</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_aux</span> <span class="o">=</span> <span class="n">zero_aux</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Auxiliary zero-value threshold set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_aux</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero in relaxation</span>
 <span class="sd">        superoperator.</span>
@@ -519,13 +519,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_relaxation</span>
     
     <span class="nd">@zero_relaxation</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_relaxation</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_relaxation</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_relaxation</span> <span class="o">=</span> <span class="n">zero_relaxation</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Relaxation zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_relaxation</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If the 1-norm of an interaction tensor (upper bound for its eigenvalues)</span>
 <span class="sd">        is smaller than this threshold, the interaction is ignored when</span>
@@ -534,13 +534,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_interaction</span>
     
     <span class="nd">@zero_interaction</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_interaction</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_interaction</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_interaction</span> <span class="o">=</span> <span class="n">zero_interaction</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interaction zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_interaction</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_propagator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_propagator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero in propagator.</span>
 <span class="sd">        This value is used to as the convergence criterion of the Taylor series</span>
@@ -549,13 +549,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_propagator</span>
     
     <span class="nd">@zero_propagator</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_propagator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_propagator</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_propagator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_propagator</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_propagator</span> <span class="o">=</span> <span class="n">zero_propagator</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Propagator zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_propagator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero in pulse. This</span>
 <span class="sd">        value is used as the convergence criterion of the Taylor series that is</span>
@@ -564,12 +564,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pulse</span>
     
     <span class="nd">@zero_pulse</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_pulse</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_pulse</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pulse</span> <span class="o">=</span> <span class="n">zero_pulse</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pulse zero-value threshold set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_pulse</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero when performing</span>
 <span class="sd">        the matrix exponential while applying the Levitt-di Bari thermalization.</span>
@@ -578,13 +578,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_thermalization</span>
     
     <span class="nd">@zero_thermalization</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_thermalization</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_thermalization</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_thermalization</span> <span class="o">=</span> <span class="n">zero_thermalization</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Thermalization zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_thermalization</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero when performing</span>
 <span class="sd">        the matrix exponential while constructing the equilibrium state.</span>
@@ -592,13 +592,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_equilibrium</span>
     
     <span class="nd">@zero_equilibrium</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_equilibrium</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_equilibrium</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_equilibrium</span> <span class="o">=</span> <span class="n">zero_equilibrium</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Equilibrium zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_equilibrium</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero when advancing</span>
 <span class="sd">        the state vector forward for one time step.</span>
@@ -606,13 +606,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_time_step</span>
     
     <span class="nd">@zero_time_step</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_time_step</span> <span class="o">=</span> <span class="n">zero_time_step</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time step zero-value threshold set to: &quot;</span>
               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_time_step</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zero_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold under which a value is considered to be zero when performing</span>
 <span class="sd">        the zero-track elimination (ZTE) basis truncation.</span>
@@ -620,7 +620,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_zte</span>
     
     <span class="nd">@zero_zte</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zero_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_zte</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_zte</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zero_zte</span> <span class="o">=</span> <span class="n">zero_zte</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ZTE zero-value threshold set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_zte</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 

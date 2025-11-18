@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_basis';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -301,22 +301,22 @@ document.write(`
 <span class="sd">This module provides functionality for constructing a basis set.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Referencing SpinSystem class</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">spinguin._core._spin_system</span> <span class="kn">import</span> <span class="n">SpinSystem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">eliminate_small</span><span class="p">,</span> <span class="n">expm_vec</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._hide_prints</span> <span class="kn">import</span> <span class="n">HidePrints</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">coherence_order</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span><span class="p">,</span> <span class="n">minimum_spanning_tree</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">combinations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">eliminate_small</span><span class="p">,</span> <span class="n">expm_vec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">coherence_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.csgraph</span><span class="w"> </span><span class="kn">import</span> <span class="n">connected_components</span><span class="p">,</span> <span class="n">minimum_spanning_tree</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module provides the Basis class which is assigned as a part of `SpinSystem`</span>
@@ -330,18 +330,18 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._states</span> <span class="kn">import</span> <span class="n">state_to_truncated_basis</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._superoperators</span> <span class="kn">import</span> <span class="n">sop_to_truncated_basis</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">isvector</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._states</span><span class="w"> </span><span class="kn">import</span> <span class="n">state_to_truncated_basis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._superoperators</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_to_truncated_basis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">isvector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
 
 <div class="viewcode-block" id="Basis">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis">[docs]</a>
-<span class="k">class</span> <span class="nc">Basis</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Basis</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Basis class manages the basis set of a spin system. Most importantly, the</span>
 <span class="sd">    basis set contains the information on the truncation of the basis set and is</span>
@@ -353,7 +353,7 @@ document.write(`
     <span class="n">_max_spin_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Basis set has been initialized with the following defaults:&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;max_spin_order: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_spin_order</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -361,12 +361,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span> <span class="o">=</span> <span class="n">spin_system</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dimension of the basis set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies the maximum number of a active spins that are included in the</span>
 <span class="sd">        product operators that constitute the basis set. Must be at least 1 and</span>
@@ -375,7 +375,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_spin_order</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Contains the actual basis set as an array of dimensions (N, M) where</span>
 <span class="sd">        N is the number of states in the basis and M is the number of spins in</span>
@@ -392,7 +392,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span>
     
     <span class="nd">@max_spin_order</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_spin_order</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_spin_order</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">max_spin_order</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Maximum spin order must be at least 1.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">max_spin_order</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
@@ -403,7 +403,7 @@ document.write(`
 
 <div class="viewcode-block" id="Basis.build">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.build">[docs]</a>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Builds the basis set for the spin system. Prior to building the basis,</span>
 <span class="sd">        the maximum spin order should be defined. If it is not defined, it is</span>
@@ -423,7 +423,7 @@ document.write(`
         
 <div class="viewcode-block" id="Basis.truncate_by_coherence">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_coherence">[docs]</a>
-    <span class="k">def</span> <span class="nf">truncate_by_coherence</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_coherence</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">coherence_orders</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
             <span class="o">*</span><span class="n">objs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
@@ -485,7 +485,7 @@ document.write(`
         
 <div class="viewcode-block" id="Basis.truncate_by_coupling">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_coupling">[docs]</a>
-    <span class="k">def</span> <span class="nf">truncate_by_coupling</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_coupling</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;weakest_link&quot;</span><span class="p">,</span> <span class="s2">&quot;network_strength&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;weakest_link&quot;</span><span class="p">,</span>
@@ -563,7 +563,7 @@ document.write(`
         
 <div class="viewcode-block" id="Basis.truncate_by_zte">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_zte">[docs]</a>
-    <span class="k">def</span> <span class="nf">truncate_by_zte</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_zte</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">L</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
         <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
@@ -642,7 +642,7 @@ document.write(`
         
 <div class="viewcode-block" id="Basis.truncate_by_indices">
 <a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_indices">[docs]</a>
-    <span class="k">def</span> <span class="nf">truncate_by_indices</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_indices</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="o">*</span><span class="n">objs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
@@ -703,7 +703,7 @@ document.write(`
 </div>
 
         
-<span class="k">def</span> <span class="nf">make_basis</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">max_spin_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_basis</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">max_spin_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a Liouville-space basis set, where the basis is spanned by all</span>
 <span class="sd">    possible Kronecker products of irreducible spherical tensor operators, up</span>
@@ -769,7 +769,7 @@ document.write(`
     
     <span class="k">return</span> <span class="n">basis</span>
 
-<span class="k">def</span> <span class="nf">make_subsystem_basis</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_subsystem_basis</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the basis set for a given subsystem.</span>
 
@@ -816,7 +816,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">basis</span>
     
-<span class="k">def</span> <span class="nf">truncate_basis_by_coherence</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_basis_by_coherence</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">coherence_orders</span><span class="p">:</span> <span class="nb">list</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -879,7 +879,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">truncated_basis</span><span class="p">,</span> <span class="n">index_map</span>
 
-<span class="k">def</span> <span class="nf">truncate_basis_by_coupling_weakest_link</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_basis_by_coupling_weakest_link</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -970,7 +970,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">truncated_basis</span><span class="p">,</span> <span class="n">index_map</span>
 
-<span class="k">def</span> <span class="nf">truncate_basis_by_coupling_network_strength</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_basis_by_coupling_network_strength</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1057,7 +1057,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">truncated_basis</span><span class="p">,</span> <span class="n">index_map</span>
 
-<span class="k">def</span> <span class="nf">truncate_basis_by_coupling</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_basis_by_coupling</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1111,7 +1111,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid truncation method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     
-<span class="k">def</span> <span class="nf">truncate_basis_by_zte</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_basis_by_zte</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">L</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
@@ -1184,7 +1184,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">truncated_basis</span><span class="p">,</span> <span class="n">index_map</span>
 
-<span class="k">def</span> <span class="nf">truncate_basis_by_indices</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate_basis_by_indices</span><span class="p">(</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>

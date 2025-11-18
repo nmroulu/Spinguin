@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_hamiltonian';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -301,21 +301,21 @@ document.write(`
 <span class="sd">This module provides functions for calculating Hamiltonian superoperators.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Referencing SpinSystem class</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">spinguin._core._spin_system</span> <span class="kn">import</span> <span class="n">SpinSystem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csc_array</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">eliminate_small</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._superoperators</span> <span class="kn">import</span> <span class="n">sop_prod</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">eliminate_small</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._superoperators</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_prod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
 
-<span class="k">def</span> <span class="nf">sop_H_Z</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_H_Z</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -373,7 +373,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">sop_Hz</span>
 
-<span class="k">def</span> <span class="nf">sop_H_CS</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_H_CS</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
              <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
              <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
              <span class="n">chemical_shifts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -435,7 +435,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">sop_Hcs</span>
 
-<span class="k">def</span> <span class="nf">sop_H_J</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_H_J</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">J_couplings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span><span class="p">,</span>
@@ -507,7 +507,7 @@ document.write(`
 
 <span class="n">INTERACTIONTYPE</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;zeeman&quot;</span><span class="p">,</span> <span class="s2">&quot;chemical_shift&quot;</span><span class="p">,</span> <span class="s2">&quot;J_coupling&quot;</span><span class="p">]</span>
 <span class="n">INTERACTIONDEFAULT</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;zeeman&quot;</span><span class="p">,</span> <span class="s2">&quot;chemical_shift&quot;</span><span class="p">,</span> <span class="s2">&quot;J_coupling&quot;</span><span class="p">]</span>
-<span class="k">def</span> <span class="nf">sop_H</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_H</span><span class="p">(</span>
         <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">gammas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -610,7 +610,7 @@ document.write(`
 
 <div class="viewcode-block" id="hamiltonian">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.hamiltonian">[docs]</a>
-<span class="k">def</span> <span class="nf">hamiltonian</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hamiltonian</span><span class="p">(</span>
         <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
         <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">INTERACTIONTYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">INTERACTIONDEFAULT</span><span class="p">,</span>
         <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span>

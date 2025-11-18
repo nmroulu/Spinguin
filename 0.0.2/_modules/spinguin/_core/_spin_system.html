@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_spin_system';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -305,16 +305,16 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._basis</span> <span class="kn">import</span> <span class="n">Basis</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._relaxation_properties</span> <span class="kn">import</span> <span class="n">RelaxationProperties</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._data_io</span> <span class="kn">import</span> <span class="n">read_array</span><span class="p">,</span> <span class="n">read_tensors</span><span class="p">,</span> <span class="n">read_xyz</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">arraylike_to_array</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._nmr_isotopes</span> <span class="kn">import</span> <span class="n">ISOTOPES</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._basis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Basis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._relaxation_properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelaxationProperties</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._data_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_array</span><span class="p">,</span> <span class="n">read_tensors</span><span class="p">,</span> <span class="n">read_xyz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">arraylike_to_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._nmr_isotopes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISOTOPES</span>
 
 <div class="viewcode-block" id="SpinSystem">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.SpinSystem">[docs]</a>
-<span class="k">class</span> <span class="nc">SpinSystem</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpinSystem</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes a spin system with the given `isotopes`. Examples::</span>
 
@@ -337,7 +337,7 @@ document.write(`
 <span class="sd">        The input will be converted and stored as a NumPy array.  </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotopes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotopes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 
         <span class="c1"># Assign the isotopes</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -373,7 +373,7 @@ document.write(`
         <span class="c1"># Initialize relaxation theory settings</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation</span> <span class="o">=</span> <span class="n">RelaxationProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method checks the consistency of the SpinSystem object by comparing</span>
 <span class="sd">        the shapes of the attributes.</span>
@@ -429,7 +429,7 @@ document.write(`
     <span class="c1">##########################</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">isotopes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isotopes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies the isotopes that constitute the spin system and determine</span>
 <span class="sd">        other properties, such as spin quantum numbers and gyromagnetic ratios.</span>
@@ -442,11 +442,11 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span>
             
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">chemical_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chemical_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chemical_shifts</span>
     
     <span class="nd">@chemical_shifts</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">chemical_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chemical_shifts</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chemical_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chemical_shifts</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Chemical shifts arising from the isotropic component of the nuclear</span>
 <span class="sd">        shielding tensors. Used when calculating the coherent Hamiltonian.</span>
@@ -478,11 +478,11 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">J_couplings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">J_couplings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_J_couplings</span>
     
     <span class="nd">@J_couplings</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">J_couplings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">J_couplings</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">J_couplings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">J_couplings</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies the J-coupling constants between each spin pair in the spin</span>
 <span class="sd">        system. Used when calculating the coherent Hamiltonian.</span>
@@ -518,11 +518,11 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following J-couplings:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span>
     
     <span class="nd">@xyz</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Coordinates in the XYZ format for each nucleus in the spin system. Used</span>
 <span class="sd">        in Redfield relaxation theory when calculating the dipole-dipole</span>
@@ -556,11 +556,11 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following XYZ coordinates:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span>
     
     <span class="nd">@shielding</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shielding</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shielding</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Specifies the nuclear shielding tensors for each nucleus. Note that the</span>
 <span class="sd">        isotropic part of the tensor is handled by `chemical_shifts`. The</span>
@@ -600,11 +600,11 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following shielding tensors:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span>
     
     <span class="nd">@efg</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">efg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">efg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Electric field gradient tensors used for incorporating the quadrupolar</span>
 <span class="sd">        interaction relaxation mechanism.</span>
@@ -641,17 +641,17 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following EFG tensors:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">nspins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nspins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of spins in the spin system.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">)</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">spins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">spins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Spin quantum numbers for each isotope the spin system.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mults</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mults</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spin multiplicities for each isotope in the `SpinSystem`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -659,7 +659,7 @@ document.write(`
                          <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gammas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gammas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gyromagnetic ratios of each isotope in the `SpinSystem` in rad/s/T.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -667,7 +667,7 @@ document.write(`
                          <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">quad</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">quad</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the quadrupolar moments in m^2.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-28</span>
                          <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span>
@@ -677,7 +677,7 @@ document.write(`
     <span class="c1">########################</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basis</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basis</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Contains the basis set for the `SpinSystem`. Includes functionality for</span>
 <span class="sd">        restricting the maximum spin order, building the basis set, and applying</span>
@@ -690,7 +690,7 @@ document.write(`
     <span class="c1">################################</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelaxationProperties</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelaxationProperties</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Contains the properties that define the relaxation of the `SpinSystem`.</span>
 <span class="sd">        Allows the definition of relaxation theory, correlation time, relaxation</span>

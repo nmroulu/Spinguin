@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_specutils';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -304,14 +304,14 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._nmr_isotopes</span> <span class="kn">import</span> <span class="n">gamma</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._nmr_isotopes</span><span class="w"> </span><span class="kn">import</span> <span class="n">gamma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
 
 <div class="viewcode-block" id="resonance_frequency">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.resonance_frequency">[docs]</a>
-<span class="k">def</span> <span class="nf">resonance_frequency</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resonance_frequency</span><span class="p">(</span>
     <span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -356,7 +356,7 @@ document.write(`
 
 <div class="viewcode-block" id="fourier_transform">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.fourier_transform">[docs]</a>
-<span class="k">def</span> <span class="nf">fourier_transform</span><span class="p">(</span><span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fourier_transform</span><span class="p">(</span><span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                       <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                       <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -401,7 +401,7 @@ document.write(`
 
 <div class="viewcode-block" id="spectrum">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.spectrum">[docs]</a>
-<span class="k">def</span> <span class="nf">spectrum</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectrum</span><span class="p">(</span>
     <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -448,7 +448,7 @@ document.write(`
 
 <div class="viewcode-block" id="frequency_to_chemical_shift">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.frequency_to_chemical_shift">[docs]</a>
-<span class="k">def</span> <span class="nf">frequency_to_chemical_shift</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">frequency_to_chemical_shift</span><span class="p">(</span>
         <span class="n">frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
         <span class="n">reference_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">spectrometer_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
@@ -476,7 +476,7 @@ document.write(`
 
 <div class="viewcode-block" id="spectral_width_to_dwell_time">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.spectral_width_to_dwell_time">[docs]</a>
-<span class="k">def</span> <span class="nf">spectral_width_to_dwell_time</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectral_width_to_dwell_time</span><span class="p">(</span>
     <span class="n">spectral_width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">B</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span>
@@ -521,7 +521,7 @@ document.write(`
 
 <div class="viewcode-block" id="time_axis">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.time_axis">[docs]</a>
-<span class="k">def</span> <span class="nf">time_axis</span><span class="p">(</span><span class="n">npoints</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">time_axis</span><span class="p">(</span><span class="n">npoints</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a 1D array with `npoints` elements using a constant `time_step`.</span>
 

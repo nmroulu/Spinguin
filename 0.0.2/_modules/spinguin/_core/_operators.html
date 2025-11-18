@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_operators';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/latest/_static/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.2';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
@@ -303,20 +303,20 @@ document.write(`
 <span class="sd">many-spin product operators.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Referencing SpinSystem class</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">spinguin._core._spin_system</span> <span class="kn">import</span> <span class="n">SpinSystem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">comm</span><span class="p">,</span> <span class="n">CG_coeff</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">parse_operator_string</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">comm</span><span class="p">,</span> <span class="n">CG_coeff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">parse_operator_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
 
-<span class="k">def</span> <span class="nf">op_E</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_E</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the unit operator for a given spin quantum number `S`.</span>
 
@@ -341,7 +341,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">E</span>
 
-<span class="k">def</span> <span class="nf">op_Sx</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sx</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the spin operator Sx for a given spin quantum number `S`.</span>
 
@@ -362,7 +362,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">Sx</span>
 
-<span class="k">def</span> <span class="nf">op_Sy</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sy</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the spin operator Sy for a given spin quantum number `S`.</span>
 
@@ -383,7 +383,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">Sy</span>
 
-<span class="k">def</span> <span class="nf">op_Sz</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sz</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the spin operator Sz for a given spin quantum number `S`.</span>
 
@@ -418,7 +418,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">Sz</span>
 
-<span class="k">def</span> <span class="nf">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the spin raising operator for a given spin quantum number `S`.</span>
 
@@ -453,7 +453,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">Sp</span>
 
-<span class="k">def</span> <span class="nf">op_Sm</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sm</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the spin lowering operator for a given spin quantum number `S`.</span>
 
@@ -489,7 +489,7 @@ document.write(`
     <span class="k">return</span> <span class="n">Sm</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_op_T</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_op_T</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
           <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
           <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
           <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -511,7 +511,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">T</span>
 
-<span class="k">def</span> <span class="nf">op_T</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_T</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
          <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
          <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
          <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -547,7 +547,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">T</span>
 
-<span class="k">def</span> <span class="nf">op_T_coupled</span><span class="p">(</span><span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_T_coupled</span><span class="p">(</span><span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">l1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">s1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                  <span class="n">l2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                  <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -600,7 +600,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">T</span>
 
-<span class="k">def</span> <span class="nf">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
             <span class="n">include_unit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -654,7 +654,7 @@ document.write(`
 
     <span class="k">return</span> <span class="n">op</span>
 
-<span class="k">def</span> <span class="nf">op_from_string</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_from_string</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -726,7 +726,7 @@ document.write(`
 
 <div class="viewcode-block" id="operator">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.operator">[docs]</a>
-<span class="k">def</span> <span class="nf">operator</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">operator</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
              <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates an operator for the `spin_system` in Hilbert space from the</span>
