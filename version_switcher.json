@@ -1,18 +1,9 @@
 [
-  {
-    "version": "latest",
-    "url": "https://nmroulu.github.io/Spinguin/latest/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://nmroulu.github.io/Spinguin/0.0.3/"
-  },
-  {
-    "version": "0.0.2",
-    "url": "https://nmroulu.github.io/Spinguin/0.0.2/"
-  },
-  {
-    "version": "0.0.1",
-    "url": "https://nmroulu.github.io/Spinguin/0.0.1/"
-  }
+  {    "version": "latest",     "url": "https://nmroulu.github.io/Spinguin/latest/"   }
+,
+  {    "version": "0.0.3",     "url": "https://nmroulu.github.io/Spinguin/0.0.3/"   }
+,
+  {    "version": "0.0.2",     "url": "https://nmroulu.github.io/Spinguin/0.0.2/"   }
+,
+  {    "version": "0.0.1",     "url": "https://nmroulu.github.io/Spinguin/0.0.1/"   }
 ]
