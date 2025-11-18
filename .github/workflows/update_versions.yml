@@ -14,56 +14,39 @@ permissions:
   contents: write
 
 jobs:
-  build-json:
+  update-versions:
     runs-on: ubuntu-latest
     if: >
       (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success')
-      || github.event_name == 'workflow_dispatch'
+       github.event.workflow_run.conclusion == 'success') ||
+       github.event_name == 'workflow_dispatch'
 
     steps:
+      - name: Check out the current branch
+        uses: actions/checkout@v4
+
+      - name: Copy the update_versions.py script
+        run: cp docs/source/update_versions.py /tmp/update_versions.py
+
       - name: Check out gh-pages branch
         uses: actions/checkout@v4
         with:
           ref: gh-pages
 
-      - name: Generate version_switcher.json
-        id: build_json
-        run: |
-          mkdir -p json_deploy_dir
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-          BASE_URL="https://nmroulu.github.io/Spinguin"
-          
-          FOLDERS=$(find . -mindepth 1 -maxdepth 1 -type d \
-            -not -name ".git" -not -name "json_deploy_dir" \
-            | sed 's|^\./||' | sort -rV)
-          
-          JSON_PATH="json_deploy_dir/version_switcher.json"
-          
-          echo '[' > $JSON_PATH
-
-          FIRST=true
-          for FOLDER in $FOLDERS; do
-            if [ "$FIRST" = "false" ]; then
-              echo ',' >> $JSON_PATH;
-            fi
-            echo "  {\
-              \"version\": \"$FOLDER\", \
-              \"url\": \"$BASE_URL/$FOLDER/\" \
-            }" >> $JSON_PATH
-            FIRST=false
-          done
-
-          echo ']' >> $JSON_PATH
-          
-          echo "publish_dir=json_deploy_dir" >> $GITHUB_OUTPUT
+      - name: Generate version_switcher.json and index.html
+        run: python /tmp/update_versions.py
 
       - name: Deploy to GitHub pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ steps.build_json.outputs.publish_dir }}
+          publish_dir: ./versionfiles
           destination_dir: .
           keep_files: true
-          commit_message: "Update version_switcher.json"
+          commit_message: "Update version numbering"
