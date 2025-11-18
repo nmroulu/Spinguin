@@ -39,11 +39,8 @@ jobs:
           make html
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build/html
-          destination_dir: ${{ steps.vars.outputs.folder }}
-          keep_files: true
-          commit_message: "Deploy ${{ steps.vars.outputs.folder }} docs"
+          folder: docs/build/html
+          target-folder: ${{ steps.vars.outputs.folder }}
+          commit-message: "Deploy ${{ steps.vars.outputs.folder }} docs"
