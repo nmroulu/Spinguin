@@ -122,6 +122,60 @@ class SpinSystem:
                 raise ValueError("EFG tensors must be a 3D array with the "
                                  "number of 3x3 tensors equal to the number of "
                                  "isotopes.")
+            
+    def subsystem(self, spins: list):
+        """
+        Creates a new `SpinSystem` object containing only the spins indicated
+        by the `spins` list. The new spin system is assigned the appropriate
+        properties from the original spin system. However, the basis set and
+        relaxation properties are not copied to the new spin system.
+
+        Parameters
+        ----------
+        spins : list
+            List of indices that define which spins to include in the subsystem.
+
+        Returns
+        -------
+        sub : SpinSystem
+            A new `SpinSystem` object containing only the specified spins.
+        """
+        # Check that each spin has been given only once
+        if len(set(spins)) != len(spins):
+            raise ValueError("Each spin must be unique in 'spins'")
+        
+        # Check that the spins isn't empty
+        if len(spins) == 0:
+            raise ValueError("'spins' cannot be empty")
+        
+        # Check that the maximum index makes sense
+        if max(spins) >= self.nspins:
+            raise ValueError(f"Spin system does not have spin: {max(spins)}")
+        
+        # Create the new SpinSystem object
+        spin_system = SpinSystem(self.isotopes[spins])
+
+        # Assign chemical shifts
+        if self.chemical_shifts is not None:
+            spin_system.chemical_shifts = self.chemical_shifts[spins]
+
+        # Assign J-couplings
+        if self.J_couplings is not None:
+            spin_system.J_couplings = self.J_couplings[np.ix_(spins, spins)]
+
+        # Assign XYZ
+        if self.xyz is not None:
+            spin_system.xyz = self.xyz[spins]
+
+        # Assign shielding tensors
+        if self.shielding is not None:
+            spin_system.shielding = self.shielding[spins]
+
+        # Assign EFG tensors
+        if self.efg is not None:
+            spin_system.efg = self.efg[spins]
+
+        return spin_system
 
     ##########################
     # SPIN SYSTEM PROPERTIES #

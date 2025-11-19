@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.4
+- It is possible to create a subsystem from a SpinSystem object.
+
 ## 0.0.3
 - Add possibility to enquire the index of a state from the basis set.
 - Add functions for converting between operator indices & rank and projection.

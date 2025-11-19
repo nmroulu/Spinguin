@@ -512,3 +512,157 @@ class TestSpinSystem(unittest.TestCase):
             'test_data',
             'T2.txt')
         self.assertTrue((spin_system.relaxation.T2 == T2).all())
+
+    def test_subsystem(self):
+        """
+        Test creating the subsystem from a spin system.
+        """
+        # Reset parameters to defaults
+        sg.parameters.default()
+
+        # Create an example spin system
+        ss = sg.SpinSystem(["1H", "14N", "19F"])
+        
+        # Try that the subsystem works with nothing else assigned to the system
+        sub = ss.subsystem([0, 1])
+        self.assertTrue(np.array_equal(np.array(["1H", "14N"]), sub.isotopes))
+
+        # Test that incorrect input leads to error
+        with self.assertRaises(ValueError):
+            ss.subsystem([0, 1, 1])
+        with self.assertRaises(ValueError):
+            ss.subsystem([1, 3])
+
+        # Assign the spin system properties
+        ss.chemical_shifts = [0, 1, 2]
+        ss.J_couplings = [
+            [0, 0, 0],
+            [1, 0, 0],
+            [2, 3, 0]
+        ]
+        ss.xyz = [
+            [0, 0, 0],
+            [1, 1, 1],
+            [2, 2, 2]
+        ]
+        ss.shielding = [
+            [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [2, 2, 2],
+                [2, 2, 2],
+                [2, 2, 2]
+            ]
+        ]
+        ss.efg = [
+            [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
+            [
+                [1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]
+            ],
+            [
+                [2, 2, 2],
+                [2, 2, 2],
+                [2, 2, 2]
+            ]
+        ]
+
+        # Create a subsystem with all spins
+        sub = ss.subsystem([0, 1, 2])
+
+        # Everything should remain the same
+        self.assertTrue(np.array_equal(ss.isotopes, sub.isotopes))
+        self.assertTrue(np.array_equal(ss.chemical_shifts, sub.chemical_shifts))
+        self.assertTrue(np.array_equal(ss.J_couplings, sub.J_couplings))
+        self.assertTrue(np.array_equal(ss.xyz, sub.xyz))
+        self.assertTrue(np.array_equal(ss.shielding, sub.shielding))
+        self.assertTrue(np.array_equal(ss.efg, sub.efg))
+
+        # Create a subsystem with one spin
+        sub = ss.subsystem([1])
+
+        # Check that the properties were copied correctly
+        self.assertTrue(np.array_equal(np.array(["14N"]), sub.isotopes))
+        self.assertTrue(np.array_equal(np.array([1]), sub.chemical_shifts))
+        self.assertTrue(np.array_equal(np.array([[0]]), sub.J_couplings))
+        self.assertTrue(np.array_equal(np.array([[1, 1, 1]]), sub.xyz))
+        self.assertTrue(np.array_equal(
+            np.array([[
+                [1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]
+            ]]),
+            sub.shielding
+        ))
+        self.assertTrue(np.array_equal(
+            np.array([[
+                [1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]
+            ]]),
+            sub.efg
+        ))
+
+        # Create a subsystem with two spins
+        sub = ss.subsystem([0, 2])
+
+        # Check that the properties were copied correctly
+        self.assertTrue(np.array_equal(np.array(["1H", "19F"]), sub.isotopes))
+        self.assertTrue(np.array_equal(np.array([0, 2]), sub.chemical_shifts))
+        self.assertTrue(np.array_equal(
+            np.array([
+                [0, 0],
+                [2, 0]
+            ]),
+            sub.J_couplings
+        ))
+        self.assertTrue(np.array_equal(
+            np.array([
+                [0, 0, 0],
+                [2, 2, 2]
+            ]),
+            sub.xyz
+        ))
+        self.assertTrue(np.array_equal(
+            np.array([
+                [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]
+                ],
+                [
+                    [2, 2, 2],
+                    [2, 2, 2],
+                    [2, 2, 2]
+                ]
+            ]),
+            sub.shielding
+        ))
+        self.assertTrue(np.array_equal(
+            np.array([
+                [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]
+                ],
+                [
+                    [2, 2, 2],
+                    [2, 2, 2],
+                    [2, 2, 2]
+                ]
+            ]),
+            sub.efg
+        ))
