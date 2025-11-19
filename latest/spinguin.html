@@ -352,6 +352,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.quad"><code class="docutils literal notranslate"><span class="pre">SpinSystem.quad</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.relaxation"><code class="docutils literal notranslate"><span class="pre">SpinSystem.relaxation</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.spins"><code class="docutils literal notranslate"><span class="pre">SpinSystem.spins</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.subsystem"><code class="docutils literal notranslate"><span class="pre">SpinSystem.subsystem()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.alpha_state"><code class="docutils literal notranslate"><span class="pre">alpha_state()</span></code></a></li>
@@ -498,6 +499,26 @@ times, etc.</p>
 <dt class="sig sig-object py" id="spinguin.SpinSystem.spins">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin.SpinSystem.spins" title="Link to this definition">#</a></dt>
 <dd><p>Spin quantum numbers for each isotope the spin system.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spinguin.SpinSystem.subsystem">
+<span class="sig-name descname"><span class="pre">subsystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_spin_system.html#SpinSystem.subsystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.SpinSystem.subsystem" title="Link to this definition">#</a></dt>
+<dd><p>Creates a new <cite>SpinSystem</cite> object containing only the spins indicated
+by the <cite>spins</cite> list. The new spin system is assigned the appropriate
+properties from the original spin system. However, the basis set and
+relaxation properties are not copied to the new spin system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spins</strong> (<em>list</em>) – List of indices that define which spins to include in the subsystem.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sub</strong> – A new <cite>SpinSystem</cite> object containing only the specified spins.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem">SpinSystem</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1725,6 +1746,7 @@ that corresponds to the identity operator.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.quad"><code class="docutils literal notranslate"><span class="pre">SpinSystem.quad</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.relaxation"><code class="docutils literal notranslate"><span class="pre">SpinSystem.relaxation</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.spins"><code class="docutils literal notranslate"><span class="pre">SpinSystem.spins</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.subsystem"><code class="docutils literal notranslate"><span class="pre">SpinSystem.subsystem()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.alpha_state"><code class="docutils literal notranslate"><span class="pre">alpha_state()</span></code></a></li>
