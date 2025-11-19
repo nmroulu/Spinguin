@@ -12,6 +12,7 @@ from spinguin._core._relaxation_properties import RelaxationProperties
 from spinguin._core._data_io import read_array, read_tensors, read_xyz
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._nmr_isotopes import ISOTOPES
+from typing import Self
 
 class SpinSystem:
     """
@@ -123,7 +124,7 @@ class SpinSystem:
                                  "number of 3x3 tensors equal to the number of "
                                  "isotopes.")
             
-    def subsystem(self, spins: list):
+    def subsystem(self, spins: list) -> Self:
         """
         Creates a new `SpinSystem` object containing only the spins indicated
         by the `spins` list. The new spin system is assigned the appropriate
