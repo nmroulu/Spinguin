@@ -542,14 +542,11 @@ def sop_R_redfield_term(
 
             # Add current term to the left operator
             sop_T, sop_T_shm = read_shared_sparse(sop_T_shared)
-            sop_T_l += G_0 * sop_T
+            sop_T_l += G_0 * sop_T.conj().T
             shms.extend(sop_T_shm)
 
-    # Handle negative q values by spherical tensor properties
-    if q == 0:
-        sop_R_term = sop_T_l.conj().T @ integral
-    else:
-        sop_R_term = sop_T_l.conj().T @ integral + sop_T_l @ integral.conj().T
+    # Calculate the relaxation superoperator term
+    sop_R_term = sop_T_l @ integral
 
     # Eliminate small values
     eliminate_small(sop_R_term, relaxation_zero)
@@ -632,9 +629,8 @@ def _sop_R_redfield(
         bottom_right, bottom_right_shm = write_shared_sparse(bottom_right)
         shms.extend(bottom_right_shm)
 
-        # Iterate over the projections (negative q values are handled by 
-        # spherical tensor properties)
-        for q in range(0, l + 1):
+        # Iterate over the projections
+        for q in range(-l, l + 1):
 
             # Iterate over the interactions
             for interaction in interactions[l]:
