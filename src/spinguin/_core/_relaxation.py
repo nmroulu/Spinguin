@@ -1054,6 +1054,10 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     # Make relaxation superoperator using Redfield theory
     elif spin_system.relaxation.theory == "redfield":
         R = _sop_R_redfield(spin_system)
+
+    # Make relaxation superoperator using Redfield theory with SVD
+    elif spin_system.relaxation.theory == "redfield_svd":
+        R = _sop_R_redfield_svd(spin_system)
     
     # Apply scalar relaxation of the second kind if requested
     if spin_system.relaxation.sr2k:
@@ -1072,5 +1076,277 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             H_left = H_left,
             T = parameters.temperature
         )
+
+    return R
+
+def _correlation_matrix(interactions: dict) -> dict:
+    """
+    Calculates the correlation matrix for ranks l = 1 and l = 2. The matrix
+    elements µµ' represent the correlation function G0 for the interaction pair
+    µµ'.
+
+    Parameters
+    ----------
+    interactions : dict
+        A dictionary that contains two keys: l = 1 and l = 2. The values are
+        lists where each interaction is represented by a tuple.
+
+    Returns
+    -------
+    G_0 : dict
+        A dictionary that contains two keys: l = 1 and l = 2. The values are
+        NumPy arrays, which contain the correlation matrix.
+    """
+    print("Calculating the correlation matrix...")
+    time_start = time.time()
+
+    # Initialise a dictionary for the correlation matrix
+    n1 = len(interactions[1])
+    n2 = len(interactions[2])
+    G_0 = {
+        1 : np.zeros(shape=(n1, n1), dtype=complex),
+        2 : np.zeros(shape=(n2, n2), dtype=complex)
+    }
+
+    # Loop over the ranks
+    for l in [1, 2]:
+
+        # Loop over the LEFT interactions
+        for i, interaction_l in enumerate(interactions[l]):
+
+            # Extract the interaction tensor
+            tensor_l = interaction_l[3]
+
+            # Loop over the RIGHT interactions
+            for j, interaction_r in enumerate(interactions[l]):
+
+                # Extract the interaction tensor
+                tensor_r = interaction_r[3]
+
+                # Compute G0 and save to the dictionary
+                G_0[l][i, j] = G0(tensor_l, tensor_r, l)
+
+    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+
+    return G_0
+
+def _correlation_matrix_svd(G_0: dict) -> tuple[dict, dict, dict]:
+    """
+    Calculates the singular value decomposition G_0 = U * S * V^dag of the
+    correlation matrix G_0 for ranks l = 1 and l = 2. The singular values
+    S are screened such that small values are removed.
+
+    Parameters
+    ----------
+    G_0 : dict
+        A dictionary that has keys l = 1 and l = 2, with the values
+        corresponding to the correlation matrices for ranks l = 1 and
+        l = 2.
+    
+    Returns
+    -------
+    U : dict
+        A dictionary that has keys l = 1 and l = 2, with the values
+        corresponding to the matrix U for ranks l = 1 and l = 2.
+    S : dict
+        A dictionary that has keys l = 1 and l = 2, with the values
+        corresponding to the singular values S for ranks l = 1 and l = 2.
+    Vdag : dict
+        A dictionary that has keys l = 1 and l = 2, with the values
+        corresponding to the matrix V^dag for ranks l = 1 and l = 2.
+    """
+    print("Performing SVD of the correlation matrix...")
+    time_start = time.time()
+
+    # Initialise dictionaries for the singular value decomposition
+    U = {}
+    S = {}
+    Vdag = {}
+
+    # Calculate the SVD for the ranks l = 1 and l = 2
+    for l in [1, 2]:
+        U_l, S_l, Vdag_l = np.linalg.svd(G_0[l])
+
+        # Find indices of the singular values to be kept
+        idx = S_l > parameters.zero_svd
+
+        # Write the SVD to the dictionaries
+        U[l] = U_l[:, idx]
+        S[l] = S_l[idx]
+        Vdag[l] = Vdag_l[idx, :]
+
+        print(f"Singular values for rank {l}:")
+        print(f"\tBefore truncation: {len(S_l)}")
+        print(f"\tAfter truncation: {len(S[l])}")
+        print(f"\tThe values that were kept: {S[l]}")
+        print(f"\tOthers were smaller than: {parameters.zero_svd}")
+
+    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+
+    return U, S, Vdag
+
+def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
+    """
+    Helper function that builds all the coupled spherical tensor superoperators.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the superoperators are going to be built.
+    interactions : dict
+        A dictionary that contains two keys: l = 1 and l = 2. The values are
+        lists where each interaction is represented by a tuple.
+
+    Returns
+    -------
+    sop_Ts : dict
+        A dictionary that contains the coupled spherical tensor superoperators.
+        The keys are tuples: (l, q, itype, spin1, spin2).
+    """
+    print("Building the coupled spherical tensor operators...")
+    time_start = time.time()
+
+    # Create an empty dictionary for the coupled spherical tensor operators
+    sop_Ts = {}
+
+    # Iterate over ranks
+    for l in [1, 2]:
+
+        # Iterate over projections
+        for q in range(-l, l+1):
+
+            # Iterate over interactions
+            for interaction in interactions[l]:
+
+                # Extract the interaction information
+                itype = interaction[0]
+                spin1 = interaction[1]
+                spin2 = interaction[2]
+
+                # Compute the coupled T superoperator
+                sop_T = _get_sop_T(spin_system, l, q, itype, spin1, spin2)
+
+                # Store the coupled T superoperator to the dictionary
+                sop_Ts[(l, q, itype, spin1, spin2)] = sop_T
+
+    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    return sop_Ts
+
+def _sop_R_redfield_svd(spin_system: SpinSystem) -> sp.csc_array:
+    """
+    Calculates the relaxation superoperator R using the Redfield theory.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        SpinSystem for which the relaxation superoperator is to be calculated.
+
+    Returns
+    -------
+    R : csc_array
+        Relaxation superoperator calculated using the Redfield theory.
+
+    """
+    time_start_R = time.time()
+    print('Constructing relaxation superoperator using Redfield theory...\n')
+
+    # Extract information from the spin system
+    dim = spin_system.basis.dim
+    tau_c = spin_system.relaxation.tau_c
+    relative_error = spin_system.relaxation.relative_error
+
+    # Initialize the relaxation superoperator
+    R = sp.csc_array((dim, dim), dtype=complex)
+
+    # Process the interactions
+    interactions = _process_interactions(spin_system)
+
+    # Calculate the correlation matrix
+    G_0 = _correlation_matrix(interactions)
+
+    # Calculate the singular value decomposition of the correlation matrix
+    U, S, Vdag = _correlation_matrix_svd(G_0)
+
+    # Build the coherent Hamiltonian superoperator
+    with HidePrints():
+        H = hamiltonian(spin_system)
+
+    # Define the integration limit for the auxiliary matrix method
+    t_max = np.log(1 / relative_error) * tau_c
+
+    # Build the top left array of the auxiliary matrix
+    top_left = 1j * H
+
+    # Build coupled spherical tensor operators
+    sop_Ts = _get_all_sop_T(spin_system, interactions)
+
+    # Iterate over the ranks
+    print("Calculating the Redfield superoperator terms...")
+    time_start = time.time()
+    for l in [1, 2]:
+
+        # Diagonal matrix of correlation time
+        tau_c_diagonal_l = 1/tau_c_l(tau_c, l) * sp.eye_array(dim, format='csc')
+
+        # Bottom right array of auxiliary matrix (C)
+        bottom_right = 1j * H - tau_c_diagonal_l
+
+        # Iterate over the projections
+        for q in range(-l, l + 1):
+
+            print(f"l = {l}, q = {q}")
+
+            # Iterate over the singular value decomposition
+            for j in range(len(S[l])):
+
+                # Calculate the coupled T superoperators
+                sop_T_left = sp.csc_array((dim, dim), dtype=complex)
+                sop_T_right = sp.csc_array((dim, dim), dtype=complex)
+                for u, interaction in enumerate(interactions[l]):
+
+                    # Extract the interaction information
+                    itype = interaction[0]
+                    spin1 = interaction[1]
+                    spin2 = interaction[2]
+
+                    # Acquire the coupled T superoperator
+                    sop_T_u = sop_Ts[(l, q, itype, spin1, spin2)]
+
+                    # Add to the sum
+                    sop_T_left = sop_T_left + U[l][u, j] * sop_T_u.conj().T
+                    sop_T_right = sop_T_right + Vdag[l][j, u] * sop_T_u
+
+                # Calculate the Redfield integral
+                aux_expm = auxiliary_matrix_expm(
+                    A = top_left,
+                    B = sop_T_right,
+                    C = bottom_right,
+                    t = t_max,
+                    zero_value = parameters.zero_aux
+                )
+                aux_top_l = aux_expm[:dim, :dim]
+                aux_top_r = aux_expm[:dim, dim:]
+                integral = aux_top_l.conj().T @ aux_top_r
+
+                # Add the current term to the relaxation superoperator
+                R = R + S[l][j] * sop_T_left @ integral
+
+    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+
+    # Return only real values unless dynamic frequency shifts are requested
+    if not spin_system.relaxation.dynamic_frequency_shift:
+        print("Removing the dynamic frequency shifts...")
+        time_start = time.time()
+        R = R.real
+        print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+
+    # Eliminate small values
+    print("Eliminating small values from the relaxation superoperator...")
+    time_start = time.time()
+    eliminate_small(R, parameters.zero_relaxation)
+    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    
+    print("Redfield relaxation superoperator constructed in "
+          f"{time.time() - time_start_R:.4f} seconds.\n")
 
     return R
