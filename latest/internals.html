@@ -37,8 +37,8 @@
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="_static/documentation_options.js?v=b1def801"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'internals';</script>
     <script>
@@ -409,7 +409,7 @@ program and should be accessed through the exposed functionality in the public
 interface.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spinguin.html#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spinguin.html#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis" title="Link to this definition">#</a></dt>
 <dd><p>Basis class manages the basis set of a spin system. Most importantly, the
 basis set contains the information on the truncation of the basis set and is
 responsible for building and making changes to the basis set.</p>
@@ -423,7 +423,7 @@ responsible for building and making changes to the basis set.</p>
 </div>
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.basis">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin._core._basis.Basis.basis" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">basis</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._basis.Basis.basis" title="Link to this definition">#</a></dt>
 <dd><p>Contains the actual basis set as an array of dimensions (N, M) where
 N is the number of states in the basis and M is the number of spins in
 the system. The basis set is constructed from Kronecker products of
@@ -447,7 +447,7 @@ set equal to the number of spins in the system (may be very slow)!</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.dim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#spinguin._core._basis.Basis.dim" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dim</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin._core._basis.Basis.dim" title="Link to this definition">#</a></dt>
 <dd><p>Dimension of the basis set.</p>
 </dd></dl>
 
@@ -477,7 +477,7 @@ projection. For example:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.max_spin_order">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_spin_order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#spinguin._core._basis.Basis.max_spin_order" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">max_spin_order</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin._core._basis.Basis.max_spin_order" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the maximum number of active spins that are included in the
 product operators that constitute the basis set. Must be at least 1 and
 not larger than the number of spins in the system.</p>
@@ -593,7 +593,7 @@ basis.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Parameters</span></span><a class="reference internal" href="_modules/spinguin/_core/_parameters.html#Parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._parameters.Parameters" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Parameters</span></span><a class="reference internal" href="_modules/spinguin/_core/_parameters.html#Parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._parameters.Parameters" title="Link to this definition">#</a></dt>
 <dd><p>Parameters class contains all the global settings for the Spinguin package.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.default">
@@ -603,13 +603,13 @@ basis.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.magnetic_field">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetic_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.magnetic_field" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetic_field</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.magnetic_field" title="Link to this definition">#</a></dt>
 <dd><p>External magnetic field (in Tesla).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.parallel_dim">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parallel_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.parallel_dim" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parallel_dim</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.parallel_dim" title="Link to this definition">#</a></dt>
 <dd><p>If the number of items in the basis is larger than this value,
 parallelization is used to speed up the calculation of the Redfield
 relaxation superoperator.</p>
@@ -617,7 +617,7 @@ relaxation superoperator.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.propagator_density">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propagator_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.propagator_density" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">propagator_density</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.propagator_density" title="Link to this definition">#</a></dt>
 <dd><p>Threshold (between 0 and 1) that specifies the array type of the time
 propagator. If the density of the progagator is greater than this value,
 dense array is returned. Otherwise, sparse array is returned.</p>
@@ -625,53 +625,53 @@ dense array is returned. Otherwise, sparse array is returned.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_operator">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_operator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_operator" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sparse_operator</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_operator" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to return the Hilbert-space operators as sparse or
 dense arrays.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_state">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_state" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sparse_state</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_state" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to return the state vectors as sparse or dense arrays.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.sparse_superoperator">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sparse_superoperator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_superoperator" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sparse_superoperator</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.sparse_superoperator" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to return the superoperators as sparse or dense
 arrays.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.temperature">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temperature</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.temperature" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">temperature</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.temperature" title="Link to this definition">#</a></dt>
 <dd><p>Temperature of the sample (in Kelvin).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_aux">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_aux</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_aux" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_aux</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_aux" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero in auxiliary
 matrix method which is used in the Redfield relaxation theory.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_equilibrium">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_equilibrium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_equilibrium" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_equilibrium</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_equilibrium" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero when performing
 the matrix exponential while constructing the equilibrium state.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_hamiltonian">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_hamiltonian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_hamiltonian" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_hamiltonian</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_hamiltonian" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero in Hamiltonian.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_interaction">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_interaction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_interaction" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_interaction</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_interaction" title="Link to this definition">#</a></dt>
 <dd><p>If the 1-norm of an interaction tensor (upper bound for its eigenvalues)
 is smaller than this threshold, the interaction is ignored when
 constructing the Redfield relaxation superoperator.</p>
@@ -679,7 +679,7 @@ constructing the Redfield relaxation superoperator.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_propagator">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_propagator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_propagator" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_propagator</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_propagator" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero in propagator.
 This value is used to as the convergence criterion of the Taylor series
 that is used to compute the matrix exponential.</p>
@@ -687,7 +687,7 @@ that is used to compute the matrix exponential.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_pulse">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_pulse</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_pulse" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_pulse</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_pulse" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero in pulse. This
 value is used as the convergence criterion of the Taylor series that is
 used to compute the matrix exponential.</p>
@@ -695,14 +695,14 @@ used to compute the matrix exponential.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_relaxation">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_relaxation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_relaxation" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_relaxation</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_relaxation" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero in relaxation
 superoperator.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_thermalization">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_thermalization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_thermalization" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_thermalization</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_thermalization" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero when performing
 the matrix exponential while applying the Levitt-di Bari thermalization.
 This value is used as the convergence criterion of the Taylor series.</p>
@@ -710,14 +710,14 @@ This value is used as the convergence criterion of the Taylor series.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_time_step">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_time_step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_time_step" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_time_step</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_time_step" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero when advancing
 the state vector forward for one time step.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_zte">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">zero_zte</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_zte" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_zte</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_zte" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero when performing
 the zero-track elimination (ZTE) basis truncation.</p>
 </dd></dl>
@@ -726,23 +726,23 @@ the zero-track elimination (ZTE) basis truncation.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RelaxationProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spinguin.html#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_relaxation_properties.html#RelaxationProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RelaxationProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="spinguin.html#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_relaxation_properties.html#RelaxationProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties" title="Link to this definition">#</a></dt>
 <dd><p>This class stores information on the relaxation properties of a spin system.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.R1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">R1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.R1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">R1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.R1" title="Link to this definition">#</a></dt>
 <dd><p>Contains the longitudinal relaxation rates for each spin in the system.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.R2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">R2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.R2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">R2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.R2" title="Link to this definition">#</a></dt>
 <dd><p>Contains the transverse relaxation rates for each spin in the system.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.T1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.T1" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">T1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.T1" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the longitudinal relaxation time constants for each spin.
 These are used to create the phenomenological relaxation superoperator.
 Two input types are supported:</p>
@@ -763,7 +763,7 @@ Two input types are supported:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.T2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.T2" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">T2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.T2" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the transverse relaxation time constants for each spin. These
 are used to create the phenomenological relaxation superoperator.
 Two input types are supported:</p>
@@ -784,14 +784,14 @@ Two input types are supported:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">antisymmetric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">antisymmetric</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to consider the antisymmetric part of the interaction
 tensors in the Redfield relaxation theory.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.dynamic_frequency_shift">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dynamic_frequency_shift</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.dynamic_frequency_shift" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dynamic_frequency_shift</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.dynamic_frequency_shift" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to include the dynamic frequency shift in the Redfield
 relaxation theory. This corresponds to the imaginary part of the
 relaxation superoperator.</p>
@@ -799,35 +799,35 @@ relaxation superoperator.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.relative_error">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">relative_error</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.relative_error" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">relative_error</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.relative_error" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the relative error for the Redfield relaxation theory. This
 corresponds to the convergence criterion for the Redfield integral.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.sr2k">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sr2k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.sr2k" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sr2k</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.sr2k" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to include the scalar relaxation of the second kind
 (SR2K) in the relaxation superoperator.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.tau_c">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_c</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.tau_c" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tau_c</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.tau_c" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the correlation time (in seconds) for the Redfield relaxation
 theory.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.theory">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">theory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.theory" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">theory</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.theory" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the relaxation theory to be used. Can be either “redfield” or
 “phenomenological”.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.thermalization">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">thermalization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.thermalization" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">thermalization</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.thermalization" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to apply Levitt-di Bari thermalization to the
 relaxation superoperator.</p>
 </dd></dl>

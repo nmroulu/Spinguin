@@ -37,8 +37,8 @@
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="_static/documentation_options.js?v=b1def801"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'spinguin';</script>
     <script>
@@ -422,7 +422,7 @@ should:</p>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="spinguin.SpinSystem">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpinSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_spin_system.html#SpinSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.SpinSystem" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SpinSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_spin_system.html#SpinSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.SpinSystem" title="Link to this definition">#</a></dt>
 <dd><p>Initializes a spin system with the given <cite>isotopes</cite>. Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span> <span class="o">=</span> <span class="n">SpinSystem</span><span class="p">([</span><span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;15N&#39;</span><span class="p">,</span> <span class="s1">&#39;19F&#39;</span><span class="p">])</span>
 <span class="n">spin_system</span> <span class="o">=</span> <span class="n">SpinSystem</span><span class="p">(</span><span class="s2">&quot;/path/to/isotopes.txt&quot;</span><span class="p">)</span>
@@ -445,7 +445,7 @@ strings.</p></li>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.basis">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">basis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="internals.html#spinguin._core._basis.Basis" title="spinguin._core._basis.Basis"><span class="pre">Basis</span></a></em><a class="headerlink" href="#spinguin.SpinSystem.basis" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">basis</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="internals.html#spinguin._core._basis.Basis" title="spinguin._core._basis.Basis"><span class="pre">Basis</span></a></span><a class="headerlink" href="#spinguin.SpinSystem.basis" title="Link to this definition">#</a></dt>
 <dd><p>Contains the basis set for the <cite>SpinSystem</cite>. Includes functionality for
 restricting the maximum spin order, building the basis set, and applying
 more advanced truncation to the basis set.</p>
@@ -453,13 +453,13 @@ more advanced truncation to the basis set.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.gammas">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gammas</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin.SpinSystem.gammas" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gammas</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.gammas" title="Link to this definition">#</a></dt>
 <dd><p>Gyromagnetic ratios of each isotope in the <cite>SpinSystem</cite> in rad/s/T.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.isotopes">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isotopes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin.SpinSystem.isotopes" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">isotopes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.isotopes" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the isotopes that constitute the spin system and determine
 other properties, such as spin quantum numbers and gyromagnetic ratios.
 Example:</p>
@@ -471,25 +471,25 @@ Example:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.mults">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mults</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin.SpinSystem.mults" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mults</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.mults" title="Link to this definition">#</a></dt>
 <dd><p>Spin multiplicities for each isotope in the <cite>SpinSystem</cite>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.nspins">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nspins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#spinguin.SpinSystem.nspins" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nspins</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin.SpinSystem.nspins" title="Link to this definition">#</a></dt>
 <dd><p>Number of spins in the spin system.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.quad">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">quad</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin.SpinSystem.quad" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">quad</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.quad" title="Link to this definition">#</a></dt>
 <dd><p>Returns the quadrupolar moments in m^2.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.relaxation">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">relaxation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="internals.html#spinguin._core._relaxation_properties.RelaxationProperties" title="spinguin._core._relaxation_properties.RelaxationProperties"><span class="pre">RelaxationProperties</span></a></em><a class="headerlink" href="#spinguin.SpinSystem.relaxation" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">relaxation</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="internals.html#spinguin._core._relaxation_properties.RelaxationProperties" title="spinguin._core._relaxation_properties.RelaxationProperties"><span class="pre">RelaxationProperties</span></a></span><a class="headerlink" href="#spinguin.SpinSystem.relaxation" title="Link to this definition">#</a></dt>
 <dd><p>Contains the properties that define the relaxation of the <cite>SpinSystem</cite>.
 Allows the definition of relaxation theory, correlation time, relaxation
 times, etc.</p>
@@ -497,7 +497,7 @@ times, etc.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.spins">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#spinguin.SpinSystem.spins" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">spins</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.spins" title="Link to this definition">#</a></dt>
 <dd><p>Spin quantum numbers for each isotope the spin system.</p>
 </dd></dl>
 
