@@ -17,7 +17,7 @@ from spinguin._core._superoperators import sop_T_coupled, sop_prod
 from spinguin._core._la import \
     eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \
-    auxiliary_matrix_expm, expm
+    auxiliary_matrix_expm, expm, decompose_matrix
 from spinguin._core._utils import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
@@ -287,7 +287,11 @@ def _process_interactions(spin_system: SpinSystem) -> dict:
         contain all interactions with meaningful strength. The interactions are
         tuples in the format ("interaction", spin_1, spin_2, tensor).
     """
-    # Obtain the threshold from the parameters
+    print("Processing interactions for relaxation...")
+    print(f"Dropping interactions smaller than {parameters.zero_interaction}:")
+    time_start = time.time()
+
+    # Obtain the required parameters
     zv = parameters.zero_interaction
 
     # Initialize the lists of interaction descriptions for different ranks
@@ -299,29 +303,25 @@ def _process_interactions(spin_system: SpinSystem) -> dict:
     # Process dipole-dipole couplings
     if spin_system.xyz is not None:
 
-        # Interaction name and rank
-        interaction = "DD"
-        rank = 2
-
         # Get the DD-coupling tensors
         dd_tensors = dd_coupling_tensors(spin_system.xyz, spin_system.gammas)
 
         # Go through the DD-coupling tensors
         for spin_1 in range(spin_system.nspins):
-            for spin_2 in range(spin_system.nspins):
+            for spin_2 in range(spin_1):
                 if norm_1(dd_tensors[spin_1, spin_2], ord='row') > zv:
-                    interactions[rank].append((
-                        interaction,
+                    interactions[2].append((
+                        "DD",
                         spin_1,
                         spin_2, 
                         dd_tensors[spin_1, spin_2]
                     ))
+                    print(f"\tKept: DD: {spin_1}-{spin_2}")
+                else:
+                    print(f"\tDropped: DD: {spin_1}-{spin_2}")
 
     # Process nuclear shielding
     if spin_system.shielding is not None:
-
-        # Interaction name
-        interaction = "CSA"
 
         # Get the shielding tensors
         sh_tensors = shielding_intr_tensors(
@@ -332,27 +332,29 @@ def _process_interactions(spin_system: SpinSystem) -> dict:
         
         # Go through the shielding tensors
         for spin_1 in range(spin_system.nspins):
-            if norm_1(sh_tensors[spin_1], ord='row') > zv:
+            _, antisym, sym = decompose_matrix(sh_tensors[spin_1])
 
-                # Add antisymmetric part if requested
-                if spin_system.relaxation.antisymmetric:
-                    rank = 1
-                    interactions[rank].append(
-                        (interaction, spin_1, None, sh_tensors[spin_1])
+            # Antisymmetric part (only if requested)
+            if spin_system.relaxation.antisymmetric:
+                if norm_1(antisym, ord='row') > zv:
+                    interactions[1].append(
+                        ("CSA", spin_1, None, sh_tensors[spin_1])
                     )
+                    print(f"\tKept: CSA: {spin_1} (rank 1)")
+                else:
+                    print(f"\tDropped: CSA: {spin_1} (rank 1)")
 
-                # Always add the symmetric part
-                rank = 2
-                interactions[rank].append(
-                    (interaction, spin_1, None, sh_tensors[spin_1])
+            # Symmetric part
+            if norm_1(sym, ord='row') > zv:
+                interactions[2].append(
+                    ("CSA", spin_1, None, sh_tensors[spin_1])
                 )
+                print(f"\tKept: CSA: {spin_1} (rank 2)")
+            else:
+                print(f"\tDropped: CSA: {spin_1} (rank 2)")
 
     # Process quadrupolar coupling
     if spin_system.efg is not None:
-
-        # Interaction name and rank
-        interaction = "Q"
-        rank = 2
 
         # Get the quadrupole coupling tensors
         q_tensors = Q_intr_tensors(
@@ -363,10 +365,16 @@ def _process_interactions(spin_system: SpinSystem) -> dict:
 
         # Go through the quadrupole coupling tensors
         for spin_1 in range(spin_system.nspins):
-            if norm_1(q_tensors[spin_1], ord='row') > zv:
-                interactions[rank].append(
-                    (interaction, spin_1, None, q_tensors[spin_1])
-                )
+            if spin_system.spins[spin_1] > 1/2:
+                if norm_1(q_tensors[spin_1], ord='row') > zv:
+                    interactions[2].append(
+                        ("Q", spin_1, None, q_tensors[spin_1])
+                    )
+                    print(f"\tKept: Q: {spin_1}")
+                else:
+                    print(f"\tDropped: Q: {spin_1}")
+
+    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return interactions
 
