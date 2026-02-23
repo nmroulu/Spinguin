@@ -793,27 +793,32 @@ def _correlation_matrix(interactions: dict) -> dict:
     n1 = len(interactions[1])
     n2 = len(interactions[2])
     G_0 = {
-        1 : np.zeros(shape=(n1, n1), dtype=complex),
-        2 : np.zeros(shape=(n2, n2), dtype=complex)
+        1 : np.zeros(shape=(n1, n1)),
+        2 : np.zeros(shape=(n2, n2))
     }
 
     # Loop over the ranks
     for l in [1, 2]:
 
         # Loop over the LEFT interactions
-        for i, interaction_l in enumerate(interactions[l]):
+        for i in range(len(interactions[l])):
 
             # Extract the interaction tensor
-            tensor_l = interaction_l[3]
+            tensor_i = interactions[l][i][3]
 
-            # Loop over the RIGHT interactions
-            for j, interaction_r in enumerate(interactions[l]):
+            # Loop over the RIGHT interactions (by symmetry µµ' = µ'u)
+            for j in range(i+1):
 
                 # Extract the interaction tensor
-                tensor_r = interaction_r[3]
+                tensor_j = interactions[l][j][3]
 
                 # Compute G0 and save to the dictionary
-                G_0[l][i, j] = G0(tensor_l, tensor_r, l)
+                G_0_curr = G0(tensor_i, tensor_j, l)
+                if i == j:
+                    G_0[l][i, j] = G_0_curr
+                else:
+                    G_0[l][i, j] = G_0_curr
+                    G_0[l][j, i] = G_0_curr
 
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
