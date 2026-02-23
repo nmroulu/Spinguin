@@ -34,7 +34,7 @@ class Parameters:
         self._sparse_superoperator: bool=True
         
         # Zero-value thresholds
-        self._zero_aux: float = 1e-18
+        self._zero_aux: float = 1e-15
         self._zero_equilibrium: float = 1e-18
         self._zero_hamiltonian: float = 1e-12
         self._zero_interaction: float = 1e-9
