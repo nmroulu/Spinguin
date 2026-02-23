@@ -214,7 +214,7 @@ class TestParameters(unittest.TestCase):
         self.assertEqual(sg.parameters.sparse_operator, True)
         self.assertEqual(sg.parameters.sparse_state, False)
         self.assertEqual(sg.parameters.sparse_superoperator, True)
-        self.assertEqual(sg.parameters.zero_aux, 1e-18)
+        self.assertEqual(sg.parameters.zero_aux, 1e-15)
         self.assertEqual(sg.parameters.zero_equilibrium, 1e-18)
         self.assertEqual(sg.parameters.zero_hamiltonian, 1e-12)
         self.assertEqual(sg.parameters.zero_interaction, 1e-9)
