@@ -1274,7 +1274,7 @@ def _sop_R_redfield_svd(spin_system: SpinSystem) -> sp.csc_array:
     # Define the integration limit for the auxiliary matrix method
     t_max = np.log(1 / relative_error) * tau_c
 
-    # Build the top left array of the auxiliary matrix
+    # Build the top left array of the auxiliary matrix (A)
     top_left = 1j * H
 
     # Build coupled spherical tensor operators
@@ -1319,7 +1319,7 @@ def _sop_R_redfield_svd(spin_system: SpinSystem) -> sp.csc_array:
                 # Calculate the Redfield integral
                 aux_expm = auxiliary_matrix_expm(
                     A = top_left,
-                    B = sop_T_right,
+                    B = S[l][j] * sop_T_right,
                     C = bottom_right,
                     t = t_max,
                     zero_value = parameters.zero_aux
@@ -1329,7 +1329,7 @@ def _sop_R_redfield_svd(spin_system: SpinSystem) -> sp.csc_array:
                 integral = aux_top_l.conj().T @ aux_top_r
 
                 # Add the current term to the relaxation superoperator
-                R = R + S[l][j] * sop_T_left @ integral
+                R = R + sop_T_left @ integral
 
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
