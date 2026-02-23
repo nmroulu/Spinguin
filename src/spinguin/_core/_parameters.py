@@ -41,7 +41,6 @@ class Parameters:
         self._zero_propagator: float = 1e-18
         self._zero_pulse: float = 1e-18
         self._zero_relaxation: float = 1e-12
-        self._zero_svd: float = 1e-3
         self._zero_thermalization: float = 1e-18
         self._zero_time_step: float = 1e-18
         self._zero_zte: float = 1e-24
@@ -221,19 +220,6 @@ class Parameters:
     def zero_pulse(self, zero_pulse: float):
         self._zero_pulse = zero_pulse
         print(f"Pulse zero-value threshold set to: {self.zero_pulse}\n")
-
-    @property
-    def zero_svd(self) -> float:
-        """
-        A singular value in the singular value decomposition of the correlation
-        matrix is considered to be zero if it is less than this threshold.
-        """
-        return self._zero_svd
-    
-    @zero_svd.setter
-    def zero_svd(self, zero_svd: float):
-        self._zero_svd = zero_svd
-        print(f"SVD zero-value threshold set to: {self.zero_svd}\n")
 
     @property
     def zero_thermalization(self) -> float:
