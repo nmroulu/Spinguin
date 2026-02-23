@@ -7,7 +7,9 @@ def inversion_recovery(
     spin_system: sg.SpinSystem,
     isotope: str,
     npoints: int,
-    time_step: float
+    time_step: float,
+    masses: np.ndarray = None,
+    coords: np.ndarray = None
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Performs the inversion-recovery experiment. The experiment differs slightly
@@ -42,6 +44,12 @@ def inversion_recovery(
     time_step : float
         Time step in the simulation (in seconds). Should be kept relatively
         short (e.g. 1 ms).
+    masses : ndarray, optional
+        Array of atomic masses for the atoms in the molecule (in atomic mass units).
+        Used to account for anisotropic rotational diffusion.
+    coords : ndarray, optional
+        Array of coordinates for the atoms in the molecule (in Angstroms).
+        Used to account for anisotropic rotational diffusion.
 
     Returns
     -------
@@ -68,10 +76,10 @@ def inversion_recovery(
     if sg.parameters.temperature is None:
         raise ValueError("Please set the temperature before using "
                          "inversion recovery.")
-    
+
     # Obtain the Liouvillian
     H = sg.hamiltonian(spin_system)
-    R = sg.relaxation(spin_system)
+    R = sg.relaxation(spin_system, masses, coords)
     L = sg.liouvillian(H, R)
 
     # Obtain the equilibrium state

@@ -30,7 +30,7 @@ class RelaxationProperties:
     _dynamic_frequency_shift: bool=False
     _relative_error: float = 1e-6
     _sr2k: bool=False
-    _tau_c: float = None
+    _tau_c: float | tuple[float, float, float] = None
     _theory: Literal["redfield", "phenomenological"] = None
     _thermalization: bool = False
     _T1: np.ndarray = None
@@ -109,17 +109,38 @@ class RelaxationProperties:
         print(f"SR2K set to: {self.sr2k}\n")
 
     @property
-    def tau_c(self) -> float:
+    def tau_c(self) -> float | np.ndarray:
         """
-        Specifies the correlation time (in seconds) for the Redfield relaxation
-        theory.
+        Specifies the correlation time(s) for the Redfield relaxation theory.
+
+        For isotropic rotational diffusion, a single value is used.
+
+        For symmetric top rotational diffusion, two values are used,
+        corresponding to the perpendicular and parallel components of the diffusion tensor.
+        
+        For anisotropic rotational diffusion, an array of three values is used,
+        corresponding to the principal components of the diffusion tensor.
         """
         return self._tau_c
     
     @tau_c.setter
-    def tau_c(self, tau_c: float):
-        self._tau_c = tau_c
-        print(f"Correlation time set to: {self.tau_c} s\n")
+    def tau_c(self, tau_c: float | list[float] | tuple[float, ...] | np.ndarray):
+        if isinstance(tau_c, (float, int)):
+            self._tau_c = float(tau_c)
+        elif isinstance(tau_c, (list, tuple)) and len(tau_c) == 2:
+            self._tau_c = np.array([float(tau_c[0]), float(tau_c[0]), float(tau_c[1])])
+        elif isinstance(tau_c, (list, tuple)) and len(tau_c) == 3:
+            self._tau_c = np.array([float(x) for x in tau_c])
+        elif isinstance(tau_c, np.ndarray) and tau_c.shape == (2,):
+            self._tau_c = np.array([tau_c[0], tau_c[0], tau_c[1]], dtype=float)
+        elif isinstance(tau_c, np.ndarray) and tau_c.shape == (3,):
+            self._tau_c = tau_c.astype(float)
+        else:
+            raise ValueError("tau_c must be either a single float (for isotropic "
+                             "rotational diffusion), a list/tuple of two or three floats "
+                             "(for symmetric top or anisotropic rotational diffusion), "
+                             "or a numpy array of shape (2,) or (3,).")
+        print("Rotational correlation time(s) set to: " f"{self.tau_c}\n")
 
     @property
     def theory(self) -> str:

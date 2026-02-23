@@ -370,6 +370,11 @@ class SpinSystem:
         """Returns the quadrupolar moments in m^2."""
         return np.array([ISOTOPES[isotope][2] * 1e-28
                          for isotope in self.isotopes])
+    
+    @property
+    def masses(self) -> np.ndarray:
+        """Atomic masses of each isotope in atomic mass units (u)."""
+        return np.array([ISOTOPES[isotope][3] for isotope in self.isotopes])
 
     ########################
     # BASIS SET PROPERTIES #
