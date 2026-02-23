@@ -824,60 +824,55 @@ def _correlation_matrix(interactions: dict) -> dict:
 
     return G_0
 
-def _correlation_matrix_svd(G_0: dict) -> tuple[dict, dict, dict]:
+def _correlation_matrix_eig(G_0: dict) -> tuple[dict, dict, dict]:
     """
-    Calculates the singular value decomposition G_0 = U * S * V^dag of the
-    correlation matrix G_0 for ranks l = 1 and l = 2. The singular values
-    S are screened such that small values are removed.
+    Calculates the eigendecomposition G_0 = Q * L * Q^T of the correlation
+    matrix G_0 for ranks l = 1 and l = 2. Only the three and five largest
+    eigenvalues are store for the ranks l = 1 and l = 2, respectively.
 
     Parameters
     ----------
     G_0 : dict
         A dictionary that has keys l = 1 and l = 2, with the values
-        corresponding to the correlation matrices for ranks l = 1 and
-        l = 2.
+        corresponding to the correlation matrices for ranks l = 1 and l = 2.
     
     Returns
     -------
-    U : dict
+    L : dict
         A dictionary that has keys l = 1 and l = 2, with the values
-        corresponding to the matrix U for ranks l = 1 and l = 2.
-    S : dict
+        corresponding to the eigenvalues L for ranks l = 1 and l = 2.
+    Q : dict
         A dictionary that has keys l = 1 and l = 2, with the values
-        corresponding to the singular values S for ranks l = 1 and l = 2.
-    Vdag : dict
-        A dictionary that has keys l = 1 and l = 2, with the values
-        corresponding to the matrix V^dag for ranks l = 1 and l = 2.
+        corresponding to the eigenvectors Q for ranks l = 1 and l = 2.
     """
-    print("Performing SVD of the correlation matrix...")
+    print("Performing eigendecomposition of the correlation matrix...")
     time_start = time.time()
 
-    # Initialise dictionaries for the singular value decomposition
-    U = {}
-    S = {}
-    Vdag = {}
+    # Initialise dictionaries for the eigendecomposition
+    L = {}
+    Q = {}
 
-    # Calculate the SVD for the ranks l = 1 and l = 2
+    # Calculate the eigendecomposition for the ranks l = 1 and l = 2
     for l in [1, 2]:
-        U_l, S_l, Vdag_l = np.linalg.svd(G_0[l])
+        L_l, Q_l = np.linalg.eigh(G_0[l])
 
-        # Find indices of the singular values to be kept
-        idx = S_l > parameters.zero_svd
+        # Find indices of the eigendecomposition to be kept
+        max_idx = min(2*l+1, len(L_l))
+        idx = np.flip(np.argsort(L_l))[:max_idx]
 
-        # Write the SVD to the dictionaries
-        U[l] = U_l[:, idx]
-        S[l] = S_l[idx]
-        Vdag[l] = Vdag_l[idx, :]
+        # Write the eigendecomposition to the dictionaries
+        L[l] = L_l[idx]
+        Q[l] = Q_l[:, idx]
 
-        print(f"Singular values for rank {l}:")
-        print(f"\tBefore truncation: {len(S_l)}")
-        print(f"\tAfter truncation: {len(S[l])}")
-        print(f"\tThe values that were kept: {S[l]}")
-        print(f"\tOthers were smaller than: {parameters.zero_svd}")
+        print(f"Rank {l}:")
+        print(f"\tCorrelations before truncation: {len(L_l)}")
+        print(f"\tCorrelations after truncation: {len(L[l])}")
+        with np.printoptions(precision=4):
+            print(f"\tEigenvalues: {L[l]}")
 
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
-    return U, S, Vdag
+    return L, Q
 
 def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
     """
@@ -959,7 +954,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     G_0 = _correlation_matrix(interactions)
 
     # Calculate the singular value decomposition of the correlation matrix
-    U, S, Vdag = _correlation_matrix_svd(G_0)
+    L, Q = _correlation_matrix_eig(G_0)
 
     # Build the coherent Hamiltonian superoperator
     with HidePrints():
@@ -990,8 +985,8 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
 
             print(f"l = {l}, q = {q}")
 
-            # Iterate over the singular value decomposition
-            for j in range(len(S[l])):
+            # Iterate over the eigenvalues
+            for j in range(len(L[l])):
 
                 # Calculate the coupled T superoperators
                 sop_T_left = sp.csc_array((dim, dim), dtype=complex)
@@ -1007,13 +1002,13 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
                     sop_T_u = sop_Ts[(l, q, itype, spin1, spin2)]
 
                     # Add to the sum
-                    sop_T_left = sop_T_left + U[l][u, j] * sop_T_u.conj().T
-                    sop_T_right = sop_T_right + Vdag[l][j, u] * sop_T_u
+                    sop_T_left = sop_T_left + Q[l][u, j] * sop_T_u.conj().T
+                    sop_T_right = sop_T_right + Q[l][u, j] * sop_T_u
 
                 # Calculate the Redfield integral
                 aux_expm = auxiliary_matrix_expm(
                     A = top_left,
-                    B = S[l][j] * sop_T_right,
+                    B = L[l][j] * sop_T_right,
                     C = bottom_right,
                     t = t_max,
                     zero_value = parameters.zero_aux
