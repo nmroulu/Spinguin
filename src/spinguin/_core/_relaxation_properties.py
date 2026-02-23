@@ -131,9 +131,9 @@ class RelaxationProperties:
     
     @theory.setter
     def theory(self, theory: Literal["redfield", "phenomenological"]):
-        if theory not in ["redfield", "phenomenological", "redfield_svd"]:
-            raise ValueError("Relaxation theory must be 'redfield', "
-                             "'phenomenological', or 'redfield_svd'.")
+        if theory not in ["redfield", "phenomenological"]:
+            raise ValueError("Relaxation theory must be 'redfield' or "
+                             "'phenomenological'.")
         self._theory = theory
         print(f"Relaxation theory set to: {self.theory}\n")
 
