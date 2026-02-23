@@ -110,7 +110,8 @@ def G0(tensor1: np.ndarray, tensor2: np.ndarray, l: int) -> float:
 
     # Compute G0
     G_0 = 1 / (2 * l + 1) * eval_legendre(2, np.cos(angle)) * sum(
-        [V1_pas[l, q] * np.conj(V2_pas[l, q]) for q in range(-l, l + 1)])
+        [V1_pas[l, q] * np.conj(V2_pas[l, q]) for q in range(-l, l + 1)]
+    ).real
 
     return G_0
 
