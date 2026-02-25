@@ -180,6 +180,8 @@ class RelaxationProperties:
         if T1.shape != self._spin_system.isotopes.shape:
             raise ValueError("Mismatch between the given T1 times and the "
                              "number of spins in the system.")
+        if np.min(T1) <= 0:
+            raise ValueError("T1 cannot be zero or negative.")
         
         self._T1 = T1
         print(f"T1 set to: {self.T1}\n")
@@ -207,7 +209,7 @@ class RelaxationProperties:
         return self._T2
     
     @T2.setter
-    def T2(self, T2: np.ndarray):
+    def T2(self, T2: list | tuple | np.ndarray | str):
         # Handle string input
         if isinstance(T2, str):
             T2 = read_array(T2, data_type=float)
@@ -224,6 +226,8 @@ class RelaxationProperties:
         if T2.shape != self._spin_system.isotopes.shape:
             raise ValueError("Mismatch between the given T2 times and the "
                              "number of spins in the system.")
+        if np.min(T2) <= 0:
+            raise ValueError("T2 cannot be zero or negative.")
         
         self._T2 = T2
         print(f"T2 set to: {self.T2}\n")
