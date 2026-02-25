@@ -461,6 +461,56 @@ class TestSpinSystem(unittest.TestCase):
         spin_system.relaxation.relative_error = relative_error
         self.assertEqual(spin_system.relaxation.relative_error, relative_error)
 
+    def test_set_R1(self):
+        """
+        A test for setting the longitudinal relaxation rates.
+        """
+        # Initialize SpinSystem
+        ss = sg.SpinSystem(['1H', '14N'])
+
+        # Wrong array size returns an error
+        R1 = [1, 0.5, 2]
+        with self.assertRaises(ValueError):
+            ss.relaxation.R1 = R1
+
+        # Test setting R1 properly
+        R1 = [1, 0.5]
+        ss.relaxation.R1 = R1
+        self.assertTrue((ss.relaxation.R1 == R1).all())
+        self.assertTrue((ss.relaxation.T1 == 1/np.array(R1)).all())
+
+        # Setting R1 from text file should be possible
+        ss.relaxation.R1 = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'test_data',
+            'R1.txt')
+        self.assertTrue((ss.relaxation.R1 == R1).all())
+
+    def test_set_R2(self):
+        """
+        A test for setting the transverse relaxation rates.
+        """
+        # Initialize SpinSystem
+        ss = sg.SpinSystem(['1H', '14N'])
+
+        # Wrong array size returns an error
+        R2 = [1, 0.5, 2]
+        with self.assertRaises(ValueError):
+            ss.relaxation.R2 = R2
+
+        # Test setting R2 properly
+        R2 = [1, 0.5]
+        ss.relaxation.R2 = R2
+        self.assertTrue((ss.relaxation.R2 == R2).all())
+        self.assertTrue((ss.relaxation.T2 == 1/np.array(R2)).all())
+
+        # Setting R2 from text file should be possible
+        ss.relaxation.R2 = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'test_data',
+            'R2.txt')
+        self.assertTrue((ss.relaxation.R2 == R2).all())
+
     def test_set_T1(self):
         """
         A test for setting the longitudinal relaxation time constants.
