@@ -246,9 +246,57 @@ class RelaxationProperties:
         """
         return 1 / self.T1
     
+    @R1.setter
+    def R1(self, R1: list | tuple | np.ndarray | str):
+        # Handle string input
+        if isinstance(R1, str):
+            R1 = read_array(R1, data_type=float)
+            
+        # Handle array like input
+        elif isinstance(R1, (list, tuple, np.ndarray)):
+            R1 = arraylike_to_array(R1)
+
+        # Otherwise throw an error
+        else:
+            raise TypeError("R1 should be a 1-dimensional array or a string.")
+        
+        # Check that the input is valid
+        if R1.shape != self._spin_system.isotopes.shape:
+            raise ValueError("Mismatch between the given R1 rates and the "
+                             "number of spins in the system.")
+        if np.min(R1) <= 0:
+            raise ValueError("R1 cannot be zero or negative.")
+        
+        self._T1 = 1/R1
+        print(f"R1 set to: {self.R1}\n")
+    
     @property
     def R2(self) -> np.ndarray:
         """
         Contains the transverse relaxation rates for each spin in the system.
         """
         return 1 / self.T2
+    
+    @R2.setter
+    def R2(self, R2: list | tuple | np.ndarray | str):
+        # Handle string input
+        if isinstance(R2, str):
+            R2 = read_array(R2, data_type=float)
+            
+        # Handle array like input
+        elif isinstance(R2, (list, tuple, np.ndarray)):
+            R2 = arraylike_to_array(R2)
+
+        # Otherwise throw an error
+        else:
+            raise TypeError("R2 should be a 1-dimensional array or a string.")
+        
+        # Check that the input is valid
+        if R2.shape != self._spin_system.isotopes.shape:
+            raise ValueError("Mismatch between the given R2 rates and the "
+                             "number of spins in the system.")
+        if np.min(R2) <= 0:
+            raise ValueError("R2 cannot be zero or negative.")
+        
+        self._T2 = 1/R2
+        print(f"R2 set to: {self.R2}\n")
