@@ -45,7 +45,7 @@ class RelaxationProperties:
     def antisymmetric(self) -> bool:
         """
         Specifies whether to consider the antisymmetric part of the interaction
-        tensors in the Redfield relaxation theory.
+        tensors in the Redfield relaxation theory. Default: False.
         """
         return self._antisymmetric
     
@@ -60,7 +60,7 @@ class RelaxationProperties:
         """
         Specifies whether to include the dynamic frequency shift in the Redfield
         relaxation theory. This corresponds to the imaginary part of the
-        relaxation superoperator.
+        relaxation superoperator. Default: False.
         """
         return self._dynamic_frequency_shift
     
@@ -75,6 +75,7 @@ class RelaxationProperties:
         """
         Specifies the relative error for the Redfield relaxation theory. This
         corresponds to the convergence criterion for the Redfield integral.
+        Default: 1e-6.
         """
         return self._relative_error
     
@@ -87,7 +88,7 @@ class RelaxationProperties:
     def sr2k(self) -> bool:
         """
         Specifies whether to include the scalar relaxation of the second kind
-        (SR2K) in the relaxation superoperator.
+        (SR2K) in the relaxation superoperator. Default: False.
         """
         return self._sr2k
     
@@ -129,7 +130,7 @@ class RelaxationProperties:
     def thermalization(self) -> bool:
         """
         Specifies whether to apply Levitt-di Bari thermalization to the
-        relaxation superoperator.
+        relaxation superoperator. Default: False.
         """
         return self._thermalization
     
@@ -190,7 +191,7 @@ class RelaxationProperties:
         are used to create the phenomenological relaxation superoperator.
         Two input types are supported:
 
-        - If `ArrayLike`: A 1D array of size N containing T2 times. Example:
+        - If `ArrayLike`: A 1D array of size N containing T2 times.
         - If `str`: Path to the file containing the T2 times.
 
         The input will be stored as a NumPy array.
@@ -230,7 +231,23 @@ class RelaxationProperties:
     @property
     def R1(self) -> np.ndarray:
         """
-        Contains the longitudinal relaxation rates for each spin in the system.
+        Specifies the longitudinal relaxation rates for each spin. These are
+        used to create the phenomenological relaxation superoperator. Two input
+        types are supported:
+
+        - If `ArrayLike`: A 1D array of size N containing R1 rates.
+        - If `str`: Path to the file containing the R1 rates.
+
+        The input will be stored as a NumPy array. Note that this attribute is
+        linked with T1 by the following relation: R1 = 1/T1.
+
+        Examples::
+
+            # Using array input
+            spin_system.relaxation.R1 = np.array([5.5, 6.0, 2.7])
+
+            # Using string input
+            spin_system.relaxation.R1 = "/path/to/the/file/R1.txt"
         """
         return 1 / self.T1
     
@@ -261,7 +278,23 @@ class RelaxationProperties:
     @property
     def R2(self) -> np.ndarray:
         """
-        Contains the transverse relaxation rates for each spin in the system.
+        Specifies the transverse relaxation rates for each spin. These are used
+        to create the phenomenological relaxation superoperator. Two input types
+        are supported:
+
+        - If `ArrayLike`: A 1D array of size N containing R2 rates.
+        - If `str`: Path to the file containing the R2 rates.
+
+        The input will be stored as a NumPy array. Note that this attribute is
+        linked with T2 by the following relation: R2 = 1/T2.
+
+        Examples::
+
+            # Using array input
+            spin_system.relaxation.R2 = np.array([5.5, 6.0, 2.7])
+
+            # Using string input
+            spin_system.relaxation.R2 = "/path/to/the/file/R2.txt"
         """
         return 1 / self.T2
     

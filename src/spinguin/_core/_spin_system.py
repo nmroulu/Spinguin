@@ -191,25 +191,24 @@ class SpinSystem:
             
     @property
     def chemical_shifts(self) -> np.ndarray:
-        return self._chemical_shifts
-    
-    @chemical_shifts.setter
-    def chemical_shifts(self, chemical_shifts: list | tuple | np.ndarray | str):
         """
         Chemical shifts arising from the isotropic component of the nuclear
         shielding tensors. Used when calculating the coherent Hamiltonian.
 
         - If `ArrayLike`: A 1D array of size N containing the chemical shifts
-          in ppm. Example:
-
-        ```python
-        np.array([8.00, -200, -130])
-        ```
-
+          in ppm.
         - If `str`: Path to the file containing the chemical shifts.
+
+        Example::
+
+            spin_system.chemical_shifts = [8.49, 7.78, 7.46]
 
         The input will be stored as a NumPy array.
         """
+        return self._chemical_shifts
+    
+    @chemical_shifts.setter
+    def chemical_shifts(self, chemical_shifts: list | tuple | np.ndarray | str):
         # Assign chemical shifts
         if isinstance(chemical_shifts, str):
             self._chemical_shifts = read_array(chemical_shifts, data_type=float)
@@ -227,30 +226,29 @@ class SpinSystem:
             
     @property
     def J_couplings(self) -> np.ndarray:
+        """
+        Specifies the J-coupling constants between each spin pair in the spin
+        system. Used when calculating the coherent Hamiltonian. Only the lower
+        triangle is specified.
+
+        - If `ArrayLike`: A 2D array of size (N, N) specifying the scalar
+          couplings between nuclei in Hz.
+        - If `str`: Path to the file containing the scalar couplings.
+
+        Example::
+
+            spin_system.J_couplings = [
+                [0,    0,    0],
+                [1,    0,    0],
+                [0.2,  8,    0]
+            ]
+
+        The input will be stored as a NumPy array.
+        """
         return self._J_couplings
     
     @J_couplings.setter
     def J_couplings(self, J_couplings: list | tuple | np.ndarray | str):
-        """
-        Specifies the J-coupling constants between each spin pair in the spin
-        system. Used when calculating the coherent Hamiltonian.
-
-        - If `ArrayLike`: A 2D array of size (N, N) specifying the scalar
-          couplings between nuclei in Hz. Only the lower triangle is specified.
-          Example:
-
-        ```python
-        np.array([
-            [0,    0,    0],
-            [1,    0,    0],
-            [0.2,  8,    0]
-        ])
-        ```
-
-        - If `str`: Path to the file containing the scalar couplings.
-
-        The input will be stored as a NumPy array.
-        """
         # Assign J-couplings
         if isinstance(J_couplings, str):
             self._J_couplings = read_array(J_couplings, data_type=float)
@@ -267,29 +265,27 @@ class SpinSystem:
 
     @property
     def xyz(self) -> np.ndarray:
+        """
+        Coordinates in the XYZ format for each nucleus in the spin system. Used
+        in Redfield relaxation theory when calculating the dipole-dipole
+        coupling tensors. The coordinates are defined in Å.
+    
+        - If `ArrayLike`: A 2D array of size (N, 3).
+        - If `str`: Path to the file containing the XYZ coordinates.
+
+        Example::
+
+            spin_system.xyz = [
+                [1.025, 2.521, 1.624],
+                [0.667, 2.754, 0.892]
+            ]
+
+        The input will be stored as a NumPy array.
+        """
         return self._xyz
     
     @xyz.setter
     def xyz(self, xyz: list | tuple | np.ndarray | str):
-        """
-        Coordinates in the XYZ format for each nucleus in the spin system. Used
-        in Redfield relaxation theory when calculating the dipole-dipole
-        coupling tensors.  
-    
-        - If `ArrayLike`: A 2D array of size (N, 3) containing the Cartesian
-          coordinates in Å. Example:
-
-        ```python
-        np.array([
-            [1.025, 2.521, 1.624],
-            [0.667, 2.754, 0.892]
-        ])
-        ```
-
-        - If `str`: Path to the file containing the XYZ coordinates.
-
-        The input will be stored as a NumPy array.
-        """
         # Assign XYZ coordinates
         if isinstance(xyz, str):
             self._xyz = read_xyz(xyz)
@@ -305,34 +301,36 @@ class SpinSystem:
 
     @property
     def shielding(self) -> np.ndarray:
-        return self._shielding
-    
-    @shielding.setter
-    def shielding(self, shielding: list | tuple | np.ndarray | str):
         """
         Specifies the nuclear shielding tensors for each nucleus. Note that the
         isotropic part of the tensor is handled by `chemical_shifts`. The
         shielding tensors are used only for Redfield relaxation theory.
 
         - If `ArrayLike`: A 3D array of size (N, 3, 3) containing the 3x3
-          shielding tensors in ppm. Example:
-
-        ```python
-        np.array([
-            [[0, 0, 0],
-             [0, 0, 0],
-             [0, 0, 0]],
-            [[101.6, -75.2, 11.1],
-             [30.5,   10.1, 87.4],
-             [99.7,  -21.1, 11.2]]
-        ])
-        ```
-
+          shielding tensors in ppm.
         - If `str`: Path to the file containing the shielding tensors.
+
+        Example::
+
+            spin_system.shielding = [
+                [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]
+                ],
+                [
+                    [101.6, -75.2, 11.1],
+                    [30.5,   10.1, 87.4],
+                    [99.7,  -21.1, 11.2]
+                ]
+            ]
 
         The input will be stored as a NumPy array.
         """
-
+        return self._shielding
+    
+    @shielding.setter
+    def shielding(self, shielding: list | tuple | np.ndarray | str):
         # Assign shielding tensors
         if isinstance(shielding, str):
             self._shielding = read_tensors(shielding)
@@ -349,32 +347,35 @@ class SpinSystem:
         
     @property
     def efg(self) -> np.ndarray:
-        return self._efg
-    
-    @efg.setter
-    def efg(self, efg: list | tuple | np.ndarray | str):
         """
         Electric field gradient tensors used for incorporating the quadrupolar
         interaction relaxation mechanism.
 
         - If `ArrayLike`: A 3D array of size (N, 3, 3) containing the 3x3 EFG
-          tensors in atomic units. Example:
-
-        ```python
-        efg = np.array([
-            [[0, 0, 0],
-             [0, 0, 0],
-             [0, 0, 0]],
-            [[ 0.31, 0.00, 0.01],
-             [-0.20, 0.04, 0.87],
-             [ 0.11, 0.16, 0.65]]
-        ])
-        ```
-
+          tensors in atomic units.
         - If `str`: Path to the file containing the EFG tensors.
+
+        Example::
+
+            spin_system.efg = [
+                [
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]
+                ],
+                [
+                    [ 0.31, 0.00, 0.01],
+                    [-0.20, 0.04, 0.87],
+                    [ 0.11, 0.16, 0.65]
+                ]
+            ]
 
         The input will be stored as a NumPy array.
         """
+        return self._efg
+    
+    @efg.setter
+    def efg(self, efg: list | tuple | np.ndarray | str):
         # Assign EFG tensors
         if isinstance(efg, str):
             self._efg = read_tensors(efg)
