@@ -58,20 +58,14 @@ class SpinSystem:
         # Check consistency
         self._check_consistency()
 
-        print("Spin system has been initialized with the following values:")
-        print(f"isotopes: {self.isotopes}")
-        print(f"chemical_shifts: {self.chemical_shifts}")
-        print(f"J_couplings:\n{self.J_couplings}")
-        print(f"xyz: {self.xyz}")
-        print(f"shielding: {self.shielding}")
-        print(f"efg: {self.efg}")
-        print()
-
         # Initialize basis set
         self._basis = Basis(self)
 
         # Initialize relaxation theory settings
         self._relaxation = RelaxationProperties(self)
+
+        print("Spin system has been created with the following isotopes:")
+        print(f"{self.isotopes}\n")
 
     def _check_consistency(self):
         """

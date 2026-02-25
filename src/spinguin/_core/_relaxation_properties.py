@@ -37,18 +37,6 @@ class RelaxationProperties:
     _T2: np.ndarray = None
 
     def __init__(self, spin_system: SpinSystem):
-        print("Relaxation theory settings have been initialized with the "
-              "following defaults: ")
-        print(f"antisymmetric: {self.antisymmetric}")
-        print(f"dynamic_frequency_shift: {self.dynamic_frequency_shift}")
-        print(f"relative_error: {self.relative_error}")
-        print(f"sr2k: {self.sr2k}")
-        print(f"tau_c: {self.tau_c}")
-        print(f"theory: {self.theory}")
-        print(f"thermalization: {self.thermalization}")
-        print(f"T1: {self.T1}")
-        print(f"T2: {self.T2}")
-        print()
 
         # Store a reference to the SpinSystem
         self._spin_system = spin_system
