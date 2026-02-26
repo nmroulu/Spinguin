@@ -18,6 +18,9 @@ from spinguin._core._hide_prints import HidePrints
 from spinguin._core._nmr_isotopes import ISOTOPES
 from multiprocessing.shared_memory import SharedMemory
 
+from scipy.spatial.transform import Rotation
+from sympy.physics.wigner import wigner_d
+
 def write_shared_sparse(A: csc_array) -> tuple[
     dict[str, str | np.dtype | tuple[int]],
     tuple[SharedMemory, SharedMemory, SharedMemory]]:
@@ -523,6 +526,58 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
             np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
 
     return theta
+
+def rotation_matrix_to_align_axes(axes1: np.ndarray,
+                                  axes2: np.ndarray) -> np.ndarray:
+    """
+    Computes the rotation matrix that aligns `axes1` to `axes2`.
+
+    Parameters
+    ----------
+    axes1 : ndarray
+        Initial coordinate system represented as a 3x3 matrix, where rows
+        are the basis vectors.
+    axes2 : ndarray
+        Target coordinate system represented as a 3x3 matrix, where rows
+        are the basis vectors.
+
+    Returns
+    -------
+    R : ndarray
+        Rotation matrix that aligns `axes1` to `axes2`.
+    """
+    # Compute the rotation matrix using scipy
+    rotation = Rotation.align_vectors(axes2, axes1)[0]
+
+    return rotation.as_matrix()
+
+def Wigner_D_matrix(rotation_matrix: np.ndarray,
+                    j: int) -> np.ndarray:
+    """
+    Computes the Wigner D-matrix for a given rotation matrix and angular
+    momentum quantum number `j`.
+
+    Parameters
+    ----------
+    rotation_matrix : ndarray
+        Rotation matrix (3x3).
+    j : int
+        Angular momentum quantum number.
+
+    Returns
+    -------
+    D : ndarray
+        Wigner D-matrix of size (2j+1, 2j+1).
+    """
+    # Convert the rotation matrix to a scipy Rotation object
+    rotation = Rotation.from_matrix(rotation_matrix)
+    
+    # Get the Euler angles from the rotation (SymPy uses ZYZ convention)
+    alpha, beta, gamma = rotation.as_euler('ZYZ', degrees=False)
+
+    # Get the Wigner D-matrix using the Euler angles and sympy
+    D = wigner_d(j, alpha, beta, gamma)
+    return np.array(D).astype(np.complex128)
 
 def decompose_matrix(matrix: np.ndarray) \
     -> tuple[np.ndarray, np.ndarray, np.ndarray]:

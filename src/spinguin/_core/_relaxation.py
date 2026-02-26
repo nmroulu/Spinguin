@@ -17,12 +17,15 @@ from spinguin._core._superoperators import sop_T_coupled, sop_prod
 from spinguin._core._la import \
     eliminate_small, principal_axis_system, \
     cartesian_tensor_to_spherical_tensor, angle_between_vectors, norm_1, \
-    auxiliary_matrix_expm, expm, decompose_matrix
+    auxiliary_matrix_expm, expm, decompose_matrix, \
+    rotation_matrix_to_align_axes, \
+    read_shared_sparse, write_shared_sparse
 from spinguin._core._utils import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import hamiltonian
 from typing import Literal
+from scipy.optimize import fsolve
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -268,6 +271,603 @@ def Q_intr_tensors(efg: np.ndarray,
         Q_tensors[i] *= val
 
     return Q_tensors
+
+def rotational_diffusion_constant_SED(T: float, 
+                                      eta: float, 
+                                      r: float | np.ndarray) -> float | np.ndarray:
+    """
+    Calculates the rotational diffusion constant using the Stokes-Einstein-Debye
+    (SED) relation.
+
+    Parameters
+    ----------
+    T : float
+        Temperature in Kelvin.
+    eta : float
+        Solvent viscosity in Pa·s.
+    r : float or ndarray
+        Effective radius of the molecule in Ångströms (Å).
+
+    Returns
+    -------
+    D_r : float or ndarray
+        Rotational diffusion constant in units of 1/s.
+    """
+    # Convert r from Å to meters
+    r_meters = r * 1e-10
+
+    # Calculate the rotational diffusion constant
+    D_r = const.k * T / (8 * np.pi * eta * r_meters**3)
+    return D_r
+
+def rotational_correlation_time(l: int, 
+                                D_r: float | np.ndarray) -> float | np.ndarray:
+    """
+    Calculates the rotational correlation time for a given rank `l`.
+
+    Parameters
+    ----------
+    l : int
+        Interaction rank.
+    D_r : float or ndarray
+        Rotational diffusion constant in units of 1/s.
+
+    Returns
+    -------
+    tau_c : float or ndarray
+        Rotational correlation time for the given rank in seconds.
+    """
+    # Calculate the rotational correlation time
+    tau_c = 1 / (l * (l + 1) * D_r)
+    return tau_c
+
+def rotational_correlation_time_SED(T: float,
+                                    eta: float,
+                                    r: float | np.ndarray,
+                                    l: int) -> float | np.ndarray:
+    """
+    Calculates the rotational correlation time using the Stokes-Einstein-Debye
+    (SED) relation for a given tensor rank.
+
+    Parameters
+    ----------
+    T : float
+        Temperature in Kelvin.
+    eta : float
+        Solvent viscosity in Pa·s.
+    r : float or ndarray
+        Effective radius of the molecule in Ångströms (Å).
+    l : int
+        Rank of the tensor.
+
+    Returns
+    -------
+    tau_c : float or ndarray
+        Rotational correlation time for the given rank in seconds.
+    """
+    # Calculate the rotational diffusion constant using SED
+    D_r = rotational_diffusion_constant_SED(T, eta, r)
+
+    # Calculate the rotational correlation time for the given rank
+    tau_c = rotational_correlation_time(l, D_r)
+
+    return tau_c
+
+def center_of_mass(masses: np.ndarray, 
+                   coords: np.ndarray) -> np.ndarray:
+    """
+    Calculates the center of mass for a molecule.
+
+    Parameters
+    ----------
+    masses : ndarray
+        A 1-dimensional array specifying the atomic masses of each atom
+        in the molecule. 
+        Must be given in atomic mass units (u).
+    coords : ndarray
+        A 2-dimensional array specifying the cartesian coordinates in
+        the XYZ format for each atom in the molecule. 
+        Must be given in the units of Å.
+
+    Returns
+    -------
+    center_of_mass : ndarray
+        Center of mass coordinates in units of Å.
+    """
+    total_mass = np.sum(masses)
+    return np.sum(masses[:, np.newaxis] * coords, axis=0) / total_mass
+
+def moment_of_inertia_tensor(masses: np.ndarray, 
+                             coords: np.ndarray) -> np.ndarray:
+    """
+    Calculates the moment of inertia tensor for a molecule.
+
+    Parameters
+    ----------
+    masses : ndarray
+        A 1-dimensional array specifying the atomic masses of each atom
+        in the molecule. 
+        Must be given in atomic mass units (u).
+    coords : ndarray
+        A 2-dimensional array specifying the cartesian coordinates in
+        the XYZ format for each atom in the molecule. 
+        Must be given in the units of Å.
+
+    Returns
+    -------
+    I : ndarray
+        Moment of inertia tensor in units of u·Å².
+    """
+
+    # Number of atoms
+    natoms = masses.shape[0]
+
+    # Calculate the center of mass
+    center_of_mass_coords = center_of_mass(masses, coords)
+
+    # Center the coordinates at the center of mass
+    coords_centered = coords - center_of_mass_coords
+
+    # Initialize the moment of inertia tensor
+    I = np.zeros((3, 3))
+
+    # Go through each atom
+    for i in range(natoms):
+        x, y, z = coords_centered[i]
+        m = masses[i]
+
+        # Update the moment of inertia tensor
+        I[0, 0] += m * (y**2 + z**2)
+        I[1, 1] += m * (x**2 + z**2)
+        I[2, 2] += m * (x**2 + y**2)
+        I[0, 1] -= m * x * y
+        I[0, 2] -= m * x * z
+        I[1, 2] -= m * y * z
+
+    # Fill the symmetric elements
+    I[1, 0] = I[0, 1]
+    I[2, 0] = I[0, 2]
+    I[2, 1] = I[1, 2]
+
+    return I
+
+def moment_of_inertia_equivalent_ellipsoid(masses: np.ndarray,
+                                           coords: np.ndarray) -> np.ndarray:
+    """
+    Calculates the three semi-axes a_x, a_y, and a_z of an mass-equivalent 
+    ellipsoid that has the same moment of inertia tensor eigenvalues as the molecule.
+    The semi-axes are determined by solving the equations:
+        
+        I_1 = (1/5) * M * (a_y^2 + a_z^2)
+        I_2 = (1/5) * M * (a_x^2 + a_z^2)
+        I_3 = (1/5) * M * (a_x^2 + a_y^2)
+
+    where I_1, I_2, and I_3 are the eigenvalues of the moment of inertia tensor,
+    M is the total mass of the molecule, and a_x, a_y, a_z are the semi-axes of the 
+    ellipsoid.
+
+    Parameters
+    ----------
+    masses : ndarray
+        A 1-dimensional array specifying the atomic masses of each atom
+        in the molecule, given in atomic mass units (u).
+    coords : ndarray
+        A 2-dimensional array specifying the Cartesian coordinates in
+        the XYZ format for each atom in the molecule, given in units of Å.
+
+    Returns
+    -------
+    semi_axes : ndarray
+        Semi-axes of the mass-equivalent ellipsoid in units of Å, calculated
+        as described above.
+    """
+    # Compute the moment of inertia tensor and its eigenvalues
+    I = moment_of_inertia_tensor(masses, coords)
+    eigenvalues, _ = np.linalg.eigh(I)
+
+    # Calculate the total mass of the molecule
+    total_mass = np.sum(masses)
+
+    # Calculate the semi-axes by solving the system of equations using Scipy's fsolve
+    def equations(vars):
+        a_x, a_y, a_z = vars
+        eq1 = (1/5) * total_mass * (a_y**2 + a_z**2) - eigenvalues[0]
+        eq2 = (1/5) * total_mass * (a_x**2 + a_z**2) - eigenvalues[1]
+        eq3 = (1/5) * total_mass * (a_x**2 + a_y**2) - eigenvalues[2]
+        return [eq1, eq2, eq3]
+
+    initial_guess = [2.0, 2.0, 2.0]  # Initial guess for the semi-axes in Å
+    a_x, a_y, a_z = fsolve(equations, initial_guess, maxfev=10000, xtol=1e-15)
+
+    return np.array([a_x, a_y, a_z])
+
+def Perrin_integrals(a_x: float, 
+                     a_y: float, 
+                     a_z: float, 
+                     upper_limit: float = 1e4, 
+                     num_points: int = int(1e6)) -> tuple[float, float, float]:
+    """
+    Calculates the Perrin integrals P, Q, and R for an ellipsoid with semi-axes a_x, a_y, and a_z.
+
+    Parameters
+    ----------
+    a_x : float
+        Semi-axis a_x of the ellipsoid in units of Å.
+    a_y : float
+        Semi-axis a_y of the ellipsoid in units of Å.
+    a_z : float
+        Semi-axis a_z of the ellipsoid in units of Å.
+    upper_limit : float, optional
+        Upper limit for the integration. Default is 1e4.
+    num_points : int, optional
+        Number of points for the integration. Default is 1e6.
+
+    Returns
+    -------
+    P : float
+        Perrin P integral for the ellipsoid.
+    Q : float
+        Perrin Q integral for the ellipsoid.
+    R : float
+        Perrin R integral for the ellipsoid.
+    """
+    # Axis to integrate over
+    s = np.linspace(0, upper_limit, num_points)  # More points for better accuracy
+
+    # Calculate the integrands
+    integrand_P = 1 / np.sqrt((a_x**2 + s)**3 * (a_y**2 + s) * (a_z**2 + s))
+    integrand_Q = 1 / np.sqrt((a_y**2 + s)**3 * (a_z**2 + s) * (a_x**2 + s))
+    integrand_R = 1 / np.sqrt((a_z**2 + s)**3 * (a_x**2 + s) * (a_y**2 + s))
+
+    # Perform the integrations using the trapezoidal rule
+    P = np.trapz(integrand_P, s)
+    Q = np.trapz(integrand_Q, s)
+    R = np.trapz(integrand_R, s)
+
+    return P, Q, R
+
+def Perrin_factors(a_x: float, 
+                   a_y: float, 
+                   a_z: float) -> np.ndarray:
+    """
+    Calculates the Perrin factors for an ellipsoid with semi-axes a_x, a_y, and a_z.
+
+    Parameters
+    ----------
+    a_x : float
+        Semi-axis a_x of the ellipsoid in units of Å.
+    a_y : float
+        Semi-axis a_y of the ellipsoid in units of Å.
+    a_z : float
+        Semi-axis a_z of the ellipsoid in units of Å.
+
+    Returns
+    -------
+    factors : ndarray
+        Array containing the Perrin factors for the x, y, and z axes.
+    """
+    # Calculate the Perrin integrals for the ellipsoid
+    P, Q, R = Perrin_integrals(a_x, a_y, a_z)
+
+    # Calculate the Perrin factors along each axis
+    f_x = (a_y**2 + a_z**2) / (a_y**2 * Q + a_z**2 * R)
+    f_y = (a_x**2 + a_z**2) / (a_z**2 * R + a_x**2 * P)
+    f_z = (a_x**2 + a_y**2) / (a_x**2 * P + a_y**2 * Q)
+
+    return np.array([f_x, f_y, f_z])
+
+def rotational_diffusion_constants_Perrin(T: float,
+                                         eta: float,
+                                         a_x: float,
+                                         a_y: float,
+                                         a_z: float) -> np.ndarray:
+    """
+    Calculates the rotational diffusion constants along the principal axes of an ellipsoid
+    using the Perrin factors.
+
+    Parameters
+    ----------
+    T : float
+        Temperature in Kelvin.
+    eta : float
+        Solvent viscosity in Pa·s.
+    a_x : float
+        Semi-axis a_x of the ellipsoid in units of Å.
+    a_y : float
+        Semi-axis a_y of the ellipsoid in units of Å.
+    a_z : float
+        Semi-axis a_z of the ellipsoid in units of Å.
+
+    Returns
+    -------
+    D_rs : ndarray
+        Rotational diffusion constants along the principal axes in units of 1/s.
+    """
+    # Calculate the Perrin factors for the ellipsoid
+    perrin_factors = Perrin_factors(a_x, a_y, a_z)
+
+    # Convert to correct units
+    perrin_factors *= 1e-30  # Convert from Å^3 to m^3
+
+    # Calculate the rotational diffusion constants along the principal axes
+    D_rs = (const.k * T / perrin_factors) / (16 * np.pi * eta / 3)
+
+    return D_rs
+
+def rotational_correlation_times_Perrin(masses: np.ndarray,
+                                        coords: np.ndarray,
+                                        T: float,
+                                        eta: float,
+                                        l: int,
+                                        scale: float = 1.0) -> np.ndarray:
+    """
+    Calculates the rotational correlation times along the principal axes
+    of rotation using the Perrin factors for a given tensor rank.
+
+    Parameters
+    ----------
+    masses : ndarray
+        A 1-dimensional array specifying the atomic masses of each atom
+        in the molecule. Must be given in atomic mass units (u).
+    coords : ndarray
+        A 2-dimensional array specifying the Cartesian coordinates in
+        the XYZ format for each atom in the molecule. Must be given in
+        the units of Å.
+    T : float
+        Temperature in Kelvin.
+    eta : float
+        Solvent viscosity in Pa·s.
+    l : int
+        Rank of the tensor (must be greater than 0).
+    scale : float, optional
+        Scaling factor for the rotational diffusion constants. Default is 1.0.
+        Useful for adjusting the correlation times to better match experimental data.
+
+    Returns
+    -------
+    tau_cs : ndarray
+        Rotational correlation times along the principal axes in seconds.
+        The output is an array of shape (3,) corresponding to the three
+        principal axes of the ellipsoid.
+    """
+    # Calculate the semi-axes of the mass-equivalent ellipsoid
+    semi_axes = moment_of_inertia_equivalent_ellipsoid(masses, coords)
+
+    # NOTE: 
+    # Add hydrodynamic thickness to semi-axes to account for the effects
+    # of solvent interactions and vibrational motion on the effective size
+    # of the molecule. Necessary for flat molecules where one of the semi-axes
+    # can be very small. 
+    semi_axes += 1.0  # Minimum thickness
+
+    # Calculate the rotational diffusion constants along the principal axes using Perrin factors
+    D_rs = rotational_diffusion_constants_Perrin(T, eta, semi_axes[0], semi_axes[1], semi_axes[2])
+
+    # Apply scaling factor to the rotational diffusion constants
+    D_rs *= scale
+
+    # Calculate the rotational correlation times along the principal axes
+    tau_cs = rotational_correlation_time(l, D_rs)
+
+    return tau_cs
+
+def l2_ellipsoidal_rot_diff_gen_constants(D_1: float, 
+                                          D_2: float, 
+                                          D_3: float) -> tuple[float, float, float, float]:
+    """
+    Calculates the rank-2 rotational diffusion generator constants (see Spinguin documentation)
+    given the three eigenvalues (principal values) of the rotational diffusion
+    tensor for an ellipsoidal diffusor.
+
+    Parameters
+    ----------
+    D_1 : float
+        Rotational diffusion constant along the first principal axis in units of 1/s.
+    D_2 : float
+        Rotational diffusion constant along the second principal axis in units of 1/s.
+    D_3 : float
+        Rotational diffusion constant along the third principal axis in units of 1/s.
+        
+    Returns
+    -------
+    D: float
+        Average rotational diffusion constant.
+    R: float
+        Rotational diffusion generator parameter R.
+    K_p: float
+        Rotational diffusion generator parameter K plus.
+    K_m: float
+        Rotational diffusion generator parameter K minus.
+    """
+    D = (D_1 + D_2 + D_3) / 3
+    R = (D_1*D_2 + D_1*D_3 + D_2*D_3) / 3
+    K_p = (np.sqrt(6) * (-2*D + D_1 + D_2 + 2*np.sqrt(D**2 - R)) / (D_1 - D_2))
+    K_m = (np.sqrt(6) * (-2*D + D_1 + D_2 - 2*np.sqrt(D**2 - R)) / (D_1 - D_2))
+
+    return D, R, K_p, K_m
+
+def ellipsoidal_rot_diff_gen_eigvals_and_eigvecs(l: int, 
+                                                 D_1: float, 
+                                                 D_2: float, 
+                                                 D_3: float) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Returns the eigenvalues and eigenvectors of the rotational diffusion
+    generator tensor given the principal values D_1, D_2, and D_3 of the rotational
+    diffusion tensor for a given rank `l`.
+
+    Parameters
+    ----------
+    l : int
+        Rank of the tensor undergoing rotational diffusion (1 or 2).
+    D_1 : float
+        Rotational diffusion constant along the first principal axis in units of 1/s.
+    D_2 : float
+        Rotational diffusion constant along the second principal axis in units of 1/s.
+    D_3 : float
+        Rotational diffusion constant along the third principal axis in units of 1/s.
+
+    Returns
+    -------
+    eigenvalues : ndarray
+        Eigenvalues of the rotational diffusion generator tensor.
+    eigenvectors : ndarray
+        Eigenvectors of the rotational diffusion generator tensor.
+    """
+    if l == 1:
+        # Eigenvalues
+        eigenvalue_1 = D_1 + D_2
+        eigenvalue_2 = D_1 + D_3
+        eigenvalue_3 = D_2 + D_3
+
+        # Eigenvectors
+        eigenvector_1 = np.array([0.0, 1.0, 0.0])
+        eigenvector_2 = np.array([1.0, 0.0, 1.0])
+        eigenvector_3 = np.array([-1.0, 0.0, 1.0])
+
+        # Normalize the eigenvectors
+        eigenvector_1 /= np.linalg.norm(eigenvector_1)
+        eigenvector_2 /= np.linalg.norm(eigenvector_2)
+        eigenvector_3 /= np.linalg.norm(eigenvector_3)
+
+        # Create arrays for eigenvalues and eigenvectors
+        eigenvalues = np.array([
+            eigenvalue_1,
+            eigenvalue_2,
+            eigenvalue_3
+        ])
+
+        eigenvectors = np.array([
+            eigenvector_1,
+            eigenvector_2,
+            eigenvector_3
+        ])
+
+    elif l == 2:
+        # Handle the special case where D_1 == D_2 (symmetric top) [or D_2 == D_3 or D_1 == D_3 below]
+        if np.isclose(D_1, D_2):
+
+            # Print status message
+            print("Symmetric top (D_1 == D_2) detected in ellipsoidal_rot_diff_gen_eigvals_and_eigvecs.")
+            
+            # Eigenvalues
+            eigenvalue_1 = 2 * (D_1 + 2*D_3)
+            eigenvalue_2 = 5*D_1 + D_3
+            eigenvalue_3 = 6*D_3
+            eigenvalue_4 = 5*D_1 + D_3
+            eigenvalue_5 = 2 * (D_1 + 2*D_3)
+
+            # Eigenvectors (all already unit norm)
+            eigenvector_1 = np.array([0.0, 0.0, 1.0, 0.0, 0.0])
+            eigenvector_2 = np.array([1.0, 0.0, 0.0, 0.0, 0.0])
+            eigenvector_3 = np.array([0.0, 0.0, 0.0, 0.0, 1.0])
+            eigenvector_4 = np.array([0.0, 1.0, 0.0, 0.0, 0.0])
+            eigenvector_5 = np.array([0.0, 0.0, 0.0, 1.0, 0.0])
+
+        # Otherwise, general ellipsoid case
+        else:
+            # Compute diffusor generator constants
+            D, R, K_p, K_m = l2_ellipsoidal_rot_diff_gen_constants(D_1, D_2, D_3)
+
+            # Eigenvalues
+            eigenvalue_1 = 3 * (4*D - D_1 - D_2)
+            eigenvalue_2 = 3 * (D + D_2)
+            eigenvalue_3 = 3 * (D + D_1)
+            eigenvalue_4 = 6 * (D - np.sqrt(D**2 - R))
+            eigenvalue_5 = 6 * (D + np.sqrt(D**2 - R))
+
+            # Eigenvectors
+            eigenvector_1 = np.array([-1.0, 0.0, 0.0, 0.0, 1.0])
+            eigenvector_2 = np.array([0.0, -1.0, 0.0, 1.0, 0.0])
+            eigenvector_3 = np.array([0.0, 1.0, 0.0, 1.0, 0.0])
+            eigenvector_4 = np.array([1.0, 0.0, K_m, 0.0, 1.0])
+            eigenvector_5 = np.array([1.0, 0.0, K_p, 0.0, 1.0])
+
+            # Normalize the eigenvectors
+            eigenvector_1 /= np.linalg.norm(eigenvector_1)
+            eigenvector_2 /= np.linalg.norm(eigenvector_2)
+            eigenvector_3 /= np.linalg.norm(eigenvector_3)
+            eigenvector_4 /= np.linalg.norm(eigenvector_4)
+            eigenvector_5 /= np.linalg.norm(eigenvector_5)
+
+        # Create arrays for eigenvalues and eigenvectors
+        eigenvalues = np.array([
+            eigenvalue_1,
+            eigenvalue_2,
+            eigenvalue_3,
+            eigenvalue_4,
+            eigenvalue_5
+        ])
+
+        eigenvectors = np.array([
+            eigenvector_1,
+            eigenvector_2,
+            eigenvector_3,
+            eigenvector_4,
+            eigenvector_5
+        ])
+
+    else:
+        raise ValueError("Only ranks l = 1 and l = 2 are supported for "
+                         "ellipsoidal_rot_diff_gen_eigvals_and_eigvecs.")
+
+    return eigenvalues, eigenvectors
+
+def g_lp_0(tensor1: np.ndarray, 
+           tensor2: np.ndarray,
+           l: int, 
+           p: int,
+           rotational_principal_axes: np.ndarray,
+           diffusion_generator_eigenvectors: np.ndarray) -> float:
+    """
+    Computes the p:th component of the time correlation function at t = 0
+    in the case of anisotropic rotational diffusion (ellipsoidal diffusor)
+    between two Cartesian tensors.
+
+    This is the multiplicative factor in front of each exponential decay term
+    for the anisotropic rotational diffusion model.
+    (See Spinguin documentation.)
+
+    Parameters
+    ----------
+    tensor1 : ndarray
+        Cartesian tensor 1.
+    tensor2 : ndarray
+        Cartesian tensor 2.
+    l : int
+        Common rank of the tensors.
+    p : int
+        Component index (eigenvalue/eigenvector index of the rotational diffusion tensor).
+    rotational_principal_axes : ndarray
+        Principal axes of rotation (eigenvectors of the rotational diffusion tensor).
+        Assumes that the axes are represented as the columns of the matrix.
+    diffusion_generator_eigenvectors : ndarray
+        Eigenvectors of the rotational diffusion generator.
+
+    Returns
+    -------
+    g_lp_0 : float
+        p:th component of the time correlation function evaluated at t = 0.
+    """
+    # Find the rotation matrix that aligns the laboratory frame to the rotational principal axes
+    lab_frame = np.eye(3)
+    R = rotation_matrix_to_align_axes(lab_frame, rotational_principal_axes.T)
+
+    # Transform the tensors to the rotational principal axes frame
+    tensor1_rpa = R @ tensor1 @ R.T
+    tensor2_rpa = R @ tensor2 @ R.T
+
+    # Write the tensors in the spherical tensor notation
+    V1_rpa = cartesian_tensor_to_spherical_tensor(tensor1_rpa)
+    V2_rpa = cartesian_tensor_to_spherical_tensor(tensor2_rpa)
+
+    # Compute two different summations in g_lp_0
+    sum1 = sum(V1_rpa[l, m] * diffusion_generator_eigenvectors[m, p] for m in range(-l, l + 1))
+    sum2 = sum(np.conj(V2_rpa[l, m] * diffusion_generator_eigenvectors[m, p]) for m in range(-l, l + 1))
+
+    # Compute g_lp_0
+    g_lp_0 = (1 / (2 * l + 1)) * sum1 * sum2
+
+    return g_lp_0
 
 def _process_interactions(spin_system: SpinSystem) -> dict:
     """
@@ -661,7 +1261,9 @@ def _ldb_thermalization(
 
     return R
 
-def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
+def relaxation(spin_system: SpinSystem, 
+               masses: np.ndarray = None, 
+               coords: np.ndarray = None) -> np.ndarray | sp.csc_array:
     """
     Creates the relaxation superoperator using the requested relaxation theory.
 
@@ -695,6 +1297,14 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     spin_system : SpinSystem
         Spin system for which the relaxation superoperator is going to be
         generated.
+    masses : ndarray, optional
+        A 1-dimensional array specifying the atomic masses of each atom
+        in the molecule. Must be given in atomic mass units (u). Required
+        only for anisotropic diffusion.
+    coords : ndarray, optional
+        A 2-dimensional array specifying the cartesian coordinates in
+        the XYZ format for each atom in the molecule. Must be given in
+        the units of Å. Required only for anisotropic diffusion.
 
     Returns
     -------
@@ -746,7 +1356,7 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     # Make relaxation superoperator using Redfield theory
     elif spin_system.relaxation.theory == "redfield":
-        R = _sop_R_redfield(spin_system)
+        R = _sop_R_redfield(spin_system, masses=masses, coords=coords)
     
     # Apply scalar relaxation of the second kind if requested
     if spin_system.relaxation.sr2k:
@@ -768,23 +1378,42 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     return R
 
-def _correlation_matrix(interactions: dict) -> dict:
+####################################
+
+def _correlation_matrix(interactions: dict,
+                        rotational_principal_axes: np.ndarray = None,
+                        diffusion_generator_eigenvectors: dict = None) -> dict:
     """
     Calculates the correlation matrix for ranks l = 1 and l = 2. The matrix
     elements µµ' represent the correlation function G0 for the interaction pair
     µµ'.
+
+    For isotropic rotational diffusion, there is only one matrix element for each
+    interaction pair, whereas for anisotropic diffusion, there are 2l + 1 matrix
+    elements for each interaction pair.
 
     Parameters
     ----------
     interactions : dict
         A dictionary that contains two keys: l = 1 and l = 2. The values are
         lists where each interaction is represented by a tuple.
+    rotational_principal_axes : ndarray, optional
+        Principal axes of rotation (eigenvectors of the rotational diffusion tensor).
+        Assumes that the axes are represented as the columns of the matrix. 
+        Default is None. This parameter is used for anisotropic diffusion.
+    diffusion_generator_eigenvectors : dict, optional
+        A dictionary containing eigenvectors of the rotational diffusion generator 
+        for each rank. Default is None. This parameter is used for anisotropic diffusion.
 
     Returns
     -------
     G_0 : dict
-        A dictionary that contains two keys: l = 1 and l = 2. The values are
-        NumPy arrays, which contain the correlation matrix.
+        Isotropic case: A dictionary that contains two keys: l = 1 and l = 2. The values are
+        2D NumPy arrays, which contain the correlation matrix for ranks l = 1 and l = 2.
+
+        Anisotropic case: A dictionary that contains two keys: l = 1 and l = 2. The values are
+        3D NumPy arrays, which contain the correlation matrices for ranks l = 1 and l = 2. 
+        The third dimension corresponds to the 2l + 1 values for each interaction pair.
     """
     print("Calculating the correlation matrix...")
     time_start = time.time()
@@ -792,10 +1421,19 @@ def _correlation_matrix(interactions: dict) -> dict:
     # Initialise a dictionary for the correlation matrix
     n1 = len(interactions[1])
     n2 = len(interactions[2])
-    G_0 = {
-        1 : np.zeros(shape=(n1, n1)),
-        2 : np.zeros(shape=(n2, n2))
-    }
+
+    # Isotropic case
+    if rotational_principal_axes is None or diffusion_generator_eigenvectors is None:
+        G_0 = {
+            1 : np.zeros(shape=(n1, n1)),
+            2 : np.zeros(shape=(n2, n2))
+        }
+    # Anisotropic case
+    else:
+        G_0 = {
+            1 : np.zeros(shape=(n1, n1, 2*1 + 1), dtype=complex),
+            2 : np.zeros(shape=(n2, n2, 2*2 + 1), dtype=complex)
+        }
 
     # Loop over the ranks
     for l in [1, 2]:
@@ -813,22 +1451,40 @@ def _correlation_matrix(interactions: dict) -> dict:
                 tensor_j = interactions[l][j][3]
 
                 # Compute G0 and save to the dictionary
-                G_0_curr = G0(tensor_i, tensor_j, l)
-                if i == j:
-                    G_0[l][i, j] = G_0_curr
+                # Isotropic case
+                if rotational_principal_axes is None or diffusion_generator_eigenvectors is None:
+                    G_0_curr = G0(tensor_i, tensor_j, l)
+
+                    if i == j:
+                        G_0[l][i, j] = G_0_curr
+                    else:
+                        G_0[l][i, j] = G_0_curr
+                        G_0[l][j, i] = G_0_curr
+
+                # Anisotropic case
                 else:
-                    G_0[l][i, j] = G_0_curr
-                    G_0[l][j, i] = G_0_curr
+                    G_l_eigenvectors = diffusion_generator_eigenvectors[l]
+
+                    for p in range(2*l + 1):
+                        G_0_curr = g_lp_0(tensor_i, tensor_j, l, p, 
+                                           rotational_principal_axes,
+                                           G_l_eigenvectors)
+
+                        if i == j:
+                            G_0[l][i, j, p] = G_0_curr
+                        else:
+                            G_0[l][i, j, p] = G_0_curr
+                            G_0[l][j, i, p] = np.conj(G_0_curr)
 
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return G_0
 
-def _correlation_matrix_eig(G_0: dict) -> tuple[dict, dict, dict]:
+def _correlation_matrix_eig(G_0: dict) -> tuple[dict, dict]:
     """
     Calculates the eigendecomposition G_0 = Q * L * Q^T of the correlation
     matrix G_0 for ranks l = 1 and l = 2. Only the three and five largest
-    eigenvalues are store for the ranks l = 1 and l = 2, respectively.
+    eigenvalues are stored for the ranks l = 1 and l = 2, respectively.
 
     Parameters
     ----------
@@ -854,21 +1510,44 @@ def _correlation_matrix_eig(G_0: dict) -> tuple[dict, dict, dict]:
 
     # Calculate the eigendecomposition for the ranks l = 1 and l = 2
     for l in [1, 2]:
-        L_l, Q_l = np.linalg.eigh(G_0[l])
 
-        # Find indices of the eigendecomposition to be kept
-        max_idx = min(2*l+1, len(L_l))
-        idx = np.flip(np.argsort(L_l))[:max_idx]
+        # Isotropic case
+        if G_0[l].ndim == 2:
+            L_l, Q_l = np.linalg.eigh(G_0[l])
 
-        # Write the eigendecomposition to the dictionaries
-        L[l] = L_l[idx]
-        Q[l] = Q_l[:, idx]
+            # Find indices of the eigendecomposition to be kept
+            max_idx = min(2*l+1, len(L_l))
+            idx = np.flip(np.argsort(L_l))[:max_idx]
 
-        print(f"Rank {l}:")
-        print(f"\tCorrelations before truncation: {len(L_l)}")
-        print(f"\tCorrelations after truncation: {len(L[l])}")
-        with np.printoptions(precision=4):
-            print(f"\tEigenvalues: {L[l]}")
+            # Write the eigendecomposition to the dictionaries
+            L[l] = L_l[idx]
+            Q[l] = Q_l[:, idx]
+
+            print(f"Rank {l}:")
+            print(f"\tCorrelations before truncation: {len(L_l)}")
+            print(f"\tCorrelations after truncation: {len(L[l])}")
+            with np.printoptions(precision=4):
+                print(f"\tEigenvalues: {L[l]}")
+
+        # Anisotropic case
+        elif G_0[l].ndim == 3:
+
+            for p in range(2*l + 1):
+                L_lp, Q_lp = np.linalg.eigh(G_0[l][:, :, p])
+                                
+                # TODO: Quick and dirty fix
+                max_idx = 1
+                idx = np.flip(np.argsort(L_lp))[:max_idx]
+
+                # Write the eigendecomposition to the dictionaries
+                L[(l, p)] = L_lp[idx]
+                Q[(l, p)] = Q_lp[:, idx]
+
+                print(f"Rank {l}, p = {p}:")
+                print(f"\tCorrelations before truncation: {len(L_lp)}")
+                print(f"\tCorrelations after truncation: {len(L[(l, p)])}")
+                with np.printoptions(precision=4):
+                    print(f"\tEigenvalues: {L[(l, p)]}")
 
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
@@ -921,7 +1600,9 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     return sop_Ts
 
-def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
+def _sop_R_redfield(spin_system: SpinSystem, 
+                    masses: np.ndarray = None, 
+                    coords: np.ndarray = None) -> sp.csc_array:
     """
     Calculates the relaxation superoperator R using the Redfield theory.
 
@@ -929,12 +1610,19 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     ----------
     spin_system : SpinSystem
         SpinSystem for which the relaxation superoperator is to be calculated.
+    masses : ndarray, optional
+        A 1-dimensional array specifying the atomic masses of each atom
+        in the molecule. Must be given in atomic mass units (u). Required
+        only for anisotropic diffusion.
+    coords : ndarray, optional
+        A 2-dimensional array specifying the cartesian coordinates in
+        the XYZ format for each atom in the molecule. Must be given in
+        the units of Å. Required only for anisotropic diffusion.
 
     Returns
     -------
     R : csc_array
         Relaxation superoperator calculated using the Redfield theory.
-
     """
     time_start_R = time.time()
     print('Constructing relaxation superoperator using Redfield theory...\n')
@@ -950,18 +1638,59 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     # Process the interactions
     interactions = _process_interactions(spin_system)
 
-    # Calculate the correlation matrix
-    G_0 = _correlation_matrix(interactions)
+    # Isotropic case
+    if not (isinstance(tau_c, (np.ndarray)) and len(tau_c) > 1):
+        # Print status message about the rotational diffusion model
+        print("Using isotropic rotational diffusion model.\n")
 
-    # Calculate the singular value decomposition of the correlation matrix
+        # Calculate the correlation matrix
+        G_0 = _correlation_matrix(interactions)
+
+        # Define the integration limit for the auxiliary matrix method
+        t_max = np.log(1 / relative_error) * tau_c
+
+    # Anisotropic case
+    else:
+        # Ensure masses and coords are provided
+        if masses is None or coords is None:
+            raise ValueError("Masses and coordinates must be provided for anisotropic diffusion.")
+        
+        # Print status message about the rotational diffusion model
+        print("Using anisotropic rotational diffusion model.\n")
+
+        # Calculate the rotational diffusion principal axes
+        moi_tensor = moment_of_inertia_tensor(masses, coords)
+        _, rot_principal_axes = np.linalg.eigh(moi_tensor)
+
+        # Calculate diffusion generator eigenvalues and eigenvectors for ranks l = 1 and l = 2
+        diffusion_generator_eigenvectors = {}
+        diffusion_generator_eigenvalues = {}
+        for l in [1, 2]:
+            D1, D2, D3 = 1 / (tau_c * l * (l + 1))
+            diffusion_generator_eigenvalues[l], diffusion_generator_eigenvectors[l] = \
+                ellipsoidal_rot_diff_gen_eigvals_and_eigvecs(l, D1, D2, D3)
+
+        # Calculate the correlation matrix
+        G_0 = _correlation_matrix(
+            interactions,
+            rotational_principal_axes=rot_principal_axes,
+            diffusion_generator_eigenvectors=diffusion_generator_eigenvectors
+        )
+
+        # Define the integration limit for the auxiliary matrix method
+        all_diffusion_eigenvalues = np.concatenate([diffusion_generator_eigenvalues[l] for l in [1, 2]])
+        t_max = np.log(1 / relative_error) * np.max(1 / all_diffusion_eigenvalues)
+
+    # # NOTE: DEBUG
+    # print(G_0)
+
+    # Calculate the eigendecomposition of the correlation matrix
+    # NOTE: Isotropic/anisotropic cases are handled inside the function
     L, Q = _correlation_matrix_eig(G_0)
 
     # Build the coherent Hamiltonian superoperator
     with HidePrints():
         H = hamiltonian(spin_system)
-
-    # Define the integration limit for the auxiliary matrix method
-    t_max = np.log(1 / relative_error) * tau_c
 
     # Build the top left array of the auxiliary matrix (A)
     top_left = 1j * H
@@ -974,51 +1703,106 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     time_start = time.time()
     for l in [1, 2]:
 
-        # Diagonal matrix of correlation time
-        tau_c_diagonal_l = 1/tau_c_l(tau_c, l) * sp.eye_array(dim, format='csc')
+        # Isotropic case
+        if not (isinstance(tau_c, (np.ndarray)) and len(tau_c) > 1):
 
-        # Bottom right array of auxiliary matrix (C)
-        bottom_right = 1j * H - tau_c_diagonal_l
+            # Diagonal matrix of correlation time
+            tau_c_diagonal_l = 1/tau_c_l(tau_c, l) * sp.eye_array(dim, format='csc')
 
-        # Iterate over the projections
-        for q in range(-l, l + 1):
+            # Bottom right array of auxiliary matrix (C)
+            bottom_right = 1j * H - tau_c_diagonal_l
 
-            print(f"l = {l}, q = {q}")
+            # Iterate over the projections
+            for q in range(-l, l + 1):
 
-            # Iterate over the eigenvalues
-            for j in range(len(L[l])):
+                print(f"l = {l}, q = {q}")
 
-                # Calculate the coupled T superoperators
-                sop_T_left = sp.csc_array((dim, dim), dtype=complex)
-                sop_T_right = sp.csc_array((dim, dim), dtype=complex)
-                for u, interaction in enumerate(interactions[l]):
+                # Iterate over the eigenvalues
+                for j in range(len(L[l])):
 
-                    # Extract the interaction information
-                    itype = interaction[0]
-                    spin1 = interaction[1]
-                    spin2 = interaction[2]
+                    # Calculate the coupled T superoperators
+                    sop_T_left = sp.csc_array((dim, dim), dtype=complex)
+                    sop_T_right = sp.csc_array((dim, dim), dtype=complex)
+                    for u, interaction in enumerate(interactions[l]):
 
-                    # Acquire the coupled T superoperator
-                    sop_T_u = sop_Ts[(l, q, itype, spin1, spin2)]
+                        # Extract the interaction information
+                        itype = interaction[0]
+                        spin1 = interaction[1]
+                        spin2 = interaction[2]
 
-                    # Add to the sum
-                    sop_T_left = sop_T_left + Q[l][u, j] * sop_T_u.conj().T
-                    sop_T_right = sop_T_right + Q[l][u, j] * sop_T_u
+                        # Acquire the coupled T superoperator
+                        sop_T_u = sop_Ts[(l, q, itype, spin1, spin2)]
 
-                # Calculate the Redfield integral
-                aux_expm = auxiliary_matrix_expm(
-                    A = top_left,
-                    B = L[l][j] * sop_T_right,
-                    C = bottom_right,
-                    t = t_max,
-                    zero_value = parameters.zero_aux
-                )
-                aux_top_l = aux_expm[:dim, :dim]
-                aux_top_r = aux_expm[:dim, dim:]
-                integral = aux_top_l.conj().T @ aux_top_r
+                        # Add to the sum
+                        sop_T_left = sop_T_left + Q[l][u, j] * sop_T_u.conj().T
+                        sop_T_right = sop_T_right + Q[l][u, j] * sop_T_u
 
-                # Add the current term to the relaxation superoperator
-                R = R + sop_T_left @ integral
+                    # Calculate the Redfield integral
+                    aux_expm = auxiliary_matrix_expm(
+                        A = top_left,
+                        B = L[l][j] * sop_T_right,
+                        C = bottom_right,
+                        t = t_max,
+                        zero_value = parameters.zero_aux
+                    )
+                    aux_top_l = aux_expm[:dim, :dim]
+                    aux_top_r = aux_expm[:dim, dim:]
+                    integral = aux_top_l.conj().T @ aux_top_r
+
+                    # Add the current term to the relaxation superoperator
+                    R = R + sop_T_left @ integral
+
+        # Anisotropic case
+        else:
+
+            # Iterate over diffusion tensor eigenvalues/eigenvectors
+            for p in range(2*l + 1):
+
+                # Diagonal matrix of correlation time
+                tau_c_diagonal_lp = diffusion_generator_eigenvalues[l][p] * sp.eye_array(dim, format='csc')
+
+                # Bottom right array of auxiliary matrix (C)
+                bottom_right = 1j * H - tau_c_diagonal_lp
+
+                # Iterate over the projections
+                for q in range(-l, l + 1):
+
+                    print(f"l = {l}, q = {q}, p = {p}")
+
+                    # Iterate over the eigenvalues
+                    for j in range(len(L[(l, p)])):
+
+                        # Calculate the coupled T superoperators
+                        sop_T_left = sp.csc_array((dim, dim), dtype=complex)
+                        sop_T_right = sp.csc_array((dim, dim), dtype=complex)
+                        for u, interaction in enumerate(interactions[l]):
+
+                            # Extract the interaction information
+                            itype = interaction[0]
+                            spin1 = interaction[1]
+                            spin2 = interaction[2]
+
+                            # Acquire the coupled T superoperator
+                            sop_T_u = sop_Ts[(l, q, itype, spin1, spin2)]
+
+                            # Add to the sum
+                            sop_T_left = sop_T_left + Q[(l, p)][u, j] * sop_T_u.conj().T
+                            sop_T_right = sop_T_right + np.conj(Q[(l, p)][u, j]) * sop_T_u
+
+                        # Calculate the Redfield integral
+                        aux_expm = auxiliary_matrix_expm(
+                            A = top_left,
+                            B = L[(l, p)][j] * sop_T_right,
+                            C = bottom_right,
+                            t = t_max,
+                            zero_value = parameters.zero_aux
+                        )
+                        aux_top_l = aux_expm[:dim, :dim]
+                        aux_top_r = aux_expm[:dim, dim:]
+                        integral = aux_top_l.conj().T @ aux_top_r
+
+                        # Add the current term to the relaxation superoperator
+                        R = R + sop_T_left @ integral
 
     print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
