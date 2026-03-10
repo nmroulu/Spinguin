@@ -53,8 +53,6 @@ class Basis:
     _spin_system: SpinSystem = None
 
     def __init__(self, spin_system: SpinSystem):
-        print("Basis set has been initialized with the following defaults:")
-        print(f"max_spin_order: {self.max_spin_order}\n")
 
         # Store a reference to the SpinSystem
         self._spin_system = spin_system

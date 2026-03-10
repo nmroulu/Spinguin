@@ -39,18 +39,6 @@ class RelaxationProperties:
     _molecule: Molecule = None
 
     def __init__(self, spin_system: SpinSystem):
-        print("Relaxation theory settings have been initialized with the "
-              "following defaults: ")
-        print(f"antisymmetric: {self.antisymmetric}")
-        print(f"dynamic_frequency_shift: {self.dynamic_frequency_shift}")
-        print(f"relative_error: {self.relative_error}")
-        print(f"sr2k: {self.sr2k}")
-        print(f"tau_c: {self.tau_c}")
-        print(f"theory: {self.theory}")
-        print(f"thermalization: {self.thermalization}")
-        print(f"T1: {self.T1}")
-        print(f"T2: {self.T2}")
-        print()
 
         # Store a reference to the SpinSystem
         self._spin_system = spin_system
@@ -59,7 +47,7 @@ class RelaxationProperties:
     def antisymmetric(self) -> bool:
         """
         Specifies whether to consider the antisymmetric part of the interaction
-        tensors in the Redfield relaxation theory.
+        tensors in the Redfield relaxation theory. Default: False.
         """
         return self._antisymmetric
     
@@ -74,7 +62,7 @@ class RelaxationProperties:
         """
         Specifies whether to include the dynamic frequency shift in the Redfield
         relaxation theory. This corresponds to the imaginary part of the
-        relaxation superoperator.
+        relaxation superoperator. Default: False.
         """
         return self._dynamic_frequency_shift
     
@@ -89,6 +77,7 @@ class RelaxationProperties:
         """
         Specifies the relative error for the Redfield relaxation theory. This
         corresponds to the convergence criterion for the Redfield integral.
+        Default: 1e-6.
         """
         return self._relative_error
     
@@ -101,7 +90,7 @@ class RelaxationProperties:
     def sr2k(self) -> bool:
         """
         Specifies whether to include the scalar relaxation of the second kind
-        (SR2K) in the relaxation superoperator.
+        (SR2K) in the relaxation superoperator. Default: False.
         """
         return self._sr2k
     
@@ -172,7 +161,7 @@ class RelaxationProperties:
     def thermalization(self) -> bool:
         """
         Specifies whether to apply Levitt-di Bari thermalization to the
-        relaxation superoperator.
+        relaxation superoperator. Default: False.
         """
         return self._thermalization
     
@@ -222,6 +211,8 @@ class RelaxationProperties:
         if T1.shape != self._spin_system.isotopes.shape:
             raise ValueError("Mismatch between the given T1 times and the "
                              "number of spins in the system.")
+        if np.min(T1) <= 0:
+            raise ValueError("T1 cannot be zero or negative.")
         
         self._T1 = T1
         print(f"T1 set to: {self.T1}\n")
@@ -233,7 +224,7 @@ class RelaxationProperties:
         are used to create the phenomenological relaxation superoperator.
         Two input types are supported:
 
-        - If `ArrayLike`: A 1D array of size N containing T2 times. Example:
+        - If `ArrayLike`: A 1D array of size N containing T2 times.
         - If `str`: Path to the file containing the T2 times.
 
         The input will be converted and stored as a NumPy array.
@@ -266,6 +257,8 @@ class RelaxationProperties:
         if T2.shape != self._spin_system.isotopes.shape:
             raise ValueError("Mismatch between the given T2 times and the "
                              "number of spins in the system.")
+        if np.min(T2) <= 0:
+            raise ValueError("T2 cannot be zero or negative.")
         
         self._T2 = T2
         print(f"T2 set to: {self.T2}\n")
@@ -273,17 +266,97 @@ class RelaxationProperties:
     @property
     def R1(self) -> np.ndarray:
         """
-        Contains the longitudinal relaxation rates for each spin in the system.
+        Specifies the longitudinal relaxation rates for each spin. These are
+        used to create the phenomenological relaxation superoperator. Two input
+        types are supported:
+
+        - If `ArrayLike`: A 1D array of size N containing R1 rates.
+        - If `str`: Path to the file containing the R1 rates.
+
+        The input will be stored as a NumPy array. Note that this attribute is
+        linked with T1 by the following relation: R1 = 1/T1.
+
+        Examples::
+
+            # Using array input
+            spin_system.relaxation.R1 = np.array([5.5, 6.0, 2.7])
+
+            # Using string input
+            spin_system.relaxation.R1 = "/path/to/the/file/R1.txt"
         """
         return 1 / self.T1
+    
+    @R1.setter
+    def R1(self, R1: list | tuple | np.ndarray | str):
+        # Handle string input
+        if isinstance(R1, str):
+            R1 = read_array(R1, data_type=float)
+            
+        # Handle array like input
+        elif isinstance(R1, (list, tuple, np.ndarray)):
+            R1 = arraylike_to_array(R1)
+
+        # Otherwise throw an error
+        else:
+            raise TypeError("R1 should be a 1-dimensional array or a string.")
+        
+        # Check that the input is valid
+        if R1.shape != self._spin_system.isotopes.shape:
+            raise ValueError("Mismatch between the given R1 rates and the "
+                             "number of spins in the system.")
+        if np.min(R1) <= 0:
+            raise ValueError("R1 cannot be zero or negative.")
+        
+        self._T1 = 1/R1
+        print(f"R1 set to: {self.R1}\n")
     
     @property
     def R2(self) -> np.ndarray:
         """
-        Contains the transverse relaxation rates for each spin in the system.
+        Specifies the transverse relaxation rates for each spin. These are used
+        to create the phenomenological relaxation superoperator. Two input types
+        are supported:
+
+        - If `ArrayLike`: A 1D array of size N containing R2 rates.
+        - If `str`: Path to the file containing the R2 rates.
+
+        The input will be stored as a NumPy array. Note that this attribute is
+        linked with T2 by the following relation: R2 = 1/T2.
+
+        Examples::
+
+            # Using array input
+            spin_system.relaxation.R2 = np.array([5.5, 6.0, 2.7])
+
+            # Using string input
+            spin_system.relaxation.R2 = "/path/to/the/file/R2.txt"
         """
         return 1 / self.T2
-    
+
+    @R2.setter
+    def R2(self, R2: list | tuple | np.ndarray | str):
+        # Handle string input
+        if isinstance(R2, str):
+            R2 = read_array(R2, data_type=float)
+            
+        # Handle array like input
+        elif isinstance(R2, (list, tuple, np.ndarray)):
+            R2 = arraylike_to_array(R2)
+
+        # Otherwise throw an error
+        else:
+            raise TypeError("R2 should be a 1-dimensional array or a string.")
+        
+        # Check that the input is valid
+        if R2.shape != self._spin_system.isotopes.shape:
+            raise ValueError("Mismatch between the given R2 rates and the "
+                             "number of spins in the system.")
+        if np.min(R2) <= 0:
+            raise ValueError("R2 cannot be zero or negative.")
+        
+        self._T2 = 1/R2
+        print(f"R2 set to: {self.R2}\n")
+
     @property
     def molecule(self) -> Molecule:
         """
