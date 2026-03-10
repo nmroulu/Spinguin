@@ -40,6 +40,9 @@ from spinguin._core import (
     op_T_coupled,
     operator,
 
+    # molecule
+    Molecule,
+
     # parameters
     parameters,
 
@@ -100,6 +103,9 @@ __all__ = [
 
     # core: liouvillian
     "liouvillian",
+
+    # core: molecule
+    "Molecule",
 
     # core: nmr_isotopes
     "gamma",

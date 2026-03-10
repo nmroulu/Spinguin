@@ -15,6 +15,7 @@ from ._chem import (
 )
 from ._hamiltonian import hamiltonian
 from ._liouvillian import liouvillian
+from ._molecule import Molecule
 from ._nmr_isotopes import (
     gamma,
     quadrupole_moment,
@@ -84,6 +85,9 @@ __all__ = [
 
     #liouvillian
     "liouvillian",
+
+    #molecule
+    "Molecule",
 
     #nmr_isotopes
     "gamma",
