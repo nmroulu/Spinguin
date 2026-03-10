@@ -411,7 +411,7 @@ def _sop_T_coupled(
             op_def[spin_1] = 2 - q1
 
             # Use the coupling of angular momenta equation
-            sop += _la.CG_coeff(1, q1, 1, 1, l, q) * \
+            sop += _la.CG_coeff(1, q1, 1, 0, l, q) * \
                    sop_prod(op_def, basis, spins, 'comm')
 
     return sop
