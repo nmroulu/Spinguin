@@ -283,6 +283,78 @@ class TestRelaxation(unittest.TestCase):
         # Build the relaxation superoperator (and see that no errors arise)
         sg.relaxation(ss)
 
+    def test_relaxation_redfield_3(self):
+        """
+        Test that creates the relaxation superoperator with isotropic and
+        anisotropic rotational diffusion and compares the obtained results.
+        """
+        # Set the global parameters
+        sg.parameters.default()
+        sg.parameters.magnetic_field = 1
+
+        # Make the spin system
+        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+
+        # Create the basis set
+        ss.basis.max_spin_order = 3
+        ss.basis.build()
+
+        # Define the chemical shifts (in ppm)
+        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+
+        # Define scalar couplings (in Hz)
+        ss.J_couplings = [
+            [ 0,     0,      0,      0,      0,      0],
+            [-1.04,  0,      0,      0,      0,      0],
+            [ 4.85,  1.05,   0,      0,      0,      0],
+            [ 1.05,  4.85,   0.71,   0,      0,      0],
+            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
+            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
+        ]
+
+        # Define Cartesian coordinates of nuclei
+        ss.xyz = [
+            [ 2.0495335, 0.0000000, -1.4916842],
+            [-2.0495335, 0.0000000, -1.4916842],
+            [ 2.1458878, 0.0000000,  0.9846086],
+            [-2.1458878, 0.0000000,  0.9846086],
+            [ 0.0000000, 0.0000000,  2.2681296],
+            [ 0.0000000, 0.0000000, -1.5987077]
+        ]
+
+        # Define shielding tensors
+        shielding = np.zeros((6, 3, 3))
+        shielding[5] = np.array([
+            [-406.20, 0.00,   0.00],
+            [ 0.00,   299.44, 0.00],
+            [ 0.00,   0.00,  -181.07]
+        ])
+        ss.shielding = shielding
+
+        # Define electric field gradient tensors
+        efg = np.zeros((6, 3, 3))
+        efg[5] = np.array([
+            [0.3069, 0.0000,  0.0000],
+            [0.0000, 0.7969,  0.0000],
+            [0.0000, 0.0000, -1.1037]
+        ])
+        ss.efg = efg
+
+        # Define the relaxation theory
+        ss.relaxation.theory = "redfield"
+        
+        # Obtain R using the isotropic rotational diffusion
+        ss.relaxation.tau_c = 50e-12
+        R_iso = sg.relaxation(ss)
+
+        # Obtain R using the anisotropic rotational diffusion
+        ss.relaxation.tau_c = [50e-12, 50e-12, 50e-12]
+        ss.relaxation.molecule = sg.Molecule(ss.isotopes, ss.xyz)
+        R_aniso = sg.relaxation(ss)
+
+        # Compare with each other
+        self.assertTrue(np.allclose(R_iso.toarray(), R_aniso.toarray()))
+
     def test_relaxation_phenomenological(self):
         """
         Test that creates the phenomenological relaxation superoperator and
