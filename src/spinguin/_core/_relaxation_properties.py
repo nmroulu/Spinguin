@@ -19,6 +19,7 @@ import numpy as np
 from typing import Literal
 from spinguin._core._data_io import read_array
 from spinguin._core._la import arraylike_to_array
+from spinguin._core._molecule import Molecule
 
 class RelaxationProperties:
     """
@@ -30,11 +31,12 @@ class RelaxationProperties:
     _dynamic_frequency_shift: bool=False
     _relative_error: float = 1e-6
     _sr2k: bool=False
-    _tau_c: float | tuple[float, float, float] = None
+    _tau_c: float | np.ndarray = None
     _theory: Literal["redfield", "phenomenological"] = None
     _thermalization: bool = False
     _T1: np.ndarray = None
     _T2: np.ndarray = None
+    _molecule: Molecule = None
 
     def __init__(self, spin_system: SpinSystem):
         print("Relaxation theory settings have been initialized with the "
@@ -113,13 +115,21 @@ class RelaxationProperties:
         """
         Specifies the correlation time(s) for the Redfield relaxation theory.
 
-        For isotropic rotational diffusion, a single value is used.
+        For isotropic rotational diffusion, a single value is used. Example::
+
+            spin_system.relaxation.tau_c = 50e-12
 
         For symmetric top rotational diffusion, two values are used,
-        corresponding to the perpendicular and parallel components of the diffusion tensor.
+        corresponding to the perpendicular and parallel components of the
+        diffusion tensor. Example::
+            
+            spin_system.relaxation.tau_c = [50e-12, 100e-12]
         
         For anisotropic rotational diffusion, an array of three values is used,
         corresponding to the principal components of the diffusion tensor.
+        Example::
+
+            spin_system.relaxation.tau_c = [50e-12, 100e-12, 150e-12]
         """
         return self._tau_c
     
@@ -226,7 +236,7 @@ class RelaxationProperties:
         - If `ArrayLike`: A 1D array of size N containing T2 times. Example:
         - If `str`: Path to the file containing the T2 times.
 
-        The input will be stored as a NumPy array.
+        The input will be converted and stored as a NumPy array.
 
         Examples::
 
@@ -239,7 +249,7 @@ class RelaxationProperties:
         return self._T2
     
     @T2.setter
-    def T2(self, T2: np.ndarray):
+    def T2(self, T2: list | tuple | np.ndarray | str):
         # Handle string input
         if isinstance(T2, str):
             T2 = read_array(T2, data_type=float)
@@ -273,3 +283,20 @@ class RelaxationProperties:
         Contains the transverse relaxation rates for each spin in the system.
         """
         return 1 / self.T2
+    
+    @property
+    def molecule(self) -> Molecule:
+        """
+        Molecule that the spin system to be simulated is part of. Used to
+        define the rotational principal axes.
+        """
+        return self._molecule
+    
+    @molecule.setter
+    def molecule(self, molecule: Molecule):
+        # Check that the input is valid
+        if not isinstance(molecule, Molecule):
+            raise ValueError("Invalid input type for molecule.")
+        
+        self._molecule = molecule
+        print("Molecule has been assigned.\n")
