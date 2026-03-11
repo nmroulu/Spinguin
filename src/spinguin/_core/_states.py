@@ -21,60 +21,6 @@ from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._status import status
 
-def _unit_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    normalized: bool=True
-) -> np.ndarray | sp.csc_array:
-    """
-    Returns a unit state vector. This is equivalent to the density matrix, which
-    has ones on the diagonal. Because the basis set is normalized, the
-    coefficient of the unit operator in the state vector is equal to the norm of
-    the unit operator.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    normalized : bool, default=True
-        If set to True, the function will return a state vector that represents
-        the trace-normalized density matrix. If False, returns a state vector
-        that corresponds to the identity operator.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the unit state.
-    """
-
-    # Obtain the basis dimension
-    dim = basis.shape[0]
-
-    # Acquire the spin multiplicities
-    mults = np.array([int(2 * S + 1) for S in spins], dtype=int)
-
-    # Initialize the state vector
-    if parameters.sparse_state:
-        rho = sp.lil_array((dim, 1), dtype=complex)
-    else:
-        rho = np.zeros((dim, 1), dtype=complex)
-
-    # Assign unit state coefficient
-    if normalized:
-        rho[0, 0] = 1 / np.sqrt(np.prod(mults))
-    else:
-        rho[0, 0] = np.sqrt(np.prod(mults))
-
-    # Convert to csc_array if requesting sparse
-    if parameters.sparse_state:
-        rho = rho.tocsc()
-
-    return rho
-
 @lru_cache(maxsize=8192)
 def _state_from_op_def(
     basis_bytes : bytes,
@@ -446,12 +392,26 @@ def unit_state(
     rho : ndarray or csc_array
         State vector corresponding to the unit state.
     """
-    # Create the unit state
-    rho = _unit_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        normalized = normalized
-    )
+    # Check that the required attributes are set
+    if spin_system.basis.basis is None:
+        raise ValueError("Please build the basis before constructing the "
+                         "unit state.")
+
+    # Initialize the state vector
+    if parameters.sparse_state:
+        rho = sp.lil_array((spin_system.basis.dim, 1), dtype=complex)
+    else:
+        rho = np.zeros((spin_system.basis.dim, 1), dtype=complex)
+
+    # Assign unit state coefficient
+    if normalized:
+        rho[0, 0] = 1 / np.sqrt(np.prod(spin_system.mults))
+    else:
+        rho[0, 0] = np.sqrt(np.prod(spin_system.mults))
+
+    # Convert to csc_array if requesting sparse
+    if parameters.sparse_state:
+        rho = rho.tocsc()
 
     return rho
 
