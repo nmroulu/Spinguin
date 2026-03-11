@@ -21,118 +21,6 @@ from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._status import status
 
-@lru_cache(maxsize=8192)
-def _state_from_op_def(
-    basis_bytes : bytes,
-    spins_bytes : bytes,
-    op_def_bytes : bytes,
-    sparse: bool
-) -> np.ndarray | sp.csc_array:
-    
-    # Obtain the hashed elements
-    spins = np.frombuffer(spins_bytes, dtype=float)
-    basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0])
-    op_def = np.frombuffer(op_def_bytes, dtype=int)
-
-    # Obtain the basis dimension and spin multiplicities
-    dim = basis.shape[0]
-    mults = (2*spins + 1).astype(int)
-
-    # Initialize the state vector
-    if sparse:
-        rho = sp.lil_array((dim, 1), dtype=complex)
-    else:
-        rho = np.zeros((dim, 1), dtype=complex)
-
-    # Get the state index
-    idx = state_idx(basis, op_def)
-
-    # Find indices of the active and inactive spins
-    idx_active = np.where(np.array(op_def) != 0)[0]
-    idx_inactive = np.where(np.array(op_def) == 0)[0]
-
-    # Calculate the norm of the active operator part if there are active
-    # spins
-    if len(idx_active) != 0:
-        if parameters.sparse_operator:
-            op_norm = sp.linalg.norm(
-                op_prod(op_def, spins, include_unit=False), ord='fro'
-            )
-        else:
-            op_norm = np.linalg.norm(
-                op_prod(op_def, spins, include_unit=False), ord='fro'
-            )
-
-    # Otherwise set it to one
-    else:
-        op_norm = 1
-    
-    # Calculate the norm of the unit operator part
-    unit_norm = np.sqrt(np.prod(mults[idx_inactive]))
-
-    # Total norm of the operator
-    norm = op_norm * unit_norm
-
-    # Set the properly normalized coefficient
-    rho[idx, 0] = norm
-
-    # Convert to csc_array if requesting sparse
-    if sparse:
-        rho = rho.tocsc()
-
-    return rho
-
-def state_from_op_def(
-    basis : np.ndarray,
-    spins : np.ndarray,
-    op_def : np.ndarray,
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates a state from the given operator definition. The output of this
-    function is a column vector where the requested state has been populated.
-    
-    Normalization:
-    The output of this function corresponds to the non-normalized operator.
-    However, because the basis set operators are constructed from products of
-    normalized single-spin spherical tensor operators, requesting a state that
-    corresponds to any operator `O` will result in a coefficient of `norm(O)`
-    for the state.
-
-    NOTE: This function is sometimes called often and is cached for high
-    performance.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    op_def : ndarray
-        An array of integers that specify the product operator.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the requested state.
-    """
-
-    # Convert types suitable for hashing
-    basis_bytes = basis.tobytes()
-    spins_bytes = spins.tobytes()
-    op_def_bytes = op_def.tobytes()
-
-    # Create the state and ensure that a different instance is returned
-    rho = _state_from_op_def(
-        basis_bytes,
-        spins_bytes,
-        op_def_bytes,
-        parameters.sparse_state
-    ).copy()
-
-    return rho
-
 @lru_cache(maxsize=128)
 def _state_from_string(
     basis_bytes: bytes,
@@ -381,25 +269,28 @@ def state(
         Defines the state to be generated. The operator string must follow the
         rules below:
 
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
+        - Cartesian or ladder operator at specific index or for all spins::
 
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
+            operator = "I(component, index)"
+            operator = "I(component)"
 
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+        - Spherical tensor operator at specific index or for all spins::
 
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
+            operator = "T(l, q, index)"
+            operator = "T(l, q)"
+
+        - Product operators::
+
+            operator = "I(component1, index1) * I(component2, index2)"
+
+        - Sum of operators::
+
+            operator = "I(component1, index1) + I(component2, index2)"
             
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
+        - Unit operators are ignored in the input. These are identical::
+
+            operator = "E * I(component, index)"
+            operator = "I(component, index)"
         
         Special case: An empty `operator` string is considered as unit operator.
 
@@ -843,10 +734,3 @@ def clear_cache_state_from_string():
     """
     # Clear the cache
     _state_from_string.cache_clear()
-
-def clear_cache_state_from_op_def():
-    """
-    Clears the cache of the `_state_from_op_def()` function.
-    """
-    # Clear the cache
-    _state_from_op_def.cache_clear()
