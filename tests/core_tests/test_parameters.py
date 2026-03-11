@@ -67,6 +67,16 @@ class TestParameters(unittest.TestCase):
         sg.parameters.sparse_state = sparse_state
         self.assertEqual(sg.parameters.sparse_state, sparse_state)
 
+    def test_set_verbose(self):
+        """
+        Test setting the status messages.
+        """
+        # Set the status messages
+        sg.parameters.default()
+        verbose = False
+        sg.parameters.verbose = verbose
+        self.assertEqual(sg.parameters.verbose, verbose)
+
     def test_set_zero_hamiltonian(self):
         """
         Test setting the zero-value threshold for Hamiltonian.
@@ -192,6 +202,7 @@ class TestParameters(unittest.TestCase):
         sg.parameters.sparse_operator = "changed"
         sg.parameters.sparse_state = "changed"
         sg.parameters.sparse_superoperator = "changed"
+        sg.parameters.verbose = "changed"
         sg.parameters.zero_aux = "changed"
         sg.parameters.zero_equilibrium = "changed"
         sg.parameters.zero_hamiltonian = "changed"
@@ -214,6 +225,7 @@ class TestParameters(unittest.TestCase):
         self.assertEqual(sg.parameters.sparse_operator, True)
         self.assertEqual(sg.parameters.sparse_state, False)
         self.assertEqual(sg.parameters.sparse_superoperator, True)
+        self.assertEqual(sg.parameters.verbose, True)
         self.assertEqual(sg.parameters.zero_aux, 1e-15)
         self.assertEqual(sg.parameters.zero_equilibrium, 1e-18)
         self.assertEqual(sg.parameters.zero_hamiltonian, 1e-12)

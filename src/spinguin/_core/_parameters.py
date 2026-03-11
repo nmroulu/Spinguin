@@ -6,6 +6,8 @@ when the Spinguin package is imported and can be accessed by::
     import spinguin as sg
     sg.parameters.PARAMETERNAME = VALUE
 """
+# Imports
+from spinguin._core._status import status
 
 class Parameters:
     """
@@ -32,6 +34,9 @@ class Parameters:
         self._sparse_operator: bool=True
         self._sparse_state: bool=False
         self._sparse_superoperator: bool=True
+
+        # Status messages
+        self._verbose: bool=True
         
         # Zero-value thresholds
         self._zero_aux: float = 1e-15
@@ -55,7 +60,7 @@ class Parameters:
     @magnetic_field.setter
     def magnetic_field(self, magnetic_field: float):
         self._magnetic_field = magnetic_field
-        print(f"Magnetic field set to: {self.magnetic_field} T\n")
+        status(f"Magnetic field set to: {self.magnetic_field} T\n")
 
     @property
     def temperature(self) -> float:
@@ -67,7 +72,7 @@ class Parameters:
     @temperature.setter
     def temperature(self, temperature: float):
         self._temperature = temperature
-        print(f"Temperature set to: {self.temperature} K\n")
+        status(f"Temperature set to: {self.temperature} K\n")
 
     @property
     def parallel_dim(self) -> int:
@@ -81,7 +86,7 @@ class Parameters:
     @parallel_dim.setter
     def parallel_dim(self, parallel_dim: int):
         self._parallel_dim = parallel_dim
-        print(f"Threshold for parallel Redfield set to: {self.parallel_dim}\n")
+        status(f"Threshold for parallel Redfield set to: {self.parallel_dim}\n")
 
     @property
     def sparse_operator(self) -> bool:
@@ -94,7 +99,7 @@ class Parameters:
     @sparse_operator.setter
     def sparse_operator(self, sparse_operator: bool):
         self._sparse_operator = sparse_operator
-        print(f"Sparity setting of operator set to: {self.sparse_operator}\n")
+        status(f"Sparity setting of operator set to: {self.sparse_operator}\n")
 
     @property
     def sparse_superoperator(self) -> bool:
@@ -107,7 +112,7 @@ class Parameters:
     @sparse_superoperator.setter
     def sparse_superoperator(self, sparse_superoperator: bool):
         self._sparse_superoperator = sparse_superoperator
-        print("Sparity setting of superoperator set to: "
+        status("Sparity setting of superoperator set to: "
               f"{self.sparse_superoperator}\n")
 
     @property
@@ -120,7 +125,7 @@ class Parameters:
     @sparse_state.setter
     def sparse_state(self, sparse_state: bool):
         self._sparse_state = sparse_state
-        print(f"Sparity setting of state set to: {self.sparse_state}\n")
+        status(f"Sparity setting of state set to: {self.sparse_state}\n")
 
     @property
     def propagator_density(self) -> float:
@@ -134,8 +139,20 @@ class Parameters:
     @propagator_density.setter
     def propagator_density(self, propagator_density: float):
         self._propagator_density = propagator_density
-        print("Propagator density threshold set to: "
+        status("Propagator density threshold set to: "
               f"{self.propagator_density}\n")
+        
+    @property
+    def verbose(self) -> bool:
+        """
+        Can be used to turn on/off status messages to the console.
+        """
+        return self._verbose
+    
+    @verbose.setter
+    def verbose(self, verbose: bool):
+        self._verbose = verbose
+        print(f"Verbose set to: {self.verbose}\n")
 
     @property
     def zero_hamiltonian(self) -> float:
@@ -147,7 +164,7 @@ class Parameters:
     @zero_hamiltonian.setter
     def zero_hamiltonian(self, zero_hamiltonian: float):
         self._zero_hamiltonian = zero_hamiltonian
-        print("Hamiltonian zero-value threshold set to: "
+        status("Hamiltonian zero-value threshold set to: "
               f"{self.zero_hamiltonian}\n")
 
     @property
@@ -161,7 +178,7 @@ class Parameters:
     @zero_aux.setter
     def zero_aux(self, zero_aux: float):
         self._zero_aux = zero_aux
-        print(f"Auxiliary zero-value threshold set to: {self.zero_aux}\n")
+        status(f"Auxiliary zero-value threshold set to: {self.zero_aux}\n")
 
     @property
     def zero_relaxation(self) -> float:
@@ -174,7 +191,7 @@ class Parameters:
     @zero_relaxation.setter
     def zero_relaxation(self, zero_relaxation: float):
         self._zero_relaxation = zero_relaxation
-        print("Relaxation zero-value threshold set to: "
+        status("Relaxation zero-value threshold set to: "
               f"{self.zero_relaxation}\n")
 
     @property
@@ -189,7 +206,7 @@ class Parameters:
     @zero_interaction.setter
     def zero_interaction(self, zero_interaction: float):
         self._zero_interaction = zero_interaction
-        print("Interaction zero-value threshold set to: "
+        status("Interaction zero-value threshold set to: "
               f"{self.zero_interaction}\n")
 
     @property
@@ -204,7 +221,7 @@ class Parameters:
     @zero_propagator.setter
     def zero_propagator(self, zero_propagator: float):
         self._zero_propagator = zero_propagator
-        print("Propagator zero-value threshold set to: "
+        status("Propagator zero-value threshold set to: "
               f"{self.zero_propagator}\n")
 
     @property
@@ -219,7 +236,7 @@ class Parameters:
     @zero_pulse.setter
     def zero_pulse(self, zero_pulse: float):
         self._zero_pulse = zero_pulse
-        print(f"Pulse zero-value threshold set to: {self.zero_pulse}\n")
+        status(f"Pulse zero-value threshold set to: {self.zero_pulse}\n")
 
     @property
     def zero_thermalization(self) -> float:
@@ -233,7 +250,7 @@ class Parameters:
     @zero_thermalization.setter
     def zero_thermalization(self, zero_thermalization: float):
         self._zero_thermalization = zero_thermalization
-        print("Thermalization zero-value threshold set to: "
+        status("Thermalization zero-value threshold set to: "
               f"{self.zero_thermalization}\n")
 
     @property
@@ -247,7 +264,7 @@ class Parameters:
     @zero_equilibrium.setter
     def zero_equilibrium(self, zero_equilibrium: float):
         self._zero_equilibrium = zero_equilibrium
-        print("Equilibrium zero-value threshold set to: "
+        status("Equilibrium zero-value threshold set to: "
               f"{self.zero_equilibrium}\n")
         
     @property
@@ -261,7 +278,7 @@ class Parameters:
     @zero_time_step.setter
     def zero_time_step(self, zero_time_step: float):
         self._zero_time_step = zero_time_step
-        print("Time step zero-value threshold set to: "
+        status("Time step zero-value threshold set to: "
               f"{self.zero_time_step}\n")
         
     @property
@@ -275,7 +292,7 @@ class Parameters:
     @zero_zte.setter
     def zero_zte(self, zero_zte: float):
         self._zero_zte = zero_zte
-        print(f"ZTE zero-value threshold set to: {self.zero_zte}\n")
+        status(f"ZTE zero-value threshold set to: {self.zero_zte}\n")
 
 # Instantiate the Parameters object
 parameters = Parameters()

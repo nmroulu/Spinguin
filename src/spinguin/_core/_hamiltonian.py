@@ -15,6 +15,7 @@ from scipy.sparse import csc_array
 from spinguin._core._la import eliminate_small
 from spinguin._core._superoperators import sop_prod
 from spinguin._core._parameters import parameters
+from spinguin._core._status import status
 
 def sop_H_Z(
     basis: np.ndarray,
@@ -260,7 +261,7 @@ def sop_H(
     """
 
     time_start = time.time()
-    print("Constructing Hamiltonian...")
+    status("Constructing Hamiltonian...")
 
     # Check that each item in the interactions list is unique
     if not len(set(interactions)) == len(interactions):
@@ -296,8 +297,7 @@ def sop_H(
     # Remove small values to enhance sparsity
     eliminate_small(sop_H, zero_value)
 
-    print(f'Hamiltonian constructed in {time.time() - time_start:.4f} seconds.')
-    print()
+    status(f'Completed in {time.time() - time_start:.4f} seconds.\n')
 
     return sop_H
 

@@ -17,6 +17,7 @@ from spinguin._core._superoperators import sop_from_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._hamiltonian import sop_H
 from spinguin._core._parameters import parameters
+from spinguin._core._status import status
 
 def propagator(
     L: np.ndarray | sp.csc_array,
@@ -38,7 +39,7 @@ def propagator(
         Time propagator exp(L*t).
     """
 
-    print("Constructing propagator...")
+    status("Constructing propagator...")
     time_start = time.time()
 
     # Compute the matrix exponential
@@ -46,15 +47,14 @@ def propagator(
 
     # Calculate the density of the propagator
     density = P.nnz / (P.shape[0] ** 2)
-    print(f"Propagator density: {density:.4f}")
+    status(f"Propagator density: {density:.4f}")
 
     # Convert to NumPy array if density exceeds the threshold
     if density > parameters.propagator_density:
-        print("Density exceeds threshold. Converting to NumPy array.")
+        status("Density exceeds threshold. Converting to NumPy array.")
         P = P.toarray()
 
-    print(f'Propagator constructed in {time.time() - time_start:.4f} seconds.')
-    print()
+    status(f'Completed in {time.time() - time_start:.4f} seconds.\n')
 
     return P
 
@@ -115,7 +115,7 @@ def pulse(
                          "superoperators.")
 
     time_start = time.time()
-    print("Creating a pulse superoperator...")
+    status("Creating a pulse superoperator...")
 
     # Show a warning if pulse is generated using a product operator
     if '*' in operator:
@@ -137,7 +137,7 @@ def pulse(
     with HidePrints():
         P = expm(-1j * angle * op, parameters.zero_pulse)
 
-    print(f'Pulse constructed in {time.time() - time_start:.4f} seconds.\n')
+    status(f'Completed in {time.time() - time_start:.4f} seconds.\n')
 
     return P
 
@@ -167,7 +167,7 @@ def propagator_to_rotframe(
     P_rot : ndarray or csc_array
         The time propagator transformed into the rotating frame.
     """
-    print("Applying rotating frame transformation...")
+    status("Applying rotating frame transformation...")
     time_start = time.time()
 
     # Obtain an array of center frequencies for each spin
@@ -196,8 +196,6 @@ def propagator_to_rotframe(
     # Convert the time propagator to rotating frame
     P_rot = expm_H0t @ P
 
-    print("Rotating frame transformation applied in "
-          f"{time.time() - time_start:.4f} seconds.")
-    print()
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     
     return P_rot

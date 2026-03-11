@@ -10,6 +10,7 @@ mark takes a minute to run with `nspins=12` and `max_spin_order=3`.
 # Imports
 import numpy as np
 import spinguin as sg
+sg.parameters.verbose = False
 
 # Testing parameters
 nspins = 12

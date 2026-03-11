@@ -12,6 +12,7 @@ from spinguin._core._relaxation_properties import RelaxationProperties
 from spinguin._core._data_io import read_array, read_tensors, read_xyz
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._status import status
 from typing import Self
 
 class SpinSystem:
@@ -64,8 +65,8 @@ class SpinSystem:
         # Initialize relaxation theory settings
         self._relaxation = RelaxationProperties(self)
 
-        print("Spin system has been created with the following isotopes:")
-        print(f"{self.isotopes}\n")
+        status("Spin system has been created with the following isotopes:")
+        status(f"{self.isotopes}\n")
 
     def _check_consistency(self):
         """
@@ -221,8 +222,8 @@ class SpinSystem:
         # Check input consistency
         self._check_consistency()
             
-        print("Assigned the following chemical shifts:")
-        print(f"{self.chemical_shifts}\n")
+        status("Assigned the following chemical shifts:")
+        status(f"{self.chemical_shifts}\n")
             
     @property
     def J_couplings(self) -> np.ndarray:
@@ -261,7 +262,7 @@ class SpinSystem:
         # Check input consistency
         self._check_consistency()
         
-        print(f"Assigned the following J-couplings:\n{self.J_couplings}\n")
+        status(f"Assigned the following J-couplings:\n{self.J_couplings}\n")
 
     @property
     def xyz(self) -> np.ndarray:
@@ -297,7 +298,7 @@ class SpinSystem:
         # Check input consistency
         self._check_consistency()
 
-        print(f"Assigned the following XYZ coordinates:\n{self.xyz}\n")
+        status(f"Assigned the following XYZ coordinates:\n{self.xyz}\n")
 
     @property
     def shielding(self) -> np.ndarray:
@@ -343,7 +344,7 @@ class SpinSystem:
         # Check input consistency
         self._check_consistency()
 
-        print(f"Assigned the following shielding tensors:\n{self.shielding}\n")
+        status(f"Assigned the following shielding tensors:\n{self.shielding}\n")
         
     @property
     def efg(self) -> np.ndarray:
@@ -387,7 +388,7 @@ class SpinSystem:
         # Check input consistency
         self._check_consistency()
 
-        print(f"Assigned the following EFG tensors:\n{self.efg}\n")
+        status(f"Assigned the following EFG tensors:\n{self.efg}\n")
 
     @property
     def nspins(self) -> int:

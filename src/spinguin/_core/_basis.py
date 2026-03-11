@@ -31,6 +31,7 @@ from spinguin._core._states import state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 from spinguin._core._la import isvector
 from spinguin._core._parameters import parameters
+from spinguin._core._status import status
 
 class Basis:
     """
@@ -96,7 +97,7 @@ class Basis:
             raise ValueError("Maximum spin order must not be larger than "
                              "the number of spins in the system.")
         self._max_spin_order = max_spin_order
-        print(f"Maximum spin order set to: {self.max_spin_order}\n")
+        status(f"Maximum spin order set to: {self.max_spin_order}\n")
 
     def build(self):
         """
@@ -558,7 +559,7 @@ def truncate_basis_by_coherence(
         basis.
     """
 
-    print("Truncating the basis set. The following coherence orders are "
+    status("Truncating the basis set. The following coherence orders are "
           f"retained: {coherence_orders}")
     time_start = time.time()
 
@@ -583,11 +584,10 @@ def truncate_basis_by_coherence(
     # Convert basis to NumPy array
     truncated_basis = np.array(truncated_basis)
 
-    print("Truncated basis created.")
-    print(f"Original dimension: {len(basis)}")
-    print(f"Truncated dimension: {len(truncated_basis)}")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status("Truncated basis created.")
+    status(f"Original dimension: {len(basis)}")
+    status(f"Truncated dimension: {len(truncated_basis)}")
+    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.\n")
 
     return truncated_basis, index_map
 
@@ -622,7 +622,7 @@ def truncate_basis_by_coupling_weakest_link(
         List that contains an index map from the original basis to the truncated
         basis.
     """
-    print("Truncating the basis set based on J-couplings.")
+    status("Truncating the basis set based on J-couplings.")
     time_start = time.time()
 
     # Create an empty list for the new basis
@@ -674,11 +674,10 @@ def truncate_basis_by_coupling_weakest_link(
     # Convert basis to NumPy array
     truncated_basis = np.array(truncated_basis)
 
-    print("Truncated basis created.")
-    print(f"Original dimension: {len(basis)}")
-    print(f"Truncated dimension: {len(truncated_basis)}")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status("Truncated basis created.")
+    status(f"Original dimension: {len(basis)}")
+    status(f"Truncated dimension: {len(truncated_basis)}")
+    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.\n")
 
     return truncated_basis, index_map
 
@@ -715,7 +714,7 @@ def truncate_basis_by_coupling_network_strength(
         List that contains an index map from the original basis to the truncated
         basis.
     """
-    print("Truncating the basis set based on J-couplings.")
+    status("Truncating the basis set based on J-couplings.")
     time_start = time.time()
 
     # Create an empty list for the new basis
@@ -761,11 +760,10 @@ def truncate_basis_by_coupling_network_strength(
     # Convert basis to NumPy array
     truncated_basis = np.array(truncated_basis)
 
-    print("Truncated basis created.")
-    print(f"Original dimension: {len(basis)}")
-    print(f"Truncated dimension: {len(truncated_basis)}")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status("Truncated basis created.")
+    status(f"Original dimension: {len(basis)}")
+    status(f"Truncated dimension: {len(truncated_basis)}")
+    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
 
     return truncated_basis, index_map
 
@@ -865,7 +863,7 @@ def truncate_basis_by_zte(
         List that contains an index map from the original basis to the truncated
         basis.
     """
-    print("Truncating the basis set using zero-track elimination.")
+    status("Truncating the basis set using zero-track elimination.")
     time_start = time.time()
 
     # Create empty vector for the maximum values of rho
@@ -877,7 +875,7 @@ def truncate_basis_by_zte(
 
     # Propagate for few steps
     for i in range(nsteps):
-        print(f"ZTE step {i+1} of {nsteps}...")
+        status(f"ZTE step {i+1} of {nsteps}...")
         with HidePrints():
             rho = expm_vec(L*time_step, rho, zero_expm_vec)
             rho_max = np.maximum(rho_max, abs(rho))
@@ -888,11 +886,10 @@ def truncate_basis_by_zte(
     # Obtain the truncated basis
     truncated_basis = basis[index_map]
 
-    print("Truncated basis created.")
-    print(f"Original dimension: {len(basis)}")
-    print(f"Truncated dimension: {len(truncated_basis)}")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status("Truncated basis created.")
+    status(f"Original dimension: {len(basis)}")
+    status(f"Truncated dimension: {len(truncated_basis)}")
+    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
 
     return truncated_basis, index_map
 
@@ -917,7 +914,7 @@ def truncate_basis_by_indices(
     truncated_basis : ndarray
         A two-dimensional array containing the truncated basis set.
     """
-    print("Truncating the basis set based on supplied indices.")
+    status("Truncating the basis set based on supplied indices.")
     time_start = time.time()
 
     # Sort the indices
@@ -926,10 +923,9 @@ def truncate_basis_by_indices(
     # Obtain the truncated basis
     truncated_basis = basis[indices]
 
-    print("Truncated basis created.")
-    print(f"Original dimension: {len(basis)}")
-    print(f"Truncated dimension: {len(truncated_basis)}")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status("Truncated basis created.")
+    status(f"Original dimension: {len(basis)}")
+    status(f"Truncated dimension: {len(truncated_basis)}")
+    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
 
     return truncated_basis

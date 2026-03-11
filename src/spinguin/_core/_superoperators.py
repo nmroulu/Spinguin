@@ -19,6 +19,7 @@ from spinguin._core import _la
 from spinguin._core._utils import idx_to_lq, parse_operator_string
 from spinguin._core._operators import op_T
 from spinguin._core._parameters import parameters
+from spinguin._core._status import status
 
 @lru_cache(maxsize=16)
 def structure_coefficients(
@@ -488,15 +489,13 @@ def sop_to_truncated_basis(
         Superoperator transformed into the truncated basis.
     """
 
-    print("Transforming the superoperator into the truncated basis.")
+    status("Transforming the superoperator into the truncated basis...")
     time_start = time.time()
 
     # Perform the transformation to truncated basis
     sop_transformed = sop[np.ix_(index_map, index_map)]
 
-    print("Transformation completed.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status(f"Completed in {time.time() - time_start:.4f} seconds.")
 
     return sop_transformed
 

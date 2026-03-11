@@ -19,6 +19,7 @@ from spinguin._core._utils import parse_operator_string, state_idx
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import sop_H
+from spinguin._core._status import status
 
 def _unit_state(
     basis: np.ndarray,
@@ -784,15 +785,13 @@ def state_to_truncated_basis(
         State vector transformed into the truncated basis.
     """
 
-    print("Transforming the state vector into the truncated basis.")
+    status("Transforming the state vector into the truncated basis...")
     time_start = time.time()
 
     # Perform the transformation to truncated basis
     rho_transformed = rho[index_map]
 
-    print("Transformation completed.")
-    print(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-    print()
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return rho_transformed
 

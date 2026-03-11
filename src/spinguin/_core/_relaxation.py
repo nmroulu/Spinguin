@@ -26,6 +26,7 @@ from spinguin._core._utils import idx_to_lq, lq_to_idx, parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import hamiltonian
+from spinguin._core._status import status
 from typing import Literal
 from scipy.optimize import fsolve
 
@@ -625,7 +626,7 @@ def _rot_diff_gen(spin_system: SpinSystem) -> dict:
         Rotational diffusion generator for ranks l = 1 and l = 2 (keys). The
         values are 3x3 and 5x5 NumPy arrays, respectively.
     """
-    print("Calculating rotational diffusion generator...")
+    status("Calculating rotational diffusion generator...")
     time_start = time.time()
 
     # Obtain the rotational correlation time
@@ -669,7 +670,7 @@ def _rot_diff_gen(spin_system: SpinSystem) -> dict:
             D3 = 1 / (tau_cl[2] * l * (l + 1))
             G[l] = D1 * Jx @ Jx + D2 * Jy @ Jy + D3 * Jz @ Jz
 
-    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return G
 
@@ -758,7 +759,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
         
             (interaction, spin_1, spin_2, tensor).
     """
-    print("Processing interactions for relaxation...")
+    status("Processing interactions for relaxation...")
     time_start = time.time()
 
     # Choose between isotropic and anisotropic models
@@ -837,7 +838,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
         if len(interactions[l]) == 0:
             del interactions[l]
 
-    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return interactions
 
@@ -933,7 +934,7 @@ def _sop_R_phenomenological(
     """
 
     time_start = time.time()
-    print('Constructing the phenomenological relaxation superoperator...')
+    status('Constructing the phenomenological relaxation superoperator...')
 
     # Obtain the basis dimension
     dim = basis.shape[0]
@@ -978,9 +979,7 @@ def _sop_R_phenomenological(
     if parameters.sparse_superoperator:
         sop_R = sop_R.tocsc()
 
-    print("Phenomenological relaxation superoperator constructed in "
-          f"{time.time() - time_start:.4f} seconds.")
-    print()
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return sop_R
 
@@ -1006,7 +1005,7 @@ def _sop_R_sr2k(
         relaxation of the second kind.
     """
 
-    print("Processing scalar relaxation of the second kind...")
+    status("Processing scalar relaxation of the second kind...")
     time_start = time.time()
 
     # Make a dictionary of the basis for fast lookup
@@ -1081,9 +1080,7 @@ def _sop_R_sr2k(
     with HidePrints():
         sop_R = _sop_R_phenomenological(spin_system.basis.basis, R1, R2)
 
-    print(f"SR2K superoperator constructed in {time.time() - time_start:.4f} "
-          "seconds.")
-    print()
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     
     return sop_R
 
@@ -1109,7 +1106,7 @@ def _ldb_thermalization(
     R : ndarray or csc_array
         Thermalized relaxation superoperator.
     """
-    print("Applying thermalization to the relaxation superoperator...")
+    status("Applying thermalization to the relaxation superoperator...")
     time_start = time.time()
 
     # Get the matrix exponential corresponding to the Boltzmann distribution
@@ -1119,8 +1116,7 @@ def _ldb_thermalization(
     # Calculate the thermalized relaxation superoperator
     R = R @ P
 
-    print(f"Thermalization applied in {time.time() - time_start:.4f} seconds.")
-    print()
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return R
 
@@ -1250,7 +1246,7 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
         A dictionary that contains the coupled spherical tensor superoperators.
         The keys are tuples: (l, q, itype, spin1, spin2).
     """
-    print("Building the coupled spherical tensor operators...")
+    status("Building the coupled spherical tensor operators...")
     time_start = time.time()
 
     # Create an empty dictionary for the coupled spherical tensor operators
@@ -1276,7 +1272,7 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
                 # Store the coupled T superoperator to the dictionary
                 sop_Ts[(l, q, itype, spin1, spin2)] = sop_T
 
-    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     return sop_Ts
 
 def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
@@ -1294,7 +1290,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
         Relaxation superoperator calculated using the Redfield theory.
     """
     time_start_R = time.time()
-    print('Constructing relaxation superoperator using Redfield theory...\n')
+    status('Constructing relaxation superoperator using Redfield theory...\n')
 
     # Extract information from the spin system
     dim = spin_system.basis.dim
@@ -1323,7 +1319,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     top_left = 1j * H
 
     # Start building the relaxation superoperator
-    print("Calculating the Redfield superoperator terms...")
+    status("Calculating the Redfield superoperator terms...")
     time_start = time.time()
     R = sp.csc_array((dim, dim), dtype=complex)
 
@@ -1345,7 +1341,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
             # Iterate over the projections
             for q in range(-l, l + 1):
 
-                print(f"l = {l}, p = {p}, q = {q}")
+                status(f"l = {l}, p = {p}, q = {q}")
 
                 # Calculate the three-index operators
                 sop_X_lpq = sp.csc_array((dim, dim), dtype=complex)
@@ -1378,22 +1374,24 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
                 # Add the current term to the relaxation superoperator
                 R = R + (1 / (2*l + 1)) * sop_X_lpq @ integral
 
-    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     # Return only real values unless dynamic frequency shifts are requested
     if not spin_system.relaxation.dynamic_frequency_shift:
-        print("Removing the dynamic frequency shifts...")
+        status("Removing the dynamic frequency shifts...")
         time_start = time.time()
         R = R.real
-        print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     # Eliminate small values
-    print("Eliminating small values from the relaxation superoperator...")
+    status("Eliminating small values from the relaxation superoperator...")
     time_start = time.time()
     eliminate_small(R, parameters.zero_relaxation)
-    print(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     
-    print("Redfield relaxation superoperator constructed in "
-          f"{time.time() - time_start_R:.4f} seconds.\n")
+    status(
+        "Redfield relaxation superoperator constructed in "
+        f"{time.time() - time_start_R:.4f} seconds.\n"
+    )
 
     return R

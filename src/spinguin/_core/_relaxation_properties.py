@@ -20,6 +20,7 @@ from typing import Literal
 from spinguin._core._data_io import read_array
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._molecule import Molecule
+from spinguin._core._status import status
 
 class RelaxationProperties:
     """
@@ -54,7 +55,7 @@ class RelaxationProperties:
     @antisymmetric.setter
     def antisymmetric(self, antisymmetric: bool):
         self._antisymmetric = antisymmetric
-        print("Antisymmetric part of the interaction tensors set to: "
+        status("Antisymmetric part of the interaction tensors set to: "
               f"{self.antisymmetric}\n")
 
     @property
@@ -69,7 +70,7 @@ class RelaxationProperties:
     @dynamic_frequency_shift.setter
     def dynamic_frequency_shift(self, dynamic_frequency_shift: bool):
         self._dynamic_frequency_shift = dynamic_frequency_shift
-        print("Dynamic frequency shift set to: "
+        status("Dynamic frequency shift set to: "
               f"{self.dynamic_frequency_shift}\n")
         
     @property
@@ -84,7 +85,7 @@ class RelaxationProperties:
     @relative_error.setter
     def relative_error(self, relative_error: float):
         self._relative_error = relative_error
-        print(f"Relative error set to: {self.relative_error}\n")
+        status(f"Relative error set to: {self.relative_error}\n")
 
     @property
     def sr2k(self) -> bool:
@@ -97,7 +98,7 @@ class RelaxationProperties:
     @sr2k.setter
     def sr2k(self, sr2k: bool):
         self._sr2k = sr2k
-        print(f"SR2K set to: {self.sr2k}\n")
+        status(f"SR2K set to: {self.sr2k}\n")
 
     @property
     def tau_c(self) -> float | np.ndarray:
@@ -139,7 +140,7 @@ class RelaxationProperties:
                              "rotational diffusion), a list/tuple of two or three floats "
                              "(for symmetric top or anisotropic rotational diffusion), "
                              "or a numpy array of shape (2,) or (3,).")
-        print("Rotational correlation time(s) set to: " f"{self.tau_c}\n")
+        status("Rotational correlation time(s) set to: " f"{self.tau_c}\n")
 
     @property
     def theory(self) -> str:
@@ -155,7 +156,7 @@ class RelaxationProperties:
             raise ValueError("Relaxation theory must be 'redfield' or "
                              "'phenomenological'.")
         self._theory = theory
-        print(f"Relaxation theory set to: {self.theory}\n")
+        status(f"Relaxation theory set to: {self.theory}\n")
 
     @property
     def thermalization(self) -> bool:
@@ -168,7 +169,7 @@ class RelaxationProperties:
     @thermalization.setter
     def thermalization(self, thermalization: bool):
         self._thermalization = thermalization
-        print(f"Thermalization set to: {self.thermalization}\n")
+        status(f"Thermalization set to: {self.thermalization}\n")
 
     @property
     def T1(self) -> np.ndarray:
@@ -215,7 +216,7 @@ class RelaxationProperties:
             raise ValueError("T1 cannot be zero or negative.")
         
         self._T1 = T1
-        print(f"T1 set to: {self.T1}\n")
+        status(f"T1 set to: {self.T1}\n")
 
     @property
     def T2(self) -> np.ndarray:
@@ -261,7 +262,7 @@ class RelaxationProperties:
             raise ValueError("T2 cannot be zero or negative.")
         
         self._T2 = T2
-        print(f"T2 set to: {self.T2}\n")
+        status(f"T2 set to: {self.T2}\n")
 
     @property
     def R1(self) -> np.ndarray:
@@ -308,7 +309,7 @@ class RelaxationProperties:
             raise ValueError("R1 cannot be zero or negative.")
         
         self._T1 = 1/R1
-        print(f"R1 set to: {self.R1}\n")
+        status(f"R1 set to: {self.R1}\n")
     
     @property
     def R2(self) -> np.ndarray:
@@ -355,7 +356,7 @@ class RelaxationProperties:
             raise ValueError("R2 cannot be zero or negative.")
         
         self._T2 = 1/R2
-        print(f"R2 set to: {self.R2}\n")
+        status(f"R2 set to: {self.R2}\n")
 
     @property
     def molecule(self) -> Molecule:
@@ -372,4 +373,4 @@ class RelaxationProperties:
             raise ValueError("Invalid input type for molecule.")
         
         self._molecule = molecule
-        print("Molecule has been assigned.\n")
+        status("Molecule has been assigned.\n")

@@ -17,6 +17,7 @@ from spinguin._core._intersect_indices import intersect_indices
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._nmr_isotopes import ISOTOPES
 from multiprocessing.shared_memory import SharedMemory
+from spinguin._core._status import status
 
 from scipy.spatial.transform import Rotation
 from sympy.physics.wigner import wigner_d
@@ -215,7 +216,7 @@ def expm(A: np.ndarray | csc_array,
         Matrix exponential of `A`.
     """
 
-    print("Calculating the matrix exponential...")
+    status("Calculating the matrix exponential...")
 
     # Calculate the norm of A
     norm_A = norm_1(A, ord='col')
@@ -227,7 +228,7 @@ def expm(A: np.ndarray | csc_array,
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2 ** scaling_count
 
-        print(f"Scaling the matrix down {scaling_count} times.")
+        status(f"Scaling the matrix down {scaling_count} times.")
 
         # Scale the matrix down
         A = A / scaling_factor
@@ -237,14 +238,14 @@ def expm(A: np.ndarray | csc_array,
 
         # Scale the matrix exponential back up by repeated squaring
         for i in range(scaling_count):
-            print(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
+            status(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
             expm_A = custom_dot(expm_A, expm_A, zero_value)
     
     # If the norm of the matrix is small, proceed without scaling
     else:
         expm_A = expm_taylor(A, zero_value)
 
-    print("Matrix exponential completed.")
+    status("Matrix exponential completed.")
 
     return expm_A
 
@@ -271,7 +272,7 @@ def expm_taylor(A: np.ndarray | csc_array,
         Matrix exponential of A.
     """
 
-    print("Calculating the matrix exponential using Taylor series.")
+    status("Calculating the matrix exponential using Taylor series.")
 
     # Increase sparsity of A
     eliminate_small(A, zero_value)
@@ -287,7 +288,7 @@ def expm_taylor(A: np.ndarray | csc_array,
     cont = True
     while cont:
 
-        print(f"Taylor series term: {k}")
+        status(f"Taylor series term: {k}")
 
         # Get the next term
         trm = custom_dot(trm, A / k, zero_value)
@@ -304,7 +305,7 @@ def expm_taylor(A: np.ndarray | csc_array,
         else:
             cont = (np.count_nonzero(trm) != 0)
 
-    print("Taylor series converged.")
+    status("Taylor series converged.")
 
     return eA
 
@@ -923,7 +924,7 @@ def expm_vec(
         Result of `expm(A) @ v`. Returns a sparse CSC array only when both input
         arrays are sparse.
     """
-    print("Calculating the action of matrix exponential on a vector...")
+    status("Calculating the action of matrix exponential on a vector...")
 
     # Calculate the norm of A
     norm_A = norm_1(A, ord='col')
@@ -932,14 +933,14 @@ def expm_vec(
     scaling_A = int(math.ceil(norm_A))
 
     # Scale the matrix
-    print(f"Scaling the matrix by {scaling_A}.")
+    status(f"Scaling the matrix by {scaling_A}.")
     A = A / scaling_A
 
     # Calculate a scaling factor for the zero value
     scaling_zv = abs(v).max()
 
     # Scale the zero-value
-    print(f"Scaling the zero-value by {scaling_zv}.")
+    status(f"Scaling the zero-value by {scaling_zv}.")
     zero_value = zero_value / scaling_zv
 
     # Initialise the result
@@ -947,7 +948,7 @@ def expm_vec(
 
     # Calculate the expm*vec using the scaled matrix
     for i in range(scaling_A):
-        print(f"Calculating expm(A)*vec. Step {i+1} of {scaling_A}.")
+        status(f"Calculating expm(A)*vec. Step {i+1} of {scaling_A}.")
         eAv = expm_vec_taylor(A, eAv, zero_value)
 
     return eAv
