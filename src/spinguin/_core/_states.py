@@ -698,71 +698,6 @@ def _triplet_minus_state(
 
     return rho
 
-def _measure(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    rho: np.ndarray | sp.csc_array,
-    operator: str
-) -> complex:
-    """
-    Computes the expectation value of the specified operator for a given state
-    vector. Assumes that the state vector `rho` represents a trace-normalized
-    density matrix.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    rho : ndarray or csc_array
-        State vector that describes the density matrix.
-    operator : str
-        Defines the operator to be measured. The operator string must follow the
-        rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-
-    Returns
-    -------
-    ex : complex
-        Expectation value.
-    """
-
-    # Get the "operator" to be measured
-    oper = state_from_string(basis, spins, operator)
-
-    # Perform the measurement
-    ex = (oper.conj().T @ rho).trace()
-
-    return ex
-
 def state_to_truncated_basis(
     index_map: list,
     rho: np.ndarray | sp.csc_array
@@ -1256,14 +1191,14 @@ def measure(
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before measuring an "
                          "expectation value of an operator.")
-    
-    # Perform the measurement
-    ex = _measure(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        rho = rho,
-        operator = operator
+
+    # Get the "operator" to be measured
+    oper = state_from_string(
+        spin_system.basis.basis, spin_system.spins, operator
     )
+
+    # Perform the measurement
+    ex = (oper.conj().T @ rho).trace()
 
     return ex
 
