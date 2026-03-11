@@ -830,9 +830,7 @@ def measure(
                          "expectation value of an operator.")
 
     # Get the "operator" to be measured
-    oper = state_from_string(
-        spin_system.basis.basis, spin_system.spins, operator
-    )
+    oper = state(spin_system, operator)
 
     # Perform the measurement
     ex = (oper.conj().T @ rho).trace()
