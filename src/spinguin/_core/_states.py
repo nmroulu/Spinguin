@@ -22,7 +22,7 @@ from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._status import status
 
 @lru_cache(maxsize=128)
-def _state_from_string(
+def _state(
     basis_bytes: bytes,
     spins_bytes: bytes,
     operator: str,
@@ -85,83 +85,6 @@ def _state_from_string(
     # Convert to csc_array if requesting sparse
     if sparse:
         rho = rho.tocsc()
-
-    return rho
-
-def state_from_string(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    operator: str
-) -> np.ndarray | sp.csc_array:
-    """
-    This function returns a column vector representing the density matrix as a
-    linear combination of spin operators. Each element of the vector corresponds
-    to the coefficient of a specific spin operator in the expansion.
-    
-    Normalization:
-    The output of this function uses a normalised basis built from normalised
-    products of single-spin spherical tensor operators. However, the
-    coefficients are scaled so that the resulting linear combination represents
-    the non-normalised version of the requested operator.
-
-    NOTE: This function is sometimes called often and is cached for high
-    performance.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    operator : str
-        Defines the state to be generated. The operator string must follow the
-        rules below:
-
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
-
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
-
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit operator.
-
-        Whitespace will be ignored in the input.
-
-        NOTE: Indexing starts from 0!
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the requested state.
-    """
-    
-    # Convert types suitable for hashing
-    basis_bytes = basis.tobytes()
-    spins_bytes = spins.tobytes()
-
-    # Create the state and ensure that a different instance is returned
-    rho = _state_from_string(
-        basis_bytes,
-        spins_bytes,
-        operator,
-        parameters.sparse_state
-    ).copy()
 
     return rho
 
@@ -306,13 +229,18 @@ def state(
     # Check that the required attributes are set
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before constructing a state.")
-    
-    # Build the state
-    rho = state_from_string(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        operator = operator
-    )
+
+    # Convert to hashable types
+    basis_bytes = spin_system.basis.basis.tobytes()
+    spins_bytes = spin_system.spins.tobytes()
+
+    # Create the state and ensure that a different instance is returned
+    rho = _state(
+        basis_bytes,
+        spins_bytes,
+        operator,
+        parameters.sparse_state
+    ).copy()
 
     return rho
 
@@ -728,9 +656,9 @@ def measure(
 
     return ex
 
-def clear_cache_state_from_string():
+def clear_cache_state():
     """
-    Clears the cache of the `_state_from_string()` function.
+    Clears the cache of the `_state()` function.
     """
     # Clear the cache
-    _state_from_string.cache_clear()
+    _state.cache_clear()
