@@ -277,66 +277,6 @@ def state_from_string(
 
     return rho
 
-def _state_to_zeeman(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    rho: np.ndarray | sp.csc_array
-) -> np.ndarray | sp.csc_array:
-    """
-    Takes the state vector defined in the normalized spherical tensor basis
-    and converts it into the Zeeman eigenbasis. Useful for error checking.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    rho : ndarray or csc_array
-        State vector defined in the normalized spherical tensor basis.
-
-    Returns
-    -------
-    rho_zeeman : ndarray or csc_array
-        Spin density matrix defined in the Zeeman eigenbasis.
-    """
-
-    # Obtain the spin multiplicities
-    mults = (2*spins + 1).astype(int)
-
-    # Get the dimension of density matrix
-    dim = np.prod(mults)
-
-    # Initialize the spin density matrix
-    if parameters.sparse_operator:
-        rho_zeeman = sp.csc_array((dim, dim), dtype=complex)
-    else:
-        rho_zeeman = np.zeros((dim, dim), dtype=complex)
-    
-    # Obtain indices of the non-zero coefficients from the state vector
-    idx_nonzero = rho.nonzero()[0]
-
-    # Loop over the nonzero indices
-    for idx in idx_nonzero:
-
-        # Get the corresponding operator definition
-        op_def = basis[idx]
-
-        # Get the normalized product operator in the Zeeman eigenbasis with
-        # normalization
-        oper = op_prod(op_def, spins, include_unit=True)
-        if parameters.sparse_operator:
-            oper = oper / sp.linalg.norm(oper, ord='fro')
-        else:
-            oper = oper / np.linalg.norm(oper, ord='fro')
-        
-        # Add to the total density matrix
-        rho_zeeman += rho[idx, 0] * oper
-    
-    return rho_zeeman
-
 def state_to_truncated_basis(
     index_map: list,
     rho: np.ndarray | sp.csc_array
@@ -491,7 +431,8 @@ def state_to_zeeman(
 ) -> np.ndarray | sp.csc_array:
     """
     Takes the state vector defined in the normalized spherical tensor basis
-    and converts it into the Zeeman eigenbasis. Useful for error checking.
+    and converts it into a density matrix written in the Zeeman eigenbasis.
+    Useful for error checking.
 
     Parameters
     ----------
@@ -510,13 +451,35 @@ def state_to_zeeman(
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before converting the "
                          "state vector into density matrix.")
+
+    # Get the dimension of density matrix
+    dim = np.prod(spin_system.mults)
+
+    # Initialize the spin density matrix
+    if parameters.sparse_operator:
+        rho_zeeman = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        rho_zeeman = np.zeros((dim, dim), dtype=complex)
     
-    # Convert the state vector into density matrix
-    rho_zeeman = _state_to_zeeman(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        rho = rho
-    )
+    # Obtain indices of the non-zero coefficients from the state vector
+    idx_nonzero = rho.nonzero()[0]
+
+    # Loop over the nonzero indices
+    for idx in idx_nonzero:
+
+        # Get the corresponding operator definition
+        op_def = spin_system.basis.basis[idx]
+
+        # Get the normalized product operator in the Zeeman eigenbasis with
+        # normalization
+        oper = op_prod(op_def, spin_system.spins, include_unit=True)
+        if parameters.sparse_operator:
+            oper = oper / sp.linalg.norm(oper, ord='fro')
+        else:
+            oper = oper / np.linalg.norm(oper, ord='fro')
+        
+        # Add to the total density matrix
+        rho_zeeman += rho[idx, 0] * oper
     
     return rho_zeeman
 
