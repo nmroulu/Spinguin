@@ -18,7 +18,7 @@ from spinguin._core._operators import op_prod
 from spinguin._core._utils import parse_operator_string, state_idx
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
-from spinguin._core._hamiltonian import sop_H
+from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._status import status
 
 def _unit_state(
@@ -390,59 +390,6 @@ def _state_to_zeeman(
         rho_zeeman += rho[idx, 0] * oper
     
     return rho_zeeman
-
-def _equilibrium_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    H_left: np.ndarray | sp.csc_array,
-    T : float,
-    zero_value: float=1e-18
-) -> np.ndarray | sp.csc_array:
-    """
-    Returns the state vector corresponding to thermal equilibrium.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    H_left : ndarray
-        Left-side coherent Hamiltonian superoperator.
-    T : float
-        Temperature of the spin bath in Kelvin.
-    zero_value : float, default=1e-18
-        This threshold value is used to estimate the convergence of Taylor
-        series in matrix exponential, and to eliminate value smaller than this
-        threshold while squaring the matrix during the matrix exponential.
-
-    Returns
-    -------
-    rho_eq : ndarray or csc_array
-        Thermal equilibrium state vector.
-    """
-
-    # Extract the necessary information from the spin system
-    mults = (2*spins + 1).astype(int)
-
-    # Get the matrix exponential corresponding to the Boltzmann distribution
-    with HidePrints():
-        P = expm(-const.hbar / (const.k * T) * H_left, zero_value)
-
-    # Obtain the thermal equilibrium by propagating the unit state
-    unit = _unit_state(basis, spins, normalized=False)
-    rho_eq = P @ unit
-
-    # Ensure the correct sparsity (might have changed during multiplication)
-    if parameters.sparse_state and not sp.issparse(rho_eq):
-        rho_eq = sp.csc_array(rho_eq)
-
-    # Normalize such that the trace of the corresponding density matrix is one
-    rho_eq = rho_eq / (rho_eq[0, 0] * np.sqrt(np.prod(mults)))
-
-    return rho_eq
 
 def _alpha_state(
     basis: np.ndarray,
@@ -962,25 +909,24 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     # Build the left Hamiltonian superoperator
     with HidePrints():
-        H_left = sop_H(
-            basis = spin_system.basis.basis,
-            spins = spin_system.spins,
-            gammas = spin_system.gammas,
-            B = parameters.magnetic_field,
-            chemical_shifts = spin_system.chemical_shifts,
-            J_couplings = spin_system.J_couplings,
-            side = "left",
-            zero_value = parameters.zero_hamiltonian
-        )
+        H_left = hamiltonian(spin_system, side="left")
 
-    # Build the equilibrium state
-    rho = _equilibrium_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        H_left = H_left,
-        T = parameters.temperature,
-        zero_value = parameters.zero_equilibrium
-    )
+        # Get the matrix exponential corresponding to the Boltzmann distribution
+        T = parameters.temperature
+        zv = parameters.zero_equilibrium
+        with HidePrints():
+            P = expm(-const.hbar / (const.k * T) * H_left, zv)
+
+        # Obtain the thermal equilibrium by propagating the unit state
+        unit = unit_state(spin_system, normalized=False)
+        rho = P @ unit
+
+        # Ensure the correct sparsity (might have changed during multiplication)
+        if parameters.sparse_state and not sp.issparse(rho):
+            rho = sp.csc_array(rho)
+
+        # Normalize: the trace of the corresponding density matrix should be one
+        rho = rho / (rho[0, 0] * np.sqrt(np.prod(spin_system.mults)))
 
     return rho
 
