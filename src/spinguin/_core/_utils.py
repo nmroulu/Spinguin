@@ -82,40 +82,43 @@ def lq_to_idx(l: int, q: int) -> int:
 
 def parse_operator_string(operator: str, nspins: int):
     """
-    Parses operator strings and returns their definitions in the basis set as
-    well as their corresponding coefficients. The operator string must
-    follow the rules below:
-
-    - Cartesian and ladder operators: `I(component,index)` or
-      `I(component)`. Examples:
-
-        - `I(x,4)` --> Creates x-operator for spin at index 4.
-        - `I(x)`--> Creates x-operator for all spins.
-
-    - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
-
-        - `T(1,-1,3)` --> \
-          Creates operator with `l=1`, `q=-1` for spin at index 3.
-        - `T(1, -1)` --> \
-          Creates operator with `l=1`, `q=-1` for all spins.
-        
-    - Product operators have `*` in between the single-spin operators:
-      `I(z,0) * I(z,1)`
-    - Sums of operators have `+` in between the operators:
-      `I(x,0) + I(x,1)`
-    - Unit operators are ignored in the input. Interpretation of these
-      two is identical: `E * I(z,1)`, `I(z,1)`
-    
-    Special case: An empty `operator` string is considered as unit operator.
-
-    Whitespace will be ignored in the input.
-
-    NOTE: Indexing starts from 0!
+    Parses operator strings and represents them as a linear combination of the
+    basis set operators (product operators of single-spin spherical tensor
+    operators).
 
     Parameters
     ----------
     operator : str
-        String that defines the operator to be generated.
+        The operator string must follow the rules below:
+
+        - Cartesian or ladder operator at specific index or for all spins::
+
+            operator = "I(component, index)"
+            operator = "I(component)"
+
+        - Spherical tensor operator at specific index or for all spins::
+
+            operator = "T(l, q, index)"
+            operator = "T(l, q)"
+
+        - Product operators::
+
+            operator = "I(component1, index1) * I(component2, index2)"
+
+        - Sum of operators::
+
+            operator = "I(component1, index1) + I(component2, index2)"
+            
+        - Unit operators are ignored in the input. These are identical::
+
+            operator = "E * I(component, index)"
+            operator = "I(component, index)"
+        
+        Special case: An empty `operator` string is considered as unit operator.
+
+        Whitespace will be ignored in the input.
+
+        NOTE: Indexing starts from 0!
     nspins : int
         Number of spins in the system.
 
