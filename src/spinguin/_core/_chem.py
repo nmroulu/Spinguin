@@ -648,6 +648,21 @@ def dissociate(
     rho_B : ndarray or csc_array
         State vector of spin system B.
     """
+    # Check that the spin maps are valid
+    if len(spin_map_A) != spin_system_A.nspins:
+        raise ValueError(
+            "length of spin_map_A does not match the number of spins "
+            "in spin_system_A"
+        )
+    if len(spin_map_B) != spin_system_B.nspins:
+        raise ValueError(
+            "length of spin_map_B does not match the number of spins "
+            "in spin_system_B"
+        )
+    spin_map_C = {i for i in spin_map_A}.union({i for i in spin_map_B})
+    if spin_map_C != {i for i in range(spin_system_C.nspins)}:
+        raise ValueError("spin maps have incorrect or have overlapping indices")
+
     # Perform the dissociation
     rho_A, rho_B = _dissociate(
         basis_A = spin_system_A.basis.basis,
@@ -708,6 +723,21 @@ def associate(
     rho_C : ndarray or csc_array
         State vector of the composite spin system C.
     """
+    # Check that the spin maps are valid
+    if len(spin_map_A) != spin_system_A.nspins:
+        raise ValueError(
+            "length of spin_map_A does not match the number of spins "
+            "in spin_system_A"
+        )
+    if len(spin_map_B) != spin_system_B.nspins:
+        raise ValueError(
+            "length of spin_map_B does not match the number of spins "
+            "in spin_system_B"
+        )
+    spin_map_C = {i for i in spin_map_A}.union({i for i in spin_map_B})
+    if spin_map_C != {i for i in range(spin_system_C.nspins)}:
+        raise ValueError("spin maps have incorrect or have overlapping indices")
+
     # Perform the association
     rho_C = _associate(
         basis_A = spin_system_A.basis.basis,
@@ -756,6 +786,13 @@ def permute_spins(
     rho : ndarray or csc_array
         Permuted state vector of the spin system.
     """
+    # Check that the spin map is valid
+    if {i for i in spin_map} != {i for i in range(spin_system.nspins)}:
+        raise ValueError(
+            "length of spin_map does not match the number of spins in "
+            "the system or spin_map contains incorrect or overlapping indices"
+        )
+
     # Perform the permutation
     rho = _permute_spins(
         basis = spin_system.basis.basis,

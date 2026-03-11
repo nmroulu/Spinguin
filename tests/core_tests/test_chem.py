@@ -59,6 +59,17 @@ class TestChemMethods(unittest.TestCase):
         self.assertTrue(np.allclose(rho3_sds.toarray(), rho3_ref))
         self.assertTrue(np.allclose(rho3_sss.toarray(), rho3_ref))
 
+        # Test that errors are thrown for incorrect spin maps
+        map1_w = [0, 2, 3]
+        with self.assertRaises(ValueError):
+            sg.associate(ss1, ss2, ss3, rho1_d, rho2_d, map1_w, map2)
+        map2_w = [1, 3]
+        with self.assertRaises(ValueError):
+            sg.associate(ss1, ss2, ss3, rho1_d, rho2_d, map1, map2_w)
+        map1_w = [0, 5]
+        with self.assertRaises(ValueError):
+            sg.associate(ss1, ss2, ss3, rho1_d, rho2_d, map1_w, map2)
+
         # Test with basis sets of varying spin orders (using dense formalism)
         sg.parameters.sparse_state = False
         for max_spin_order1 in range(1, ss1.nspins+1):
@@ -135,6 +146,17 @@ class TestChemMethods(unittest.TestCase):
         self.assertTrue(np.allclose(rho1_ss.toarray(), rho1_ref))
         self.assertTrue(np.allclose(rho2_ss.toarray(), rho2_ref))
 
+        # Test that errors are thrown for incorrect spin maps
+        map1_w = [0, 2, 3]
+        with self.assertRaises(ValueError):
+            sg.dissociate(ss1, ss2, ss3, rho3_d, map1_w, map2)
+        map2_w = [1, 3]
+        with self.assertRaises(ValueError):
+            sg.dissociate(ss1, ss2, ss3, rho3_d, map1, map2_w)
+        map1_w = [0, 5]
+        with self.assertRaises(ValueError):
+            sg.dissociate(ss1, ss2, ss3, rho3_d, map1_w, map2)
+
         # Test with basis sets of varying spin orders (using dense formalism)
         sg.parameters.sparse_state = False
         for max_spin_order1 in range(1, ss1.nspins+1):
@@ -195,6 +217,14 @@ class TestChemMethods(unittest.TestCase):
             rho_perm_sd.toarray(),
             rho_perm_ss.toarray()
         ))
+
+        # Test that using incorrect spin maps lead to an error
+        with self.assertRaises(ValueError):
+            sg.permute_spins(ss, rho_d, [0, 1])
+        with self.assertRaises(ValueError):
+            sg.permute_spins(ss, rho_d, [0, 1, 1])
+        with self.assertRaises(ValueError):
+            sg.permute_spins(ss, rho_d, [0, 1, 3])
 
         # Get all possible permutations
         permutations = list(itertools.permutations([0, 1, 2]))
