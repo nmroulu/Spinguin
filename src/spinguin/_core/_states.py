@@ -469,182 +469,6 @@ def _beta_state(
 
     return rho
 
-def _singlet_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates the singlet state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    index_1 : int
-        Index of the first spin in the singlet state.
-    index_2 : int
-        Index of the second spin in the singlet state.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the singlet state.
-    """
-
-    # Calculate the dimension of the full Liouville space
-    mults = (2*spins+1).astype(int)
-    dim = np.prod(mults)
-
-    # Get states
-    E = _unit_state(basis, spins, normalized=False)
-    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
-    IpIm = state_from_string(basis, spins, f"I(+,{index_1}) * I(-, {index_2})")
-    ImIp = state_from_string(basis, spins, f"I(-,{index_1}) * I(+, {index_2})")
-
-    # Make the singlet
-    rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
-
-    return rho
-
-def _triplet_zero_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    index_1 : int
-        Index of the first spin in the triplet zero state.
-    index_2 : int
-        Index of the second spin in the triplet zero state.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the triplet zero state.
-    """
-
-    # Calculate the dimension of the full Liouville space
-    mults = (2*spins+1).astype(int)
-    dim = np.prod(mults)
-
-    # Get states
-    E = _unit_state(basis, spins, normalized=False)
-    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
-    IpIm = state_from_string(basis, spins, f"I(+,{index_1}) * I(-, {index_2})")
-    ImIp = state_from_string(basis, spins, f"I(-,{index_1}) * I(+, {index_2})")
-
-    # Make the triplet zero
-    rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
-
-    return rho
-
-def _triplet_plus_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    index_1 : int
-        Index of the first spin in the triplet plus state.
-    index_2 : int
-        Index of the second spin in the triplet plus state.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the triplet plus state.
-    """
-
-    # Calculate the dimension of the full Liouville space
-    mults = (2*spins+1).astype(int)
-    dim = np.prod(mults)
-
-    # Get states
-    E = _unit_state(basis, spins, normalized=False)
-    IzE = state_from_string(basis, spins, f"I(z, {index_1})")
-    EIz = state_from_string(basis, spins, f"I(z, {index_2})")
-    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
-
-    # Make the triplet plus
-    rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
-
-    return rho
-
-def _triplet_minus_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    index_1 : int
-        Index of the first spin in the triplet minus state.
-    index_2 : int
-        Index of the second spin in the triplet minus state.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the triplet minus state.
-    """
-
-    # Calculate the dimension of the full Liouville space
-    mults = (2*spins+1).astype(int)
-    dim = np.prod(mults)
-
-    # Get states
-    E = _unit_state(basis, spins, normalized=False)
-    IzE = state_from_string(basis, spins, f"I(z, {index_1})")
-    EIz = state_from_string(basis, spins, f"I(z, {index_2})")
-    IzIz = state_from_string(basis, spins, f"I(z,{index_1}) * I(z, {index_2})")
-
-    # Make the triplet minus
-    rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
-
-    return rho
-
 def state_to_truncated_basis(
     index_map: list,
     rho: np.ndarray | sp.csc_array
@@ -958,13 +782,17 @@ def singlet_state(
         raise ValueError("Please build the basis before constructing the "
                          "singlet state.")
 
-    # Build the singlet state
-    rho = _singlet_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        index_1 = index_1,
-        index_2 = index_2
-    )
+    # Calculate the dimension of the full Liouville space
+    dim = np.prod(spin_system.mults)
+
+    # Get states
+    E = unit_state(spin_system, normalized=False)
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
+    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})")
+    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})")
+
+    # Make the singlet
+    rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
 
     return rho
 
@@ -996,13 +824,17 @@ def triplet_zero_state(
         raise ValueError("Please build the basis before constructing the "
                          "triplet zero state.")
     
-    # Make the triplet zero state
-    rho = _triplet_zero_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        index_1 = index_1,
-        index_2 = index_2
-    )
+    # Calculate the dimension of the full Liouville space
+    dim = np.prod(spin_system.mults)
+
+    # Get states
+    E = unit_state(spin_system, normalized=False)
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
+    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})")
+    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})")
+
+    # Make the triplet zero
+    rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
 
     return rho
 
@@ -1034,13 +866,17 @@ def triplet_plus_state(
         raise ValueError("Please build the basis before constructing the "
                          "triplet plus state.")
     
-    # Create the triplet plus state
-    rho = _triplet_plus_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        index_1 = index_1,
-        index_2 = index_2
-    )
+    # Calculate the dimension of the full Liouville space
+    dim = np.prod(spin_system.mults)
+
+    # Get states
+    E = unit_state(spin_system, normalized=False)
+    IzE = state(spin_system, f"I(z, {index_1})")
+    EIz = state(spin_system, f"I(z, {index_2})")
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
+
+    # Make the triplet plus
+    rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
@@ -1072,13 +908,17 @@ def triplet_minus_state(
         raise ValueError("Please build the basis before constructing the "
                          "triplet minus state.")
     
-    # Create the triplet minus state
-    rho = _triplet_minus_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        index_1 = index_1,
-        index_2 = index_2
-    )
+    # Calculate the dimension of the full Liouville space
+    dim = np.prod(spin_system.mults)
+
+    # Get states
+    E = unit_state(spin_system, normalized=False)
+    IzE = state(spin_system, f"I(z, {index_1})")
+    EIz = state(spin_system, f"I(z, {index_2})")
+    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
+
+    # Make the triplet minus
+    rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
 
     return rho
 
