@@ -391,84 +391,6 @@ def _state_to_zeeman(
     
     return rho_zeeman
 
-def _alpha_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    index: int
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates the alpha state for a given spin-1/2 nucleus. Unit state is
-    assigned to the other spins.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    index : int
-        Index of the spin that has the alpha state.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the alpha state of the given spin index.
-    """
-
-    # Calculate the dimension of the full Liouville space
-    mults = (2*spins+1).astype(int)
-    dim = np.prod(mults)
-
-    # Get states
-    E = _unit_state(basis, spins, normalized=False)
-    I_z = state_from_string(basis, spins, f"I(z, {index})")
-
-    # Make the alpha state
-    rho = 1 / dim * E + 2 / dim * I_z
-
-    return rho
-
-def _beta_state(
-    basis: np.ndarray,
-    spins: np.ndarray,
-    index: int
-) -> np.ndarray | sp.csc_array:
-    """
-    Generates the beta state for a given spin-1/2 nucleus. Unit state is
-    assigned to the other spins.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers of the system.
-    index : int
-        Index of the spin that has the beta state.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        State vector corresponding to the beta state of the given spin index.
-    """
-
-    # Calculate the dimension of the full Liouville space
-    mults = (2*spins+1).astype(int)
-    dim = np.prod(mults)
-
-    # Get states
-    E = _unit_state(basis, spins, normalized=False)
-    I_z = state_from_string(basis, spins, f"I(z, {index})")
-
-    # Make the beta state
-    rho = 1 / dim * E - 2 / dim * I_z
-
-    return rho
-
 def state_to_truncated_basis(
     index_map: list,
     rho: np.ndarray | sp.csc_array
@@ -663,12 +585,15 @@ def alpha_state(
         raise ValueError("Please build the basis before constructing the "
                          "alpha state.")
     
-    # Create the alpha state
-    rho = _alpha_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        index = index
-    )
+    # Calculate the dimension of the full Liouville space
+    dim = np.prod(spin_system.mults)
+
+    # Get states
+    E = unit_state(spin_system, normalized=False)
+    I_z = state(spin_system, f"I(z, {index})")
+
+    # Make the alpha state
+    rho = 1 / dim * E + 2 / dim * I_z
 
     return rho
 
@@ -697,12 +622,15 @@ def beta_state(
         raise ValueError("Please build the basis before constructing the "
                          "beta state.")
     
-    # Create the beta state
-    rho = _beta_state(
-        basis = spin_system.basis.basis,
-        spins = spin_system.spins,
-        index = index
-    )
+    # Calculate the dimension of the full Liouville space
+    dim = np.prod(spin_system.mults)
+
+    # Get states
+    E = unit_state(spin_system, normalized=False)
+    I_z = state(spin_system, f"I(z, {index})")
+
+    # Make the beta state
+    rho = 1 / dim * E - 2 / dim * I_z
 
     return rho
 
