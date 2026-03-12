@@ -168,7 +168,7 @@ def rotating_frame(
         norms.append(norm_1(L0))
 
     # Re-order based on the norms
-    sort = np.argsort(norms)
+    sort = np.flip(np.argsort(norms))
     freqs = [freqs[i] for i in sort]
     orders = [orders[i] for i in sort]
     L0s = [L0s[i] for i in sort]
