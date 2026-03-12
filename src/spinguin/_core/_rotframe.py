@@ -80,8 +80,8 @@ def rotating_frame(
     spin_system: SpinSystem,
     L: np.ndarray | sp.csc_array,
     isotopes: list,
-    orders: list = [],
     center_frequencies: list = [],
+    orders: list = []
 ) -> np.ndarray | sp.csc_array:
     """
     Transforms the Liouvillian into the rotating frame.
@@ -94,13 +94,13 @@ def rotating_frame(
         Liouvillian superoperator in the laboratory frame.
     isotopes : list
         List of isotopes whose rotating frames are applied.
+    center_frequencies : list, default=[]
+        List of center frequencies (in ppm) for each isotope. If empty, zero is
+        used for all isotopes.
     orders : list, default=[]
         List of integers that define the order of the rotating frame for each
         isotope. If empty, the default value defined in
         `parameters.rotating_frame_order` is used for all isotopes.
-    center_frequencies : list, default=[]
-        List of center frequencies (in ppm) for each isotope. If empty, zero is
-        used for all isotopes.
 
     Returns
     -------
