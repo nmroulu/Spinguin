@@ -138,6 +138,42 @@ def _associate_index_map(
     spin_map_A_bytes: bytes,
     spin_map_B_bytes: bytes
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Generates arrays that map the state indices from spin systems A and B to the
+    composite spin system C. This function is used in `associate()`.
+
+    Example. We have spin system A that has two spins and spin system B that has
+    three spins. These systems associate to form a composite spin system C that
+    has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
+    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
+    spin systems A and B will be indexed in spin system C by defining the spin
+    maps as follows::
+
+        spin_map_A = np.ndarray([0, 2])
+        spin_map_B = np.ndarray([1, 3, 4])
+
+    Parameters
+    ----------
+    basis_A_bytes : bytes
+        Basis set for the subsystem A converted to bytes.
+    basis_B_bytes : bytes
+        Basis set for the subsystem B converted to bytes.
+    basis_C_bytes : bytes
+        Basis set for the composite system C converted to bytes.
+    spin_map_A_bytes : bytes
+        Indices of spin system A within spin system C converted to bytes.
+    spin_map_B_bytes : bytes
+        Indices of spin system B within spin system C converted to bytes.
+
+    Returns
+    -------
+    index_map_A : ndarray
+        Mapping of indices for spin system A.
+    index_map_B : ndarray
+        Mapping of indices for spin system B.
+    index_map_C : ndarray
+        Mapping of indices for spin system C.
+    """
     
     # Convert bytes back to arrays
     spin_map_A = np.frombuffer(spin_map_A_bytes, dtype=int)
@@ -177,156 +213,6 @@ def _associate_index_map(
     index_map_C = np.array(index_map_C)
 
     return index_map_A, index_map_B, index_map_C
-
-def associate_index_map(
-    basis_A: np.ndarray,
-    basis_B: np.ndarray,
-    basis_C: np.ndarray,
-    spin_map_A: np.ndarray,
-    spin_map_B: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Generates arrays that map the state indices from spin systems A and B to the
-    composite spin system C. This function is used in `associate()`.
-
-    Example. We have spin system A that has two spins and spin system B that has
-    three spins. These systems associate to form a composite spin system C that
-    has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
-    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
-    spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows::
-
-        spin_map_A = np.ndarray([0, 2])
-        spin_map_B = np.ndarray([1, 3, 4])
-
-    Parameters
-    ----------
-    basis_A : ndarray
-        Basis set for the subsystem A. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_B : ndarray
-        Basis set for the subsystem B. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_C : ndarray
-        Basis set for the composite system C. It is a 2-dimensional array
-        containing sequences of integers describing the Kronecker products of
-        irreducible spherical tensors.
-    spin_map_A : ndarray
-        Indices of spin system A within spin system C.
-    spin_map_B : ndarray
-        Indices of spin system B within spin system C.
-
-    Returns
-    -------
-    index_map_A : ndarray
-        Mapping of indices for spin system A.
-    index_map_B : ndarray
-        Mapping of indices for spin system B.
-    index_map_C : ndarray
-        Mapping of indices for spin system C.
-    """
-
-    # Convert the arrays to bytes for hashing
-    basis_A_bytes = basis_A.tobytes()
-    basis_B_bytes = basis_B.tobytes()
-    basis_C_bytes = basis_C.tobytes()
-    spin_map_A_bytes = spin_map_A.tobytes()
-    spin_map_B_bytes = spin_map_B.tobytes()
-
-    # Calculate the index maps using cached function
-    index_map_A, index_map_B, index_map_C = \
-        _associate_index_map(basis_A_bytes, basis_B_bytes, basis_C_bytes,
-                             spin_map_A_bytes, spin_map_B_bytes)
-
-    # Ensure that a different instance is returned
-    index_map_A = index_map_A.copy()
-    index_map_B = index_map_B.copy()
-    index_map_C = index_map_C.copy()
-
-    return index_map_A, index_map_B, index_map_C
-
-def _associate(
-    basis_A: np.ndarray,
-    basis_B: np.ndarray,
-    basis_C: np.ndarray,
-    rho_A: np.ndarray | sp.csc_array,
-    rho_B: np.ndarray | sp.csc_array,
-    spin_map_A: list | tuple | np.ndarray,
-    spin_map_B: list | tuple | np.ndarray,
-    sparse: bool
-) -> np.ndarray | sp.csc_array:
-    """
-    Combines two state vectors when spin systems associate in a chemical
-    reaction A + B -> C.
-
-    Example. We have spin system A that has two spins and spin system B that has
-    three spins. These systems associate to form a composite spin system C that
-    has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
-    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
-    spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows::
-
-        spin_map_A = np.ndarray([0, 2])
-        spin_map_B = np.ndarray([1, 3, 4])
-
-    Parameters
-    ----------
-    basis_A : ndarray
-        Basis set for the subsystem A. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_B : ndarray
-        Basis set for the subsystem B. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_C : ndarray
-        Basis set for the composite system C. It is a 2-dimensional array
-        containing sequences of integers describing the Kronecker products of
-        irreducible spherical tensors.
-    rho_A : ndarray or csc_array
-        State vector of spin system A.
-    rho_B : ndarray or csc_array
-        State vector of spin system B.
-    spin_map_A : list or tuple or ndarray
-        Indices of spin system A within spin system C.
-    spin_map_B : list or tuple or ndarray
-        Indices of spin system B within spin system C.
-    sparse : bool
-        Decides whether to return a dense or a sparse array.
-
-    Returns
-    -------
-    rho_C : ndarray or csc_array
-        State vector of the composite spin system C.
-    """
-
-    # Convert the spin maps into NumPy
-    spin_map_A = arraylike_to_array(spin_map_A)
-    spin_map_B = arraylike_to_array(spin_map_B)
-
-    # Acquire the C basis dimension
-    dim_C = basis_C.shape[0]
-
-    # Get the index mappings
-    idx_A, idx_B, idx_C = \
-        associate_index_map(basis_A, basis_B, basis_C, spin_map_A, spin_map_B)
-
-    # Initialize an empty state vector for the composite system
-    if sparse:
-        rho_C = sp.lil_array((dim_C, 1), dtype=complex)
-    else:
-        rho_C = np.zeros((dim_C, 1), dtype=complex)
-
-    # Combine the state vectors
-    rho_C[idx_C, [0]] = rho_A[idx_A, [0]] * rho_B[idx_B, [0]]
-
-    # Convert to csc_array if using sparse arrays
-    if sparse:
-        rho_C = rho_C.tocsc()
-
-    return rho_C
 
 @lru_cache(maxsize=16)
 def _permutation_matrix(
@@ -633,17 +519,36 @@ def associate(
     if spin_map_C != {i for i in range(spin_system_C.nspins)}:
         raise ValueError("spin maps have incorrect or have overlapping indices")
 
-    # Perform the association
-    rho_C = _associate(
-        basis_A = spin_system_A.basis.basis,
-        basis_B = spin_system_B.basis.basis,
-        basis_C = spin_system_C.basis.basis,
-        rho_A = rho_A,
-        rho_B = rho_B,
-        spin_map_A = spin_map_A,
-        spin_map_B = spin_map_B,
-        sparse = parameters.sparse_state
-    )
+    # Convert the spin maps into NumPy
+    spin_map_A = arraylike_to_array(spin_map_A)
+    spin_map_B = arraylike_to_array(spin_map_B)
+
+    # Convert the arrays to bytes for hashing
+    basis_A_bytes = spin_system_A.basis.basis.tobytes()
+    basis_B_bytes = spin_system_B.basis.basis.tobytes()
+    basis_C_bytes = spin_system_C.basis.basis.tobytes()
+    spin_map_A_bytes = spin_map_A.tobytes()
+    spin_map_B_bytes = spin_map_B.tobytes()
+
+    # Calculate the index maps using cached function
+    idx_A, idx_B, idx_C = \
+        _associate_index_map(
+            basis_A_bytes, basis_B_bytes, basis_C_bytes,
+            spin_map_A_bytes, spin_map_B_bytes
+        )
+
+    # Initialize an empty state vector for the composite system
+    if parameters.sparse_state:
+        rho_C = sp.lil_array((spin_system_C.basis.dim, 1), dtype=complex)
+    else:
+        rho_C = np.zeros((spin_system_C.basis.dim, 1), dtype=complex)
+
+    # Combine the state vectors
+    rho_C[idx_C, [0]] = rho_A[idx_A, [0]] * rho_B[idx_B, [0]]
+
+    # Convert to csc_array if using sparse arrays
+    if parameters.sparse_state:
+        rho_C = rho_C.tocsc()
 
     return rho_C
 
