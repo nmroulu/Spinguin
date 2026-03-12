@@ -520,30 +520,32 @@ def superoperator(
         - A string. Example: `I(z,0) * I(z,1)`
         - An array of integers. Example: `[2, 2]`
         
-        **The string input must follow the rules below:**
+        **The operator string must follow the rules below:**
 
-        - Cartesian and ladder operators: `I(component,index)` or 
-          `I(component)`, with the indexing starting from zero. Examples:
+        - Cartesian or ladder operator at specific index or for all spins::
 
-            - `I(x,4)` --> Creates *x*-operator for spin at index 4.
-            - `I(x)`--> Creates *x*-operator for all spins.
+            operator = "I(component, index)"
+            operator = "I(component)"
 
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+        - Spherical tensor operator at specific index or for all spins::
 
-            - `T(1,-1,3)` --> \
-              Creates operator with *l*=1, *q*=-1 for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with *l*=1, *q*=-1 for all spins.
+            operator = "T(l, q, index)"
+            operator = "T(l, q)"
+
+        - Product operators::
+
+            operator = "I(component1, index1) * I(component2, index2)"
+
+        - Sum of operators::
+
+            operator = "I(component1, index1) + I(component2, index2)"
             
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)` and `I(z,1)`
+        - Unit operators are ignored in the input. These are identical::
+
+            operator = "E * I(component, index)"
+            operator = "I(component, index)"
         
-        Special case: An empty `operator` string is considered as unit
-        operator.
+        Special case: An empty `operator` string is considered as unit operator.
 
         Whitespace will be ignored in the input.
 
@@ -552,6 +554,8 @@ def superoperator(
         - Each spin is given an integer *N* in the array.
         - Each integer corresponds to a spherical tensor operator of rank *l*
           and projection *q*: *N* = *l*^2 + *l* - *q*
+
+        NOTE: Indexing starts from 0!
 
     side : {'comm', 'left', 'right'}
         The type of superoperator:
