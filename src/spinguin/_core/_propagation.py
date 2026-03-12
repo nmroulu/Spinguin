@@ -14,7 +14,7 @@ import numpy as np
 import scipy.sparse as sp
 import warnings
 from spinguin._core._la import expm
-from spinguin._core._superoperators import sop_from_string
+from spinguin._core._superoperators import superoperator
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._parameters import parameters
@@ -127,12 +127,7 @@ def pulse(
                       "a well-defined angle.")
 
     # Generate the operator
-    op = sop_from_string(
-        operator,
-        spin_system.basis.basis,
-        spin_system.spins,
-        side="comm"
-    )
+    op = superoperator(spin_system, operator, side="comm")
 
     # Convert the angle to radians
     angle = angle / 180 * np.pi
