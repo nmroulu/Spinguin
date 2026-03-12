@@ -13,7 +13,7 @@ import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
 from spinguin._core._operators import op_Sx, op_Sy, op_Sz
-from spinguin._core._superoperators import sop_T_coupled, sop_prod
+from spinguin._core._superoperators import sop_T_coupled, superoperator
 from spinguin._core._la import (
     eliminate_small,
     cartesian_tensor_to_spherical_tensor,
@@ -884,9 +884,7 @@ def _get_sop_T(
 
     # Single-spin quadratic interaction
     elif interaction_type == "Q":
-        op_def = np.zeros(spin_system.nspins, dtype=int)
-        op_def[spin_1] = lq_to_idx(l, q)
-        sop = sop_prod(op_def, spin_system.basis.basis, spin_system.spins, 'comm')
+        sop = superoperator(spin_system, f"T({l},{q},{spin_1})")
 
     # Two-spin bilinear interaction
     elif interaction_type == "DD":
