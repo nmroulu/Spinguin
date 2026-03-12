@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
 # Imports
+from copy import deepcopy
 import time
 import numpy as np
 import scipy.sparse as sp
@@ -15,7 +16,7 @@ import warnings
 from spinguin._core._la import expm
 from spinguin._core._superoperators import sop_from_string
 from spinguin._core._hide_prints import HidePrints
-from spinguin._core._hamiltonian import sop_H
+from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 
@@ -75,25 +76,28 @@ def pulse(
         Defines the pulse to be generated. The operator string must
         follow the rules below:
 
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
+        - Cartesian or ladder operator at specific index or for all spins::
 
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
+            operator = "I(component, index)"
+            operator = "I(component)"
 
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+        - Spherical tensor operator at specific index or for all spins::
 
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
+            operator = "T(l, q, index)"
+            operator = "T(l, q)"
+
+        - Product operators::
+
+            operator = "I(component1, index1) * I(component2, index2)"
+
+        - Sum of operators::
+
+            operator = "I(component1, index1) + I(component2, index2)"
             
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
-        - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
+        - Unit operators are ignored in the input. These are identical::
+
+            operator = "E * I(component, index)"
+            operator = "I(component, index)"
         
         Special case: An empty `operator` string is considered as unit operator.
 
@@ -176,18 +180,14 @@ def propagator_to_rotframe(
         if spin_system.isotopes[spin] in center_frequencies:
             center[spin] = center_frequencies[spin_system.isotopes[spin]]
 
+    # Create a copy of the spin system and assign the center frequency
+    with HidePrints():
+        spin_system_copy = deepcopy(spin_system)
+        spin_system_copy.chemical_shifts = center
+
     # Construct Hamiltonian that specifies the interaction frame
     with HidePrints():
-        H_frame = sop_H(
-            basis = spin_system.basis.basis,
-            spins = spin_system.spins,
-            gammas = spin_system.gammas,
-            B = parameters.magnetic_field,
-            chemical_shifts = center,
-            interactions = ["zeeman", "chemical_shift"],
-            side = "comm",
-            zero_value = parameters.zero_hamiltonian
-        )
+        H_frame = hamiltonian(spin_system_copy, ["zeeman", "chemical_shift"])
 
     # Acquire matrix exponential from the Hamiltonian
     with HidePrints():
