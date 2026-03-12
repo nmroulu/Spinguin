@@ -29,6 +29,9 @@ class Parameters:
         # Parallelisation settings
         self._parallel_dim: int=1000
 
+        # Rotating frame settings
+        self._rotating_frame_order: int=5
+
         # Sparsity settings
         self._propagator_density: float=0.5
         self._sparse_operator: bool=True
@@ -87,6 +90,20 @@ class Parameters:
     def parallel_dim(self, parallel_dim: int):
         self._parallel_dim = parallel_dim
         status(f"Threshold for parallel Redfield set to: {self.parallel_dim}\n")
+
+    @property
+    def rotating_frame_order(self) -> int:
+        """
+        Order of the Taylor series expansion used when applying the rotating
+        frame transformation. Higher order gives more accurate results but takes
+        more time to compute. Default = 5.
+        """
+        return self._rotating_frame_order
+    
+    @rotating_frame_order.setter
+    def rotating_frame_order(self, rotating_frame_order: int):
+        self._rotating_frame_order = rotating_frame_order
+        status(f"Rotating frame order set to: {self.rotating_frame_order}\n")
 
     @property
     def sparse_operator(self) -> bool:
