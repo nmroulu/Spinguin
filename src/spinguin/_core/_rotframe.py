@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 import math
 import numpy as np
 import scipy.sparse as sp
+import time
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._la import norm_1, expm
 from spinguin._core._specutils import resonance_frequency
@@ -107,6 +108,9 @@ def rotating_frame(
     L_rot : ndarray or csc_array
         Liouvillian superoperator in the rotating frame.
     """
+    print("Transforming Liouvillian to the rotating frame...")
+    time_start = time.time()
+
     # Check list lengths
     if len(isotopes) == 0:
         raise ValueError("must specify at least one isotope")
@@ -172,19 +176,23 @@ def rotating_frame(
     freqs = [freqs[i] for i in sort]
     orders = [orders[i] for i in sort]
     L0s = [L0s[i] for i in sort]
+    isotopes = [isotopes[i] for i in sort]
 
-    # Calculate the periods TODO Check sign?
+    # Calculate the periods
     Ts = []
     for freq in freqs:
         Ts.append(2*np.pi / freq)
 
     # Apply each rotating frame
     for i in range(len(L0s)):
+        print(f"\tApplying rotating frame for {isotopes[i]}...")
         L0 = L0s[i]
         L1 = L - L0
         T = Ts[i]
         order = orders[i]
         L = _sop_L_to_rotframe(L0, L1, T, order)
+
+    print(f"Completed in {time.time() - time_start:.4f} seconds.")
 
     return L
 
