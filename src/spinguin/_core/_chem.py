@@ -258,7 +258,7 @@ def _permutation_matrix(
     return perm
 
 def permutation_matrix(
-    basis: np.ndarray,
+    spin_system: SpinSystem,
     spin_map: list | tuple | np.ndarray
 ) -> sp.csc_array:
     """
@@ -281,10 +281,8 @@ def permutation_matrix(
 
     Parameters
     ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
+    spin_system : SpinSystem
+        The spin system for which the permutation matrix is going to be created.
     spin_map : list or tuple or ndarray
         Indices of the spins in the spin system after permutation.
 
@@ -297,69 +295,13 @@ def permutation_matrix(
     spin_map = arraylike_to_array(spin_map)
 
     # Convert the arrays to bytes for hashing
-    basis_bytes = basis.tobytes()
+    basis_bytes = spin_system.basis.basis.tobytes()
     spin_map_bytes = spin_map.tobytes()
 
     # Ensure that a separate copy is returned
     perm = _permutation_matrix(basis_bytes, spin_map_bytes).copy()
 
     return perm
-
-def _permute_spins(
-    basis: np.ndarray,
-    rho: np.ndarray | sp.csc_array,
-    spin_map: list | tuple | np.ndarray,
-    sparse: bool
-) -> np.ndarray | sp.csc_array:
-    """
-    Permutes the state vector of a spin system to correspond to a reordering
-    of the spins in the system. 
-
-    Example. Our spin system has three spins, which are indexed (0, 1, 2). We
-    want to perform the following permulation:
-
-    - 0 --> 2 (Spin 0 goes to position 2)
-    - 1 --> 0 (Spin 1 goes to position 0)
-    - 2 --> 1 (Spin 2 goes to position 1)
-
-    In this case, we want to assign the following map::
-
-        spin_map = np.array([2, 0, 1])
-
-    Parameters
-    ----------
-    basis : ndarray
-        A 2-dimensional array containing the basis set that contains sequences
-        of integers describing the Kronecker products of irreducible spherical
-        tensors.
-    rho : ndarray or csc_array
-        State vector of the spin system.
-    spin_map : list or tuple or ndarray
-        Indices of the spins in the spin system after permutation.
-    sparse : bool
-        Specifies whether to return a dense or sparse array.
-
-    Returns
-    -------
-    rho : ndarray or csc_array
-        Permuted state vector of the spin system.
-    """
-    # Convert the spin map into NumPy
-    spin_map = arraylike_to_array(spin_map)
-
-    # Get the permutation matrix
-    perm = permutation_matrix(basis, spin_map)
-
-    # Apply the permutation to the density vector
-    rho = perm @ rho
-
-    # Ensure the correct return type
-    if sparse and not sp.issparse(rho):
-        rho = sp.csc_array(rho)
-    if not sparse and sp.issparse(rho):
-        rho = rho.toarray()
-
-    return rho
 
 def dissociate(
     spin_system_A: SpinSystem,
@@ -593,13 +535,17 @@ def permute_spins(
             "the system or spin_map contains incorrect or overlapping indices"
         )
 
-    # Perform the permutation
-    rho = _permute_spins(
-        basis = spin_system.basis.basis,
-        rho = rho,
-        spin_map = spin_map,
-        sparse = parameters.sparse_state
-    )
+    # Get the permutation matrix
+    perm = permutation_matrix(spin_system, spin_map)
+
+    # Apply the permutation to the density vector
+    rho = perm @ rho
+
+    # Ensure the correct return type
+    if parameters.sparse_state and not sp.issparse(rho):
+        rho = sp.csc_array(rho)
+    if not parameters.sparse_state and sp.issparse(rho):
+        rho = rho.toarray()
 
     return rho
 
