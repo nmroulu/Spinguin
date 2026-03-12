@@ -144,23 +144,23 @@ def rotating_frame(
         freqs.append(freq)
 
     # Corresponding Hamiltonians
-    hamiltonians = []
+    H0s = []
     for i in range(len(isotopes)):
         spins = np.where(spin_system.isotopes == isotopes[i])[0]
         dim = spin_system.basis.dim
         if parameters.sparse_superoperator:
-            hamiltonian = sp.csc_array((dim, dim))
+            H = sp.csc_array((dim, dim))
         else:
-            hamiltonian = np.zeros((dim, dim))
+            H = np.zeros((dim, dim))
         for n in spins:
             Iz_n = superoperator(spin_system, f"I(z, {n})")
-            hamiltonian = hamiltonian + freqs[i] * Iz_n
-        hamiltonians.append(hamiltonian)
+            H = H + freqs[i] * Iz_n
+        H0s.append(H)
 
     # Corresponding Liouvillians
     L0s = []
-    for hamiltonian in hamiltonians:
-        L0s.append(-1j*hamiltonian)
+    for H in H0s:
+        L0s.append(-1j*H)
 
     # Norms of the Liouvillians
     norms = []
