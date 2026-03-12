@@ -22,6 +22,44 @@ def _dissociate_index_map(
     spin_map_A_bytes: bytes,
     spin_map_B_bytes: bytes
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Generates arrays that map the state indices from the basis set C to basis
+    sets A and B. This function is used in `dissociate()`.
+
+    Example. Basis set C contains five spins, which are indexed as
+    (0, 1, 2, 3, 4). We want to dissociate this into two subsystems A and B.
+    Spins 0 and 2 should go to subsystem A and the rest to subsystem B. In this
+    case, we define the following spin maps::
+
+        spin_map_A = np.array([0, 2])
+        spin_map_B = np.array([1, 3, 4])
+
+    Parameters
+    ----------
+    basis_A_bytes : bytes
+        Basis set for the subsystem A converted to bytes.
+    basis_B_bytes : bytes
+        Basis set for the subsystem B converted to bytes.
+    basis_C_bytes : bytes
+        Basis set for the composite system C converted to bytes.
+    spin_map_A_bytes : bytes
+        Indices of spin system A within spin system C converted to bytes.
+    spin_map_B_bytes : bytes
+        Indices of spin system B within spin system C converted to bytes.
+
+    Returns
+    -------
+    index_map_A : ndarray
+        Indices of states in A that also appear in C.
+    index_map_CA : ndarray
+        Corresponding indices of the matching elements in C. The array length is
+        equal to `index_map_A`.
+    index_map_B : ndarray
+        Indices of states in B that also appear in C.
+    index_map_CB : ndarray
+        Corresponding indices of the matching elements in C. The array length is
+        equal to `index_map_B`.
+    """
     
     # Convert bytes back to arrays
     spin_map_A = np.frombuffer(spin_map_A_bytes, dtype=int)
@@ -91,175 +129,6 @@ def _dissociate_index_map(
     index_map_CB = np.array(index_map_CB)
 
     return index_map_A, index_map_CA, index_map_B, index_map_CB
-
-def dissociate_index_map(
-    basis_A: np.ndarray,
-    basis_B: np.ndarray,
-    basis_C: np.ndarray,
-    spin_map_A: np.ndarray,
-    spin_map_B: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Generates arrays that map the state indices from the basis set C to basis
-    sets A and B. This function is used in `dissociate()`.
-
-    Example. Basis set C contains five spins, which are indexed as
-    (0, 1, 2, 3, 4). We want to dissociate this into two subsystems A and B.
-    Spins 0 and 2 should go to subsystem A and the rest to subsystem B. In this
-    case, we define the following spin maps::
-
-        spin_map_A = np.array([0, 2])
-        spin_map_B = np.array([1, 3, 4])
-
-    Parameters
-    ----------
-    basis_A : ndarray
-        Basis set for the subsystem A. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_B : ndarray
-        Basis set for the subsystem B. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_C : ndarray
-        Basis set for the composite system C. It is a 2-dimensional array
-        containing sequences of integers describing the Kronecker products of
-        irreducible spherical tensors.
-    spin_map_A : ndarray
-        Indices of spin system A within spin system C.
-    spin_map_B : ndarray
-        Indices of spin system B within spin system C.
-
-    Returns
-    -------
-    index_map_A : ndarray
-        Indices of states in A that also appear in C.
-    index_map_CA : ndarray
-        Corresponding indices of the matching elements in C. The array length is
-        equal to `index_map_A`.
-    index_map_B : ndarray
-        Indices of states in B that also appear in C.
-    index_map_CB : ndarray
-        Corresponding indices of the matching elements in C. The array length is
-        equal to `index_map_B`.
-    """
-
-    # Convert the arrays to bytes for hashing
-    basis_A_bytes = basis_A.tobytes()
-    basis_B_bytes = basis_B.tobytes()
-    basis_C_bytes = basis_C.tobytes()
-    spin_map_A_bytes = spin_map_A.tobytes()
-    spin_map_B_bytes = spin_map_B.tobytes()
-
-    # Acquire the index maps using the cached function
-    index_map_A, index_map_CA, index_map_B, index_map_CB = \
-        _dissociate_index_map(basis_A_bytes, basis_B_bytes, basis_C_bytes,
-                              spin_map_A_bytes, spin_map_B_bytes)
-
-    # Ensure that a different instance is returned
-    index_map_A = index_map_A.copy()
-    index_map_CA = index_map_CA.copy()
-    index_map_B = index_map_B.copy()
-    index_map_CB = index_map_CB.copy()
-
-    return index_map_A, index_map_CA, index_map_B, index_map_CB
-
-def _dissociate(
-    basis_A: np.ndarray,
-    basis_B: np.ndarray,
-    basis_C: np.ndarray,
-    spins_A : np.ndarray,
-    spins_B : np.ndarray,
-    rho_C: np.ndarray | sp.csc_array,
-    spin_map_A: list | tuple | np.ndarray,
-    spin_map_B: list | tuple | np.ndarray,
-    sparse: bool
-) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
-    """
-    Dissociates the density vector of composite system C into density vectors of
-    two subsystems A and B in a chemical reaction C -> A + B.
-
-    Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).
-    We want to dissociate this into two subsystems A and B. Spins 0 and 2 should
-    go to subsystem A and the rest to subsystem B. In this case, we define the
-    following spin maps::
-
-        spin_map_A = np.array([0, 2])
-        spin_map_B = np.array([1, 3, 4])
-
-    Parameters
-    ----------
-    basis_A : ndarray
-        Basis set for the subsystem A. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_B : ndarray
-        Basis set for the subsystem B. It is a 2-dimensional array containing
-        sequences of integers describing the Kronecker products of irreducible
-        spherical tensors.
-    basis_C : ndarray
-        Basis set for the composite system C. It is a 2-dimensional array
-        containing sequences of integers describing the Kronecker products of
-        irreducible spherical tensors.
-    spins_A : ndarray
-        Spin quantum numbers for each spin in system A.
-    spins_B : ndarray
-        Spin quantum numbers for each spin in system B.
-    rho_C : ndarray or csc_array
-        State vector of the composite spin system C.
-    spin_map_A : list or tuple or ndarray
-        Indices of spin system A within spin system C.
-    spin_map_B : list or tuple or ndarray
-        Indices of spin system B within spin system C.
-    sparse : bool
-        Decides whether to return dense or sparse arrays.
-
-    Returns
-    -------
-    rho_A : ndarray or csc_array
-        State vector of spin system A.
-    rho_B : ndarray or csc_array
-        State vector of spin system B.
-    """
-    
-    # Convert the spin maps to NumPy arrays
-    spin_map_A = arraylike_to_array(spin_map_A)
-    spin_map_B = arraylike_to_array(spin_map_B)
-
-    # Obtain the basis set dimensions
-    dim_A = basis_A.shape[0]
-    dim_B = basis_B.shape[0]
-
-    # Get spin multiplicities for normalization
-    mults_A = (2*spins_A + 1).astype(int)
-    mults_B = (2*spins_B + 1).astype(int)
-
-    # Get index mappings
-    idx_A, idx_CA, idx_B, idx_CB = \
-        dissociate_index_map(basis_A, basis_B, basis_C, spin_map_A, spin_map_B)
-
-    # Initialize empty state vectors
-    if sparse:
-        rho_A = sp.lil_array((dim_A, 1), dtype=complex)
-        rho_B = sp.lil_array((dim_B, 1), dtype=complex)
-    else:
-        rho_A = np.zeros((dim_A, 1), dtype=complex)
-        rho_B = np.zeros((dim_B, 1), dtype=complex)
-
-    # Populate the state vectors
-    rho_A[idx_A, [0]] = rho_C[idx_CA, [0]]
-    rho_B[idx_B, [0]] = rho_C[idx_CB, [0]]
-
-    # Normalize the state vectors
-    rho_A = rho_A / (rho_A[0, 0] * np.sqrt(np.prod(mults_A)))
-    rho_B = rho_B / (rho_B[0, 0] * np.sqrt(np.prod(mults_B)))
-
-    # Convert to csc_array if using sparse
-    if sparse:
-        rho_A = rho_A.tocsc()
-        rho_B = rho_B.tocsc()
-
-    return rho_A, rho_B
 
 @lru_cache(maxsize=16)
 def _associate_index_map(
@@ -663,18 +532,44 @@ def dissociate(
     if spin_map_C != {i for i in range(spin_system_C.nspins)}:
         raise ValueError("spin maps have incorrect or have overlapping indices")
 
-    # Perform the dissociation
-    rho_A, rho_B = _dissociate(
-        basis_A = spin_system_A.basis.basis,
-        basis_B = spin_system_B.basis.basis,
-        basis_C = spin_system_C.basis.basis,
-        spins_A = spin_system_A.spins,
-        spins_B = spin_system_B.spins,
-        rho_C = rho_C,
-        spin_map_A = spin_map_A,
-        spin_map_B = spin_map_B,
-        sparse = parameters.sparse_state
-    )
+    # Convert the spin maps to NumPy arrays
+    spin_map_A = arraylike_to_array(spin_map_A)
+    spin_map_B = arraylike_to_array(spin_map_B)
+
+    # Convert basis sets and spin maps to bytes for hashing
+    basis_A_bytes = spin_system_A.basis.basis.tobytes()
+    basis_B_bytes = spin_system_B.basis.basis.tobytes()
+    basis_C_bytes = spin_system_C.basis.basis.tobytes()
+    spin_map_A_bytes = spin_map_A.tobytes()
+    spin_map_B_bytes = spin_map_B.tobytes()
+
+    # Get index mappings
+    idx_A, idx_CA, idx_B, idx_CB = \
+        _dissociate_index_map(
+            basis_A_bytes, basis_B_bytes, basis_C_bytes,
+            spin_map_A_bytes, spin_map_B_bytes
+        )
+
+    # Initialize empty state vectors
+    if parameters.sparse_state:
+        rho_A = sp.lil_array((spin_system_A.basis.dim, 1), dtype=complex)
+        rho_B = sp.lil_array((spin_system_B.basis.dim, 1), dtype=complex)
+    else:
+        rho_A = np.zeros((spin_system_A.basis.dim, 1), dtype=complex)
+        rho_B = np.zeros((spin_system_B.basis.dim, 1), dtype=complex)
+
+    # Populate the state vectors
+    rho_A[idx_A, [0]] = rho_C[idx_CA, [0]]
+    rho_B[idx_B, [0]] = rho_C[idx_CB, [0]]
+
+    # Normalize the state vectors
+    rho_A = rho_A / (rho_A[0, 0] * np.sqrt(np.prod(spin_system_A.mults)))
+    rho_B = rho_B / (rho_B[0, 0] * np.sqrt(np.prod(spin_system_B.mults)))
+
+    # Convert to csc_array if using sparse
+    if parameters.sparse_state:
+        rho_A = rho_A.tocsc()
+        rho_B = rho_B.tocsc()
 
     return rho_A, rho_B
 
