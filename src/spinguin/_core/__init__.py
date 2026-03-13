@@ -39,6 +39,7 @@ from ._propagation import (
     pulse
 )
 from ._relaxation import relaxation
+from ._rotframe import rotating_frame
 from ._specutils import (
     fourier_transform,
     frequency_to_chemical_shift,
@@ -115,6 +116,9 @@ __all__ = [
 
     #relaxation
     "relaxation",
+
+    #rotframe
+    "rotating_frame",
 
     #specutils
     "fourier_transform",

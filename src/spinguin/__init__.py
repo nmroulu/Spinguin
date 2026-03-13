@@ -54,6 +54,9 @@ from spinguin._core import (
     # relaxation
     relaxation,
 
+    # rotframe
+    rotating_frame,
+
     # specutils
     fourier_transform,
     frequency_to_chemical_shift,
@@ -133,6 +136,9 @@ __all__ = [
 
     # core: relaxation
     "relaxation",
+
+    # core: rotframe
+    "rotating_frame",
 
     # core: specutils
     "fourier_transform",
