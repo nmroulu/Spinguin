@@ -24,9 +24,9 @@ import warnings
 from itertools import product, combinations
 from typing import Iterator, Literal
 from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
-from spinguin._core._la import eliminate_small, expm_vec
+from spinguin._core._la import eliminate_small, expm_vec, arraylike_to_tuple
 from spinguin._core._hide_prints import HidePrints
-from spinguin._core._utils import coherence_order, state_idx
+from spinguin._core._utils import coherence_order
 from spinguin._core._states import state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 from spinguin._core._la import isvector
@@ -50,6 +50,7 @@ class Basis:
 
     # Basis set properties
     _basis: np.ndarray = None
+    _basis_dict: dict = None
     _max_spin_order: int = None
     _spin_system: SpinSystem = None
 
@@ -89,6 +90,25 @@ class Basis:
         """
         return self._basis
     
+    @basis.setter
+    def basis(self, basis: np.ndarray):
+        # Check the input
+        if not isinstance(basis, np.ndarray):
+            raise ValueError("Basis set must be a NumPy array.")
+        if basis.ndim != 2:
+            raise ValueError("Basis set must be a two-dimensional array.")
+        if basis.shape[1] != self._spin_system.nspins:
+            raise ValueError("Mismatch between basis set and number of spins.")
+
+        # Change the basis set to immutable
+        basis.flags.writeable = False
+
+        # Set the basis set and the basis dictionary
+        self._basis = basis
+        self._basis_dict = {tuple(state): i for i, state in enumerate(basis)}
+
+        print(f"Basis set has been set. Dimension: {self.dim}.\n")
+    
     @max_spin_order.setter
     def max_spin_order(self, max_spin_order):
         if max_spin_order < 1:
@@ -113,10 +133,10 @@ class Basis:
             self.max_spin_order = self._spin_system.nspins
 
         # Build the basis
-        self._basis = make_basis(spins = self._spin_system.spins,
-                                 max_spin_order = self.max_spin_order)
+        self.basis = make_basis(spins = self._spin_system.spins,
+                                max_spin_order = self.max_spin_order)
         
-    def indexof(self, op_def: np.ndarray | list | tuple):
+    def indexof(self, op_def: np.ndarray | list | tuple) -> int:
         """
         Finds the index of the basis state defined by `op_def`.
 
@@ -139,11 +159,14 @@ class Basis:
         if self.basis is None:
             raise ValueError("Basis must be built before obtaining indices.")
         
-        # Convert the input as array if not already
-        op_def = np.asarray(op_def)
+        # Convert the input as tuple
+        op_def = arraylike_to_tuple(op_def)
 
         # Obtain the index
-        idx = state_idx(self.basis, op_def)
+        if op_def in self._basis_dict:
+            idx = self._basis_dict[op_def]
+        else:
+            raise ValueError(f"Could not find {op_def} in the basis set.")
 
         return idx
         
@@ -177,7 +200,7 @@ class Basis:
         )
 
         # Update the basis
-        self._basis = truncated_basis
+        self.basis = truncated_basis
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
@@ -252,7 +275,7 @@ class Basis:
         )
 
         # Update the basis
-        self._basis = truncated_basis
+        self.basis = truncated_basis
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
@@ -328,7 +351,7 @@ class Basis:
         )
 
         # Update the basis
-        self._basis = truncated_basis
+        self.basis = truncated_basis
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
@@ -387,7 +410,7 @@ class Basis:
         )
 
         # Update the basis
-        self._basis = truncated_basis
+        self.basis = truncated_basis
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
