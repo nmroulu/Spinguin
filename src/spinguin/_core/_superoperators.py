@@ -488,14 +488,8 @@ def sop_to_truncated_basis(
     sop_transformed : ndarray or csc_array
         Superoperator transformed into the truncated basis.
     """
-
-    status("Transforming the superoperator into the truncated basis...")
-    time_start = time.time()
-
     # Perform the transformation to truncated basis
     sop_transformed = sop[np.ix_(index_map, index_map)]
-
-    status(f"Completed in {time.time() - time_start:.4f} seconds.")
 
     return sop_transformed
 

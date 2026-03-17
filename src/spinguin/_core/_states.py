@@ -41,14 +41,8 @@ def state_to_truncated_basis(
     rho_transformed : ndarray or csc_array
         State vector transformed into the truncated basis.
     """
-
-    status("Transforming the state vector into the truncated basis...")
-    time_start = time.time()
-
     # Perform the transformation to truncated basis
     rho_transformed = rho[index_map]
-
-    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return rho_transformed
 
