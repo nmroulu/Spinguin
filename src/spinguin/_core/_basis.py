@@ -133,8 +133,8 @@ class Basis:
             self.max_spin_order = self._spin_system.nspins
 
         # Build the basis
-        self.basis = make_basis(spins = self._spin_system.spins,
-                                max_spin_order = self.max_spin_order)
+        self.basis = _make_basis(spins = self._spin_system.spins,
+                                 max_spin_order = self.max_spin_order)
         
     def indexof(self, op_def: np.ndarray | list | tuple) -> int:
         """
@@ -171,10 +171,10 @@ class Basis:
         return idx
         
     def truncate_by_coherence(
-            self,
-            coherence_orders: list,
-            *objs: np.ndarray | sp.csc_array
-        ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        self,
+        coherence_orders: list,
+        *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
         """
         Truncates the basis set by retaining only the product operators that
         correspond to coherence orders specified in the `coherence_orders` list.
@@ -439,7 +439,7 @@ class Basis:
 
             return objs_transformed
         
-def make_basis(spins: np.ndarray, max_spin_order: int):
+def _make_basis(spins: np.ndarray, max_spin_order: int):
     """
     Constructs a Liouville-space basis set, where the basis is spanned by all
     possible Kronecker products of irreducible spherical tensor operators, up
@@ -485,7 +485,7 @@ def make_basis(spins: np.ndarray, max_spin_order: int):
     for subsystem in subsystems:
 
         # Get the basis for the subsystem
-        sub_basis = make_subsystem_basis(spins, subsystem)
+        sub_basis = _make_subsystem_basis(spins, subsystem)
 
         # Iterate through the states in the subsystem basis
         for state in sub_basis:
@@ -505,7 +505,7 @@ def make_basis(spins: np.ndarray, max_spin_order: int):
     
     return basis
 
-def make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
+def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     """
     Generates the basis set for a given subsystem.
 
