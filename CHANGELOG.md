@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.0
+- Basis set improvements.
+
 ## 0.0.4
 - It is possible to create a subsystem from a SpinSystem object.
 
