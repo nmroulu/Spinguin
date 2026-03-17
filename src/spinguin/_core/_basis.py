@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 import numpy as np
 import scipy.sparse as sp
 import time
-import math
 import warnings
 from itertools import product, combinations
 from typing import Iterator
@@ -230,33 +229,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            status("Converting superoperators or state vectors to the "
-                   "truncated basis...")
-            time_start = time.time()
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
-            status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, index_map)
             return objs_transformed
         
     def truncate_by_coupling(
@@ -387,28 +360,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, index_map)
             return objs_transformed
         
     def truncate_by_zte(
@@ -463,28 +415,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, index_map)
             return objs_transformed
         
     def truncate_by_indices(
@@ -522,28 +453,7 @@ class Basis:
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=indices,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=indices,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, indices)
             return objs_transformed
         
 def _make_basis(spins: np.ndarray, max_spin_order: int):
@@ -767,3 +677,51 @@ def truncate_basis_by_indices(
     status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
 
     return truncated_basis
+
+def _sop_or_state_to_truncated_basis(objs: tuple, index_map: list):
+    """
+    Internal helper function to convert the superoperators or state vectors
+    into the truncated basis set.
+
+    Parameters
+    ----------
+    objs : tuple
+        Tuple of superoperators and state vectors to be converted to the
+        truncated basis.
+    index_map : list
+        An index map between the original basis and the truncated basis.
+
+    Returns
+    -------
+    objs_transformed : list
+        List of superoperators and state vectors transformed into the truncated
+        basis.
+    """
+    status("Converting superoperators or state vectors to the "
+           "truncated basis...")
+    time_start = time.time()
+    objs_transformed = []
+    for obj in objs:
+
+        # Consider state vectors
+        if isvector(obj):
+            objs_transformed.append(state_to_truncated_basis(
+                index_map=index_map,
+                rho=obj))
+            
+        # Consider superoperators
+        else:
+            objs_transformed.append(sop_to_truncated_basis(
+                index_map=index_map,
+                sop=obj
+            ))
+
+    # Convert to tuple or just single value
+    if len(objs_transformed) == 1:
+        objs_transformed = objs_transformed[0]
+    else:
+        objs_transformed = tuple(objs_transformed)
+
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+
+    return objs_transformed
