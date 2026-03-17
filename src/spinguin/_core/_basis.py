@@ -193,18 +193,45 @@ class Basis:
             Superoperators and state vectors transformed into the truncated
             basis.
         """
-        # Truncate the basis and obtain the index map
-        truncated_basis, index_map = truncate_basis_by_coherence(
-            basis = self.basis,
-            coherence_orders = coherence_orders
-        )
+        status("Truncating the basis set...")
+        status(f"\tRetaining coherence orders {coherence_orders}")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Create an empty list for the new basis
+        truncated_basis = []
+
+        # Create an empty list for the mapping from old to new basis
+        index_map = []
+
+        # Iterate over the basis
+        for idx, state in enumerate(self.basis):
+
+            # Check if coherence order is in the list
+            if coherence_order(state) in coherence_orders:
+
+                # Assign state to the truncated basis and increment index
+                truncated_basis.append(state)
+
+                # Assign index to the index map
+                index_map.append(idx)
+
+        # Convert basis to NumPy array
+        truncated_basis = np.array(truncated_basis)
 
         # Update the basis
-        self.basis = truncated_basis
+        with HidePrints():
+            self.basis = truncated_basis
+        
+        status(f"\tTruncated dimension: {len(truncated_basis)}")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
+            status("Converting superoperators or state vectors to the "
+                   "truncated basis...")
+            time_start = time.time()
             objs_transformed = []
             for obj in objs:
 
@@ -226,6 +253,8 @@ class Basis:
                 objs_transformed = objs_transformed[0]
             else:
                 objs_transformed = tuple(objs_transformed)
+
+            status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
             return objs_transformed
         
@@ -551,68 +580,6 @@ def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     basis = product(*operators)
 
     return basis
-    
-def truncate_basis_by_coherence(
-    basis: np.ndarray,coherence_orders: list
-) -> tuple[np.ndarray, list]:
-    """
-    Truncates the basis set by retaining only the product operators that
-    correspond to coherence orders specified in the `coherence_orders` list.
-
-    The function generates an index map from the original basis to the truncated
-    basis.
-    This map can be used to transform superoperators or state vectors to the new
-    basis.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    coherence_orders : list
-        List of coherence orders to be retained in the basis.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the basis set with only the specified
-        coherence orders retained.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
-        basis.
-    """
-
-    status("Truncating the basis set. The following coherence orders are "
-          f"retained: {coherence_orders}")
-    time_start = time.time()
-
-    # Create an empty list for the new basis
-    truncated_basis = []
-
-    # Create an empty list for the mapping from old to new basis
-    index_map = []
-
-    # Iterate over the basis
-    for idx, state in enumerate(basis):
-
-        # Check if coherence order is in the list
-        if coherence_order(state) in coherence_orders:
-
-            # Assign state to the truncated basis and increment index
-            truncated_basis.append(state)
-
-            # Assign index to the index map
-            index_map.append(idx)
-
-    # Convert basis to NumPy array
-    truncated_basis = np.array(truncated_basis)
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.\n")
-
-    return truncated_basis, index_map
 
 def truncate_basis_by_coupling_weakest_link(
     basis: np.ndarray,
