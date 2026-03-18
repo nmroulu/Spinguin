@@ -732,7 +732,7 @@ def _process_interaction_tensor(
     # Compute the interaction tensor terms
     for l in V_lp.keys():
         for p in range(2*l+1):
-            V_lp[l][p] = sum(V[l, m] * dge[l][m, p] for m in range(-l, l + 1))
+            V_lp[l][p] = sum(V[l, m] * dge[l][l-m, p] for m in range(-l, l + 1))
 
     return V_lp
 
