@@ -21,6 +21,7 @@ from spinguin._core._data_io import read_array
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._molecule import Molecule
 from spinguin._core._status import status
+from spinguin._core._relaxation import rotational_correlation_time_SED, rotational_correlation_times_Perrin
 
 class RelaxationProperties:
     """
@@ -109,15 +110,8 @@ class RelaxationProperties:
 
             spin_system.relaxation.tau_c = 50e-12
 
-        For symmetric top rotational diffusion, two values are used,
-        corresponding to the perpendicular and parallel components of the
-        diffusion tensor. Example::
-            
-            spin_system.relaxation.tau_c = [50e-12, 100e-12]
-        
         For anisotropic rotational diffusion, an array of three values is used,
-        corresponding to the principal components of the diffusion tensor.
-        Example::
+        corresponding to the principal components of the diffusion tensor. Example::
 
             spin_system.relaxation.tau_c = [50e-12, 100e-12, 150e-12]
         """
@@ -127,20 +121,66 @@ class RelaxationProperties:
     def tau_c(self, tau_c: float | list[float] | tuple[float, ...] | np.ndarray):
         if isinstance(tau_c, (float, int)):
             self._tau_c = float(tau_c)
-        elif isinstance(tau_c, (list, tuple)) and len(tau_c) == 2:
-            self._tau_c = np.array([float(tau_c[0]), float(tau_c[0]), float(tau_c[1])])
         elif isinstance(tau_c, (list, tuple)) and len(tau_c) == 3:
             self._tau_c = np.array([float(x) for x in tau_c])
-        elif isinstance(tau_c, np.ndarray) and tau_c.shape == (2,):
-            self._tau_c = np.array([tau_c[0], tau_c[0], tau_c[1]], dtype=float)
         elif isinstance(tau_c, np.ndarray) and tau_c.shape == (3,):
             self._tau_c = tau_c.astype(float)
         else:
             raise ValueError("tau_c must be either a single float (for isotropic "
-                             "rotational diffusion), a list/tuple of two or three floats "
-                             "(for symmetric top or anisotropic rotational diffusion), "
-                             "or a numpy array of shape (2,) or (3,).")
+                             "rotational diffusion) or a list/tuple of three floats "
+                             "(for anisotropic rotational diffusion) or a numpy array "
+                             "of shape (3,).")
         status("Rotational correlation time(s) set to: " f"{self.tau_c}\n")
+        
+    def auto_tau_c(self, 
+                   T: float, 
+                   eta: float, 
+                   model: Literal["iso", "aniso"] = "iso",
+                   r: float = None, 
+                   scaling_factor: float = 1.0) -> float | np.ndarray:
+        """
+        Automatically calculates the rotational correlation time(s) for the relaxation theory
+        using either the Stokes-Einstein-Debye relation for isotropic rotational diffusion
+        or the Perrin theory for anisotropic rotational diffusion.
+
+        Parameters
+        ----------
+        T : float
+            Temperature in Kelvin.
+        eta : float
+            Viscosity of the solvent in Pascal-seconds (Pa·s).
+        model : str, optional
+            Specifies the model to use for calculating the rotational correlation time(s).
+            Can be either "iso" for isotropic or "aniso" for anisotropic. Default is "iso".
+        r : float, optional
+            Effective hydrodynamic radius of the molecule in meters (m). Required for isotropic model.
+        scaling_factor : float, optional
+            Scaling factor for the rotational diffusion constants. Default is 1.0.
+            Useful for adjusting the correlation times to better match experimental data.
+
+        Returns
+        -------
+        tau_c : float or np.ndarray
+            Rotational correlation time(s) in seconds (s). A single float for isotropic
+            diffusion or a NumPy array of shape (3,) for anisotropic diffusion.
+        """
+        if model == "iso":
+            if r is None:
+                raise ValueError("Hydrodynamic radius 'r' must be provided for isotropic model.")
+            self.tau_c = rotational_correlation_time_SED(T, eta, r, 2) * scaling_factor
+        elif model == "aniso":
+            if self.molecule is None:
+                raise ValueError("Molecule must be assigned to the 'molecule' attribute "
+                                 "before calling auto_tau_c with anisotropic model.")
+            self.tau_c = rotational_correlation_times_Perrin(
+                self.molecule.masses, 
+                self.molecule.xyz,
+                T,
+                eta,
+                2
+            ) * scaling_factor
+        else:
+            raise ValueError("Model must be either 'iso' or 'aniso'.")
 
     @property
     def theory(self) -> str:

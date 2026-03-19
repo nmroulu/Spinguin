@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 # Imports
 import time
+import warnings
 import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
@@ -422,7 +423,7 @@ def moment_of_inertia_equivalent_ellipsoid(masses: np.ndarray,
     """
     # Compute the moment of inertia tensor and its eigenvalues
     I = moment_of_inertia_tensor(masses, coords)
-    eigenvalues, _ = np.linalg.eigh(I)
+    eigenvalues, _ = np.linalg.eigh(I) # NOTE: In ascending order
 
     # Calculate the total mass of the molecule
     total_mass = np.sum(masses)
@@ -435,18 +436,22 @@ def moment_of_inertia_equivalent_ellipsoid(masses: np.ndarray,
         eq3 = (1/5) * total_mass * (a_x**2 + a_y**2) - eigenvalues[2]
         return [eq1, eq2, eq3]
 
-    initial_guess = [2.0, 2.0, 2.0]  # Initial guess for the semi-axes in Å
-    a_x, a_y, a_z = fsolve(equations, initial_guess, maxfev=10000, xtol=1e-15)
+    # Initial guess corresponding to a sphere with the same mass and the same largest moment of inertia
+    initial_guess = np.sqrt(5/2 * eigenvalues[2] / total_mass) * np.ones(3)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        a_x, a_y, a_z = fsolve(equations, initial_guess, maxfev=10000, xtol=1e-15)
 
     return np.array([a_x, a_y, a_z])
 
 def Perrin_integrals(a_x: float, 
                      a_y: float, 
                      a_z: float, 
-                     upper_limit: float = 1e4, 
                      num_points: int = int(1e6)) -> tuple[float, float, float]:
     """
-    Calculates the Perrin integrals P, Q, and R for an ellipsoid with semi-axes a_x, a_y, and a_z.
+    Calculates the Perrin integrals P, Q, and R for an ellipsoid with semi-axes a_x, a_y, and a_z,
+    using a variable substitution to map the infinite domain to [0, 1).
 
     Parameters
     ----------
@@ -456,8 +461,6 @@ def Perrin_integrals(a_x: float,
         Semi-axis a_y of the ellipsoid in units of Å.
     a_z : float
         Semi-axis a_z of the ellipsoid in units of Å.
-    upper_limit : float, optional
-        Upper limit for the integration. Default is 1e4.
     num_points : int, optional
         Number of points for the integration. Default is 1e6.
 
@@ -470,18 +473,21 @@ def Perrin_integrals(a_x: float,
     R : float
         Perrin R integral for the ellipsoid.
     """
-    # Axis to integrate over
-    s = np.linspace(0, upper_limit, num_points)  # More points for better accuracy
+    # Change of variables: s = t / (1 - t), which maps s in [0, ∞) to t in [0, 1).
+    # ds/dt = 1 / (1 - t)^2, so the Jacobian is 1 / (1 - t)^2
+    t = np.linspace(0, 1, num_points, endpoint=False)
+    s = t / (1 - t)
+    jacobian = 1 / (1 - t)**2
 
-    # Calculate the integrands
-    integrand_P = 1 / np.sqrt((a_x**2 + s)**3 * (a_y**2 + s) * (a_z**2 + s))
-    integrand_Q = 1 / np.sqrt((a_y**2 + s)**3 * (a_z**2 + s) * (a_x**2 + s))
-    integrand_R = 1 / np.sqrt((a_z**2 + s)**3 * (a_x**2 + s) * (a_y**2 + s))
+    # Calculate the integrands with the Jacobian
+    integrand_P = 1 / np.sqrt((a_x**2 + s)**3 * (a_y**2 + s) * (a_z**2 + s)) * jacobian
+    integrand_Q = 1 / np.sqrt((a_y**2 + s)**3 * (a_z**2 + s) * (a_x**2 + s)) * jacobian
+    integrand_R = 1 / np.sqrt((a_z**2 + s)**3 * (a_x**2 + s) * (a_y**2 + s)) * jacobian
 
-    # Perform the integrations using the trapezoidal rule
-    P = np.trapz(integrand_P, s)
-    Q = np.trapz(integrand_Q, s)
-    R = np.trapz(integrand_R, s)
+    # Integrate over t from 0 to 1
+    P = np.trapz(integrand_P, t)
+    Q = np.trapz(integrand_Q, t)
+    R = np.trapz(integrand_R, t)
 
     return P, Q, R
 
@@ -557,8 +563,7 @@ def rotational_correlation_times_Perrin(masses: np.ndarray,
                                         coords: np.ndarray,
                                         T: float,
                                         eta: float,
-                                        l: int,
-                                        scale: float = 1.0) -> np.ndarray:
+                                        l: int) -> np.ndarray:
     """
     Calculates the rotational correlation times along the principal axes
     of rotation using the Perrin factors for a given tensor rank.
@@ -578,9 +583,6 @@ def rotational_correlation_times_Perrin(masses: np.ndarray,
         Solvent viscosity in Pa·s.
     l : int
         Rank of the tensor (must be greater than 0).
-    scale : float, optional
-        Scaling factor for the rotational diffusion constants. Default is 1.0.
-        Useful for adjusting the correlation times to better match experimental data.
 
     Returns
     -------
@@ -601,9 +603,6 @@ def rotational_correlation_times_Perrin(masses: np.ndarray,
 
     # Calculate the rotational diffusion constants along the principal axes using Perrin factors
     D_rs = rotational_diffusion_constants_Perrin(T, eta, semi_axes[0], semi_axes[1], semi_axes[2])
-
-    # Apply scaling factor to the rotational diffusion constants
-    D_rs *= scale
 
     # Calculate the rotational correlation times along the principal axes
     tau_cs = rotational_correlation_time(l, D_rs)
@@ -772,9 +771,9 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
         masses = spin_system.relaxation.molecule.masses
         coords = spin_system.relaxation.molecule.xyz
         moi_tensor = moment_of_inertia_tensor(masses, coords)
-        _, rot_principal_axes = np.linalg.eigh(moi_tensor)
+        _, rot_principal_axes = np.linalg.eigh(moi_tensor) # NOTE: In ascending order
         lab_frame = np.eye(3)
-        R = rotation_matrix_to_align_axes(lab_frame, rot_principal_axes.T)
+        R = rotation_matrix_to_align_axes(lab_frame, rot_principal_axes.T) # NOTE: Important to transpose for Scipy's convention
 
     # Initialize the dictionary
     interactions = {}
