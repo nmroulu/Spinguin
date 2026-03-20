@@ -24,7 +24,12 @@ from itertools import product, combinations
 from typing import Iterator
 from scipy.sparse.csgraph import connected_components
 from scipy.constants import mu_0, hbar
-from spinguin._core._la import eliminate_small, expm_vec, arraylike_to_tuple
+from spinguin._core._la import (
+    eliminate_small,
+    expm_vec,
+    arraylike_to_tuple,
+    norm_1
+)
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._utils import coherence_order
 from spinguin._core._states import state_to_truncated_basis
@@ -367,10 +372,8 @@ class Basis:
         self,
         L: np.ndarray | sp.csc_array,
         rho: np.ndarray | sp.csc_array,
-        time_step: float,
-        nsteps: int,
         *objs: np.ndarray | sp.csc_array
-    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+    ) ->  tuple[np.ndarray | sp.csc_array]:
         """
         Removes basis states using the Zero-Track Elimination (ZTE) described
         in:
@@ -384,10 +387,6 @@ class Basis:
             Liouvillian superoperator, L = -iH - R + K.
         rho : ndarray or csc_array
             Initial spin density vector.
-        time_step : float
-            Time step of the propagation within the ZTE.
-        nsteps : int
-            Number of steps to take in the ZTE.
         *objs : tuple of {ndarray, csc_array}
             Superoperators or state vectors defined in the original basis. These
             will be converted into the truncated basis.
@@ -396,27 +395,72 @@ class Basis:
         -------
         objs_transformed : tuple of {ndarray, csc_array}
             Superoperators and state vectors transformed into the truncated
-            basis.
+            basis. The Liouvillian and the density vector, which are given as
+            the input, are always returned.
         """
-        # Truncate the basis and obtain the index map
-        truncated_basis, index_map = truncate_basis_by_zte(
-            basis = self.basis,
-            L = L,
-            rho = rho,
-            time_step = time_step,
-            nsteps = nsteps,
-            zero_zte = parameters.zero_zte,
-            zero_expm_vec = parameters.zero_time_step
+        status("Truncating the basis set using zero-track elimination...")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Take a copy of the state vector for ZTE
+        rho_zte = rho.copy()
+
+        # Create a vector to store the maximum values of rho
+        rho_max = abs(np.array(rho_zte))
+
+        # Scale the zero value of the ZTE to take into account different norms
+        # and the possibility of having a hyperpolarised state
+        zero_zte = parameters.zero_zte / max(rho_max[1:, 0])
+        status(f"\tNormalised zero value of ZTE: {zero_zte}")
+
+        # Obtain the time step
+        time_step = 1 / norm_1(L, ord='col')
+        status(f"\tTime-step of ZTE set to: {time_step:.4e} s")
+
+        # Obtain the dimension required to describe density vector
+        dim = np.sum(rho_max > zero_zte)
+        status(
+            "\tBefore ZTE. "
+            f"Current required basis dimension: {dim}"
         )
 
-        # Update the basis
-        self.basis = truncated_basis
+        # Perform the ZTE steps
+        for i in range(parameters.nsteps_zte):
 
-        # Optionally, convert the superoperators and state vectors to the
-        # truncated basis
-        if objs:
-            objs_transformed = _sop_or_state_to_truncated_basis(objs, index_map)
-            return objs_transformed
+            # Propagate the state forward and update the maximum values
+            with HidePrints():
+                rho_zte = expm_vec(L*time_step, rho_zte, zero_zte)
+                rho_max = np.maximum(rho_max, abs(rho_zte))
+
+            # Obtain the dimension required to describe density vector
+            dim_curr = np.sum(rho_max > zero_zte)
+            status(
+                f"\tZTE step {i+1} of {parameters.nsteps_zte}. "
+                f"Current required basis dimension: {dim_curr}"
+            )
+
+            # Terminate ZTE if the required dimension remains the same
+            if dim == dim_curr:
+                status("\tDimension remained the same. Finishing ZTE.")
+                break
+            else:
+                dim = dim_curr
+
+        # Obtain indices of states that should remain in the basis
+        index_map = list(np.where(rho_max > zero_zte)[0])
+
+        # Update the basis
+        with HidePrints():
+            self.basis = self.basis[index_map]
+
+        status(f"\tTruncated dimension: {self.dim}")
+        status(f"Completed in: {time.time() - time_start:.4f} seconds.\n")
+
+        # Convert the L and rho to the truncated basis. In addition, convert
+        # other objects given as input
+        all_objs = (L, rho, *objs)
+        objs_transformed = _sop_or_state_to_truncated_basis(all_objs, index_map)
+        return objs_transformed
         
     def truncate_by_indices(
         self,
@@ -568,78 +612,6 @@ def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     basis = product(*operators)
 
     return basis
-    
-def truncate_basis_by_zte(
-    basis: np.ndarray,
-    L: np.ndarray | sp.csc_array,
-    rho: np.ndarray | sp.csc_array,
-    time_step: float,
-    nsteps: int,
-    zero_zte: float,
-    zero_expm_vec: float
-) -> tuple[np.ndarray, list]:
-    """
-    Removes basis states using the Zero-Track Elimination (ZTE) described in:
-
-    Kuprov, I. (2008):
-    https://doi.org/10.1016/j.jmr.2008.08.008
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    L : ndarray or csc_array
-        Liouvillian superoperator, L = -iH - R + K.
-    rho : ndarray or csc_array
-        Initial spin density vector.
-    time_step : float
-        Time step of the propagation within the ZTE.
-    nsteps : int
-        Number of steps to take in the ZTE.
-    zero_zte : float
-        If state population is below this value, it is dropped from the basis.
-    zero_expm_vec: float
-        Convergence criterion to be used when calculating the action of matrix
-        exponential of the Liouvillian to the state vector.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
-        basis.
-    """
-    status("Truncating the basis set using zero-track elimination.")
-    time_start = time.time()
-
-    # Create empty vector for the maximum values of rho
-    rho_max = abs(np.array(rho))
-
-    # Scale the zero value of the ZTE to take into account different norms
-    scaling_zv = abs(rho).max()
-    zero_zte = zero_zte / scaling_zv
-
-    # Propagate for few steps
-    for i in range(nsteps):
-        status(f"ZTE step {i+1} of {nsteps}...")
-        with HidePrints():
-            rho = expm_vec(L*time_step, rho, zero_expm_vec)
-            rho_max = np.maximum(rho_max, abs(rho))
-
-    # Obtain indices of states that should remain
-    index_map = list(np.where(rho_max > zero_zte)[0])
-
-    # Obtain the truncated basis
-    truncated_basis = basis[index_map]
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-
-    return truncated_basis, index_map
 
 def truncate_basis_by_indices(
     basis: np.ndarray,
