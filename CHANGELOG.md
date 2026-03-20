@@ -2,6 +2,7 @@
 
 ## 0.1.0
 - Basis set improvements.
+- Small change to the implementation of zero-track elimination.
 
 ## 0.0.4
 - It is possible to create a subsystem from a SpinSystem object.
