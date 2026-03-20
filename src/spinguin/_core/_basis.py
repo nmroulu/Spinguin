@@ -485,14 +485,19 @@ class Basis:
             Superoperators and state vectors transformed into the truncated
             basis.
         """
-        # Obtain the truncated basis
-        truncated_basis = truncate_basis_by_indices(
-            basis = self.basis,
-            indices = indices
-        )
+        status("Truncating the basis set based on supplied indices...")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Sort the indices
+        indices = np.sort(indices)
 
         # Update the basis
-        self.basis = truncated_basis
+        with HidePrints():
+            self.basis = self.basis[indices]
+
+        status(f"\tTruncated dimension: {self.dim}")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
@@ -612,43 +617,6 @@ def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     basis = product(*operators)
 
     return basis
-
-def truncate_basis_by_indices(
-    basis: np.ndarray,
-    indices: list | np.ndarray
-) -> np.ndarray:
-    """
-    Truncate the basis set to include only the basis states specified by the
-    `indices` supplied by the user.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    indices : list or ndarray
-        List of indices that specify which basis states to retain.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    """
-    status("Truncating the basis set based on supplied indices.")
-    time_start = time.time()
-
-    # Sort the indices
-    indices = np.sort(indices)
-
-    # Obtain the truncated basis
-    truncated_basis = basis[indices]
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-
-    return truncated_basis
 
 def _sop_or_state_to_truncated_basis(objs: tuple, index_map: list):
     """
