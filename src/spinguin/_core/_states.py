@@ -12,81 +12,13 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.constants as const
 import time
-from functools import lru_cache
 from spinguin._core._la import expm
 from spinguin._core._operators import op_prod
-from spinguin._core._utils import parse_operator_string, state_idx
+from spinguin._core._utils import parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._status import status
-
-@lru_cache(maxsize=128)
-def _state(
-    basis_bytes: bytes,
-    spins_bytes: bytes,
-    operator: str,
-    sparse: bool
-) -> np.ndarray | sp.csc_array:
-
-    # Obtain the hashed elements
-    spins = np.frombuffer(spins_bytes, dtype=float)
-    basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, spins.shape[0]) 
-
-    # Obtain the basis dimension, number of spins and spin multiplicities
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
-    mults = (2*spins + 1).astype(int)
-
-    # Initialize the state vector
-    if sparse:
-        rho = sp.lil_array((dim, 1), dtype=complex)
-    else:
-        rho = np.zeros((dim, 1), dtype=complex)
-
-    # Get the operator definition and coefficients
-    op_defs, coeffs = parse_operator_string(operator, nspins)
-
-    # Get the state indices
-    idxs = [state_idx(basis, op_def) for op_def in op_defs]
-
-    # Assign the state
-    for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
-
-        # Find indices of the active and inactive spins
-        idx_active = np.where(np.array(op_def) != 0)[0]
-        idx_inactive = np.where(np.array(op_def) == 0)[0]
-
-        # Calculate the norm of the active operator part if there are active
-        # spins
-        if len(idx_active) != 0:
-            if parameters.sparse_operator:
-                op_norm = sp.linalg.norm(
-                    op_prod(op_def, spins, include_unit=False), ord='fro'
-                )
-            else:
-                op_norm = np.linalg.norm(
-                    op_prod(op_def, spins, include_unit=False), ord='fro'
-                )
-
-        # Otherwise set it to one
-        else:
-            op_norm = 1
-        
-        # Calculate the norm of the unit operator part
-        unit_norm = np.sqrt(np.prod(mults[idx_inactive]))
-
-        # Total norm of the operator
-        norm = op_norm * unit_norm
-
-        # Set the properly normalized coefficient
-        rho[idx, 0] = coeff * norm
-
-    # Convert to csc_array if requesting sparse
-    if sparse:
-        rho = rho.tocsc()
-
-    return rho
 
 def state_to_truncated_basis(
     index_map: list,
@@ -109,14 +41,8 @@ def state_to_truncated_basis(
     rho_transformed : ndarray or csc_array
         State vector transformed into the truncated basis.
     """
-
-    status("Transforming the state vector into the truncated basis...")
-    time_start = time.time()
-
     # Perform the transformation to truncated basis
     rho_transformed = rho[index_map]
-
-    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return rho_transformed
 
@@ -230,17 +156,54 @@ def state(
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before constructing a state.")
 
-    # Convert to hashable types
-    basis_bytes = spin_system.basis.basis.tobytes()
-    spins_bytes = spin_system.spins.tobytes()
+    # Initialize the state vector
+    dim = spin_system.basis.dim
+    if parameters.sparse_state:
+        rho = sp.lil_array((dim, 1), dtype=complex)
+    else:
+        rho = np.zeros((dim, 1), dtype=complex)
 
-    # Create the state and ensure that a different instance is returned
-    rho = _state(
-        basis_bytes,
-        spins_bytes,
-        operator,
-        parameters.sparse_state
-    ).copy()
+    # Get the operator definition and coefficients
+    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
+
+    # Get the state indices
+    idxs = [spin_system.basis.indexof(op_def) for op_def in op_defs]
+
+    # Assign the state
+    for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
+
+        # Find indices of the active and inactive spins
+        idx_active = np.where(np.array(op_def) != 0)[0]
+        idx_inactive = np.where(np.array(op_def) == 0)[0]
+
+        # Calculate the norm of the active operator part if there are active
+        # spins
+        if len(idx_active) != 0:
+            if parameters.sparse_operator:
+                op_norm = sp.linalg.norm(
+                    op_prod(op_def, spin_system.spins, include_unit=False), ord='fro'
+                )
+            else:
+                op_norm = np.linalg.norm(
+                    op_prod(op_def, spin_system.spins, include_unit=False), ord='fro'
+                )
+
+        # Otherwise set it to one
+        else:
+            op_norm = 1
+        
+        # Calculate the norm of the unit operator part
+        unit_norm = np.sqrt(np.prod(spin_system.mults[idx_inactive]))
+
+        # Total norm of the operator
+        norm = op_norm * unit_norm
+
+        # Set the properly normalized coefficient
+        rho[idx, 0] = coeff * norm
+
+    # Convert to csc_array if requesting sparse
+    if parameters.sparse_state:
+        rho = rho.tocsc()
 
     return rho
 
@@ -658,10 +621,3 @@ def measure(
     ex = (oper.conj().T @ rho).trace()
 
     return ex
-
-def clear_cache_state():
-    """
-    Clears the cache of the `_state()` function.
-    """
-    # Clear the cache
-    _state.cache_clear()

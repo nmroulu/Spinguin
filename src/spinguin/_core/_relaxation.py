@@ -23,7 +23,7 @@ from spinguin._core._la import (
     decompose_matrix,
     rotation_matrix_to_align_axes
 )
-from spinguin._core._utils import idx_to_lq, lq_to_idx, parse_operator_string
+from spinguin._core._utils import idx_to_lq, parse_operator_string
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
 from spinguin._core._hamiltonian import hamiltonian

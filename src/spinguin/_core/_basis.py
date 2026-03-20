@@ -19,14 +19,19 @@ if TYPE_CHECKING:
 import numpy as np
 import scipy.sparse as sp
 import time
-import math
 import warnings
 from itertools import product, combinations
-from typing import Iterator, Literal
-from scipy.sparse.csgraph import connected_components, minimum_spanning_tree
-from spinguin._core._la import eliminate_small, expm_vec
+from typing import Iterator
+from scipy.sparse.csgraph import connected_components
+from scipy.constants import mu_0, hbar
+from spinguin._core._la import (
+    eliminate_small,
+    expm_vec,
+    arraylike_to_tuple,
+    norm_1
+)
 from spinguin._core._hide_prints import HidePrints
-from spinguin._core._utils import coherence_order, state_idx
+from spinguin._core._utils import coherence_order
 from spinguin._core._states import state_to_truncated_basis
 from spinguin._core._superoperators import sop_to_truncated_basis
 from spinguin._core._la import isvector
@@ -50,6 +55,7 @@ class Basis:
 
     # Basis set properties
     _basis: np.ndarray = None
+    _basis_dict: dict = None
     _max_spin_order: int = None
     _spin_system: SpinSystem = None
 
@@ -89,6 +95,25 @@ class Basis:
         """
         return self._basis
     
+    @basis.setter
+    def basis(self, basis: np.ndarray):
+        # Check the input
+        if not isinstance(basis, np.ndarray):
+            raise ValueError("Basis set must be a NumPy array.")
+        if basis.ndim != 2:
+            raise ValueError("Basis set must be a two-dimensional array.")
+        if basis.shape[1] != self._spin_system.nspins:
+            raise ValueError("Mismatch between basis set and number of spins.")
+
+        # Change the basis set to immutable
+        basis.flags.writeable = False
+
+        # Set the basis set and the basis dictionary
+        self._basis = basis
+        self._basis_dict = {tuple(state): i for i, state in enumerate(basis)}
+
+        status(f"Basis set has been set. Dimension: {self.dim}.\n")
+    
     @max_spin_order.setter
     def max_spin_order(self, max_spin_order):
         if max_spin_order < 1:
@@ -113,10 +138,10 @@ class Basis:
             self.max_spin_order = self._spin_system.nspins
 
         # Build the basis
-        self._basis = make_basis(spins = self._spin_system.spins,
+        self.basis = _make_basis(spins = self._spin_system.spins,
                                  max_spin_order = self.max_spin_order)
         
-    def indexof(self, op_def: np.ndarray | list | tuple):
+    def indexof(self, op_def: np.ndarray | list | tuple) -> int:
         """
         Finds the index of the basis state defined by `op_def`.
 
@@ -139,19 +164,22 @@ class Basis:
         if self.basis is None:
             raise ValueError("Basis must be built before obtaining indices.")
         
-        # Convert the input as array if not already
-        op_def = np.asarray(op_def)
+        # Convert the input as tuple
+        op_def = arraylike_to_tuple(op_def)
 
         # Obtain the index
-        idx = state_idx(self.basis, op_def)
+        if op_def in self._basis_dict:
+            idx = self._basis_dict[op_def]
+        else:
+            raise ValueError(f"Could not find {op_def} in the basis set.")
 
         return idx
         
     def truncate_by_coherence(
-            self,
-            coherence_orders: list,
-            *objs: np.ndarray | sp.csc_array
-        ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+        self,
+        coherence_orders: list,
+        *objs: np.ndarray | sp.csc_array
+    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
         """
         Truncates the basis set by retaining only the product operators that
         correspond to coherence orders specified in the `coherence_orders` list.
@@ -170,69 +198,67 @@ class Basis:
             Superoperators and state vectors transformed into the truncated
             basis.
         """
-        # Truncate the basis and obtain the index map
-        truncated_basis, index_map = truncate_basis_by_coherence(
-            basis = self.basis,
-            coherence_orders = coherence_orders
-        )
+        status("Truncating the basis set...")
+        status(f"\tRetaining coherence orders {coherence_orders}")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Create an empty list for the new basis
+        truncated_basis = []
+
+        # Create an empty list for the mapping from old to new basis
+        index_map = []
+
+        # Iterate over the basis
+        for idx, state in enumerate(self.basis):
+
+            # Check if coherence order is in the list
+            if coherence_order(state) in coherence_orders:
+
+                # Assign state to the truncated basis and increment index
+                truncated_basis.append(state)
+
+                # Assign index to the index map
+                index_map.append(idx)
+
+        # Convert basis to NumPy array
+        truncated_basis = np.array(truncated_basis)
 
         # Update the basis
-        self._basis = truncated_basis
+        with HidePrints():
+            self.basis = truncated_basis
+        
+        status(f"\tTruncated dimension: {len(truncated_basis)}")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, index_map)
             return objs_transformed
         
     def truncate_by_coupling(
         self,
-        threshold: float,
-        method: Literal["weakest_link", "network_strength"] = "weakest_link",
+        threshold_J: float=0.01,
+        threshold_DD: float=500,
         *objs: np.ndarray | sp.csc_array
     ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
         """
-        Removes basis states based on the scalar J-couplings. Whenever there
-        exists a J-coupling network of sufficient strength between spins that
-        constitute a product state, the particular state is kept in the basis.
-        Otherwise, the state is removed. The coupling strength is evaluated
-        either by the weakest link or by the overall network strength.
+        Removes basis states based on the scalar J-couplings and DD-couplings.
+        Whenever there exists a coupling network of sufficient strength between
+        spins that constitute a product state, the particular state is kept in
+        the basis. Otherwise, the state is removed.
 
         Optionally, superoperators or state vectors can be given as input. These
         will be converted to the truncated basis.
 
         Parameters
         ----------
-        threshold : float
-            Coupling strength must be above this value in order for the product
-            state to be considered in the basis set.
-        method : {"weakest_link", "network_strength"}
-            Decides how the importance of a product state is evaluated. Weakest
-            link method considers a J-coupling network invalid based on the
-            smallest J-coupling within that network. Network strength method
-            calculates the effective coupling as a geometric mean scaled by the
-            factorial of the number of couplings within the network.
+        threshold_J : float
+            J-couplings less than this value (in Hz) are considered to be zero.
+        threshold_DD : float
+            Dipole-dipole couplings less than this value (in Hz) are considered
+            to be zero.
         *objs : tuple of {ndarray, csc_array}
             Superoperators or state vectors defined in the original basis. These
             will be converted into the truncated basis.
@@ -243,52 +269,111 @@ class Basis:
             Superoperators and state vectors transformed into the truncated
             basis.
         """
-        # Truncate the basis and obtain the index map
-        truncated_basis, index_map = truncate_basis_by_coupling(
-            basis = self.basis,
-            J_couplings = self._spin_system.J_couplings,
-            threshold = threshold,
-            method = method
-        )
+        status("Truncating the basis set based on couplings...")
+        status(f"\tJ-couplings <{threshold_J} Hz are considered zero.")
+        status(f"\tDD-couplings <{threshold_DD} Hz are considered zero.")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Create an empty list for the new basis
+        truncated_basis = []
+
+        # Create an empty list for the mapping from old to new basis
+        index_map = []
+
+        # Initialise an array for the DD-couplings
+        nspins = self._spin_system.nspins
+        DD_couplings = np.zeros(shape=(nspins, nspins))
+
+        # Calculate DD-couplings only if XYZ is assigned
+        if self._spin_system.xyz is not None:
+        
+            # Convert the molecular coordinates to SI units
+            xyz = self._spin_system.xyz * 1e-10
+
+            # Get the connector and distance arrays
+            connectors = xyz[:, np.newaxis] - xyz
+            r = np.linalg.norm(connectors, axis=2)
+
+            # Get the DD-couplings (in Hz)
+            y = self._spin_system.gammas
+            for i in range(nspins):
+                for j in range(i):
+                    DD_couplings[i, j] = \
+                        - mu_0 * y[i] * y[j] * hbar / (8*np.pi**2 * r[i,j]**3)
+
+        # Create the connectivity matrix from the J-couplings
+        J_connectivity = self._spin_system._J_couplings.copy()
+        eliminate_small(J_connectivity, zero_value=threshold_J)
+        J_connectivity[J_connectivity!=0] = 1
+
+        # Create the connectivity matrix from the DD-couplings
+        DD_connectivity = DD_couplings.copy()
+        eliminate_small(DD_connectivity, zero_value=threshold_DD)
+        DD_connectivity[DD_connectivity!=0] = 1
+
+        # Get the union of the connectivity matrices
+        connectivity = J_connectivity + DD_connectivity
+        connectivity[connectivity!=0] = 1
+
+        # Cache the connectivity of spins
+        conn = dict()
+
+        # Iterate over the basis
+        for idx, state in enumerate(self.basis):
+
+            # Obtain the indices of the participating spins
+            idx_spins = np.nonzero(state)[0]
+
+            # Special case: always include the unit state
+            if len(idx_spins) == 0:
+                truncated_basis.append(state)
+                index_map.append(idx)
+                continue
+
+            # Analyse the connectivity if not already
+            if not tuple(idx_spins) in conn:
+
+                # Obtain the current connectivity graphs
+                connectivity_curr = connectivity[np.ix_(idx_spins, idx_spins)]
+
+                # Calculate the number of connected components
+                n_components = connected_components(
+                    csgraph = connectivity_curr,
+                    directed = False,
+                    return_labels = False
+                )
+
+                # Store the connectivity of the state
+                conn[tuple(idx_spins)] = n_components
+
+            # If the state is connected, keep it
+            if conn[tuple(idx_spins)] == 1:
+                truncated_basis.append(state)
+                index_map.append(idx)
+
+        # Convert basis to NumPy array
+        truncated_basis = np.array(truncated_basis)
+
+        status(f"\tTruncated dimension: {len(truncated_basis)}")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Update the basis
-        self._basis = truncated_basis
+        with HidePrints():
+            self.basis = truncated_basis
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, index_map)
             return objs_transformed
         
     def truncate_by_zte(
         self,
         L: np.ndarray | sp.csc_array,
         rho: np.ndarray | sp.csc_array,
-        time_step: float,
-        nsteps: int,
         *objs: np.ndarray | sp.csc_array
-    ) -> None | np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array]:
+    ) ->  tuple[np.ndarray | sp.csc_array]:
         """
         Removes basis states using the Zero-Track Elimination (ZTE) described
         in:
@@ -302,10 +387,6 @@ class Basis:
             Liouvillian superoperator, L = -iH - R + K.
         rho : ndarray or csc_array
             Initial spin density vector.
-        time_step : float
-            Time step of the propagation within the ZTE.
-        nsteps : int
-            Number of steps to take in the ZTE.
         *objs : tuple of {ndarray, csc_array}
             Superoperators or state vectors defined in the original basis. These
             will be converted into the truncated basis.
@@ -314,48 +395,72 @@ class Basis:
         -------
         objs_transformed : tuple of {ndarray, csc_array}
             Superoperators and state vectors transformed into the truncated
-            basis.
+            basis. The Liouvillian and the density vector, which are given as
+            the input, are always returned.
         """
-        # Truncate the basis and obtain the index map
-        truncated_basis, index_map = truncate_basis_by_zte(
-            basis = self.basis,
-            L = L,
-            rho = rho,
-            time_step = time_step,
-            nsteps = nsteps,
-            zero_zte = parameters.zero_zte,
-            zero_expm_vec = parameters.zero_time_step
+        status("Truncating the basis set using zero-track elimination...")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Take a copy of the state vector for ZTE
+        rho_zte = rho.copy()
+
+        # Create a vector to store the maximum values of rho
+        rho_max = abs(np.array(rho_zte))
+
+        # Scale the zero value of the ZTE to take into account different norms
+        # and the possibility of having a hyperpolarised state
+        zero_zte = parameters.zero_zte / max(rho_max[1:, 0])
+        status(f"\tNormalised zero value of ZTE: {zero_zte}")
+
+        # Obtain the time step
+        time_step = 1 / norm_1(L, ord='col')
+        status(f"\tTime-step of ZTE set to: {time_step:.4e} s")
+
+        # Obtain the dimension required to describe density vector
+        dim = np.sum(rho_max > zero_zte)
+        status(
+            "\tBefore ZTE. "
+            f"Current required basis dimension: {dim}"
         )
 
-        # Update the basis
-        self._basis = truncated_basis
+        # Perform the ZTE steps
+        for i in range(parameters.nsteps_zte):
 
-        # Optionally, convert the superoperators and state vectors to the
-        # truncated basis
-        if objs:
-            objs_transformed = []
-            for obj in objs:
+            # Propagate the state forward and update the maximum values
+            with HidePrints():
+                rho_zte = expm_vec(L*time_step, rho_zte, zero_zte)
+                rho_max = np.maximum(rho_max, abs(rho_zte))
 
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=index_map,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=index_map,
-                        sop=obj
-                    ))
+            # Obtain the dimension required to describe density vector
+            dim_curr = np.sum(rho_max > zero_zte)
+            status(
+                f"\tZTE step {i+1} of {parameters.nsteps_zte}. "
+                f"Current required basis dimension: {dim_curr}"
+            )
 
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
+            # Terminate ZTE if the required dimension remains the same
+            if dim == dim_curr:
+                status("\tDimension remained the same. Finishing ZTE.")
+                break
             else:
-                objs_transformed = tuple(objs_transformed)
+                dim = dim_curr
 
-            return objs_transformed
+        # Obtain indices of states that should remain in the basis
+        index_map = list(np.where(rho_max > zero_zte)[0])
+
+        # Update the basis
+        with HidePrints():
+            self.basis = self.basis[index_map]
+
+        status(f"\tTruncated dimension: {self.dim}")
+        status(f"Completed in: {time.time() - time_start:.4f} seconds.\n")
+
+        # Convert the L and rho to the truncated basis. In addition, convert
+        # other objects given as input
+        all_objs = (L, rho, *objs)
+        objs_transformed = _sop_or_state_to_truncated_basis(all_objs, index_map)
+        return objs_transformed
         
     def truncate_by_indices(
         self,
@@ -380,43 +485,27 @@ class Basis:
             Superoperators and state vectors transformed into the truncated
             basis.
         """
-        # Obtain the truncated basis
-        truncated_basis = truncate_basis_by_indices(
-            basis = self.basis,
-            indices = indices
-        )
+        status("Truncating the basis set based on supplied indices...")
+        status(f"\tOriginal dimension: {self.dim}")
+        time_start = time.time()
+
+        # Sort the indices
+        indices = np.sort(indices)
 
         # Update the basis
-        self._basis = truncated_basis
+        with HidePrints():
+            self.basis = self.basis[indices]
+
+        status(f"\tTruncated dimension: {self.dim}")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Optionally, convert the superoperators and state vectors to the
         # truncated basis
         if objs:
-            objs_transformed = []
-            for obj in objs:
-
-                # Consider state vectors
-                if isvector(obj):
-                    objs_transformed.append(state_to_truncated_basis(
-                        index_map=indices,
-                        rho=obj))
-                    
-                # Consider superoperators
-                else:
-                    objs_transformed.append(sop_to_truncated_basis(
-                        index_map=indices,
-                        sop=obj
-                    ))
-
-            # Convert to tuple or just single value
-            if len(objs_transformed) == 1:
-                objs_transformed = objs_transformed[0]
-            else:
-                objs_transformed = tuple(objs_transformed)
-
+            objs_transformed = _sop_or_state_to_truncated_basis(objs, indices)
             return objs_transformed
         
-def make_basis(spins: np.ndarray, max_spin_order: int):
+def _make_basis(spins: np.ndarray, max_spin_order: int):
     """
     Constructs a Liouville-space basis set, where the basis is spanned by all
     possible Kronecker products of irreducible spherical tensor operators, up
@@ -462,7 +551,7 @@ def make_basis(spins: np.ndarray, max_spin_order: int):
     for subsystem in subsystems:
 
         # Get the basis for the subsystem
-        sub_basis = make_subsystem_basis(spins, subsystem)
+        sub_basis = _make_subsystem_basis(spins, subsystem)
 
         # Iterate through the states in the subsystem basis
         for state in sub_basis:
@@ -482,7 +571,7 @@ def make_basis(spins: np.ndarray, max_spin_order: int):
     
     return basis
 
-def make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
+def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     """
     Generates the basis set for a given subsystem.
 
@@ -528,404 +617,51 @@ def make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
     basis = product(*operators)
 
     return basis
-    
-def truncate_basis_by_coherence(
-    basis: np.ndarray,coherence_orders: list
-) -> tuple[np.ndarray, list]:
-    """
-    Truncates the basis set by retaining only the product operators that
-    correspond to coherence orders specified in the `coherence_orders` list.
 
-    The function generates an index map from the original basis to the truncated
-    basis.
-    This map can be used to transform superoperators or state vectors to the new
-    basis.
+def _sop_or_state_to_truncated_basis(objs: tuple, index_map: list):
+    """
+    Internal helper function to convert the superoperators or state vectors
+    into the truncated basis set.
 
     Parameters
     ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    coherence_orders : list
-        List of coherence orders to be retained in the basis.
+    objs : tuple
+        Tuple of superoperators and state vectors to be converted to the
+        truncated basis.
+    index_map : list
+        An index map between the original basis and the truncated basis.
 
     Returns
     -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the basis set with only the specified
-        coherence orders retained.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
+    objs_transformed : list
+        List of superoperators and state vectors transformed into the truncated
         basis.
     """
-
-    status("Truncating the basis set. The following coherence orders are "
-          f"retained: {coherence_orders}")
+    status("Converting superoperators or state vectors to the "
+           "truncated basis...")
     time_start = time.time()
+    objs_transformed = []
+    for obj in objs:
 
-    # Create an empty list for the new basis
-    truncated_basis = []
+        # Consider state vectors
+        if isvector(obj):
+            objs_transformed.append(state_to_truncated_basis(
+                index_map=index_map,
+                rho=obj))
+            
+        # Consider superoperators
+        else:
+            objs_transformed.append(sop_to_truncated_basis(
+                index_map=index_map,
+                sop=obj
+            ))
 
-    # Create an empty list for the mapping from old to new basis
-    index_map = []
-
-    # Iterate over the basis
-    for idx, state in enumerate(basis):
-
-        # Check if coherence order is in the list
-        if coherence_order(state) in coherence_orders:
-
-            # Assign state to the truncated basis and increment index
-            truncated_basis.append(state)
-
-            # Assign index to the index map
-            index_map.append(idx)
-
-    # Convert basis to NumPy array
-    truncated_basis = np.array(truncated_basis)
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.\n")
-
-    return truncated_basis, index_map
-
-def truncate_basis_by_coupling_weakest_link(
-    basis: np.ndarray,
-    J_couplings: np.ndarray,
-    threshold: float,
-) -> tuple[np.ndarray, list]:
-    """
-    Removes basis states based on the scalar J-couplings. Whenever there exists
-    a coupling network between the spins that constitute the product state, in
-    which the couplings surpass the given threshold, the basis state is kept.
-    Otherwise, the basis state is dropped.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    J_couplings : ndarray
-        A two-dimensional array that contains the scalar J-couplings between
-        the spins in Hz.
-    threshold : float
-        J-coupling between two spins must be above this value in order for the
-        algorithm to consider them connected.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
-        basis.
-    """
-    status("Truncating the basis set based on J-couplings.")
-    time_start = time.time()
-
-    # Create an empty list for the new basis
-    truncated_basis = []
-
-    # Create an empty list for the mapping from old to new basis
-    index_map = []
-
-    # Create the connectivity matrix from the J-couplings
-    J_connectivity = J_couplings.copy()
-    eliminate_small(J_connectivity, zero_value=threshold)
-    J_connectivity[J_connectivity!=0] = 1
-
-    # Cache the connectivity of spins
-    connectivity = dict()
-
-    # Iterate over the basis
-    for idx, state in enumerate(basis):
-
-        # Obtain the indices of the participating spins
-        idx_spins = np.nonzero(state)[0]
-
-        # Special case always include the unit state:
-        if len(idx_spins) == 0:
-            truncated_basis.append(state)
-            index_map.append(idx)
-            continue
-
-        # Analyse the connectivity if not already
-        if not tuple(idx_spins) in connectivity:
-
-            # Obtain the current connectivity graph
-            J_connectivity_curr = J_connectivity[np.ix_(idx_spins, idx_spins)]
-
-            # Calculate the number of connected components
-            n_components = connected_components(
-                csgraph = J_connectivity_curr,
-                directed = False,
-                return_labels = False
-            )
-
-            connectivity[tuple(idx_spins)] = n_components
-
-        # If the state is connected, keep it
-        if connectivity[tuple(idx_spins)] == 1:
-            truncated_basis.append(state)
-            index_map.append(idx)
-
-    # Convert basis to NumPy array
-    truncated_basis = np.array(truncated_basis)
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.\n")
-
-    return truncated_basis, index_map
-
-def truncate_basis_by_coupling_network_strength(
-    basis: np.ndarray,
-    J_couplings: np.ndarray,
-    threshold: float,
-) -> tuple[np.ndarray, list]:
-    """
-    Removes basis states based on the scalar J-couplings. The coupling network
-    within a product state is evaluated based on the maximum overall coupling
-    strength defined as the geometric mean of the J-couplings divided by the
-    factorial of the number of the couplings.
-    
-    TODO: More rigorous way to estimate the network strength?
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    J_couplings : ndarray
-        A two-dimensional array that contains the scalar J-couplings between
-        the spins in Hz.
-    threshold : float
-        Calculated effective J-coupling network strength must be above this
-        value in order for the algorithm to consider them connected.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
-        basis.
-    """
-    status("Truncating the basis set based on J-couplings.")
-    time_start = time.time()
-
-    # Create an empty list for the new basis
-    truncated_basis = []
-
-    # Create an empty list for the mapping from old to new basis
-    index_map = []
-
-    # Prepare the coupling matrix for the Kruskal's algorithm
-    J_couplings = -np.abs(J_couplings)
-
-    # Iterate over the basis
-    for idx, state in enumerate(basis):
-
-        # Obtain the indices of the participating spins
-        idx_spins = np.nonzero(state)[0]
-
-        # Special case: always include the unit state and one-spin states:
-        if len(idx_spins) in {0, 1}:
-            truncated_basis.append(state)
-            index_map.append(idx)
-            continue
-
-        # Obtain the current J-coupling network
-        J_couplings_curr = J_couplings[np.ix_(idx_spins, idx_spins)]
-
-        # Obtain the maximum spanning tree
-        maxtree = abs(minimum_spanning_tree(J_couplings_curr))
-
-        # Continue only if the state is connected in the first place
-        connections = len(idx_spins) - 1
-        if maxtree.nnz == connections:
-
-            # Calculate the coupling strength
-            geomean = np.prod(maxtree.data) ** (1/connections)
-            coupling_strength = geomean / math.factorial(connections)
-
-            # Include the state if the coupling strength is above threshold
-            if coupling_strength >= threshold:
-                truncated_basis.append(state)
-                index_map.append(idx)
-
-    # Convert basis to NumPy array
-    truncated_basis = np.array(truncated_basis)
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-
-    return truncated_basis, index_map
-
-def truncate_basis_by_coupling(
-    basis: np.ndarray,
-    J_couplings: np.ndarray,
-    threshold: float,
-    method: Literal["weakest_link", "network_strength"] = "weakest_link"
-) -> tuple[np.ndarray, list]:
-    """
-    Removes basis states based on the scalar J-couplings. Whenever there exists
-    a J-coupling network of sufficient strength between spins that constitute a
-    product state, the particular state is kept in the basis. Otherwise, the
-    state is removed. The coupling strength is evaluated either by the weakest
-    link or by the overall network strength.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    J_couplings : ndarray
-        A two-dimensional array that contains the scalar J-couplings between
-        the spins in Hz.
-    threshold : float
-        Coupling strength must be above this value in order for the product
-        state to be considered in the basis set.
-    method : {"weakest_link", "network_strength"}
-        Decides how the importance of a product state is evaluated. Weakest link
-        method considers a J-coupling network invalid based on the smallest J-
-        coupling within that network. Network strength method calculates the
-        effective coupling as a geometric mean scaled by the factorial of the
-        number of couplings within the network.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
-        basis.
-    """
-    if method == "weakest_link":
-        return truncate_basis_by_coupling_weakest_link(
-            basis = basis,
-            J_couplings = J_couplings,
-            threshold = threshold
-        )
-    elif method == "network_strength":
-        return truncate_basis_by_coupling_network_strength(
-            basis = basis,
-            J_couplings = J_couplings,
-            threshold = threshold
-        )
+    # Convert to tuple or just single value
+    if len(objs_transformed) == 1:
+        objs_transformed = objs_transformed[0]
     else:
-        raise ValueError(f"Invalid truncation method {method}.")
-    
-def truncate_basis_by_zte(
-    basis: np.ndarray,
-    L: np.ndarray | sp.csc_array,
-    rho: np.ndarray | sp.csc_array,
-    time_step: float,
-    nsteps: int,
-    zero_zte: float,
-    zero_expm_vec: float
-) -> tuple[np.ndarray, list]:
-    """
-    Removes basis states using the Zero-Track Elimination (ZTE) described in:
+        objs_transformed = tuple(objs_transformed)
 
-    Kuprov, I. (2008):
-    https://doi.org/10.1016/j.jmr.2008.08.008
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    L : ndarray or csc_array
-        Liouvillian superoperator, L = -iH - R + K.
-    rho : ndarray or csc_array
-        Initial spin density vector.
-    time_step : float
-        Time step of the propagation within the ZTE.
-    nsteps : int
-        Number of steps to take in the ZTE.
-    zero_zte : float
-        If state population is below this value, it is dropped from the basis.
-    zero_expm_vec: float
-        Convergence criterion to be used when calculating the action of matrix
-        exponential of the Liouvillian to the state vector.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    index_map : list
-        List that contains an index map from the original basis to the truncated
-        basis.
-    """
-    status("Truncating the basis set using zero-track elimination.")
-    time_start = time.time()
-
-    # Create empty vector for the maximum values of rho
-    rho_max = abs(np.array(rho))
-
-    # Scale the zero value of the ZTE to take into account different norms
-    scaling_zv = abs(rho).max()
-    zero_zte = zero_zte / scaling_zv
-
-    # Propagate for few steps
-    for i in range(nsteps):
-        status(f"ZTE step {i+1} of {nsteps}...")
-        with HidePrints():
-            rho = expm_vec(L*time_step, rho, zero_expm_vec)
-            rho_max = np.maximum(rho_max, abs(rho))
-
-    # Obtain indices of states that should remain
-    index_map = list(np.where(rho_max > zero_zte)[0])
-
-    # Obtain the truncated basis
-    truncated_basis = basis[index_map]
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-
-    return truncated_basis, index_map
-
-def truncate_basis_by_indices(
-    basis: np.ndarray,
-    indices: list | np.ndarray
-) -> np.ndarray:
-    """
-    Truncate the basis set to include only the basis states specified by the
-    `indices` supplied by the user.
-
-    Parameters
-    ----------
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    indices : list or ndarray
-        List of indices that specify which basis states to retain.
-
-    Returns
-    -------
-    truncated_basis : ndarray
-        A two-dimensional array containing the truncated basis set.
-    """
-    status("Truncating the basis set based on supplied indices.")
-    time_start = time.time()
-
-    # Sort the indices
-    indices = np.sort(indices)
-
-    # Obtain the truncated basis
-    truncated_basis = basis[indices]
-
-    status("Truncated basis created.")
-    status(f"Original dimension: {len(basis)}")
-    status(f"Truncated dimension: {len(truncated_basis)}")
-    status(f"Elapsed time: {time.time() - time_start:.4f} seconds.")
-
-    return truncated_basis
+    return objs_transformed

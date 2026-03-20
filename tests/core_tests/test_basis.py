@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import math
 import spinguin as sg
+from copy import deepcopy
 
 class TestBasis(unittest.TestCase):
 
@@ -123,3 +124,277 @@ class TestBasis(unittest.TestCase):
             else:
                 with self.assertRaises(ValueError):
                     spin_system.basis.indexof(op_def)
+
+    def test_truncate_basis_by_coupling_1(self):
+        """
+        Test truncating the basis set by coupling.
+        """
+        # Example system
+        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+
+        # Assign J-couplings
+        spin_system.J_couplings = [
+            [0, 0, 0],
+            [1, 0, 0],
+            [1, 0, 0]
+        ]
+
+        # Create a basis set with all coherence orders 
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Save the original basis set for further testing
+        basis_org = spin_system.basis.basis.copy()
+
+        # Truncate the basis set
+        spin_system.basis.truncate_by_coupling()
+
+        # Test each state in the original basis
+        for op_def in basis_org:
+
+            # Determine whether a state should exist in the basis
+            deleted = op_def[0] == 0 and op_def[1] != 0 and op_def[2] != 0 
+
+            # Check if the state is deleted as it should be
+            if deleted:
+                with self.assertRaises(ValueError):
+                    spin_system.basis.indexof(op_def)
+
+            # Otherwise the state should be in the basis set (no Error)
+            else:
+                spin_system.basis.indexof(op_def)
+
+    def test_truncate_basis_by_coupling_2(self):
+        """
+        Test truncating the basis set by coupling.
+        """
+        # Example system
+        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+
+        # Assign XYZ
+        spin_system.xyz = [
+            [0, 0, 0],
+            [1, 1, 1],
+            [99, 99, 99]
+        ]
+
+        # Create a basis set with all coherence orders 
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Save the original basis set for further testing
+        basis_org = spin_system.basis.basis.copy()
+
+        # Truncate the basis set
+        spin_system.basis.truncate_by_coupling()
+
+        # Test each state in the original basis
+        for op_def in basis_org:
+
+            # Determine whether a state should exist in the basis
+            deleted = (op_def[0] != 0 or op_def[1] != 0) and op_def[2] != 0 
+
+            # Check if the state is deleted as it should be
+            if deleted:
+                with self.assertRaises(ValueError):
+                    spin_system.basis.indexof(op_def)
+
+            # Otherwise the state should be in the basis set (no Error)
+            else:
+                spin_system.basis.indexof(op_def)
+
+    def test_truncate_basis_by_coupling_3(self):
+        """
+        Test truncating the basis set by coupling.
+        """
+        # Example system
+        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+
+        # Assign J-couplings (spins 1 and 3 are coupled)
+        spin_system.J_couplings = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [1, 0, 0]
+        ]
+
+        # Assign XYZ (spins 1 and 2 are coupled)
+        spin_system.xyz = [
+            [0, 0, 0],
+            [1, 1, 1],
+            [99, 99, 99]
+        ]
+
+        # Create a basis set with all coherence orders 
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Save the original basis set for further testing
+        basis_org = spin_system.basis.basis.copy()
+
+        # Truncate the basis set
+        spin_system.basis.truncate_by_coupling()
+
+        # Test each state in the original basis
+        for op_def in basis_org:
+
+            # Determine whether a state should exist in the basis
+            deleted = op_def[0] == 0 and op_def[1] != 0 and op_def[2] != 0 
+
+            # Check if the state is deleted as it should be
+            if deleted:
+                with self.assertRaises(ValueError):
+                    spin_system.basis.indexof(op_def)
+
+            # Otherwise the state should be in the basis set (no Error)
+            else:
+                spin_system.basis.indexof(op_def)
+
+    def test_truncate_basis_by_zte(self):
+        """
+        Test the basis set truncation using ZTE by comparing the generated FID
+        to the exact solution.
+        """
+        # Set the global parameters
+        sg.parameters.default()
+        sg.parameters.magnetic_field = 1
+        sg.parameters.temperature = 295
+
+        # Make the spin system
+        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+
+        # Create the basis set
+        ss.basis.max_spin_order = 3
+        ss.basis.build()
+
+        # Define the chemical shifts (in ppm)
+        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+
+        # Define scalar couplings (in Hz)
+        ss.J_couplings = [
+            [ 0,     0,      0,      0,      0,      0],
+            [-1.04,  0,      0,      0,      0,      0],
+            [ 4.85,  1.05,   0,      0,      0,      0],
+            [ 1.05,  4.85,   0.71,   0,      0,      0],
+            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
+            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
+        ]
+
+        # Define Cartesian coordinates of nuclei
+        ss.xyz = [
+            [ 2.0495335, 0.0000000, -1.4916842],
+            [-2.0495335, 0.0000000, -1.4916842],
+            [ 2.1458878, 0.0000000,  0.9846086],
+            [-2.1458878, 0.0000000,  0.9846086],
+            [ 0.0000000, 0.0000000,  2.2681296],
+            [ 0.0000000, 0.0000000, -1.5987077]
+        ]
+
+        # Define shielding tensors
+        shielding = np.zeros((6, 3, 3))
+        shielding[5] = np.array([
+            [-406.20, 0.00,   0.00],
+            [ 0.00,   299.44, 0.00],
+            [ 0.00,   0.00,  -181.07]
+        ])
+        ss.shielding = shielding
+
+        # Define electric field gradient tensors
+        efg = np.zeros((6, 3, 3))
+        efg[5] = np.array([
+            [0.3069, 0.0000,  0.0000],
+            [0.0000, 0.7969,  0.0000],
+            [0.0000, 0.0000, -1.1037]
+        ])
+        ss.efg = efg
+
+        # Define the relaxation theory
+        ss.relaxation.thermalization = True
+        ss.relaxation.theory = "redfield"
+        ss.relaxation.tau_c = 50e-12
+
+        # Dwell time and number of points
+        dt = 1e-3
+        npoints = 1000
+
+        # Get the Hamiltonian
+        H = sg.hamiltonian(ss)
+        
+        # Get the Redfield relaxation superoperator
+        R = sg.relaxation(ss)
+
+        # Get the Liouvillian
+        L = sg.liouvillian(H, R)
+
+        # Transform the Liouvillian to the rotating frame
+        L = sg.rotating_frame(ss, L, ["1H", "14N"], [8, 96])
+
+        # Get the thermal equilibrium state
+        rho = sg.equilibrium_state(ss)
+
+        # Apply pulse for protons
+        indices = np.where(ss.isotopes == "1H")[0]
+        op_pulse = "+".join(f"I(y,{i})" for i in indices)
+        Px = sg.pulse(ss, op_pulse, 90)
+        rho = Px @ rho
+
+        # Truncate the basis set to single-quantum coherence
+        L, rho = ss.basis.truncate_by_coherence([1, -1], L, rho)
+
+        # Truncate the basis set using ZTE (make new spin system for this)
+        ss_ZTE = deepcopy(ss)
+        L_ZTE, rho_ZTE = ss_ZTE.basis.truncate_by_zte(L, rho)
+
+        # Get the time propagators
+        P = sg.propagator(L, dt)
+        P_ZTE = sg.propagator(L_ZTE, dt)
+
+        # Construct the operator to be measured
+        op_measure = "+".join(f"I(-,{i})" for i in indices)
+
+        # Initialize an array for storing results
+        fid = np.zeros(npoints, dtype=complex)
+        fid_ZTE = np.zeros(npoints, dtype=complex)
+
+        # Perform the time evolution
+        for step in range(npoints):
+            fid[step] = sg.measure(ss, rho, op_measure)
+            fid_ZTE[step] = sg.measure(ss_ZTE, rho_ZTE, op_measure)
+            rho = P @ rho
+            rho_ZTE = P_ZTE @ rho_ZTE
+
+        # Check that the FIDs match
+        self.assertTrue(np.allclose(fid, fid_ZTE))
+
+    def test_truncate_basis_by_indices(self):
+        """
+        Test the basis set truncation by indices.
+        """
+        # Example system
+        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+
+        # Create a basis set
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Make a copy of the spin system
+        spin_system_org = deepcopy(spin_system)
+
+        # Truncate the basis set by retaining only a set of states
+        retained_indices = [0, 7, spin_system.basis.dim-1]
+        spin_system.basis.truncate_by_indices(retained_indices)
+
+        # Test each state in the original basis
+        for op_def in spin_system_org.basis.basis:
+
+            # Determine whether a state should exist in the basis
+            idx = spin_system_org.basis.indexof(op_def)
+            deleted = idx not in retained_indices
+
+            # Check if the state is deleted as it should be
+            if deleted:
+                with self.assertRaises(ValueError):
+                    spin_system.basis.indexof(op_def)
+
+            # Otherwise the state should be in the basis set (no Error)
+            else:
+                spin_system.basis.indexof(op_def)

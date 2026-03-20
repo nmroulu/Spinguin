@@ -9,9 +9,6 @@ from spinguin._core._chem import (
 )
 from spinguin._core._la import clear_cache_CG_coeff
 from spinguin._core._operators import clear_cache_op_T
-from spinguin._core._states import (
-    clear_cache_state
-)
 from spinguin._core._superoperators import (
     clear_cache_sop_prod,
     clear_cache_sop_T_coupled,
@@ -28,7 +25,6 @@ def clear_cache():
     clear_cache_permutation_matrix()
     clear_cache_CG_coeff()
     clear_cache_op_T()
-    clear_cache_state()
     clear_cache_sop_prod()
     clear_cache_sop_T_coupled()
     clear_cache_structure_coefficients()

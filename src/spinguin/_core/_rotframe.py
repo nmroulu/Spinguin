@@ -18,6 +18,7 @@ from spinguin._core._la import norm_1, expm
 from spinguin._core._specutils import resonance_frequency
 from spinguin._core._parameters import parameters
 from spinguin._core._superoperators import superoperator
+from spinguin._core._status import status
 
 def _auxiliary_matrix_rotframe_expm(
     A: np.ndarray | sp.csc_array,
@@ -108,7 +109,7 @@ def rotating_frame(
     L_rot : ndarray or csc_array
         Liouvillian superoperator in the rotating frame.
     """
-    print("Transforming Liouvillian to the rotating frame...")
+    status("Transforming Liouvillian to the rotating frame...")
     time_start = time.time()
 
     # Check list lengths
@@ -185,14 +186,14 @@ def rotating_frame(
 
     # Apply each rotating frame
     for i in range(len(L0s)):
-        print(f"\tApplying rotating frame for {isotopes[i]}...")
+        status(f"\tApplying rotating frame for {isotopes[i]}...")
         L0 = L0s[i]
         L1 = L - L0
         T = Ts[i]
         order = orders[i]
         L = _sop_L_to_rotframe(L0, L1, T, order)
 
-    print(f"Completed in {time.time() - time_start:.4f} seconds.")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.")
 
     return L
 
