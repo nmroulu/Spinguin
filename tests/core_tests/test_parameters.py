@@ -213,6 +213,7 @@ class TestParameters(unittest.TestCase):
         sg.parameters.zero_thermalization = "changed"
         sg.parameters.zero_time_step = "changed"
         sg.parameters.zero_zte = "changed"
+        sg.parameters.nsteps_zte = "changed"
 
         # Reset to defaults
         sg.parameters.default()
@@ -235,4 +236,5 @@ class TestParameters(unittest.TestCase):
         self.assertEqual(sg.parameters.zero_relaxation, 1e-12)
         self.assertEqual(sg.parameters.zero_thermalization, 1e-18)
         self.assertEqual(sg.parameters.zero_time_step, 1e-18)
-        self.assertEqual(sg.parameters.zero_zte, 1e-24)
+        self.assertEqual(sg.parameters.zero_zte, 1e-33)
+        self.assertEqual(sg.parameters.nsteps_zte, 10)
