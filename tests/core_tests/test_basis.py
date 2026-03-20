@@ -364,3 +364,37 @@ class TestBasis(unittest.TestCase):
 
         # Check that the FIDs match
         self.assertTrue(np.allclose(fid, fid_ZTE))
+
+    def test_truncate_basis_by_indices(self):
+        """
+        Test the basis set truncation by indices.
+        """
+        # Example system
+        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+
+        # Create a basis set
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Make a copy of the spin system
+        spin_system_org = deepcopy(spin_system)
+
+        # Truncate the basis set by retaining only a set of states
+        retained_indices = [0, 7, spin_system.basis.dim-1]
+        spin_system.basis.truncate_by_indices(retained_indices)
+
+        # Test each state in the original basis
+        for op_def in spin_system_org.basis.basis:
+
+            # Determine whether a state should exist in the basis
+            idx = spin_system_org.basis.indexof(op_def)
+            deleted = idx not in retained_indices
+
+            # Check if the state is deleted as it should be
+            if deleted:
+                with self.assertRaises(ValueError):
+                    spin_system.basis.indexof(op_def)
+
+            # Otherwise the state should be in the basis set (no Error)
+            else:
+                spin_system.basis.indexof(op_def)
