@@ -51,7 +51,10 @@ class Parameters:
         self._zero_relaxation: float = 1e-12
         self._zero_thermalization: float = 1e-18
         self._zero_time_step: float = 1e-18
-        self._zero_zte: float = 1e-24
+        self._zero_zte: float = 1e-33
+
+        # Zero-track elimination settings
+        self._nsteps_zte: int = 10
 
     @property
     def magnetic_field(self) -> float:
@@ -302,7 +305,8 @@ class Parameters:
     def zero_zte(self) -> float:
         """
         Threshold under which a value is considered to be zero when performing
-        the zero-track elimination (ZTE) basis truncation.
+        the zero-track elimination (ZTE) basis truncation. The default value is
+        1e-33, designed to eliminate only basis states that remain exactly zero.
         """
         return self._zero_zte
     
@@ -310,6 +314,19 @@ class Parameters:
     def zero_zte(self, zero_zte: float):
         self._zero_zte = zero_zte
         status(f"ZTE zero-value threshold set to: {self.zero_zte}\n")
+
+    @property
+    def nsteps_zte(self) -> int:
+        """
+        Defines the maximum number of steps to be performed in the zero-track
+        elimination (ZTE) basis truncation. Default: 10.
+        """
+        return self._nsteps_zte
+    
+    @nsteps_zte.setter
+    def nsteps_zte(self, nsteps_zte: int):
+        self._nsteps_zte = nsteps_zte
+        status(f"Maximum number of steps in ZTE set to: {self.nsteps_zte}\n")
 
 # Instantiate the Parameters object
 parameters = Parameters()
