@@ -1,17 +1,21 @@
 """
-This script benchmarks the performance of SciPy's sparse matrix multiplication
-against a custom sparse dot implementation for various matrix densities.
+Benchmarks sparse matrix multiplication using SciPy against Spinguin's custom
+sparse dot implementation for a range of matrix densities.
 
-NOTE: Takes several minutes to run!
+For each density, random square sparse matrices are generated over a range of
+dimensions and both methods are timed using repeated multiplications.
+
+NOTE: This benchmark takes several minutes to run.
 """
 
 # Imports
-import numpy as np
-import matplotlib.pyplot as plt
 import os
+from time import perf_counter
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.sparse import random_array
 from spinguin._core._la import custom_dot
-from time import perf_counter
 
 # Densities to test (fraction of non-zero elements in the matrix)
 densities = np.array([0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.5])
@@ -22,57 +26,68 @@ max_nnz = 1e6
 # Number of matrix dimensions to test for each density
 npoints = 30
 
-# Averaging
+# Number of repeated multiplications per matrix size
 nrounds = 100
+
+# Create the output directory for benchmark figures
+script_path = os.path.dirname(os.path.abspath(__file__))
+output_directory = os.path.join(script_path, 'results')
+os.makedirs(output_directory, exist_ok=True)
 
 # Iterate over the specified densities
 for density in densities:
 
-    # Calculate the maximum matrix dimension based on the density and max_nnz
+    # Determine the largest test dimension allowed by the nnz limit
     max_dim = int(np.sqrt(max_nnz / density))
 
-    # Generate a range of matrix dimensions to test (logarithmically spaced)
-    dims = np.geomspace(start=100, stop=max_dim, num=npoints, dtype=int)
+    # Generate logarithmically spaced matrix dimensions for this density
+    matrix_dimensions = np.geomspace(
+        start=100,
+        stop=max_dim,
+        num=npoints,
+        dtype=int
+    )
 
-    # Arrays to store benchmark results for SciPy and custom implementations
-    result_SciPy = np.empty(len(dims))
-    result_custom = np.empty(len(dims))
+    # Initialise arrays for SciPy and custom timing results
+    result_scipy = np.empty(len(matrix_dimensions), dtype=float)
+    result_custom = np.empty(len(matrix_dimensions), dtype=float)
 
     # Test each matrix dimension
-    for i, dim in enumerate(dims):
+    for i, dim in enumerate(matrix_dimensions):
 
-        # Create a random sparse matrix with the given dimension and density
-        A_CSR = random_array((dim, dim), density=density, format='csr',
-                             dtype=complex)
-        A_CSC = A_CSR.tocsc()
+        # Construct one random matrix in both CSR and CSC formats
+        matrix_csr = random_array(
+            (dim, dim),
+            density=density,
+            format='csr',
+            dtype=complex
+        )
+        matrix_csc = matrix_csr.tocsc()
 
         # Measure execution time for SciPy sparse matrix multiplication
-        time_start_SciPy = perf_counter()
+        time_start_scipy = perf_counter()
         for _ in range(nrounds):
-            A_CSR @ A_CSR
-        time_end_SciPy = perf_counter()
-        result_SciPy[i] = (time_end_SciPy - time_start_SciPy)/nrounds
+            matrix_csr @ matrix_csr
+        time_end_scipy = perf_counter()
+        result_scipy[i] = (time_end_scipy - time_start_scipy)/nrounds
 
         # Measure execution time for the custom sparse dot implementation
         time_start_custom = perf_counter()
         for _ in range(nrounds):
-            custom_dot(A_CSC, A_CSC, zero_value=0)
+            custom_dot(matrix_csc, matrix_csc, zero_value=0)
         time_end_custom = perf_counter()
         result_custom[i] = (time_end_custom - time_start_custom)/nrounds
 
     # Plot the benchmark results for the current density
-    plt.plot(dims, result_SciPy, label='SciPy')
-    plt.plot(dims, result_custom, label='Custom')
+    plt.plot(matrix_dimensions, result_scipy, label='SciPy')
+    plt.plot(matrix_dimensions, result_custom, label='Custom')
     plt.title(f"Density: {density}")
     plt.xlabel("Matrix Dimension")
     plt.ylabel("Time (s)")
     plt.legend()
     plt.tight_layout()
 
-    # Save the plot to the 'results' folder
-    script_path = os.path.dirname(os.path.abspath(__file__))
-    folder_path = os.path.join(script_path, 'results')
-    os.makedirs(folder_path, exist_ok=True)
-    file_path = os.path.join(folder_path, f'density_{density}.png')
+    # Save the plot for the current density
+    file_path = os.path.join(output_directory, f'density_{density}.png')
     plt.savefig(file_path)
     plt.clf()
