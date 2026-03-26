@@ -1,6 +1,12 @@
 import unittest
 import numpy as np
-from spinguin._core._nmr_isotopes import spin, gamma, quadrupole_moment
+from spinguin._core._nmr_isotopes import (
+    atomic_mass,
+    gamma,
+    natural_abundance,
+    quadrupole_moment,
+    spin,
+)
 
 class TestNMRIsotopes(unittest.TestCase):
 
@@ -45,4 +51,32 @@ class TestNMRIsotopes(unittest.TestCase):
         self.assertTrue(np.allclose(quadrupole_moment("14N"), 20.44e-3*1e-28))
         self.assertTrue(np.allclose(quadrupole_moment("19F"), 0))
         self.assertTrue(np.allclose(quadrupole_moment("23Na"), 0))
+
+    def test_atomic_mass(self):
+        """
+        Test acquiring the atomic mass.
+        """
+
+        self.assertTrue(np.allclose(atomic_mass("1H"), 1.007825))
+        self.assertTrue(np.allclose(atomic_mass("28Si"), 27.976927))
+        self.assertTrue(np.allclose(atomic_mass("40Ar"), 39.962383))
+
+    def test_natural_abundance(self):
+        """
+        Test acquiring the natural abundance.
+        """
+
+        self.assertTrue(np.allclose(natural_abundance("1H"), 99.9885))
+        self.assertTrue(np.allclose(natural_abundance("13C"), 1.07))
+        self.assertTrue(np.allclose(natural_abundance("28Si"), 92.223))
+        self.assertTrue(np.allclose(natural_abundance("239Pu"), 0.0))
+
+    def test_common_non_nmr_active_isotopes(self):
+        """
+        Test added common non-NMR-active isotopes.
+        """
+
+        self.assertAlmostEqual(spin("4He"), 0.0)
+        self.assertTrue(np.allclose(gamma("40Ar", "Hz"), 0.0))
+        self.assertTrue(np.allclose(quadrupole_moment("56Fe"), 0.0))
         

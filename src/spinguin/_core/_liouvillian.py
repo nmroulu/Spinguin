@@ -1,40 +1,60 @@
 """
-This module provides a function for calculating the Liouvillian.
+Construction of the Liouvillian superoperator.
+
+This module provides a small helper for combining Hamiltonian, relaxation, and
+exchange contributions into a single Liouvillian.
 """
 
 # Imports
 import numpy as np
-import scipy.sparse as sp
+from scipy.sparse import csc_array
+
+# Define a type alias for the allowed input types of the superoperators.
+DenseOrSparse = np.ndarray | csc_array
 
 def liouvillian(
-    H: np.ndarray | sp.csc_array = None,
-    R: np.ndarray | sp.csc_array = None,
-    K: np.ndarray | sp.csc_array = None
-) -> np.ndarray | sp.csc_array:
+    H: DenseOrSparse=None,
+    R: DenseOrSparse=None,
+    K: DenseOrSparse=None,
+) -> DenseOrSparse:
     """
-    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation
-    superoperator, and exchange superoperator.
+    Construct the Liouvillian superoperator.
+
+    The Liouvillian is assembled according to
+
+    $$
+    L = -iH - R + K,
+    $$
+
+    where `H` is the Hamiltonian superoperator, `R` is the relaxation
+    superoperator, and `K` is the exchange superoperator.
 
     Parameters
     ----------
-    H : ndarray or csc_array
+    H : ndarray or csc_array, optional
         Hamiltonian superoperator.
-    R : ndarray or csc_array
-        Relaxation superoperator
-    K : ndarray or csc_array
+    R : ndarray or csc_array, optional
+        Relaxation superoperator.
+    K : ndarray or csc_array, optional
         Exchange superoperator.
 
     Returns
     -------
     L : ndarray or csc_array
         Liouvillian superoperator.
+
+    Raises
+    ------
+    ValueError
+        Raised if `H`, `R`, and `K` are all `None`.
     """
 
-    # Check for totally empty input
+    # Require at least one physical contribution for the Liouvillian.
     if H is None and R is None and K is None:
         raise ValueError("H, R and K cannot all be None simultaneously.")
 
-    # Assign zeroes if None
+    # Replace omitted contributions by zero so that the algebra below remains
+    # uniform.
     if H is None:
         H = 0
     if R is None:
@@ -42,7 +62,6 @@ def liouvillian(
     if K is None:
         K = 0
 
-    # Construct the Liouvillian
-    L = -1j*H - R + K
-
+    # Combine the three superoperator contributions into the Liouvillian.
+    L = -1j * H - R + K
     return L

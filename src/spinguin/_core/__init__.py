@@ -19,7 +19,9 @@ from ._hamiltonian import hamiltonian
 from ._liouvillian import liouvillian
 from ._molecule import Molecule
 from ._nmr_isotopes import (
+    atomic_mass,
     gamma,
+    natural_abundance,
     quadrupole_moment,
     spin
 )
@@ -93,7 +95,9 @@ __all__ = [
     "Molecule",
 
     # NMR isotopes
+    "atomic_mass",
     "gamma",
+    "natural_abundance",
     "quadrupole_moment",
     "spin",
 
