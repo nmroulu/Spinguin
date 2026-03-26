@@ -16,7 +16,7 @@ Spinguin is a software package for spin physics and spin dynamics simulations of
 
 - For indentation, use tab, not spaces. 
 
-- Include spaces around operators except for the multiplication operators *, / and @. 
+- In actual code, include spaces around operators except for the multiplication operators *, / and @. In function definitions with optional arguments, do not include spaces around the equals sign (=) in the argument list. 
 
 - Length of code lines should not exceed the standard limit of 80 characters. If a line of code, comment, or documentation exceeds this limit, it should be continued on the next line to maintain readability.
 
@@ -32,8 +32,10 @@ Spinguin is a software package for spin physics and spin dynamics simulations of
 
 - After generating the output, you must evaluate its quality against the user instructions and these guidelines. If the output is incomplete, of low quality, or does not follow the guidelines, you must continue improving it until it meets the standards. You must also evaluate the quality of the code in terms of academic, software engineering, general Python coding, and numerical efficiency standards. If the code does not meet these standards, you must continue improving it until it does.
 
-- When you are asked to go through a piece of code and update and/or improve it in terms of code quality, documentation, readability, commenting, or code structure, you must not delete any existing code or documentation unless the user explicitly asks you to do so. You are only allowed to edit the existing code and suggest improvements to it, which the user can then choose to accept or reject. You must not suggest to replace the entire piece of code with a new code that only contains the part that needs to be changed.
+- Docstrings must always start with """" followed by a line break, then the actual docstring content, and end with a line break followed by """. 
+
+- When you are asked to go through a piece of code, for example using the "Tidy up" command, and update and/or improve it in terms of code quality, documentation, readability, commenting, or code structure, you are only allowed to edit the existing code and suggest improvements to it, which the user can then choose to accept or reject. You must not suggest to replace the entire piece of code with a new code that only contains the part that needs to be changed. Always go through the entire code and suggest improvements to all of it, including the parts that do not necessarily need to be changed, such as improving the docstrings and comments, improving readability, and improving code structure.
 
 2. Specific commands for GitHub Copilot
 
-- "Tidy up": This command instructs you to go through the code and tidy it up in terms of code structure and quality, readability, documentation, and commenting. The purpose of this command is not to change the functionality of the code, but to improve its quality and documentation. In particular, focus on improving the docstrings and comments, making sure they are clear, informative, follow the Sphinx format and are written in good British English. Use scientific text as the general style. If the given code file starts with a general descriptive docstring, also improve that docstring.
+- "Tidy up": This command instructs you to go through the code and tidy it up in terms of code structure and quality, readability, documentation, and commenting. The purpose of this command is not to change the functionality of the code, but to improve its quality and documentation. In particular, focus on improving the docstrings and comments, making sure they are clear, informative, follow the Sphinx format and are written in good British English. Use scientific text as the general style. If the given code file starts with a general descriptive docstring, also improve that docstring, and if such a docstring is missing, add one. Make sure you go through the entire code, including all functions, classes, and any other code, and improve the quality of all of it. 

@@ -1,11 +1,13 @@
 """
-This module provides the core functionality of Spinguin. The module is not meant
-to be imported. The preferred way to use Spinguin is to use the functionality
-directly under `spinguin` namespace, using::
+Internal core namespace for Spinguin.
 
-    import spinguin as sg
+This module re-exports the internal core functionality of Spinguin. In normal
+use, the public package namespace should be preferred::
 
-If you still wish to import the _core module, continue with precaution!
+	import spinguin as sg
+
+Direct imports from :mod:`spinguin._core` are possible but intended primarily
+for internal use and advanced development workflows.
 """
 from ._cache import clear_cache
 from ._chem import (
@@ -73,29 +75,29 @@ from ._utils import (
 )
 
 __all__ = [
-    #cache
+    # Cache
     "clear_cache",
 
-    #chem
+    # Chemistry
     "associate",
     "dissociate",
     "permute_spins",
 
-    #hamiltonian
+    # Hamiltonian
     "hamiltonian",
 
-    #liouvillian
+    # Liouvillian
     "liouvillian",
 
-    #molecule
+    # Molecule
     "Molecule",
 
-    #nmr_isotopes
+    # NMR isotopes
     "gamma",
     "quadrupole_moment",
     "spin",
 
-    #operators
+    # Operators
     "op_E",
     "op_Sm",
     "op_Sp",
@@ -106,21 +108,21 @@ __all__ = [
     "op_T_coupled",
     "operator",
 
-    #parameters 
+    # Parameters
     "parameters",
 
-    #propagation
+    # Propagation
     "propagator",
     "propagator_to_rotframe",
     "pulse",
 
-    #relaxation
+    # Relaxation
     "relaxation",
 
-    #rotframe
+    # Rotating frame
     "rotating_frame",
 
-    #specutils
+    # Spectral utilities
     "fourier_transform",
     "frequency_to_chemical_shift",
     "resonance_frequency",
@@ -128,10 +130,10 @@ __all__ = [
     "spectrum",
     "time_axis",
 
-    #spin_system
+    # Spin system
     "SpinSystem",
 
-    #states
+    # States
     "alpha_state",
     "beta_state",
     "equilibrium_state",
@@ -143,12 +145,12 @@ __all__ = [
     "triplet_plus_state",
     "triplet_zero_state",
     "unit_state",
-    
-    #superoperators
+
+    # Superoperators
     "sop_T_coupled",
     "superoperator",
 
-    #utils
+    # Utilities
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",

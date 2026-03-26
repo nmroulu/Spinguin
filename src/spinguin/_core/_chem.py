@@ -1,18 +1,164 @@
 """
-This module contains functions responsible for chemical kinetics.
+chem.py
+
+Provides helper functions for simple chemical exchange operations in Liouville
+space, including association, dissociation, and spin-order permutation.
+Non-linear chemical kinetics is also supported by these functions.
 """
-# Referencing SpinSystem class
+
+# Imports
 from __future__ import annotations
+
+from functools import lru_cache
 from typing import TYPE_CHECKING
+
+import numpy as np
+import scipy.sparse as sp
+
+from spinguin._core._la import arraylike_to_array
+from spinguin._core._parameters import parameters
+
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Imports
-import numpy as np
-import scipy.sparse as sp
-from functools import lru_cache
-from spinguin._core._la import arraylike_to_array
-from spinguin._core._parameters import parameters
+# Define type aliases for improved readability.
+SpinMap = list | tuple | np.ndarray
+StateVector = np.ndarray | sp.csc_array
+
+def _validate_bipartite_spin_maps(
+    spin_system_A: SpinSystem,
+    spin_system_B: SpinSystem,
+    spin_system_C: SpinSystem,
+    spin_map_A: SpinMap,
+    spin_map_B: SpinMap,
+) -> None:
+    """
+    Validate spin maps used for association and dissociation.
+
+    Parameters
+    ----------
+    spin_system_A : SpinSystem
+        First subsystem.
+    spin_system_B : SpinSystem
+        Second subsystem.
+    spin_system_C : SpinSystem
+        Composite system.
+    spin_map_A : list or tuple or ndarray
+        Indices of subsystem A within the composite system.
+    spin_map_B : list or tuple or ndarray
+        Indices of subsystem B within the composite system.
+
+    Returns
+    -------
+    None
+    """
+
+    # Check that subsystem A has the expected number of mapped spins.
+    if len(spin_map_A) != spin_system_A.nspins:
+        raise ValueError(
+            "length of spin_map_A does not match the number of spins "
+            "in spin_system_A"
+        )
+
+    # Check that subsystem B has the expected number of mapped spins.
+    if len(spin_map_B) != spin_system_B.nspins:
+        raise ValueError(
+            "length of spin_map_B does not match the number of spins "
+            "in spin_system_B"
+        )
+
+    # Check that both maps form a complete non-overlapping partition of C.
+    spin_map_C = set(spin_map_A).union(set(spin_map_B))
+    if spin_map_C != set(range(spin_system_C.nspins)):
+        raise ValueError("spin maps have incorrect or have overlapping indices")
+
+
+def _validate_permutation_spin_map(
+    spin_system: SpinSystem,
+    spin_map: SpinMap,
+) -> None:
+    """
+    Validate a spin map used for spin permutation.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system to be permuted.
+    spin_map : list or tuple or ndarray
+        Permuted spin indices.
+
+    Returns
+    -------
+    None
+    """
+
+    # Check that the map is a valid permutation of all spin indices.
+    if set(spin_map) != set(range(spin_system.nspins)):
+        raise ValueError(
+            "length of spin_map does not match the number of spins in "
+            "the system or spin_map contains incorrect or overlapping indices"
+        )
+
+
+def _state_vector_container(dim: int) -> np.ndarray | sp.lil_array:
+    """
+    Create an empty state-vector container with the configured sparsity.
+
+    Parameters
+    ----------
+    dim : int
+        Basis dimension of the target spin system.
+
+    Returns
+    -------
+    ndarray or lil_array
+        Empty column vector of shape `(dim, 1)`.
+    """
+
+    # Allocate either a sparse or dense state vector according to settings.
+    if parameters.sparse_state:
+        return sp.lil_array((dim, 1), dtype=complex)
+    return np.zeros((dim, 1), dtype=complex)
+
+
+def _basis_and_spin_map_bytes(
+    spin_system_A: SpinSystem,
+    spin_system_B: SpinSystem,
+    spin_system_C: SpinSystem,
+    spin_map_A: np.ndarray,
+    spin_map_B: np.ndarray,
+) -> tuple[bytes, bytes, bytes, bytes, bytes]:
+    """
+    Convert basis sets and spin maps to cached byte representations.
+
+    Parameters
+    ----------
+    spin_system_A : SpinSystem
+        First subsystem.
+    spin_system_B : SpinSystem
+        Second subsystem.
+    spin_system_C : SpinSystem
+        Composite system.
+    spin_map_A : ndarray
+        Indices of subsystem A within the composite system.
+    spin_map_B : ndarray
+        Indices of subsystem B within the composite system.
+
+    Returns
+    -------
+    tuple of bytes
+        Byte representations of the three basis sets and two spin maps.
+    """
+
+    # Convert all basis sets and spin maps to immutable byte strings.
+    return (
+        spin_system_A.basis.basis.tobytes(),
+        spin_system_B.basis.basis.tobytes(),
+        spin_system_C.basis.basis.tobytes(),
+        spin_map_A.tobytes(),
+        spin_map_B.tobytes(),
+    )
+
 
 @lru_cache(maxsize=16)
 def _dissociate_index_map(
@@ -20,11 +166,12 @@ def _dissociate_index_map(
     basis_B_bytes: bytes,
     basis_C_bytes: bytes,
     spin_map_A_bytes: bytes,
-    spin_map_B_bytes: bytes
+    spin_map_B_bytes: bytes,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Generates arrays that map the state indices from the basis set C to basis
-    sets A and B. This function is used in `dissociate()`.
+    Generate index maps from a composite basis to two subsystem bases.
+
+    This helper is used internally by `dissociate()`.
 
     Example. Basis set C contains five spins, which are indexed as
     (0, 1, 2, 3, 4). We want to dissociate this into two subsystems A and B.
@@ -37,9 +184,9 @@ def _dissociate_index_map(
     Parameters
     ----------
     basis_A_bytes : bytes
-        Basis set for the subsystem A converted to bytes.
+        Basis set for subsystem A converted to bytes.
     basis_B_bytes : bytes
-        Basis set for the subsystem B converted to bytes.
+        Basis set for subsystem B converted to bytes.
     basis_C_bytes : bytes
         Basis set for the composite system C converted to bytes.
     spin_map_A_bytes : bytes
@@ -60,8 +207,8 @@ def _dissociate_index_map(
         Corresponding indices of the matching elements in C. The array length is
         equal to `index_map_B`.
     """
-    
-    # Convert bytes back to arrays
+
+    # Reconstruct the spin maps and basis arrays from cached byte strings.
     spin_map_A = np.frombuffer(spin_map_A_bytes, dtype=int)
     spin_map_B = np.frombuffer(spin_map_B_bytes, dtype=int)
     nspins_A = spin_map_A.shape[0]
@@ -71,58 +218,54 @@ def _dissociate_index_map(
     basis_B = np.frombuffer(basis_B_bytes, dtype=int).reshape(-1, nspins_B)
     basis_C = np.frombuffer(basis_C_bytes, dtype=int).reshape(-1, nspins_C)
 
-    # Create empty lists for the index maps
+    # Initialise the lists that store the subsystem-to-composite mappings.
     index_map_A = []
     index_map_CA = []
     index_map_B = []
     index_map_CB = []
 
-    # Make a dictionary of the C basis for fast lookup
+    # Build a lookup table for basis states of the composite system.
     basis_C_lookup = {tuple(row): idx for idx, row in enumerate(basis_C)}
 
-    # Loop over the basis set of spin system A
+    # Map basis states of subsystem A into the composite basis.
     for idx_A, state in enumerate(basis_A):
 
-        # Initialize the state definition for spin system C
+        # Initialise the composite operator definition for the current state.
         op_def_C = np.zeros(nspins_C, dtype=int)
 
-        # Map the states
+        # Place the subsystem operators into their composite-system positions.
         for op, idx in zip(state, spin_map_A):
             op_def_C[idx] = op
 
-        # Convert to tuple for efficient searching
+        # Convert the state definition to a hashable tuple for lookup.
         op_def_C = tuple(op_def_C)
 
-        # Find the index of this state in spin system C
+        # Store the mapping when the state exists in the composite basis.
         if op_def_C in basis_C_lookup:
             idx_C = basis_C_lookup[op_def_C]
-
-            # Add the indices to the index maps
             index_map_CA.append(idx_C)
             index_map_A.append(idx_A)
 
-    # Loop over the basis set of spin system B
+    # Map basis states of subsystem B into the composite basis.
     for idx_B, state in enumerate(basis_B):
 
-        # Initialize the state definition for spin system C
+        # Initialise the composite operator definition for the current state.
         op_def_C = np.zeros(nspins_C, dtype=int)
 
-        # Map the states
+        # Place the subsystem operators into their composite-system positions.
         for op, idx in zip(state, spin_map_B):
             op_def_C[idx] = op
 
-        # Convert to tuple for efficient searching
+        # Convert the state definition to a hashable tuple for lookup.
         op_def_C = tuple(op_def_C)
 
-        # Find the index of this state in spin system C
+        # Store the mapping when the state exists in the composite basis.
         if op_def_C in basis_C_lookup:
             idx_C = basis_C_lookup[op_def_C]
-
-            # Add the indices to the index maps
             index_map_CB.append(idx_C)
             index_map_B.append(idx_B)
 
-    # Convert the lists to NumPy arrays
+    # Convert the accumulated mappings to NumPy arrays.
     index_map_A = np.array(index_map_A)
     index_map_CA = np.array(index_map_CA)
     index_map_B = np.array(index_map_B)
@@ -130,17 +273,19 @@ def _dissociate_index_map(
 
     return index_map_A, index_map_CA, index_map_B, index_map_CB
 
+
 @lru_cache(maxsize=16)
 def _associate_index_map(
     basis_A_bytes: bytes,
     basis_B_bytes: bytes,
     basis_C_bytes: bytes,
     spin_map_A_bytes: bytes,
-    spin_map_B_bytes: bytes
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    spin_map_B_bytes: bytes,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Generates arrays that map the state indices from spin systems A and B to the
-    composite spin system C. This function is used in `associate()`.
+    Generate index maps from two subsystem bases to a composite basis.
+
+    This helper is used internally by `associate()`.
 
     Example. We have spin system A that has two spins and spin system B that has
     three spins. These systems associate to form a composite spin system C that
@@ -174,8 +319,8 @@ def _associate_index_map(
     index_map_C : ndarray
         Mapping of indices for spin system C.
     """
-    
-    # Convert bytes back to arrays
+
+    # Reconstruct the spin maps and basis arrays from cached byte strings.
     spin_map_A = np.frombuffer(spin_map_A_bytes, dtype=int)
     spin_map_B = np.frombuffer(spin_map_B_bytes, dtype=int)
     nspins_A = spin_map_A.shape[0]
@@ -185,87 +330,103 @@ def _associate_index_map(
     basis_B = np.frombuffer(basis_B_bytes, dtype=int).reshape(-1, nspins_B)
     basis_C = np.frombuffer(basis_C_bytes, dtype=int).reshape(-1, nspins_C)
 
-    # Create empty lists for the index mappings
+    # Initialise the lists that store the subsystem-to-composite mappings.
     index_map_A = []
     index_map_B = []
     index_map_C = []
 
-    # Make a dictionary of the A and B basis sets for fast lookup
+    # Build lookup tables for the subsystem basis states.
     basis_A_lookup = {tuple(row): idx for idx, row in enumerate(basis_A)}
     basis_B_lookup = {tuple(row): idx for idx, row in enumerate(basis_B)}
 
-    # Loop over the basis states of spin system C
+    # Find composite states that can be assembled from both subsystems.
     for idx_C, state in enumerate(basis_C):
 
-        # Extract the corresponding states of A and B
+        # Extract the subsystem states that correspond to the current state.
         state_A = tuple(state[i] for i in spin_map_A)
         state_B = tuple(state[i] for i in spin_map_B)
 
-        # Only include states that exist in both A and B
+        # Store the mapping when both subsystem states exist.
         if (state_A in basis_A_lookup) and (state_B in basis_B_lookup):
             index_map_A.append(basis_A_lookup[state_A])
             index_map_B.append(basis_B_lookup[state_B])
             index_map_C.append(idx_C)
 
-    # Convert to NumPy arrays
+    # Convert the accumulated mappings to NumPy arrays.
     index_map_A = np.array(index_map_A)
     index_map_B = np.array(index_map_B)
     index_map_C = np.array(index_map_C)
 
     return index_map_A, index_map_B, index_map_C
 
+
 @lru_cache(maxsize=16)
 def _permutation_matrix(
     basis_bytes: bytes,
-    spin_map_bytes: bytes
+    spin_map_bytes: bytes,
 ) -> sp.csc_array:
-    
-    # Convert bytes back to arrays
+    """
+    Build a cached permutation matrix for a specific basis and spin map.
+
+    Parameters
+    ----------
+    basis_bytes : bytes
+        Basis array converted to bytes.
+    spin_map_bytes : bytes
+        Permutation map converted to bytes.
+
+    Returns
+    -------
+    csc_array
+        Sparse permutation matrix in CSC format.
+    """
+
+    # Reconstruct the spin map and basis array from cached byte strings.
     spin_map = np.frombuffer(spin_map_bytes, dtype=int)
     nspins = spin_map.shape[0]
     basis = np.frombuffer(basis_bytes, dtype=int).reshape(-1, nspins)
 
-    # Obtain the basis dimension
+    # Obtain the dimension of the basis.
     dim = basis.shape[0]
 
-    # Create an empty array for the permuted indices
+    # Allocate the array that stores row indices after permutation.
     indices = np.empty(dim, dtype=int)
 
-    # Make a dictionary of the basis set for fast lookup
+    # Build a lookup table for basis states in the original ordering.
     basis_lookup = {tuple(row): idx for idx, row in enumerate(basis)}
 
-    # Loop through the basis set
+    # Find the destination index for every permuted basis state.
     for idx, state in enumerate(basis):
 
-        # Find the permuted state
+        # Permute the current state according to the supplied spin map.
         state_permuted = tuple(state[i] for i in spin_map)
 
-        # Find the index of the permuted state
+        # Look up the permuted state in the original basis ordering.
         idx_permuted = basis_lookup[state_permuted]
 
-        # Add to the array of indices
+        # Store the row index selected by the permutation.
         indices[idx] = idx_permuted
 
-    # Initialize the permutation matrix
+    # Start from the identity matrix in a row-addressable sparse format.
     perm = sp.eye_array(dim, dtype=int, format='lil')
 
-    # Re-order the rows
+    # Reorder the rows according to the permutation indices.
     perm = perm[indices]
 
-    # Convert to CSC
+    # Convert the matrix to CSC format for later multiplication.
     perm = perm.tocsc()
 
     return perm
 
 def permutation_matrix(
     spin_system: SpinSystem,
-    spin_map: list | tuple | np.ndarray
+    spin_map: SpinMap,
 ) -> sp.csc_array:
     """
-    Creates a permutation matrix to reorder the spins in the system.
+    Create a permutation matrix that reorders spins in a spin system.
 
     Example. Our spin system has three spins, which are indexed (0, 1, 2). We
-    want to perform the following permulation:
+    want to perform the following permutation:
 
     - 0 --> 2 (Spin 0 goes to position 2)
     - 1 --> 0 (Spin 1 goes to position 0)
@@ -291,14 +452,15 @@ def permutation_matrix(
     perm : csc_array
         The permutation matrix.
     """
-    # Convert the spin map into NumPy
+
+    # Convert the supplied spin map to a NumPy array.
     spin_map = arraylike_to_array(spin_map)
 
-    # Convert the arrays to bytes for hashing
+    # Convert the basis and the spin map to cached byte representations.
     basis_bytes = spin_system.basis.basis.tobytes()
     spin_map_bytes = spin_map.tobytes()
 
-    # Ensure that a separate copy is returned
+    # Return a copy so that callers cannot modify the cached matrix.
     perm = _permutation_matrix(basis_bytes, spin_map_bytes).copy()
 
     return perm
@@ -307,13 +469,14 @@ def dissociate(
     spin_system_A: SpinSystem,
     spin_system_B: SpinSystem,
     spin_system_C: SpinSystem,
-    rho_C: np.ndarray | sp.csc_array,
-    spin_map_A: list | tuple | np.ndarray,
-    spin_map_B: list | tuple | np.ndarray
-) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
+    rho_C: StateVector,
+    spin_map_A: SpinMap,
+    spin_map_B: SpinMap,
+) -> tuple[StateVector, StateVector]:
     """
-    Dissociates the density vector of composite system C into density vectors of
-    two subsystems A and B in a chemical reaction C -> A + B.
+    Dissociate a composite density vector into two subsystem vectors.
+
+    This function models the chemical step `C -> A + B`.
 
     Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).
     We want to dissociate this into two subsystems A and B. Spins 0 and 2 should
@@ -345,56 +508,57 @@ def dissociate(
     rho_B : ndarray or csc_array
         State vector of spin system B.
     """
-    # Check that the spin maps are valid
-    if len(spin_map_A) != spin_system_A.nspins:
-        raise ValueError(
-            "length of spin_map_A does not match the number of spins "
-            "in spin_system_A"
-        )
-    if len(spin_map_B) != spin_system_B.nspins:
-        raise ValueError(
-            "length of spin_map_B does not match the number of spins "
-            "in spin_system_B"
-        )
-    spin_map_C = {i for i in spin_map_A}.union({i for i in spin_map_B})
-    if spin_map_C != {i for i in range(spin_system_C.nspins)}:
-        raise ValueError("spin maps have incorrect or have overlapping indices")
 
-    # Convert the spin maps to NumPy arrays
+    # Validate that the subsystem maps form a complete partition of C.
+    _validate_bipartite_spin_maps(
+        spin_system_A,
+        spin_system_B,
+        spin_system_C,
+        spin_map_A,
+        spin_map_B,
+    )
+
+    # Convert the supplied spin maps to NumPy arrays.
     spin_map_A = arraylike_to_array(spin_map_A)
     spin_map_B = arraylike_to_array(spin_map_B)
 
-    # Convert basis sets and spin maps to bytes for hashing
-    basis_A_bytes = spin_system_A.basis.basis.tobytes()
-    basis_B_bytes = spin_system_B.basis.basis.tobytes()
-    basis_C_bytes = spin_system_C.basis.basis.tobytes()
-    spin_map_A_bytes = spin_map_A.tobytes()
-    spin_map_B_bytes = spin_map_B.tobytes()
+    # Convert basis sets and spin maps to byte strings for caching.
+    (
+        basis_A_bytes,
+        basis_B_bytes,
+        basis_C_bytes,
+        spin_map_A_bytes,
+        spin_map_B_bytes,
+    ) = _basis_and_spin_map_bytes(
+        spin_system_A,
+        spin_system_B,
+        spin_system_C,
+        spin_map_A,
+        spin_map_B,
+    )
 
-    # Get index mappings
-    idx_A, idx_CA, idx_B, idx_CB = \
-        _dissociate_index_map(
-            basis_A_bytes, basis_B_bytes, basis_C_bytes,
-            spin_map_A_bytes, spin_map_B_bytes
-        )
+    # Obtain the cached index mappings for the dissociation step.
+    idx_A, idx_CA, idx_B, idx_CB = _dissociate_index_map(
+        basis_A_bytes,
+        basis_B_bytes,
+        basis_C_bytes,
+        spin_map_A_bytes,
+        spin_map_B_bytes,
+    )
 
-    # Initialize empty state vectors
-    if parameters.sparse_state:
-        rho_A = sp.lil_array((spin_system_A.basis.dim, 1), dtype=complex)
-        rho_B = sp.lil_array((spin_system_B.basis.dim, 1), dtype=complex)
-    else:
-        rho_A = np.zeros((spin_system_A.basis.dim, 1), dtype=complex)
-        rho_B = np.zeros((spin_system_B.basis.dim, 1), dtype=complex)
+    # Allocate empty state vectors for the two product systems.
+    rho_A = _state_vector_container(spin_system_A.basis.dim)
+    rho_B = _state_vector_container(spin_system_B.basis.dim)
 
-    # Populate the state vectors
+    # Transfer the matching composite populations into the subsystems.
     rho_A[idx_A, [0]] = rho_C[idx_CA, [0]]
     rho_B[idx_B, [0]] = rho_C[idx_CB, [0]]
 
-    # Normalize the state vectors
+    # Normalise the subsystem vectors to preserve the unit operator scale.
     rho_A = rho_A / (rho_A[0, 0] * np.sqrt(np.prod(spin_system_A.mults)))
     rho_B = rho_B / (rho_B[0, 0] * np.sqrt(np.prod(spin_system_B.mults)))
 
-    # Convert to csc_array if using sparse
+    # Convert sparse results to CSC format for consistency.
     if parameters.sparse_state:
         rho_A = rho_A.tocsc()
         rho_B = rho_B.tocsc()
@@ -405,14 +569,15 @@ def associate(
     spin_system_A: SpinSystem,
     spin_system_B: SpinSystem,
     spin_system_C: SpinSystem,
-    rho_A: np.ndarray | sp.csc_array,
-    rho_B: np.ndarray | sp.csc_array,
-    spin_map_A: list | tuple | np.ndarray,
-    spin_map_B: list | tuple | np.ndarray
-) -> np.ndarray | sp.csc_array:
+    rho_A: StateVector,
+    rho_B: StateVector,
+    spin_map_A: SpinMap,
+    spin_map_B: SpinMap,
+) -> StateVector:
     """
-    Combines two state vectors when spin systems associate in a chemical
-    reaction A + B -> C.
+    Combine two subsystem density vectors into a composite vector.
+
+    This function models the chemical step `A + B -> C`.
 
     Example. We have spin system A that has two spins and spin system B that has
     three spins. These systems associate to form a composite spin system C that
@@ -446,49 +611,51 @@ def associate(
     rho_C : ndarray or csc_array
         State vector of the composite spin system C.
     """
-    # Check that the spin maps are valid
-    if len(spin_map_A) != spin_system_A.nspins:
-        raise ValueError(
-            "length of spin_map_A does not match the number of spins "
-            "in spin_system_A"
-        )
-    if len(spin_map_B) != spin_system_B.nspins:
-        raise ValueError(
-            "length of spin_map_B does not match the number of spins "
-            "in spin_system_B"
-        )
-    spin_map_C = {i for i in spin_map_A}.union({i for i in spin_map_B})
-    if spin_map_C != {i for i in range(spin_system_C.nspins)}:
-        raise ValueError("spin maps have incorrect or have overlapping indices")
 
-    # Convert the spin maps into NumPy
+    # Validate that the subsystem maps form a complete partition of C.
+    _validate_bipartite_spin_maps(
+        spin_system_A,
+        spin_system_B,
+        spin_system_C,
+        spin_map_A,
+        spin_map_B,
+    )
+
+    # Convert the supplied spin maps to NumPy arrays.
     spin_map_A = arraylike_to_array(spin_map_A)
     spin_map_B = arraylike_to_array(spin_map_B)
 
-    # Convert the arrays to bytes for hashing
-    basis_A_bytes = spin_system_A.basis.basis.tobytes()
-    basis_B_bytes = spin_system_B.basis.basis.tobytes()
-    basis_C_bytes = spin_system_C.basis.basis.tobytes()
-    spin_map_A_bytes = spin_map_A.tobytes()
-    spin_map_B_bytes = spin_map_B.tobytes()
+    # Convert basis sets and spin maps to byte strings for caching.
+    (
+        basis_A_bytes,
+        basis_B_bytes,
+        basis_C_bytes,
+        spin_map_A_bytes,
+        spin_map_B_bytes,
+    ) = _basis_and_spin_map_bytes(
+        spin_system_A,
+        spin_system_B,
+        spin_system_C,
+        spin_map_A,
+        spin_map_B,
+    )
 
-    # Calculate the index maps using cached function
-    idx_A, idx_B, idx_C = \
-        _associate_index_map(
-            basis_A_bytes, basis_B_bytes, basis_C_bytes,
-            spin_map_A_bytes, spin_map_B_bytes
-        )
+    # Obtain the cached index mappings for the association step.
+    idx_A, idx_B, idx_C = _associate_index_map(
+        basis_A_bytes,
+        basis_B_bytes,
+        basis_C_bytes,
+        spin_map_A_bytes,
+        spin_map_B_bytes,
+    )
 
-    # Initialize an empty state vector for the composite system
-    if parameters.sparse_state:
-        rho_C = sp.lil_array((spin_system_C.basis.dim, 1), dtype=complex)
-    else:
-        rho_C = np.zeros((spin_system_C.basis.dim, 1), dtype=complex)
+    # Allocate an empty state vector for the composite system.
+    rho_C = _state_vector_container(spin_system_C.basis.dim)
 
-    # Combine the state vectors
+    # Combine the subsystem amplitudes in the composite basis.
     rho_C[idx_C, [0]] = rho_A[idx_A, [0]] * rho_B[idx_B, [0]]
 
-    # Convert to csc_array if using sparse arrays
+    # Convert sparse results to CSC format for consistency.
     if parameters.sparse_state:
         rho_C = rho_C.tocsc()
 
@@ -496,15 +663,14 @@ def associate(
 
 def permute_spins(
     spin_system: SpinSystem,
-    rho: np.ndarray | sp.csc_array,
-    spin_map: list | tuple | np.ndarray
-) -> np.ndarray | sp.csc_array:
+    rho: StateVector,
+    spin_map: SpinMap,
+) -> StateVector:
     """
-    Permutes the state vector of a spin system to correspond to a reordering
-    of the spins in the system. 
+    Permute a state vector to match a reordering of spins.
 
     Example. Our spin system has three spins, which are indexed (0, 1, 2). We
-    want to perform the following permulation:
+    want to perform the following permutation:
 
     - 0 --> 2 (Spin 0 goes to position 2)
     - 1 --> 0 (Spin 1 goes to position 0)
@@ -528,20 +694,17 @@ def permute_spins(
     rho : ndarray or csc_array
         Permuted state vector of the spin system.
     """
-    # Check that the spin map is valid
-    if {i for i in spin_map} != {i for i in range(spin_system.nspins)}:
-        raise ValueError(
-            "length of spin_map does not match the number of spins in "
-            "the system or spin_map contains incorrect or overlapping indices"
-        )
 
-    # Get the permutation matrix
+    # Validate that the permutation map contains each spin exactly once.
+    _validate_permutation_spin_map(spin_system, spin_map)
+
+    # Build the permutation matrix for the requested spin ordering.
     perm = permutation_matrix(spin_system, spin_map)
 
-    # Apply the permutation to the density vector
+    # Apply the permutation matrix to the state vector.
     rho = perm @ rho
 
-    # Ensure the correct return type
+    # Convert the result to the configured sparse or dense representation.
     if parameters.sparse_state and not sp.issparse(rho):
         rho = sp.csc_array(rho)
     if not parameters.sparse_state and sp.issparse(rho):
@@ -549,23 +712,41 @@ def permute_spins(
 
     return rho
 
-def clear_cache_associate_index_map():
+
+def clear_cache_associate_index_map() -> None:
     """
-    This function clears the cache from the `_associate_index_map()` function.
+    Clear the cache used by `_associate_index_map()`.
+
+    Returns
+    -------
+    None
     """
-    # Clear the cache
+
+    # Reset the cached association index maps.
     _associate_index_map.cache_clear()
 
-def clear_cache_dissociate_index_map():
+
+def clear_cache_dissociate_index_map() -> None:
     """
-    This function clears the cache from the `_dissociate_index_map()` function.
+    Clear the cache used by `_dissociate_index_map()`.
+
+    Returns
+    -------
+    None
     """
-    # Clear the cache
+
+    # Reset the cached dissociation index maps.
     _dissociate_index_map.cache_clear()
 
-def clear_cache_permutation_matrix():
+
+def clear_cache_permutation_matrix() -> None:
     """
-    This function clears the cache from the `_permutation_matrix()` function.
+    Clear the cache used by `_permutation_matrix()`.
+
+    Returns
+    -------
+    None
     """
-    # Clear the cache
+
+    # Reset the cached permutation matrices.
     _permutation_matrix.cache_clear()
