@@ -1,87 +1,91 @@
 """
-This module contains functions for reading data from files and converting it
-into suitable formats.
+data_io.py
+
+Provides helper functions for reading plain-text arrays, XYZ coordinates, and
+Cartesian interaction tensors from files.
 """
 
-# Imports
 import numpy as np
+
 
 def read_array(file_path: str, data_type: type) -> np.ndarray:
     """
-    Reads a .txt file where values are stored in a space-separated format and
-    converts that into a NumPy array.
+    Read a whitespace-separated text file into a NumPy array.
 
     Parameters
     ----------
     file_path : str
         Path to the file to be read.
     data_type : type
-        Data type of the values to be read (e.g., float or str).
+        Data type of the values to be read, for example `float` or `str`.
 
     Returns
     -------
     value_array : ndarray
-        A NumPy array containing the values read from the file.
+        Array containing the values read from the file.
     """
 
-    # Open the file
+    # Open the input file and pass it to NumPy.
     with open(file_path, 'r') as file:
 
-        # Read the values into a NumPy array
+        # Read the whitespace-separated values into an array.
         value_array = np.loadtxt(file, delimiter=None, dtype=data_type)
 
     return value_array
 
+
 def read_xyz(file_path: str) -> np.ndarray:
     """
-    Reads a .xyz file where the first line specifies the number of atoms, the second line 
-    contains a comment, and the subsequent lines contain the atom symbols and Cartesian coordinates.
+    Read Cartesian coordinates from an XYZ file.
+
+    The first line contains the number of atoms, the second line contains a
+    comment, and the remaining lines contain atomic symbols followed by the
+    Cartesian coordinates.
 
     Parameters
     ----------
     file_path : str
-        Path to the .xyz file to be read.
+        Path to the XYZ file to be read.
 
     Returns
     -------
     xyz : ndarray
-        A NumPy array containing the atom symbols and Cartesian coordinates.
+        Array of Cartesian coordinates with shape `(n_atoms, 3)`.
     """
 
-    # Open the file
+    # Open the XYZ file for line-by-line parsing.
     with open(file_path, 'r') as file:
 
-        # Initialize a list for the xyz coordinates
+        # Collect the Cartesian coordinates in a temporary list.
         xyz = []
 
-        # Read the number of atoms and skip the comment line
+        # Read the number of atoms and skip the comment line.
         n_atoms = int(file.readline())
         file.readline()
 
-        # Extract the coordinates for each atom
+        # Extract the three Cartesian coordinates for each atom.
         for _ in range(n_atoms):
 
-            # Read only the coordinates
+            # Ignore the atomic symbol and store only the coordinates.
             xyz.append(file.readline().split()[1:])
 
-    # Convert the list to a NumPy array
+    # Convert the collected coordinates to a floating-point array.
     xyz = np.array(xyz, dtype=float)
 
     return xyz
 
+
 def read_tensors(file_path: str) -> np.ndarray:
     """
-    Reads a file containing Cartesian interaction tensors (from quantum chemistry calculations)
-    for each spin or spin pair.
+    Read Cartesian interaction tensors from a text file.
 
-    The file should have the following format:
-    
-    - The first column is the index of the spin.
-    - The subsequent columns represent the components of a 3x3 tensor.
-    
-    This structure is repeated for each spin.
+    The file is assumed to contain one 3x3 tensor for each spin or spin pair.
+    Each tensor starts with a line whose first entry is an integer index,
+    followed by the first tensor row. The next two lines contain the remaining
+    tensor rows.
 
-    TODO: Input mahdollinen ilman nollatensoreita?
+    The first column identifies the spin entry, and the remaining columns
+    contain the tensor components.
 
     Parameters
     ----------
@@ -91,34 +95,41 @@ def read_tensors(file_path: str) -> np.ndarray:
     Returns
     -------
     tensors : ndarray
-        A NumPy array containing the tensors.
+        Array of Cartesian tensors with shape `(n_tensors, 3, 3)`.
     """
 
-    # Initialize the lists and the current index
+    # Initialise the tensor collection and the current tensor buffer.
     tensors = []
     matrix_rows = []
     current_index = None
-    
-    # Open the file
+
+    # Open the tensor file for line-by-line parsing.
     with open(file_path, 'r') as file:
 
-        # Process each line
+        # Process each line and group rows into individual tensors.
         for line in file:
+            values = line.strip().split()
 
-            # Handle lines with spin indices differently
-            if line.strip().split()[0].isdigit() and len(line.strip().split()) == 4:
+            # Detect the first row of a new tensor block.
+            if values[0].isdigit() and len(values) == 4:
+
+                # Store the previous tensor before starting a new one.
                 if current_index is not None:
                     tensors.append(np.array(matrix_rows, dtype=float))
-                current_index = int(line.strip().split()[0])
-                matrix_rows = [list(map(float, line.strip().split()[1:]))]
+
+                # Record the current tensor index and its first row.
+                current_index = int(values[0])
+                matrix_rows = [list(map(float, values[1:]))]
             else:
-                matrix_rows.append(list(map(float, line.strip().split())))
-        
-        # Append the last tensor
+
+                # Append a continuation row to the current tensor.
+                matrix_rows.append(list(map(float, values)))
+
+        # Append the final tensor after the loop ends.
         if current_index is not None:
             tensors.append(np.array(matrix_rows, dtype=float))
-    
-    # Convert to a NumPy array
+
+    # Convert the tensor list to a single floating-point array.
     tensors = np.array(tensors, dtype=float)
 
     return tensors

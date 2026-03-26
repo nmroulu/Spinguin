@@ -1,1 +1,1 @@
-# TODO
+# Placeholder file for the composite spin system class. 
