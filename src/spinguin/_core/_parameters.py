@@ -1,47 +1,98 @@
 """
-This module provides the Parameters class which contains all the necessary
-global parameters required for spin dynamics simulations. It is instantiated
-when the Spinguin package is imported and can be accessed by::
+Global parameter definitions for the Spinguin package.
+
+The module provides the `Parameters` class that stores the package-wide
+settings used throughout spin-dynamics simulations. A single instance is
+created when Spinguin is imported and may be modified as follows::
 
     import spinguin as sg
     sg.parameters.PARAMETERNAME = VALUE
 """
-# Imports
+
 from spinguin._core._status import status
+
 
 class Parameters:
     """
-    Parameters class contains all the global settings for the Spinguin package.
+    Store the global settings used throughout the Spinguin package.
+
+    Usage: ``Parameters()``.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+    ) -> None:
+        """
+        Initialise the parameter container with the default settings.
+
+        Usage: ``Parameters()``.
+
+        Returns
+        -------
+        None
+            The instance is initialised in place.
+        """
+
+        # Populate the object with the default parameter values.
         self.default()
 
-    def default(self):
+    def _report_update(
+        self,
+        message: str,
+    ) -> None:
         """
-        Set the parameters to the default settings.
+        Print a status message for a parameter update.
+
+        Usage: ``self._report_update(message)``.
+
+        Parameters
+        ----------
+        message : str
+            Status message to be printed.
+
+        Returns
+        -------
+        None
+            The message is forwarded to the package status printer.
         """
 
-        # Experimental conditions
+        # Forward the update message through the standard status channel.
+        status(message)
+
+    def default(
+        self,
+    ) -> None:
+        """
+        Reset all parameters to their default values.
+
+        Usage: ``parameters.default()``.
+
+        Returns
+        -------
+        None
+            All parameter values are reset in place.
+        """
+
+        # Set the default experimental conditions.
         self._magnetic_field: float = None
         self._temperature: float = None
 
-        # Parallelisation settings
-        self._parallel_dim: int=1000
+        # Set the default parallelisation threshold.
+        self._parallel_dim: int = 1000
 
-        # Rotating frame settings
-        self._rotating_frame_order: int=5
+        # Set the default rotating-frame expansion order.
+        self._rotating_frame_order: int = 5
 
-        # Sparsity settings
-        self._propagator_density: float=0.5
-        self._sparse_operator: bool=True
-        self._sparse_state: bool=False
-        self._sparse_superoperator: bool=True
+        # Set the default sparsity controls.
+        self._propagator_density: float = 0.5
+        self._sparse_operator: bool = True
+        self._sparse_state: bool = False
+        self._sparse_superoperator: bool = True
 
-        # Status messages
-        self._verbose: bool=True
-        
-        # Zero-value thresholds
+        # Enable status messages by default.
+        self._verbose: bool = True
+
+        # Set the default numerical zero-value thresholds.
         self._zero_aux: float = 1e-15
         self._zero_equilibrium: float = 1e-18
         self._zero_hamiltonian: float = 1e-12
@@ -53,280 +104,503 @@ class Parameters:
         self._zero_time_step: float = 1e-18
         self._zero_zte: float = 1e-33
 
-        # Zero-track elimination settings
+        # Set the default zero-track elimination controls.
         self._nsteps_zte: int = 10
 
     @property
-    def magnetic_field(self) -> float:
+    def magnetic_field(
+        self,
+    ) -> float:
         """
-        External magnetic field (in Tesla).
+        Return the external magnetic field in tesla.
         """
+
         return self._magnetic_field
 
     @magnetic_field.setter
-    def magnetic_field(self, magnetic_field: float):
+    def magnetic_field(
+        self,
+        magnetic_field: float,
+    ) -> None:
+        # Store the new magnetic-field value.
         self._magnetic_field = magnetic_field
-        status(f"Magnetic field set to: {self.magnetic_field} T\n")
+
+        # Report the updated magnetic-field value.
+        self._report_update(
+            f"Magnetic field set to: {self.magnetic_field} T\n"
+        )
 
     @property
-    def temperature(self) -> float:
+    def temperature(
+        self,
+    ) -> float:
         """
-        Temperature of the sample (in Kelvin).
+        Return the sample temperature in kelvin.
         """
+
         return self._temperature
-    
+
     @temperature.setter
-    def temperature(self, temperature: float):
+    def temperature(
+        self,
+        temperature: float,
+    ) -> None:
+        # Store the new temperature value.
         self._temperature = temperature
-        status(f"Temperature set to: {self.temperature} K\n")
+
+        # Report the updated temperature value.
+        self._report_update(f"Temperature set to: {self.temperature} K\n")
 
     @property
-    def parallel_dim(self) -> int:
+    def parallel_dim(
+        self,
+    ) -> int:
         """
-        If the number of items in the basis is larger than this value,
-        parallelization is used to speed up the calculation of the Redfield
-        relaxation superoperator.
+        Return the basis-size threshold for parallel Redfield calculations.
+
+        If the number of basis elements exceeds this value, parallel execution is
+        used when constructing the Redfield relaxation superoperator.
         """
+
         return self._parallel_dim
-    
+
     @parallel_dim.setter
-    def parallel_dim(self, parallel_dim: int):
+    def parallel_dim(
+        self,
+        parallel_dim: int,
+    ) -> None:
+        # Store the new parallelisation threshold.
         self._parallel_dim = parallel_dim
-        status(f"Threshold for parallel Redfield set to: {self.parallel_dim}\n")
+
+        # Report the updated parallelisation threshold.
+        self._report_update(
+            f"Threshold for parallel Redfield set to: {self.parallel_dim}\n"
+        )
 
     @property
-    def rotating_frame_order(self) -> int:
+    def rotating_frame_order(
+        self,
+    ) -> int:
         """
-        Order of the Taylor series expansion used when applying the rotating
-        frame transformation. Higher order gives more accurate results but takes
-        more time to compute. Default = 5.
+        Return the Taylor-expansion order used in the rotating frame.
+
+        Higher orders give more accurate rotating-frame transformations but
+        require more computation time. The default value is 5.
         """
+
         return self._rotating_frame_order
-    
+
     @rotating_frame_order.setter
-    def rotating_frame_order(self, rotating_frame_order: int):
+    def rotating_frame_order(
+        self,
+        rotating_frame_order: int,
+    ) -> None:
+        # Store the new rotating-frame expansion order.
         self._rotating_frame_order = rotating_frame_order
-        status(f"Rotating frame order set to: {self.rotating_frame_order}\n")
+
+        # Report the updated rotating-frame expansion order.
+        self._report_update(
+            f"Rotating frame order set to: {self.rotating_frame_order}\n"
+        )
 
     @property
-    def sparse_operator(self) -> bool:
+    def sparse_operator(
+        self,
+    ) -> bool:
         """
-        Specifies whether to return the Hilbert-space operators as sparse or
-        dense arrays.
+        Return whether Hilbert-space operators are stored sparsely.
         """
+
         return self._sparse_operator
-    
+
     @sparse_operator.setter
-    def sparse_operator(self, sparse_operator: bool):
+    def sparse_operator(
+        self,
+        sparse_operator: bool,
+    ) -> None:
+        # Store the new Hilbert-space operator sparsity setting.
         self._sparse_operator = sparse_operator
-        status(f"Sparity setting of operator set to: {self.sparse_operator}\n")
+
+        # Report the updated Hilbert-space operator sparsity setting.
+        self._report_update(
+            f"Sparsity setting of operator set to: {self.sparse_operator}\n"
+        )
 
     @property
-    def sparse_superoperator(self) -> bool:
+    def sparse_superoperator(
+        self,
+    ) -> bool:
         """
-        Specifies whether to return the superoperators as sparse or dense
-        arrays.
+        Return whether superoperators are stored sparsely.
         """
+
         return self._sparse_superoperator
-    
+
     @sparse_superoperator.setter
-    def sparse_superoperator(self, sparse_superoperator: bool):
+    def sparse_superoperator(
+        self,
+        sparse_superoperator: bool,
+    ) -> None:
+        # Store the new superoperator sparsity setting.
         self._sparse_superoperator = sparse_superoperator
-        status("Sparity setting of superoperator set to: "
-              f"{self.sparse_superoperator}\n")
+
+        # Report the updated superoperator sparsity setting.
+        self._report_update(
+            "Sparsity setting of superoperator set to: "
+            f"{self.sparse_superoperator}\n"
+        )
 
     @property
-    def sparse_state(self) -> bool:
+    def sparse_state(
+        self,
+    ) -> bool:
         """
-        Specifies whether to return the state vectors as sparse or dense arrays.
+        Return whether state vectors are stored sparsely.
         """
+
         return self._sparse_state
-    
+
     @sparse_state.setter
-    def sparse_state(self, sparse_state: bool):
+    def sparse_state(
+        self,
+        sparse_state: bool,
+    ) -> None:
+        # Store the new state-vector sparsity setting.
         self._sparse_state = sparse_state
-        status(f"Sparity setting of state set to: {self.sparse_state}\n")
+
+        # Report the updated state-vector sparsity setting.
+        self._report_update(
+            f"Sparsity setting of state set to: {self.sparse_state}\n"
+        )
 
     @property
-    def propagator_density(self) -> float:
+    def propagator_density(
+        self,
+    ) -> float:
         """
-        Threshold (between 0 and 1) that specifies the array type of the time
-        propagator. If the density of the progagator is greater than this value,
-        dense array is returned. Otherwise, sparse array is returned.
+        Return the density threshold used for propagator storage selection.
+
+        If the density of the propagator exceeds this value, a dense array is
+        returned; otherwise, a sparse array is returned.
         """
+
         return self._propagator_density
-    
+
     @propagator_density.setter
-    def propagator_density(self, propagator_density: float):
+    def propagator_density(
+        self,
+        propagator_density: float,
+    ) -> None:
+        # Store the new propagator-density threshold.
         self._propagator_density = propagator_density
-        status("Propagator density threshold set to: "
-              f"{self.propagator_density}\n")
-        
+
+        # Report the updated propagator-density threshold.
+        self._report_update(
+            "Propagator density threshold set to: "
+            f"{self.propagator_density}\n"
+        )
+
     @property
-    def verbose(self) -> bool:
+    def verbose(
+        self,
+    ) -> bool:
         """
-        Can be used to turn on/off status messages to the console.
+        Return whether status messages are printed to the console.
         """
+
         return self._verbose
-    
+
     @verbose.setter
-    def verbose(self, verbose: bool):
+    def verbose(
+        self,
+        verbose: bool,
+    ) -> None:
+        # Store the new verbosity setting.
         self._verbose = verbose
+
+        # Report the updated verbosity setting unconditionally.
         print(f"Verbose set to: {self.verbose}\n")
 
     @property
-    def zero_hamiltonian(self) -> float:
+    def zero_hamiltonian(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero in Hamiltonian.
+        Return the zero-value threshold used for Hamiltonians.
         """
+
         return self._zero_hamiltonian
-    
+
     @zero_hamiltonian.setter
-    def zero_hamiltonian(self, zero_hamiltonian: float):
+    def zero_hamiltonian(
+        self,
+        zero_hamiltonian: float,
+    ) -> None:
+        # Store the new Hamiltonian zero-value threshold.
         self._zero_hamiltonian = zero_hamiltonian
-        status("Hamiltonian zero-value threshold set to: "
-              f"{self.zero_hamiltonian}\n")
+
+        # Report the updated Hamiltonian zero-value threshold.
+        self._report_update(
+            "Hamiltonian zero-value threshold set to: "
+            f"{self.zero_hamiltonian}\n"
+        )
 
     @property
-    def zero_aux(self) -> float:
+    def zero_aux(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero in auxiliary
-        matrix method which is used in the Redfield relaxation theory.
+        Return the zero-value threshold used in the auxiliary-matrix method.
+
+        This threshold is used in the Redfield relaxation treatment.
         """
+
         return self._zero_aux
-    
+
     @zero_aux.setter
-    def zero_aux(self, zero_aux: float):
+    def zero_aux(
+        self,
+        zero_aux: float,
+    ) -> None:
+        # Store the new auxiliary-method zero-value threshold.
         self._zero_aux = zero_aux
-        status(f"Auxiliary zero-value threshold set to: {self.zero_aux}\n")
+
+        # Report the updated auxiliary-method zero-value threshold.
+        self._report_update(
+            f"Auxiliary zero-value threshold set to: {self.zero_aux}\n"
+        )
 
     @property
-    def zero_relaxation(self) -> float:
+    def zero_relaxation(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero in relaxation
-        superoperator.
+        Return the zero-value threshold used for relaxation superoperators.
         """
+
         return self._zero_relaxation
-    
+
     @zero_relaxation.setter
-    def zero_relaxation(self, zero_relaxation: float):
+    def zero_relaxation(
+        self,
+        zero_relaxation: float,
+    ) -> None:
+        # Store the new relaxation zero-value threshold.
         self._zero_relaxation = zero_relaxation
-        status("Relaxation zero-value threshold set to: "
-              f"{self.zero_relaxation}\n")
+
+        # Report the updated relaxation zero-value threshold.
+        self._report_update(
+            "Relaxation zero-value threshold set to: "
+            f"{self.zero_relaxation}\n"
+        )
 
     @property
-    def zero_interaction(self) -> float:
+    def zero_interaction(
+        self,
+    ) -> float:
         """
-        If the 1-norm of an interaction tensor (upper bound for its eigenvalues)
-        is smaller than this threshold, the interaction is ignored when
-        constructing the Redfield relaxation superoperator.
+        Return the threshold below which interaction tensors are ignored.
+
+        If the matrix 1-norm of an interaction tensor, which is an upper bound
+        for its eigenvalues, is smaller than this threshold, the interaction is
+        neglected when constructing the Redfield relaxation superoperator.
         """
+
         return self._zero_interaction
-    
+
     @zero_interaction.setter
-    def zero_interaction(self, zero_interaction: float):
+    def zero_interaction(
+        self,
+        zero_interaction: float,
+    ) -> None:
+        # Store the new interaction zero-value threshold.
         self._zero_interaction = zero_interaction
-        status("Interaction zero-value threshold set to: "
-              f"{self.zero_interaction}\n")
+
+        # Report the updated interaction zero-value threshold.
+        self._report_update(
+            "Interaction zero-value threshold set to: "
+            f"{self.zero_interaction}\n"
+        )
 
     @property
-    def zero_propagator(self) -> float:
+    def zero_propagator(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero in propagator.
-        This value is used to as the convergence criterion of the Taylor series
-        that is used to compute the matrix exponential.
+        Return the zero-value threshold used in propagator calculations.
+
+        This threshold is used as the convergence criterion for the Taylor
+        series employed to evaluate the matrix exponential.
         """
+
         return self._zero_propagator
-    
+
     @zero_propagator.setter
-    def zero_propagator(self, zero_propagator: float):
+    def zero_propagator(
+        self,
+        zero_propagator: float,
+    ) -> None:
+        # Store the new propagator zero-value threshold.
         self._zero_propagator = zero_propagator
-        status("Propagator zero-value threshold set to: "
-              f"{self.zero_propagator}\n")
+
+        # Report the updated propagator zero-value threshold.
+        self._report_update(
+            "Propagator zero-value threshold set to: "
+            f"{self.zero_propagator}\n"
+        )
 
     @property
-    def zero_pulse(self) -> float:
+    def zero_pulse(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero in pulse. This
-        value is used as the convergence criterion of the Taylor series that is
-        used to compute the matrix exponential.
+        Return the zero-value threshold used in pulse calculations.
+
+        This threshold is used as the convergence criterion for the Taylor
+        series employed to evaluate the matrix exponential.
         """
+
         return self._zero_pulse
-    
+
     @zero_pulse.setter
-    def zero_pulse(self, zero_pulse: float):
+    def zero_pulse(
+        self,
+        zero_pulse: float,
+    ) -> None:
+        # Store the new pulse zero-value threshold.
         self._zero_pulse = zero_pulse
-        status(f"Pulse zero-value threshold set to: {self.zero_pulse}\n")
+
+        # Report the updated pulse zero-value threshold.
+        self._report_update(
+            f"Pulse zero-value threshold set to: {self.zero_pulse}\n"
+        )
 
     @property
-    def zero_thermalization(self) -> float:
+    def zero_thermalization(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero when performing
-        the matrix exponential while applying the Levitt-di Bari thermalization.
-        This value is used as the convergence criterion of the Taylor series.
+        Return the zero-value threshold used in thermalization calculations.
+
+        This threshold is used as the convergence criterion for the Taylor
+        series employed during Levitt-di Bari thermalization.
         """
+
         return self._zero_thermalization
-    
+
     @zero_thermalization.setter
-    def zero_thermalization(self, zero_thermalization: float):
+    def zero_thermalization(
+        self,
+        zero_thermalization: float,
+    ) -> None:
+        # Store the new thermalization zero-value threshold.
         self._zero_thermalization = zero_thermalization
-        status("Thermalization zero-value threshold set to: "
-              f"{self.zero_thermalization}\n")
+
+        # Report the updated thermalization zero-value threshold.
+        self._report_update(
+            "Thermalization zero-value threshold set to: "
+            f"{self.zero_thermalization}\n"
+        )
 
     @property
-    def zero_equilibrium(self) -> float:
+    def zero_equilibrium(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero when performing
-        the matrix exponential while constructing the equilibrium state.
+        Return the zero-value threshold used for equilibrium-state construction.
         """
+
         return self._zero_equilibrium
-    
+
     @zero_equilibrium.setter
-    def zero_equilibrium(self, zero_equilibrium: float):
+    def zero_equilibrium(
+        self,
+        zero_equilibrium: float,
+    ) -> None:
+        # Store the new equilibrium zero-value threshold.
         self._zero_equilibrium = zero_equilibrium
-        status("Equilibrium zero-value threshold set to: "
-              f"{self.zero_equilibrium}\n")
-        
+
+        # Report the updated equilibrium zero-value threshold.
+        self._report_update(
+            "Equilibrium zero-value threshold set to: "
+            f"{self.zero_equilibrium}\n"
+        )
+
     @property
-    def zero_time_step(self) -> float:
+    def zero_time_step(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero when advancing
-        the state vector forward for one time step.
+        Return the zero-value threshold used in single-step propagation.
         """
+
         return self._zero_time_step
-    
+
     @zero_time_step.setter
-    def zero_time_step(self, zero_time_step: float):
+    def zero_time_step(
+        self,
+        zero_time_step: float,
+    ) -> None:
+        # Store the new time-step zero-value threshold.
         self._zero_time_step = zero_time_step
-        status("Time step zero-value threshold set to: "
-              f"{self.zero_time_step}\n")
-        
+
+        # Report the updated time-step zero-value threshold.
+        self._report_update(
+            "Time step zero-value threshold set to: "
+            f"{self.zero_time_step}\n"
+        )
+
     @property
-    def zero_zte(self) -> float:
+    def zero_zte(
+        self,
+    ) -> float:
         """
-        Threshold under which a value is considered to be zero when performing
-        the zero-track elimination (ZTE) basis truncation. The default value is
-        1e-33, designed to eliminate only basis states that remain exactly zero.
+        Return the zero-value threshold used in zero-track elimination.
+
+        The default value, ``1e-33``, is intended to eliminate only basis states
+        that remain exactly zero during ZTE basis truncation.
         """
+
         return self._zero_zte
-    
+
     @zero_zte.setter
-    def zero_zte(self, zero_zte: float):
+    def zero_zte(
+        self,
+        zero_zte: float,
+    ) -> None:
+        # Store the new zero-track-elimination threshold.
         self._zero_zte = zero_zte
-        status(f"ZTE zero-value threshold set to: {self.zero_zte}\n")
+
+        # Report the updated zero-track-elimination threshold.
+        self._report_update(
+            f"ZTE zero-value threshold set to: {self.zero_zte}\n"
+        )
 
     @property
-    def nsteps_zte(self) -> int:
+    def nsteps_zte(
+        self,
+    ) -> int:
         """
-        Defines the maximum number of steps to be performed in the zero-track
-        elimination (ZTE) basis truncation. Default: 10.
-        """
-        return self._nsteps_zte
-    
-    @nsteps_zte.setter
-    def nsteps_zte(self, nsteps_zte: int):
-        self._nsteps_zte = nsteps_zte
-        status(f"Maximum number of steps in ZTE set to: {self.nsteps_zte}\n")
+        Return the maximum number of steps used in ZTE basis truncation.
 
-# Instantiate the Parameters object
+        The default value is 10.
+        """
+
+        return self._nsteps_zte
+
+    @nsteps_zte.setter
+    def nsteps_zte(
+        self,
+        nsteps_zte: int,
+    ) -> None:
+        # Store the new limit for ZTE propagation steps.
+        self._nsteps_zte = nsteps_zte
+
+        # Report the updated ZTE propagation-step limit.
+        self._report_update(
+            f"Maximum number of steps in ZTE set to: {self.nsteps_zte}\n"
+        )
+
+
+# Instantiate the global parameter container.
 parameters = Parameters()

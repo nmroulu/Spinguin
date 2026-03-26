@@ -1,34 +1,105 @@
 """
-This module contains functions that are used to transform the Liouvillian into
-a rotating frame.
+Rotating-frame transformation utilities for Liouville-space dynamics.
+
+The module contains helper functions for transforming Liouvillian
+superoperators into one or more rotating frames.
 """
-# Type checking
+
 from __future__ import annotations
+
+import math
+import time
 from typing import TYPE_CHECKING
+
+import numpy as np
+import scipy.sparse as sp
+
+from spinguin._core._hide_prints import HidePrints
+from spinguin._core._la import expm, norm_1
+from spinguin._core._parameters import parameters
+from spinguin._core._specutils import resonance_frequency
+from spinguin._core._status import status
+from spinguin._core._superoperators import superoperator
+
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Imports
-import math
-import numpy as np
-import scipy.sparse as sp
-import time
-from spinguin._core._hide_prints import HidePrints
-from spinguin._core._la import norm_1, expm
-from spinguin._core._specutils import resonance_frequency
-from spinguin._core._parameters import parameters
-from spinguin._core._superoperators import superoperator
-from spinguin._core._status import status
+
+def _report_completion(
+    time_start: float,
+) -> None:
+    """
+    Report the elapsed wall-clock time of a completed task.
+
+    Usage: ``_report_completion(time_start)``.
+
+    Parameters
+    ----------
+    time_start : float
+        Start time returned by ``time.time()``.
+
+    Returns
+    -------
+    None
+        The elapsed wall-clock time is reported via the status printer.
+    """
+
+    # Report the elapsed wall-clock time of the completed operation.
+    status(f"Completed in {time.time() - time_start:.4f} seconds.")
+
+
+def _prepare_rotating_frame_inputs(
+    isotopes: list,
+    center_frequencies: list,
+    orders: list,
+) -> tuple[list, list, list]:
+    """
+    Fill missing rotating-frame input lists with default values.
+
+    Usage: ``_prepare_rotating_frame_inputs(isotopes, center_frequencies, orders)``.
+
+    Parameters
+    ----------
+    isotopes : list
+        List of isotopes for which rotating frames are requested.
+    center_frequencies : list
+        Centre frequencies in ppm.
+    orders : list
+        Rotating-frame correction orders.
+
+    Returns
+    -------
+    center_frequencies : list
+        Centre frequencies with defaults inserted where needed.
+    orders : list
+        Rotating-frame orders with defaults inserted where needed.
+    isotopes : list
+        Unmodified isotope list.
+    """
+
+    # Fill missing correction orders with the global default value.
+    if len(orders) == 0:
+        orders = [
+            parameters.rotating_frame_order
+            for _ in range(len(isotopes))
+        ]
+
+    # Fill missing centre frequencies with zeros.
+    if len(center_frequencies) == 0:
+        center_frequencies = [0 for _ in range(len(isotopes))]
+
+    return center_frequencies, orders, isotopes
 
 def _auxiliary_matrix_rotframe_expm(
     A: np.ndarray | sp.csc_array,
     B: np.ndarray | sp.csc_array,
     T: float,
-    order: int
+    order: int,
 ) -> sp.csc_array:
     """
-    Computes the matrix exponential of an auxiliary matrix that is used to
-    calculate the interaction frame Hamiltonian.
+    Compute the auxiliary-matrix exponential used in rotating-frame theory.
+
+    Usage: ``_auxiliary_matrix_rotframe_expm(A, B, T, order)``.
 
     Based on Goodwin and Kuprov (Eq. 18): https://doi.org/10.1063/1.4928978
 
@@ -49,32 +120,33 @@ def _auxiliary_matrix_rotframe_expm(
         Matrix exponential of the auxiliary matrix. The output is sparse
         regardless of the input array.
     """
-    # Convert input arrays to sparse if not already
+
+    # Convert the input blocks to sparse format if needed.
     if not sp.issparse(A):
         A = sp.csc_array(A)
     if not sp.issparse(B):
         B = sp.csc_array(B)
 
-    # Create a sparse zero-array
+    # Construct the sparse zero block used in the auxiliary matrix.
     Z = sp.csc_array(A.shape)
 
-    # Construct the auxiliary matrix
+    # Assemble the block auxiliary matrix.
     aux = []
-    for i in range(order+1):
+    for i in range(order + 1):
         row = []
-        for j in range(order+1):
+        for j in range(order + 1):
             if i == j:
                 row.append(A)
-            elif i == j-1:
+            elif i == j - 1:
                 row.append(B)
             else:
                 row.append(Z)
         aux.append(row)
-    aux = sp.block_array(aux, format='csc')
+    aux = sp.block_array(aux, format="csc")
 
-    # Compute the matrix exponential of the auxiliary matrix
+    # Evaluate the auxiliary-matrix exponential while silencing nested output.
     with HidePrints():
-        expm_aux = expm(T*aux, parameters.zero_aux)
+        expm_aux = expm(T * aux, parameters.zero_aux)
 
     return expm_aux
 
@@ -83,10 +155,12 @@ def rotating_frame(
     L: np.ndarray | sp.csc_array,
     isotopes: list,
     center_frequencies: list = [],
-    orders: list = []
+    orders: list = [],
 ) -> np.ndarray | sp.csc_array:
     """
-    Transforms the Liouvillian into the rotating frame.
+    Transform a Liouvillian into one or more rotating frames.
+
+    Usage: ``rotating_frame(spin_system, L, isotopes, center_frequencies=[], orders=[])``.
 
     Parameters
     ----------
@@ -109,10 +183,12 @@ def rotating_frame(
     L_rot : ndarray or csc_array
         Liouvillian superoperator in the rotating frame.
     """
+
+    # Report the start of the rotating-frame transformation.
     status("Transforming Liouvillian to the rotating frame...")
     time_start = time.time()
 
-    # Check list lengths
+    # Validate the basic input list lengths.
     if len(isotopes) == 0:
         raise ValueError("must specify at least one isotope")
     if not (len(orders) == len(isotopes) or len(orders) == 0):
@@ -123,32 +199,33 @@ def rotating_frame(
     ):
         raise ValueError("center_frequencies and isotopes must have same length")
     
-    # Check that the isotopes exist in the spin system
+    # Check that each requested isotope exists in the spin system.
     for isotope in isotopes:
         if isotope not in spin_system.isotopes:
             raise ValueError(f"isotope {isotope} is not in the spin system")
         
-    # Check that each given isotope is unique
+    # Check that the requested isotope labels are unique.
     if not len(isotopes) == len(set(isotopes)):
         raise ValueError("given isotopes must be unique")
-    
-    # Fill input lists with default values
-    if len(orders) == 0:
-        orders = [parameters.rotating_frame_order for _ in range(len(isotopes))]
-    if len(center_frequencies) == 0:
-        center_frequencies = [0 for _ in range(len(isotopes))]
 
-    # Frequencies for the interaction frames
+    # Fill optional inputs with default values when needed.
+    center_frequencies, orders, isotopes = _prepare_rotating_frame_inputs(
+        isotopes,
+        center_frequencies,
+        orders,
+    )
+
+    # Calculate the resonance frequencies that define the interaction frames.
     freqs = []
     for i in range(len(isotopes)):
         freq = resonance_frequency(
-            isotope = isotopes[i], 
+            isotope=isotopes[i],
             delta = center_frequencies[i],
-            unit = "rad/s"
+            unit="rad/s",
         )
         freqs.append(freq)
 
-    # Corresponding Hamiltonians
+    # Build the Hamiltonians associated with the requested rotating frames.
     H0s = []
     for i in range(len(isotopes)):
         spins = np.where(spin_system.isotopes == isotopes[i])[0]
@@ -162,29 +239,29 @@ def rotating_frame(
             H = H + freqs[i] * Iz_n
         H0s.append(H)
 
-    # Corresponding Liouvillians
+    # Convert the frame Hamiltonians to Liouvillians.
     L0s = []
     for H in H0s:
-        L0s.append(-1j*H)
+        L0s.append(-1j * H)
 
-    # Norms of the Liouvillians
+    # Calculate the norms used to determine the transformation order.
     norms = []
     for L0 in L0s:
         norms.append(norm_1(L0))
 
-    # Re-order based on the norms
+    # Reorder the transformations from largest to smallest norm.
     sort = np.flip(np.argsort(norms))
     freqs = [freqs[i] for i in sort]
     orders = [orders[i] for i in sort]
     L0s = [L0s[i] for i in sort]
     isotopes = [isotopes[i] for i in sort]
 
-    # Calculate the periods
+    # Convert the frequencies to periods.
     Ts = []
     for freq in freqs:
-        Ts.append(2*np.pi / freq)
+        Ts.append(2 * np.pi / freq)
 
-    # Apply each rotating frame
+    # Apply the requested rotating-frame transformations sequentially.
     for i in range(len(L0s)):
         status(f"\tApplying rotating frame for {isotopes[i]}...")
         L0 = L0s[i]
@@ -193,7 +270,8 @@ def rotating_frame(
         order = orders[i]
         L = _sop_L_to_rotframe(L0, L1, T, order)
 
-    status(f"Completed in {time.time() - time_start:.4f} seconds.")
+    # Report the completion of the rotating-frame transformation.
+    _report_completion(time_start)
 
     return L
 
@@ -201,11 +279,12 @@ def _sop_L_to_rotframe(
     L0: np.ndarray | sp.csc_array,
     L1: np.ndarray | sp.csc_array,
     T: float,
-    order: int
+    order: int,
 ) -> np.ndarray | sp.csc_array:
     """
-    Converts the input Liouvillian `L = L0 + L1` into a rotating frame defined
-    by `L0`.
+    Convert ``L = L0 + L1`` into the rotating frame defined by ``L0``.
+
+    Usage: ``_sop_L_to_rotframe(L0, L1, T, order)``.
 
     Based on Goodwin and Kuprov (Eq. 16): https://doi.org/10.1063/1.4928978
 
@@ -226,31 +305,35 @@ def _sop_L_to_rotframe(
     L_rot : ndarray or csc_array
         Total Liouvillian in the rotating frame.
     """
-    # Obtain the auxiliary matrix (returns a sparse array)
+
+    # Evaluate the auxiliary-matrix exponential used in the expansion.
     aux = _auxiliary_matrix_rotframe_expm(L0, L1, T, order)
 
-    # Extract the derivatives
+    # Extract the derivative-like blocks from the auxiliary matrix.
     D = []
-    for i in range(order+1):
-        aux_element = aux[:L0.shape[0], i*L0.shape[0]:(i+1)*L0.shape[0]]
+    for i in range(order + 1):
+        aux_element = aux[
+            :L0.shape[0],
+            i * L0.shape[0]:(i + 1) * L0.shape[0],
+        ]
         if not parameters.sparse_superoperator:
             aux_element = aux_element.toarray()
-        D.append(math.factorial(i)*aux_element)
+        D.append(math.factorial(i) * aux_element)
 
-    # Initialise the result
+    # Allocate the rotating-frame Liouvillian.
     if parameters.sparse_superoperator:
         L_rot = sp.csc_array(L0.shape)
     else:
         L_rot = np.zeros(shape=L0.shape)
 
-    # Build the rotating frame Liouvillian (Eq. 16)
-    for n in range(1, order+1):
-        for k in range(1, n+1):
+    # Assemble the rotating-frame Liouvillian according to Eq. 16.
+    for n in range(1, order + 1):
+        for k in range(1, n + 1):
 
-            # Get the denominator in a numerically stable manner
+            # Build the denominator of the current series contribution.
             denom = T * n * math.factorial(k - 1) * math.factorial(n - k)
 
-            # Add to the existing term
+            # Accumulate the current contribution to the rotating-frame series.
             L_rot = L_rot + D[n-k].conj().T @ D[k] / denom
 
     return L_rot

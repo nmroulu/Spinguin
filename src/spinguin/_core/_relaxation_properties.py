@@ -1,38 +1,46 @@
 """
-This module provides a RelaxationProperties class that stores information on the
-relaxation theory settings. It is assigned as part of `SpinSystem` upon its
-instantiation. The relaxation properties can be accessed as follows::
+Relaxation-property definitions attached to a spin system.
 
-    import spinguin as sg                       # Import the package     
-    spin_system = sg.SpinSystem(["1H"])         # Create an example spin system
-    spin_system.relaxation.theory = "redfield"  # Set relaxation theory
+The module provides the `RelaxationProperties` class, which stores the
+relaxation-theory settings associated with a `SpinSystem` instance. The
+properties may be accessed as follows::
+
+    import spinguin as sg
+    spin_system = sg.SpinSystem(["1H"])
+    spin_system.relaxation.theory = "redfield"
 """
 
-# Referencing SpinSystem class
 from __future__ import annotations
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from spinguin._core._spin_system import SpinSystem
 
-# Imports
+from typing import TYPE_CHECKING, Literal
+
 import numpy as np
-from typing import Literal
+
 from spinguin._core._data_io import read_array
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._molecule import Molecule
+from spinguin._core._relaxation import (
+    rotational_correlation_time_SED,
+    rotational_correlation_times_Perrin,
+)
 from spinguin._core._status import status
-from spinguin._core._relaxation import rotational_correlation_time_SED, rotational_correlation_times_Perrin
+
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
+
 
 class RelaxationProperties:
     """
-    This class stores information on the relaxation properties of a spin system.
+    Store the relaxation settings associated with a spin system.
+
+    Usage: ``RelaxationProperties(spin_system)``.
     """
 
-    # Relaxation properties
-    _antisymmetric: bool=False
-    _dynamic_frequency_shift: bool=False
+    # Store the default relaxation settings at class level.
+    _antisymmetric: bool = False
+    _dynamic_frequency_shift: bool = False
     _relative_error: float = 1e-6
-    _sr2k: bool=False
+    _sr2k: bool = False
     _tau_c: float | np.ndarray = None
     _theory: Literal["redfield", "phenomenological"] = None
     _thermalization: bool = False
@@ -40,188 +48,392 @@ class RelaxationProperties:
     _T2: np.ndarray = None
     _molecule: Molecule = None
 
-    def __init__(self, spin_system: SpinSystem):
+    def __init__(
+        self,
+        spin_system: SpinSystem,
+    ) -> None:
+        """
+        Initialise the relaxation settings for a spin system.
 
-        # Store a reference to the SpinSystem
+        Usage: ``RelaxationProperties(spin_system)``.
+
+        Parameters
+        ----------
+        spin_system : SpinSystem
+            Spin system to which the relaxation settings belong.
+
+        Returns
+        -------
+        None
+            The instance is initialised in place.
+        """
+
+        # Store a reference to the parent spin system.
         self._spin_system = spin_system
 
-    @property
-    def antisymmetric(self) -> bool:
+    def _convert_relaxation_array(
+        self,
+        values: list | tuple | np.ndarray | str,
+        name: str,
+    ) -> np.ndarray:
         """
-        Specifies whether to consider the antisymmetric part of the interaction
-        tensors in the Redfield relaxation theory. Default: False.
+        Convert file or array-like relaxation data to a NumPy array.
+
+        Usage: ``self._convert_relaxation_array(values, name)``.
+
+        Parameters
+        ----------
+        values : list or tuple or ndarray or str
+            Input relaxation data or a path to a text file.
+        name : str
+            Name of the relaxation quantity for error reporting.
+
+        Returns
+        -------
+        values : ndarray
+            One-dimensional NumPy array of floating-point values.
         """
-        return self._antisymmetric
-    
-    @antisymmetric.setter
-    def antisymmetric(self, antisymmetric: bool):
-        self._antisymmetric = antisymmetric
-        status("Antisymmetric part of the interaction tensors set to: "
-              f"{self.antisymmetric}\n")
+
+        # Read relaxation data from a text file when a path is provided.
+        if isinstance(values, str):
+            values = read_array(values, data_type=float)
+
+        # Convert array-like relaxation data to a NumPy array.
+        elif isinstance(values, (list, tuple, np.ndarray)):
+            values = arraylike_to_array(values)
+
+        # Reject unsupported input types explicitly.
+        else:
+            raise TypeError(
+                f"{name} should be a one-dimensional array or a string."
+            )
+
+        return values
+
+    def _validate_positive_spin_array(
+        self,
+        values: np.ndarray,
+        name: str,
+    ) -> None:
+        """
+        Validate the shape and positivity of spin-resolved input data.
+
+        Usage: ``self._validate_positive_spin_array(values, name)``.
+
+        Parameters
+        ----------
+        values : ndarray
+            Array to validate.
+        name : str
+            Name of the relaxation quantity for error reporting.
+
+        Returns
+        -------
+        None
+            The input is validated in place.
+        """
+
+        # Check that the array length matches the number of spins.
+        if values.shape != self._spin_system.isotopes.shape:
+            raise ValueError(
+                f"Mismatch between the given {name} values and the "
+                "number of spins in the system."
+            )
+
+        # Check that all relaxation values are strictly positive.
+        if np.min(values) <= 0:
+            raise ValueError(f"{name} cannot be zero or negative.")
 
     @property
-    def dynamic_frequency_shift(self) -> bool:
+    def antisymmetric(
+        self,
+    ) -> bool:
         """
-        Specifies whether to include the dynamic frequency shift in the Redfield
-        relaxation theory. This corresponds to the imaginary part of the
-        relaxation superoperator. Default: False.
+        Return whether antisymmetric interaction tensors are included.
+
+        This option applies to Redfield relaxation theory. The default value is
+        ``False``.
         """
-        return self._dynamic_frequency_shift
-    
-    @dynamic_frequency_shift.setter
-    def dynamic_frequency_shift(self, dynamic_frequency_shift: bool):
-        self._dynamic_frequency_shift = dynamic_frequency_shift
-        status("Dynamic frequency shift set to: "
-              f"{self.dynamic_frequency_shift}\n")
-        
+
+        return self._antisymmetric
+
+    @antisymmetric.setter
+    def antisymmetric(
+        self,
+        antisymmetric: bool,
+    ) -> None:
+        # Store the antisymmetric-interaction setting.
+        self._antisymmetric = antisymmetric
+
+        # Report the updated antisymmetric-interaction setting.
+        status(
+            "Antisymmetric part of the interaction tensors set to: "
+            f"{self.antisymmetric}\n"
+        )
+
     @property
-    def relative_error(self) -> float:
+    def dynamic_frequency_shift(
+        self,
+    ) -> bool:
         """
-        Specifies the relative error for the Redfield relaxation theory. This
-        corresponds to the convergence criterion for the Redfield integral.
-        Default: 1e-6.
+        Return whether the dynamic frequency shift is included.
+
+        This option applies to Redfield relaxation theory and corresponds to the
+        imaginary part of the relaxation superoperator. The default value is
+        ``False``.
         """
+
+        return self._dynamic_frequency_shift
+
+    @dynamic_frequency_shift.setter
+    def dynamic_frequency_shift(
+        self,
+        dynamic_frequency_shift: bool,
+    ) -> None:
+        # Store the dynamic-frequency-shift setting.
+        self._dynamic_frequency_shift = dynamic_frequency_shift
+
+        # Report the updated dynamic-frequency-shift setting.
+        status(
+            "Dynamic frequency shift set to: "
+            f"{self.dynamic_frequency_shift}\n"
+        )
+
+    @property
+    def relative_error(
+        self,
+    ) -> float:
+        """
+        Return the relative error used in Redfield calculations.
+
+        This value acts as the convergence criterion for the Redfield integral.
+        The default value is ``1e-6``.
+        """
+
         return self._relative_error
-    
+
     @relative_error.setter
-    def relative_error(self, relative_error: float):
+    def relative_error(
+        self,
+        relative_error: float,
+    ) -> None:
+        # Store the Redfield relative-error threshold.
         self._relative_error = relative_error
+
+        # Report the updated Redfield relative-error threshold.
         status(f"Relative error set to: {self.relative_error}\n")
 
     @property
-    def sr2k(self) -> bool:
+    def sr2k(
+        self,
+    ) -> bool:
         """
-        Specifies whether to include the scalar relaxation of the second kind
-        (SR2K) in the relaxation superoperator. Default: False.
+        Return whether scalar relaxation of the second kind is included.
+
+        The default value is ``False``.
         """
+
         return self._sr2k
-    
+
     @sr2k.setter
-    def sr2k(self, sr2k: bool):
+    def sr2k(
+        self,
+        sr2k: bool,
+    ) -> None:
+        # Store the SR2K setting.
         self._sr2k = sr2k
+
+        # Report the updated SR2K setting.
         status(f"SR2K set to: {self.sr2k}\n")
 
     @property
-    def tau_c(self) -> float | np.ndarray:
+    def tau_c(
+        self,
+    ) -> float | np.ndarray:
         """
-        Specifies the correlation time(s) for the Redfield relaxation theory.
+        Return the rotational correlation time or times.
 
         For isotropic rotational diffusion, a single value is used. Example::
 
             spin_system.relaxation.tau_c = 50e-12
 
         For anisotropic rotational diffusion, an array of three values is used,
-        corresponding to the principal components of the diffusion tensor. Example::
+        corresponding to the principal components of the diffusion tensor.
+        Example::
 
             spin_system.relaxation.tau_c = [50e-12, 100e-12, 150e-12]
         """
+
         return self._tau_c
-    
+
     @tau_c.setter
-    def tau_c(self, tau_c: float | list[float] | tuple[float, ...] | np.ndarray):
+    def tau_c(
+        self,
+        tau_c: float | list[float] | tuple[float, ...] | np.ndarray,
+    ) -> None:
+        # Store a single isotropic correlation time.
         if isinstance(tau_c, (float, int)):
             self._tau_c = float(tau_c)
+
+        # Store three anisotropic principal-axis correlation times.
         elif isinstance(tau_c, (list, tuple)) and len(tau_c) == 3:
-            self._tau_c = np.array([float(x) for x in tau_c])
+            self._tau_c = np.array([float(value) for value in tau_c])
+
+        # Store an anisotropic correlation-time array directly.
         elif isinstance(tau_c, np.ndarray) and tau_c.shape == (3,):
             self._tau_c = tau_c.astype(float)
+
+        # Reject unsupported correlation-time input formats.
         else:
-            raise ValueError("tau_c must be either a single float (for isotropic "
-                             "rotational diffusion) or a list/tuple of three floats "
-                             "(for anisotropic rotational diffusion) or a numpy array "
-                             "of shape (3,).")
-        status("Rotational correlation time(s) set to: " f"{self.tau_c}\n")
-        
-    def auto_tau_c(self, 
-                   T: float, 
-                   eta: float, 
-                   model: Literal["iso", "aniso"] = "iso",
-                   r: float = None, 
-                   scaling_factor: float = 1.0) -> float | np.ndarray:
+            raise ValueError(
+                "tau_c must be either a single float for isotropic rotational "
+                "diffusion or three values for anisotropic rotational diffusion."
+            )
+
+        # Report the updated rotational correlation time or times.
+        status(f"Rotational correlation time(s) set to: {self.tau_c}\n")
+
+    def auto_tau_c(
+        self,
+        T: float,
+        eta: float,
+        model: Literal["iso", "aniso"] = "iso",
+        r: float = None,
+        scaling_factor: float = 1.0,
+    ) -> None:
         """
-        Automatically calculates the rotational correlation time(s) for the relaxation theory
-        using either the Stokes-Einstein-Debye relation for isotropic rotational diffusion
-        or the Perrin theory for anisotropic rotational diffusion.
+        Automatically assign rotational correlation time or times.
+
+        Usage: ``auto_tau_c(T, eta, model="iso", r=None, scaling_factor=1.0)``.
+
+        The correlation time is evaluated either from the
+        Stokes-Einstein-Debye relation for isotropic rotational diffusion or
+        from Perrin theory for anisotropic rotational diffusion.
 
         Parameters
         ----------
         T : float
-            Temperature in Kelvin.
+            Temperature in kelvin.
         eta : float
-            Viscosity of the solvent in Pascal-seconds (Pa·s).
-        model : str, optional
-            Specifies the model to use for calculating the rotational correlation time(s).
-            Can be either "iso" for isotropic or "aniso" for anisotropic. Default is "iso".
-        r : float, optional
-            Effective hydrodynamic radius of the molecule in meters (m). Required for isotropic model.
-        scaling_factor : float, optional
-            Scaling factor for the rotational diffusion constants. Default is 1.0.
-            Useful for adjusting the correlation times to better match experimental data.
+            Viscosity of the solvent in pascal-seconds.
+        model : {"iso", "aniso"}, default="iso"
+            Rotational-diffusion model used in the calculation.
+        r : float, default=None
+            Effective hydrodynamic radius in metres. Required for the isotropic
+            model.
+        scaling_factor : float, default=1.0
+            Scaling factor applied to the calculated correlation times.
 
         Returns
         -------
-        tau_c : float or np.ndarray
-            Rotational correlation time(s) in seconds (s). A single float for isotropic
-            diffusion or a NumPy array of shape (3,) for anisotropic diffusion.
+        None
+            The calculated value is stored in ``tau_c``.
+
+        Raises
+        ------
+        ValueError
+            Raised if the required model-specific inputs are missing or if
+            ``model`` is invalid.
         """
+
+        # Use the isotropic Stokes-Einstein-Debye relation when requested.
         if model == "iso":
             if r is None:
-                raise ValueError("Hydrodynamic radius 'r' must be provided for isotropic model.")
-            self.tau_c = rotational_correlation_time_SED(T, eta, r, 2) * scaling_factor
+                raise ValueError(
+                    "Hydrodynamic radius 'r' must be provided for the isotropic "
+                    "model."
+                )
+            self.tau_c = (
+                rotational_correlation_time_SED(T, eta, r, 2)
+                * scaling_factor
+            )
+
+        # Use Perrin theory for anisotropic rotational diffusion.
         elif model == "aniso":
             if self.molecule is None:
-                raise ValueError("Molecule must be assigned to the 'molecule' attribute "
-                                 "before calling auto_tau_c with anisotropic model.")
+                raise ValueError(
+                    "Molecule must be assigned to the 'molecule' attribute "
+                    "before calling auto_tau_c with the anisotropic model."
+                )
             self.tau_c = rotational_correlation_times_Perrin(
-                self.molecule.masses, 
+                self.molecule.masses,
                 self.molecule.xyz,
                 T,
                 eta,
-                2
+                2,
             ) * scaling_factor
+
+        # Reject unsupported rotational-diffusion models.
         else:
             raise ValueError("Model must be either 'iso' or 'aniso'.")
 
     @property
-    def theory(self) -> str:
+    def theory(
+        self,
+    ) -> str:
         """
-        Specifies the relaxation theory to be used. Can be either "redfield" or
-        "phenomenological".
+        Return the selected relaxation theory.
+
+        Supported values are ``"redfield"`` and ``"phenomenological"``.
         """
+
         return self._theory
-    
+
     @theory.setter
-    def theory(self, theory: Literal["redfield", "phenomenological"]):
+    def theory(
+        self,
+        theory: Literal["redfield", "phenomenological"],
+    ) -> None:
+        # Validate the requested relaxation-theory label.
         if theory not in ["redfield", "phenomenological"]:
-            raise ValueError("Relaxation theory must be 'redfield' or "
-                             "'phenomenological'.")
+            raise ValueError(
+                "Relaxation theory must be 'redfield' or 'phenomenological'."
+            )
+
+        # Store the selected relaxation theory.
         self._theory = theory
+
+        # Report the updated relaxation-theory selection.
         status(f"Relaxation theory set to: {self.theory}\n")
 
     @property
-    def thermalization(self) -> bool:
+    def thermalization(
+        self,
+    ) -> bool:
         """
-        Specifies whether to apply Levitt-di Bari thermalization to the
-        relaxation superoperator. Default: False.
+        Return whether Levitt-di Bari thermalization is applied.
+
+        The default value is ``False``.
         """
+
         return self._thermalization
-    
+
     @thermalization.setter
-    def thermalization(self, thermalization: bool):
+    def thermalization(
+        self,
+        thermalization: bool,
+    ) -> None:
+        # Store the thermalization setting.
         self._thermalization = thermalization
+
+        # Report the updated thermalization setting.
         status(f"Thermalization set to: {self.thermalization}\n")
 
     @property
-    def T1(self) -> np.ndarray:
+    def T1(
+        self,
+    ) -> np.ndarray:
         """
-        Specifies the longitudinal relaxation time constants for each spin.
-        These are used to create the phenomenological relaxation superoperator.
-        Two input types are supported:
+        Return the longitudinal relaxation time constants for each spin.
 
-        - If `ArrayLike`: A 1D array of size N containing T1 times.
-        - If `str`: Path to the file containing the T1 times.
+        These values are used to construct the phenomenological relaxation
+        superoperator. Two input types are supported:
 
-        The input will be converted and stored as a NumPy array.
+        - If `ArrayLike`: a one-dimensional array of size ``N`` containing
+          ``T1`` values.
+        - If `str`: path to the file containing the ``T1`` values.
+
+        The input is converted and stored as a NumPy array.
 
         Examples::
 
@@ -230,45 +442,40 @@ class RelaxationProperties:
 
             # Using string input
             spin_system.relaxation.T1 = "/path/to/the/file/T1.txt"
-
         """
-        return self._T1
-    
-    @T1.setter
-    def T1(self, T1: list | tuple | np.ndarray | str):
-        # Handle string input
-        if isinstance(T1, str):
-            T1 = read_array(T1, data_type=float)
-            
-        # Handle array like input
-        elif isinstance(T1, (list, tuple, np.ndarray)):
-            T1 = arraylike_to_array(T1)
 
-        # Otherwise throw an error
-        else:
-            raise TypeError("T1 should be a 1-dimensional array or a string.")
-        
-        # Check that the input is valid
-        if T1.shape != self._spin_system.isotopes.shape:
-            raise ValueError("Mismatch between the given T1 times and the "
-                             "number of spins in the system.")
-        if np.min(T1) <= 0:
-            raise ValueError("T1 cannot be zero or negative.")
-        
+        return self._T1
+
+    @T1.setter
+    def T1(
+        self,
+        T1: list | tuple | np.ndarray | str,
+    ) -> None:
+        # Convert the T1 input to a validated NumPy array.
+        T1 = self._convert_relaxation_array(T1, "T1")
+        self._validate_positive_spin_array(T1, "T1")
+
+        # Store the longitudinal relaxation times.
         self._T1 = T1
+
+        # Report the updated longitudinal relaxation times.
         status(f"T1 set to: {self.T1}\n")
 
     @property
-    def T2(self) -> np.ndarray:
+    def T2(
+        self,
+    ) -> np.ndarray:
         """
-        Specifies the transverse relaxation time constants for each spin. These
-        are used to create the phenomenological relaxation superoperator.
-        Two input types are supported:
+        Return the transverse relaxation time constants for each spin.
 
-        - If `ArrayLike`: A 1D array of size N containing T2 times.
-        - If `str`: Path to the file containing the T2 times.
+        These values are used to construct the phenomenological relaxation
+        superoperator. Two input types are supported:
 
-        The input will be converted and stored as a NumPy array.
+        - If `ArrayLike`: a one-dimensional array of size ``N`` containing
+          ``T2`` values.
+        - If `str`: path to the file containing the ``T2`` values.
+
+        The input is converted and stored as a NumPy array.
 
         Examples::
 
@@ -278,44 +485,39 @@ class RelaxationProperties:
             # Using string input
             spin_system.relaxation.T2 = "/path/to/the/file/T2.txt"
         """
-        return self._T2
-    
-    @T2.setter
-    def T2(self, T2: list | tuple | np.ndarray | str):
-        # Handle string input
-        if isinstance(T2, str):
-            T2 = read_array(T2, data_type=float)
-            
-        # Handle array like input
-        elif isinstance(T2, (list, tuple, np.ndarray)):
-            T2 = arraylike_to_array(T2)
 
-        # Otherwise throw an error
-        else:
-            raise TypeError("T2 should be a 1-dimensional array or a string.")
-    
-        # Check that the input is valid
-        if T2.shape != self._spin_system.isotopes.shape:
-            raise ValueError("Mismatch between the given T2 times and the "
-                             "number of spins in the system.")
-        if np.min(T2) <= 0:
-            raise ValueError("T2 cannot be zero or negative.")
-        
+        return self._T2
+
+    @T2.setter
+    def T2(
+        self,
+        T2: list | tuple | np.ndarray | str,
+    ) -> None:
+        # Convert the T2 input to a validated NumPy array.
+        T2 = self._convert_relaxation_array(T2, "T2")
+        self._validate_positive_spin_array(T2, "T2")
+
+        # Store the transverse relaxation times.
         self._T2 = T2
+
+        # Report the updated transverse relaxation times.
         status(f"T2 set to: {self.T2}\n")
 
     @property
-    def R1(self) -> np.ndarray:
+    def R1(
+        self,
+    ) -> np.ndarray:
         """
-        Specifies the longitudinal relaxation rates for each spin. These are
-        used to create the phenomenological relaxation superoperator. Two input
-        types are supported:
+        Return the longitudinal relaxation rates for each spin.
 
-        - If `ArrayLike`: A 1D array of size N containing R1 rates.
-        - If `str`: Path to the file containing the R1 rates.
+        These values are used to construct the phenomenological relaxation
+        superoperator. Two input types are supported:
 
-        The input will be stored as a NumPy array. Note that this attribute is
-        linked with T1 by the following relation: R1 = 1/T1.
+        - If `ArrayLike`: a one-dimensional array of size ``N`` containing
+          ``R1`` values.
+        - If `str`: path to the file containing the ``R1`` values.
+
+        The input is stored indirectly through the relation ``R1 = 1 / T1``.
 
         Examples::
 
@@ -325,44 +527,39 @@ class RelaxationProperties:
             # Using string input
             spin_system.relaxation.R1 = "/path/to/the/file/R1.txt"
         """
+
         return 1 / self.T1
-    
+
     @R1.setter
-    def R1(self, R1: list | tuple | np.ndarray | str):
-        # Handle string input
-        if isinstance(R1, str):
-            R1 = read_array(R1, data_type=float)
-            
-        # Handle array like input
-        elif isinstance(R1, (list, tuple, np.ndarray)):
-            R1 = arraylike_to_array(R1)
+    def R1(
+        self,
+        R1: list | tuple | np.ndarray | str,
+    ) -> None:
+        # Convert the R1 input to a validated NumPy array.
+        R1 = self._convert_relaxation_array(R1, "R1")
+        self._validate_positive_spin_array(R1, "R1")
 
-        # Otherwise throw an error
-        else:
-            raise TypeError("R1 should be a 1-dimensional array or a string.")
-        
-        # Check that the input is valid
-        if R1.shape != self._spin_system.isotopes.shape:
-            raise ValueError("Mismatch between the given R1 rates and the "
-                             "number of spins in the system.")
-        if np.min(R1) <= 0:
-            raise ValueError("R1 cannot be zero or negative.")
-        
-        self._T1 = 1/R1
+        # Store the corresponding longitudinal relaxation times.
+        self._T1 = 1 / R1
+
+        # Report the updated longitudinal relaxation rates.
         status(f"R1 set to: {self.R1}\n")
-    
+
     @property
-    def R2(self) -> np.ndarray:
+    def R2(
+        self,
+    ) -> np.ndarray:
         """
-        Specifies the transverse relaxation rates for each spin. These are used
-        to create the phenomenological relaxation superoperator. Two input types
-        are supported:
+        Return the transverse relaxation rates for each spin.
 
-        - If `ArrayLike`: A 1D array of size N containing R2 rates.
-        - If `str`: Path to the file containing the R2 rates.
+        These values are used to construct the phenomenological relaxation
+        superoperator. Two input types are supported:
 
-        The input will be stored as a NumPy array. Note that this attribute is
-        linked with T2 by the following relation: R2 = 1/T2.
+        - If `ArrayLike`: a one-dimensional array of size ``N`` containing
+          ``R2`` values.
+        - If `str`: path to the file containing the ``R2`` values.
+
+        The input is stored indirectly through the relation ``R2 = 1 / T2``.
 
         Examples::
 
@@ -372,45 +569,47 @@ class RelaxationProperties:
             # Using string input
             spin_system.relaxation.R2 = "/path/to/the/file/R2.txt"
         """
+
         return 1 / self.T2
 
     @R2.setter
-    def R2(self, R2: list | tuple | np.ndarray | str):
-        # Handle string input
-        if isinstance(R2, str):
-            R2 = read_array(R2, data_type=float)
-            
-        # Handle array like input
-        elif isinstance(R2, (list, tuple, np.ndarray)):
-            R2 = arraylike_to_array(R2)
+    def R2(
+        self,
+        R2: list | tuple | np.ndarray | str,
+    ) -> None:
+        # Convert the R2 input to a validated NumPy array.
+        R2 = self._convert_relaxation_array(R2, "R2")
+        self._validate_positive_spin_array(R2, "R2")
 
-        # Otherwise throw an error
-        else:
-            raise TypeError("R2 should be a 1-dimensional array or a string.")
-        
-        # Check that the input is valid
-        if R2.shape != self._spin_system.isotopes.shape:
-            raise ValueError("Mismatch between the given R2 rates and the "
-                             "number of spins in the system.")
-        if np.min(R2) <= 0:
-            raise ValueError("R2 cannot be zero or negative.")
-        
-        self._T2 = 1/R2
+        # Store the corresponding transverse relaxation times.
+        self._T2 = 1 / R2
+
+        # Report the updated transverse relaxation rates.
         status(f"R2 set to: {self.R2}\n")
 
     @property
-    def molecule(self) -> Molecule:
+    def molecule(
+        self,
+    ) -> Molecule:
         """
-        Molecule that the spin system to be simulated is part of. Used to
-        define the rotational principal axes.
+        Return the molecule associated with the spin system.
+
+        The molecule is used to define the rotational principal axes.
         """
+
         return self._molecule
-    
+
     @molecule.setter
-    def molecule(self, molecule: Molecule):
-        # Check that the input is valid
+    def molecule(
+        self,
+        molecule: Molecule,
+    ) -> None:
+        # Validate the assigned molecule object.
         if not isinstance(molecule, Molecule):
             raise ValueError("Invalid input type for molecule.")
-        
+
+        # Store the molecular structure used in relaxation calculations.
         self._molecule = molecule
+
+        # Report that a molecule has been assigned.
         status("Molecule has been assigned.\n")
