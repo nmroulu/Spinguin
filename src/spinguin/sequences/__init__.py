@@ -1,5 +1,5 @@
 """
-This is a subpackage of Spinguin that contains ready-to-use pulse sequences.
+Ready-to-use pulse-sequence helpers provided by Spinguin.
 """
 
 from ._inversion_recovery import inversion_recovery

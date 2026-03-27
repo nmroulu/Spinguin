@@ -1,21 +1,28 @@
+"""
+Inversion-recovery pulse sequence with continuous recovery detection.
+"""
+
 # Imports
 from copy import deepcopy
 import numpy as np
 import spinguin._core as sg
 
+
 def inversion_recovery(
     spin_system: sg.SpinSystem,
     isotope: str,
     npoints: int,
-    time_step: float
-) -> tuple[np.ndarray, np.ndarray]:
+    time_step: float,
+) -> np.ndarray:
     """
-    Performs the inversion-recovery experiment. The experiment differs slightly
-    from the actual inversion-recovery experiments performed on spectrometers.
-    In this experiment, the inversion is performed only once, and the
-    magnetization is detected at each step during the recovery (much faster).
-    
-    If the traditional inversion recovery is desired, use the function
+    Perform an inversion-recovery experiment with direct recovery monitoring.
+
+    This implementation differs slightly from a conventional spectrometer
+    experiment. The inversion pulse is applied only once, and the recovery is
+    monitored continuously by measuring the longitudinal magnetisation at each
+    simulated time step.
+
+    If a traditional inversion-recovery experiment is desired, use
     `inversion_recovery_fid()`.
 
     This experiment requires the following spin system properties to be defined:
@@ -32,27 +39,34 @@ def inversion_recovery(
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system to which the inversion-recovery experiment is performed.
+        Spin system on which the inversion-recovery experiment is performed.
     isotope : str
-        Specifies the isotope, for example "1H", whose magnetization is inverted
-        and detected. This function applies hard pulses.
+        Isotope, for example `'1H'`, whose longitudinal magnetisation is
+        inverted and detected. Hard pulses are applied.
     npoints : int
         Number of points in the simulation. Defines the total simulation time
         together with `time_step`.
     time_step : float
-        Time step in the simulation (in seconds). Should be kept relatively
-        short (e.g. 1 ms).
+        Time step in the simulation, in seconds. This should usually be kept
+        relatively short, for example 1 ms.
 
     Returns
     -------
     magnetizations : ndarray
-        Two-dimensional array of size (nspins, npoints) containing the
-        observed z-magnetizations for each spin at various times.
+        Two-dimensional array of shape `(nspins, npoints)` containing the
+        observed z-magnetisations for the selected spins at each time point.
+
+    Raises
+    ------
+    ValueError
+        Raised if the basis, relaxation settings, magnetic field, or
+        temperature required by the sequence have not been defined.
     """
-    # Operate on a copy of the SpinSystem object
+
+    # Operate on a copy so that truncation does not modify the input object.
     spin_system = deepcopy(spin_system)
 
-    # Check that the required attributes have been set
+    # Check that the sequence prerequisites have been defined.
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before using "
                          "inversion recovery.")
@@ -69,37 +83,40 @@ def inversion_recovery(
         raise ValueError("Please set the temperature before using "
                          "inversion recovery.")
 
-    # Obtain the Liouvillian
+    # Construct the Liouvillian governing the spin dynamics.
     H = sg.hamiltonian(spin_system)
     R = sg.relaxation(spin_system)
     L = sg.liouvillian(H, R)
 
-    # Obtain the equilibrium state
+    # Construct the thermal-equilibrium state.
     rho = sg.equilibrium_state(spin_system)
 
-    # Find indices of the isotopes to be measured
+    # Identify the spins whose magnetisation is inverted and detected.
     indices = np.where(spin_system.isotopes == isotope)[0]
     nspins = indices.shape[0]
 
-    # Apply 180-degree pulse
+    # Apply a hard 180-degree pulse to the selected isotope channel.
     operator = "+".join(f"I(x,{i})" for i in indices)
     P180 = sg.pulse(spin_system, operator, 180)
     rho = P180 @ rho
 
-    # Change to ZQ-basis to speed up the calculations
+    # Restrict the dynamics to the zero-quantum basis for efficiency.
     L, rho = spin_system.basis.truncate_by_coherence([0], L, rho)
 
-    # Construct the time propagator
+    # Construct the propagator for one simulation time step.
     P = sg.propagator(L, time_step)
 
-    # Initialize an array for storing results
+    # Allocate the array used to store the longitudinal magnetisations.
     magnetizations = np.zeros((nspins, npoints), dtype=complex)
 
-    # Perform the time evolution
+    # Propagate the state and record the longitudinal magnetisation.
     for step in range(npoints):
         for i, idx in enumerate(indices):
-            magnetizations[i, step] = \
-                sg.measure(spin_system, rho, f"I(z,{idx})")
+            magnetizations[i, step] = sg.measure(
+                spin_system,
+                rho,
+                f"I(z,{idx})",
+            )
         rho = P @ rho
 
     return magnetizations
