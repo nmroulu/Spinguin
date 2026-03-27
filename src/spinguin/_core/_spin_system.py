@@ -1,23 +1,34 @@
 """
 spin_system.py
 
-Defines a class for the spin system. Once a spin system is initialized, other
-modules can be used to calculate its properties.
+Defines the `SpinSystem` class, which stores isotope identities together with
+the spin-resolved data required for Hamiltonian and relaxation calculations.
 """
 
 # Imports
+from __future__ import annotations
+
+from typing import Callable, Self
+
 import numpy as np
-from spinguin._core._basis import Basis
-from spinguin._core._relaxation_properties import RelaxationProperties
+
 from spinguin._core._data_io import read_array, read_tensors, read_xyz
+from spinguin._core._basis import Basis
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._relaxation_properties import RelaxationProperties
 from spinguin._core._status import status
-from typing import Self
+
+
+ArrayInput = list | tuple | np.ndarray | str
+OptionalArray = np.ndarray | None
+
 
 class SpinSystem:
     """
-    Initializes a spin system with the given `isotopes`. Examples::
+    Store the isotopes and associated data of a spin system.
+
+    Examples::
 
         spin_system = SpinSystem(['1H', '15N', '19F'])
         spin_system = SpinSystem("/path/to/isotopes.txt")
@@ -35,139 +46,258 @@ class SpinSystem:
           strings. 
         - If `str`: Path to the file containing the isotopes.
 
-        The input will be converted and stored as a NumPy array.  
+        The input is converted and stored as a NumPy array.
     """
 
-    def __init__(self, isotopes: list | tuple | np.ndarray | str):
+    def __init__(
+        self,
+        isotopes: ArrayInput,
+    ) -> None:
+        """
+        Initialise a spin system from isotope labels.
 
-        # Assign the isotopes
-        if isinstance(isotopes, str):
-            self._isotopes = read_array(isotopes, data_type=str)
-        elif isinstance(isotopes, (list, tuple, np.ndarray)):
-            self._isotopes = arraylike_to_array(isotopes)
-        else:
-            raise TypeError("Isotopes should be a 1-dimensional array or a "
-                            "string.")
-        
-        # Set the other spin system properties
+        Parameters
+        ----------
+        isotopes : list or tuple or ndarray or str
+            One-dimensional isotope labels, or a path to a file containing
+            them.
+
+        Returns
+        -------
+        None
+            The instance is initialised in place.
+        """
+
+        # Store the isotope labels as a NumPy array.
+        self._isotopes = self._read_spin_data(
+            isotopes,
+            name="Isotopes",
+            ndim_description="1-dimensional",
+            file_reader=read_array,
+            data_type=str,
+        )
+
+        # Initialise the remaining spin-resolved properties.
         self._chemical_shifts = np.zeros(self.nspins)
         self._J_couplings = np.zeros((self.nspins, self.nspins))
-        self._xyz: np.ndarray = None
-        self._shielding: np.ndarray = None
-        self._efg: np.ndarray = None
+        self._xyz: OptionalArray = None
+        self._shielding: OptionalArray = None
+        self._efg: OptionalArray = None
 
-        # Check consistency
+        # Validate the newly initialised object state.
         self._check_consistency()
 
-        # Initialize basis set
+        # Create the basis-set handler for the spin system.
         self._basis = Basis(self)
 
-        # Initialize relaxation theory settings
+        # Create the relaxation settings for the spin system.
         self._relaxation = RelaxationProperties(self)
 
+        # Report the newly created spin system.
         status("Spin system has been created with the following isotopes:")
         status(f"{self.isotopes}\n")
 
-    def _check_consistency(self):
+    def _read_spin_data(
+        self,
+        values: ArrayInput,
+        name: str,
+        ndim_description: str,
+        file_reader: Callable,
+        data_type: type | None=None,
+    ) -> np.ndarray:
         """
-        This method checks the consistency of the SpinSystem object by comparing
-        the shapes of the attributes.
+        Convert file-based or array-like input to a NumPy array.
+
+        Parameters
+        ----------
+        values : list or tuple or ndarray or str
+            Input values or a path to a text file.
+        name : str
+            Name of the quantity for error reporting.
+        ndim_description : str
+            Human-readable description of the required array dimensionality.
+        file_reader : callable
+            Reader used when `values` is supplied as a file path.
+        data_type : type or None, default=None
+            Optional data type passed to `read_array`.
+
+        Returns
+        -------
+        ndarray
+            Converted NumPy array.
+
+        Raises
+        ------
+        TypeError
+            Raised if `values` is neither array-like nor a string.
         """
-        
-        # Check that the isotopes array is one-dimensional
+
+        # Read values from file when a path is supplied.
+        if isinstance(values, str):
+            if data_type is None:
+                return file_reader(values)
+            return file_reader(values, data_type=data_type)
+
+        # Convert array-like input directly to a NumPy array.
+        if isinstance(values, (list, tuple, np.ndarray)):
+            return arraylike_to_array(values)
+
+        # Reject unsupported input types explicitly.
+        raise TypeError(
+            f"{name} should be a {ndim_description} array or a string."
+        )
+
+    def _validate_optional_shape(
+        self,
+        values: OptionalArray,
+        expected_shape: tuple[int, ...],
+        error_message: str,
+    ) -> None:
+        """
+        Validate the shape of an optional spin-resolved array.
+
+        Parameters
+        ----------
+        values : ndarray or None
+            Array to be validated. `None` is accepted without checks.
+        expected_shape : tuple of int
+            Shape required for the given quantity.
+        error_message : str
+            Error message raised when the shape does not match.
+
+        Returns
+        -------
+        None
+            Validation is performed for its side effect only.
+
+        Raises
+        ------
+        ValueError
+            Raised if `values` is not `None` and the shape is incorrect.
+        """
+
+        # Accept missing optional arrays without further validation.
+        if values is None:
+            return
+
+        # Reject arrays whose shape does not match the expected one.
+        if values.shape != expected_shape:
+            raise ValueError(error_message)
+
+    def _check_consistency(self) -> None:
+        """
+        Check that the stored spin-system data are internally consistent.
+
+        Returns
+        -------
+        None
+            Validation is performed for its side effect only.
+        """
+
+        # Check that the isotope labels form a one-dimensional array.
         if self.isotopes.ndim != 1:
             raise ValueError("Isotopes must be a 1D array containing the "
                              "names of the isotopes as strings.")
 
-        # Check that each isotope exists in the dictionary
+        # Check that every isotope label is defined in the isotope table.
         for isotope in self.isotopes:
             if isotope not in ISOTOPES:
                 raise ValueError(f"Isotope '{isotope}' is not defined in the "
                                  "ISOTOPES dictionary.")
 
-        # Check that the chemical shifts array is of correct size
-        if self.chemical_shifts is not None:
-            if self.chemical_shifts.shape != (self.nspins, ):
-                raise ValueError("Chemical shifts must be a 1D array with a "
-                                 "length equal to the number of isotopes.")
-            
-        # Check that the J-couplings array is of correct size
-        if self.J_couplings is not None:
-            if self.J_couplings.shape != (self.nspins, self.nspins):
-                raise ValueError("J-couplings must be a 2D array with both of "
-                                 "the dimensions equal to the number of " 
-                                 "isotopes.")
-            
-        # Check that the XYZ array is of correct size
-        if self.xyz is not None:
-            if self.xyz.shape != (self.nspins, 3):
-                raise ValueError("XYZ coordinates must be a 2D array with the "
-                                 "number of rows equal to the number of " 
-                                 "isotopes.")
-            
-        # Check that shielding tensors array is of correct size
-        if self.shielding is not None:
-            if self.shielding.shape != (self.nspins, 3, 3):
-                raise ValueError("Shielding tensors must be a 3D array with "
-                                 "the number of 3x3 tensors equal to the "
-                                 "number of isotopes.")
-            
-        # Check that EFG tensors array is of correct size
-        if self.efg is not None:
-            if self.efg.shape != (self.nspins, 3, 3):
-                raise ValueError("EFG tensors must be a 3D array with the "
-                                 "number of 3x3 tensors equal to the number of "
-                                 "isotopes.")
-            
-    def subsystem(self, spins: list) -> Self:
+        # Check the isotropic chemical-shift array.
+        self._validate_optional_shape(
+            self.chemical_shifts,
+            (self.nspins,),
+            "Chemical shifts must be a 1D array with a length equal to the "
+            "number of isotopes.",
+        )
+
+        # Check the scalar-coupling matrix.
+        self._validate_optional_shape(
+            self.J_couplings,
+            (self.nspins, self.nspins),
+            "J-couplings must be a 2D array with both dimensions equal to "
+            "the number of isotopes.",
+        )
+
+        # Check the Cartesian coordinate array.
+        self._validate_optional_shape(
+            self.xyz,
+            (self.nspins, 3),
+            "XYZ coordinates must be a 2D array with the number of rows "
+            "equal to the number of isotopes.",
+        )
+
+        # Check the shielding-tensor array.
+        self._validate_optional_shape(
+            self.shielding,
+            (self.nspins, 3, 3),
+            "Shielding tensors must be a 3D array with the number of 3x3 "
+            "tensors equal to the number of isotopes.",
+        )
+
+        # Check the electric-field-gradient tensor array.
+        self._validate_optional_shape(
+            self.efg,
+            (self.nspins, 3, 3),
+            "EFG tensors must be a 3D array with the number of 3x3 tensors "
+            "equal to the number of isotopes.",
+        )
+
+    def subsystem(
+        self,
+        spins: list,
+    ) -> Self:
         """
-        Creates a new `SpinSystem` object containing only the spins indicated
-        by the `spins` list. The new spin system is assigned the appropriate
-        properties from the original spin system. However, the basis set and
-        relaxation properties are not copied to the new spin system.
+        Create a new spin system from a selected subset of spins.
+
+        The basis-set and relaxation settings are reinitialised for the new
+        object rather than copied from the parent spin system.
 
         Parameters
         ----------
         spins : list
-            List of indices that define which spins to include in the subsystem.
+            List of spin indices to be retained in the subsystem.
 
         Returns
         -------
-        sub : SpinSystem
-            A new `SpinSystem` object containing only the specified spins.
+        SpinSystem
+            New spin system containing only the selected spins.
         """
-        # Check that each spin has been given only once
+
+        # Check that each selected spin index is unique.
         if len(set(spins)) != len(spins):
             raise ValueError("Each spin must be unique in 'spins'")
-        
-        # Check that the spins isn't empty
+
+        # Check that at least one spin has been selected.
         if len(spins) == 0:
             raise ValueError("'spins' cannot be empty")
-        
-        # Check that the maximum index makes sense
+
+        # Check that the selected indices exist in the spin system.
         if max(spins) >= self.nspins:
             raise ValueError(f"Spin system does not have spin: {max(spins)}")
-        
-        # Create the new SpinSystem object
+
+        # Create the subsystem with the selected isotope labels.
         spin_system = SpinSystem(self.isotopes[spins])
 
-        # Assign chemical shifts
+        # Transfer the isotropic chemical shifts.
         if self.chemical_shifts is not None:
             spin_system.chemical_shifts = self.chemical_shifts[spins]
 
-        # Assign J-couplings
+        # Transfer the scalar-coupling matrix.
         if self.J_couplings is not None:
             spin_system.J_couplings = self.J_couplings[np.ix_(spins, spins)]
 
-        # Assign XYZ
+        # Transfer the Cartesian coordinates.
         if self.xyz is not None:
             spin_system.xyz = self.xyz[spins]
 
-        # Assign shielding tensors
+        # Transfer the shielding tensors.
         if self.shielding is not None:
             spin_system.shielding = self.shielding[spins]
 
-        # Assign EFG tensors
+        # Transfer the electric-field-gradient tensors.
         if self.efg is not None:
             spin_system.efg = self.efg[spins]
 
@@ -180,21 +310,20 @@ class SpinSystem:
     @property
     def isotopes(self) -> np.ndarray:
         """
-        Specifies the isotopes that constitute the spin system and determine
-        other properties, such as spin quantum numbers and gyromagnetic ratios.
+        Isotope labels that define the spin system.
+
         Example::
 
             np.array(['1H', '15N', '19F'])
 
-        Isotopes are set during the initialization of the spin system.
+        The isotope array is defined during initialisation.
         """
         return self._isotopes
-            
+
     @property
     def chemical_shifts(self) -> np.ndarray:
         """
-        Chemical shifts arising from the isotropic component of the nuclear
-        shielding tensors. Used when calculating the coherent Hamiltonian.
+        Isotropic chemical shifts used in the coherent Hamiltonian.
 
         - If `ArrayLike`: A 1D array of size N containing the chemical shifts
           in ppm.
@@ -207,30 +336,34 @@ class SpinSystem:
         The input will be stored as a NumPy array.
         """
         return self._chemical_shifts
-    
+
     @chemical_shifts.setter
-    def chemical_shifts(self, chemical_shifts: list | tuple | np.ndarray | str):
-        # Assign chemical shifts
-        if isinstance(chemical_shifts, str):
-            self._chemical_shifts = read_array(chemical_shifts, data_type=float)
-        elif isinstance(chemical_shifts, (list, tuple, np.ndarray)):
-            self._chemical_shifts = arraylike_to_array(chemical_shifts)
-        else:
-            raise TypeError("Chemical shifts should be a 1-dimensional array "
-                            "or a string.")
-        
-        # Check input consistency
+    def chemical_shifts(
+        self,
+        chemical_shifts: ArrayInput,
+    ) -> None:
+        # Store the chemical-shift data.
+        self._chemical_shifts = self._read_spin_data(
+            chemical_shifts,
+            name="Chemical shifts",
+            ndim_description="1-dimensional",
+            file_reader=read_array,
+            data_type=float,
+        )
+
+        # Validate the updated object state.
         self._check_consistency()
-            
+
+        # Report the assigned chemical shifts.
         status("Assigned the following chemical shifts:")
         status(f"{self.chemical_shifts}\n")
-            
+
     @property
     def J_couplings(self) -> np.ndarray:
         """
-        Specifies the J-coupling constants between each spin pair in the spin
-        system. Used when calculating the coherent Hamiltonian. Only the lower
-        triangle is specified.
+        Scalar J-coupling matrix used in the coherent Hamiltonian.
+
+        Only the lower triangle needs to be specified.
 
         - If `ArrayLike`: A 2D array of size (N, N) specifying the scalar
           couplings between nuclei in Hz.
@@ -247,30 +380,35 @@ class SpinSystem:
         The input will be stored as a NumPy array.
         """
         return self._J_couplings
-    
+
     @J_couplings.setter
-    def J_couplings(self, J_couplings: list | tuple | np.ndarray | str):
-        # Assign J-couplings
-        if isinstance(J_couplings, str):
-            self._J_couplings = read_array(J_couplings, data_type=float)
-        elif isinstance(J_couplings, (list, tuple, np.ndarray)):
-            self._J_couplings = arraylike_to_array(J_couplings)
-        else:
-            raise TypeError("J-couplings should be a 2-dimensional array or a "
-                            "string.")
-        
-        # Check input consistency
+    def J_couplings(
+        self,
+        J_couplings: ArrayInput,
+    ) -> None:
+        # Store the scalar-coupling matrix.
+        self._J_couplings = self._read_spin_data(
+            J_couplings,
+            name="J-couplings",
+            ndim_description="2-dimensional",
+            file_reader=read_array,
+            data_type=float,
+        )
+
+        # Validate the updated object state.
         self._check_consistency()
-        
+
+        # Report the assigned scalar couplings.
         status(f"Assigned the following J-couplings:\n{self.J_couplings}\n")
 
     @property
-    def xyz(self) -> np.ndarray:
+    def xyz(self) -> OptionalArray:
         """
-        Coordinates in the XYZ format for each nucleus in the spin system. Used
-        in Redfield relaxation theory when calculating the dipole-dipole
-        coupling tensors. The coordinates are defined in Å.
-    
+        Cartesian coordinates of the nuclei in Å.
+
+        The coordinates are used in Redfield relaxation theory when evaluating
+        dipole-dipole coupling tensors.
+
         - If `ArrayLike`: A 2D array of size (N, 3).
         - If `str`: Path to the file containing the XYZ coordinates.
 
@@ -284,28 +422,34 @@ class SpinSystem:
         The input will be stored as a NumPy array.
         """
         return self._xyz
-    
+
     @xyz.setter
-    def xyz(self, xyz: list | tuple | np.ndarray | str):
-        # Assign XYZ coordinates
-        if isinstance(xyz, str):
-            self._xyz = read_xyz(xyz)
-        elif isinstance(xyz, (list, tuple, np.ndarray)):
-            self._xyz = arraylike_to_array(xyz)
-        else:
-            raise TypeError("XYZ should be a 2-dimensional array or a string.")
-        
-        # Check input consistency
+    def xyz(
+        self,
+        xyz: ArrayInput,
+    ) -> None:
+        # Store the Cartesian coordinates.
+        self._xyz = self._read_spin_data(
+            xyz,
+            name="XYZ",
+            ndim_description="2-dimensional",
+            file_reader=read_xyz,
+        )
+
+        # Validate the updated object state.
         self._check_consistency()
 
+        # Report the assigned Cartesian coordinates.
         status(f"Assigned the following XYZ coordinates:\n{self.xyz}\n")
 
     @property
-    def shielding(self) -> np.ndarray:
+    def shielding(self) -> OptionalArray:
         """
-        Specifies the nuclear shielding tensors for each nucleus. Note that the
-        isotropic part of the tensor is handled by `chemical_shifts`. The
-        shielding tensors are used only for Redfield relaxation theory.
+        Nuclear shielding tensors for each spin.
+
+        The isotropic contribution is handled separately through
+        `chemical_shifts`. The full tensors are used only in Redfield
+        relaxation theory.
 
         - If `ArrayLike`: A 3D array of size (N, 3, 3) containing the 3x3
           shielding tensors in ppm.
@@ -329,28 +473,30 @@ class SpinSystem:
         The input will be stored as a NumPy array.
         """
         return self._shielding
-    
+
     @shielding.setter
-    def shielding(self, shielding: list | tuple | np.ndarray | str):
-        # Assign shielding tensors
-        if isinstance(shielding, str):
-            self._shielding = read_tensors(shielding)
-        elif isinstance(shielding, (list, tuple, np.ndarray)):
-            self._shielding = arraylike_to_array(shielding)
-        else:
-            raise TypeError("Shielding should be a 3-dimensional array or a "
-                            "string.")
-        
-        # Check input consistency
+    def shielding(
+        self,
+        shielding: ArrayInput,
+    ) -> None:
+        # Store the shielding tensors.
+        self._shielding = self._read_spin_data(
+            shielding,
+            name="Shielding",
+            ndim_description="3-dimensional",
+            file_reader=read_tensors,
+        )
+
+        # Validate the updated object state.
         self._check_consistency()
 
+        # Report the assigned shielding tensors.
         status(f"Assigned the following shielding tensors:\n{self.shielding}\n")
-        
+
     @property
-    def efg(self) -> np.ndarray:
+    def efg(self) -> OptionalArray:
         """
-        Electric field gradient tensors used for incorporating the quadrupolar
-        interaction relaxation mechanism.
+        Electric-field-gradient tensors for quadrupolar relaxation.
 
         - If `ArrayLike`: A 3D array of size (N, 3, 3) containing the 3x3 EFG
           tensors in atomic units.
@@ -374,54 +520,69 @@ class SpinSystem:
         The input will be stored as a NumPy array.
         """
         return self._efg
-    
+
     @efg.setter
-    def efg(self, efg: list | tuple | np.ndarray | str):
-        # Assign EFG tensors
-        if isinstance(efg, str):
-            self._efg = read_tensors(efg)
-        elif isinstance(efg, (list, tuple, np.ndarray)):
-            self._efg = arraylike_to_array(efg)
-        else:
-            raise TypeError("EFG should be a 3-dimensional array or a string.")
-        
-        # Check input consistency
+    def efg(
+        self,
+        efg: ArrayInput,
+    ) -> None:
+        # Store the electric-field-gradient tensors.
+        self._efg = self._read_spin_data(
+            efg,
+            name="EFG",
+            ndim_description="3-dimensional",
+            file_reader=read_tensors,
+        )
+
+        # Validate the updated object state.
         self._check_consistency()
 
+        # Report the assigned electric-field-gradient tensors.
         status(f"Assigned the following EFG tensors:\n{self.efg}\n")
 
     @property
     def nspins(self) -> int:
-        """Number of spins in the spin system."""
+        """
+        Number of spins in the spin system.
+        """
+
         return len(self.isotopes)
-    
+
     @property
     def spins(self) -> np.ndarray:
-        """Spin quantum numbers for each isotope the spin system."""
+        """
+        Spin quantum numbers of the isotopes in the spin system.
+        """
+
         return np.array([ISOTOPES[isotope][0] for isotope in self.isotopes])
-    
+
     @property
     def mults(self) -> np.ndarray:
         """
-        Spin multiplicities for each isotope in the `SpinSystem`.
+        Spin multiplicities of the isotopes in the spin system.
         """
+
         return np.array([int(2 * ISOTOPES[isotope][0] + 1)
                          for isotope in self.isotopes], dtype=int)
-    
+
     @property
     def gammas(self) -> np.ndarray:
         """
-        Gyromagnetic ratios of each isotope in the `SpinSystem` in rad/s/T.
+        Gyromagnetic ratios of the isotopes in rad/s/T.
         """
+
         return np.array([2 * np.pi * ISOTOPES[isotope][1] * 1e6
                          for isotope in self.isotopes])
-    
+
     @property
     def quad(self) -> np.ndarray:
-        """Returns the quadrupolar moments in m^2."""
+        """
+        Quadrupolar moments of the isotopes in $\mathrm{m^2}$.
+        """
+
         return np.array([ISOTOPES[isotope][2] * 1e-28
                          for isotope in self.isotopes])
-    
+
     ########################
     # BASIS SET PROPERTIES #
     ########################
@@ -429,12 +590,15 @@ class SpinSystem:
     @property
     def basis(self) -> Basis:
         """
-        Contains the basis set for the `SpinSystem`. Includes functionality for
-        restricting the maximum spin order, building the basis set, and applying
-        more advanced truncation to the basis set.
+        Basis-set handler associated with the spin system.
+
+        The object provides the functionality required to restrict the maximum
+        spin order, build the basis set, and apply more advanced truncation
+        strategies.
         """
+
         return self._basis
-    
+
     ################################
     # RELAXATION THEORY PROPERTIES #
     ################################
@@ -442,8 +606,11 @@ class SpinSystem:
     @property
     def relaxation(self) -> RelaxationProperties:
         """
-        Contains the properties that define the relaxation of the `SpinSystem`.
-        Allows the definition of relaxation theory, correlation time, relaxation
-        times, etc.
+        Relaxation settings associated with the spin system.
+
+        The object stores the relaxation-theory choice together with the
+        corresponding correlation times, relaxation times, and related
+        settings.
         """
+
         return self._relaxation

@@ -1,33 +1,226 @@
 """
-This module provides functions for creating state vectors.
+states.py
+
+Provides utilities for constructing Liouville-space state vectors, converting
+them between representations, and evaluating expectation values.
 """
-# Referencing SpinSystem class
+
+# Referencing the SpinSystem class for type checking.
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
 # Imports
 import numpy as np
-import scipy.sparse as sp
 import scipy.constants as const
-import time
+import scipy.sparse as sp
+
+from spinguin._core._hamiltonian import hamiltonian
+from spinguin._core._hide_prints import HidePrints
 from spinguin._core._la import expm
 from spinguin._core._operators import op_prod
-from spinguin._core._utils import parse_operator_string
-from spinguin._core._hide_prints import HidePrints
 from spinguin._core._parameters import parameters
-from spinguin._core._hamiltonian import hamiltonian
-from spinguin._core._status import status
+from spinguin._core._utils import parse_operator_string
+
+
+StateLike = np.ndarray | sp.csc_array
+
+
+def _require_basis(
+    spin_system: SpinSystem,
+    action: str,
+) -> None:
+    """
+    Ensure that the basis has been built before state manipulation.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system whose basis is required.
+    action : str
+        Description of the attempted operation for error reporting.
+
+    Returns
+    -------
+    None
+        Validation is performed for its side effect only.
+
+    Raises
+    ------
+    ValueError
+        Raised if the basis has not yet been built.
+    """
+
+    # Reject operations that require a built basis when none is present.
+    if spin_system.basis.basis is None:
+        raise ValueError(f"Please build the basis before {action}.")
+
+
+def _allocate_state_vector(
+    dim: int,
+) -> np.ndarray | sp.lil_array:
+    """
+    Allocate a mutable state vector in the configured storage format.
+
+    Parameters
+    ----------
+    dim : int
+        Length of the Liouville-space state vector.
+
+    Returns
+    -------
+    ndarray or lil_array
+        Mutable state vector initialised to zero.
+    """
+
+    # Allocate sparse or dense storage according to the global settings.
+    if parameters.sparse_state:
+        return sp.lil_array((dim, 1), dtype=complex)
+
+    return np.zeros((dim, 1), dtype=complex)
+
+
+def _finalise_state_vector(
+    rho: np.ndarray | sp.lil_array | sp.csc_array,
+) -> StateLike:
+    """
+    Return a state vector in the configured output storage format.
+
+    Parameters
+    ----------
+    rho : ndarray or sparse array
+        State vector assembled in mutable storage.
+
+    Returns
+    -------
+    ndarray or csc_array
+        Finalised state vector.
+    """
+
+    # Convert sparse work arrays to CSC format when sparse storage is used.
+    if parameters.sparse_state and hasattr(rho, "tocsc"):
+        return rho.tocsc()
+
+    return rho
+
+
+def _frobenius_norm(
+    operator: np.ndarray | sp.csc_array,
+) -> float:
+    """
+    Compute the Frobenius norm in the configured operator format.
+
+    Parameters
+    ----------
+    operator : ndarray or csc_array
+        Operator whose norm is required.
+
+    Returns
+    -------
+    float
+        Frobenius norm of the operator.
+    """
+
+    # Dispatch to the sparse or dense norm implementation as appropriate.
+    if parameters.sparse_operator:
+        return sp.linalg.norm(operator, ord="fro")
+
+    return np.linalg.norm(operator, ord="fro")
+
+
+def _liouville_dimension(
+    spin_system: SpinSystem,
+) -> int:
+    """
+    Return the Hilbert-space dimension of the spin system.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system whose total multiplicity product is required.
+
+    Returns
+    -------
+    int
+        Hilbert-space dimension of the spin system.
+    """
+
+    # Multiply the single-spin multiplicities to obtain the full dimension.
+    return int(np.prod(spin_system.mults))
+
+
+def _pair_longitudinal_states(
+    spin_system: SpinSystem,
+    index_1: int,
+    index_2: int,
+) -> tuple[StateLike, StateLike, StateLike]:
+    """
+    Construct the longitudinal basis states for a two-spin pair.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system in which the states are constructed.
+    index_1 : int
+        Index of the first spin.
+    index_2 : int
+        Index of the second spin.
+
+    Returns
+    -------
+    tuple of state-like
+        Unit-state, first-spin `Iz`, and second-spin `Iz` contributions.
+    """
+
+    # Build the unit and single-spin longitudinal states.
+    unit = unit_state(spin_system, normalized=False)
+    Iz_1 = state(spin_system, f"I(z, {index_1})")
+    Iz_2 = state(spin_system, f"I(z, {index_2})")
+
+    return unit, Iz_1, Iz_2
+
+
+def _pair_correlation_states(
+    spin_system: SpinSystem,
+    index_1: int,
+    index_2: int,
+) -> tuple[StateLike, StateLike, StateLike, StateLike]:
+    """
+    Construct the pair-correlation states for a two-spin manifold.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system in which the states are constructed.
+    index_1 : int
+        Index of the first spin.
+    index_2 : int
+        Index of the second spin.
+
+    Returns
+    -------
+    tuple of state-like
+        Unit state, `IzIz`, `IpIm`, and `ImIp` contributions.
+    """
+
+    # Build the unit and two-spin correlation states.
+    unit = unit_state(spin_system, normalized=False)
+    IzIz = state(spin_system, f"I(z, {index_1}) * I(z, {index_2})")
+    IpIm = state(spin_system, f"I(+, {index_1}) * I(-, {index_2})")
+    ImIp = state(spin_system, f"I(-, {index_1}) * I(+, {index_2})")
+
+    return unit, IzIz, IpIm, ImIp
+
 
 def state_to_truncated_basis(
     index_map: list,
-    rho: np.ndarray | sp.csc_array
-) -> np.ndarray | sp.csc_array:
+    rho: StateLike,
+) -> StateLike:
     """
-    Transforms a state vector to a truncated basis using the `index_map`,
-    which contains indices that determine the elements that are retained
-    after the transformation.
+    Transform a state vector to a truncated basis.
 
     Parameters
     ----------
@@ -41,19 +234,20 @@ def state_to_truncated_basis(
     rho_transformed : ndarray or csc_array
         State vector transformed into the truncated basis.
     """
-    # Perform the transformation to truncated basis
-    rho_transformed = rho[index_map]
 
-    return rho_transformed
+    # Retain only those coefficients selected by the truncation map.
+    return rho[index_map]
+
 
 def unit_state(
     spin_system: SpinSystem,
-    normalized: bool=True
-) -> np.ndarray | sp.csc_array:
+    normalized: bool=True,
+) -> StateLike:
     """
-    Returns a unit state vector, which represents the identity operator. The
-    output can be either normalised (trace equal to one) or unnormalised (raw
-    identity matrix).
+    Return the Liouville-space representation of the unit operator.
+
+    The output can be either normalised to unit trace or left in the raw
+    unnormalised form.
 
     Parameters
     ----------
@@ -69,46 +263,33 @@ def unit_state(
     rho : ndarray or csc_array
         State vector corresponding to the unit state.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "unit state.")
 
-    # Initialize the state vector
-    if parameters.sparse_state:
-        rho = sp.lil_array((spin_system.basis.dim, 1), dtype=complex)
-    else:
-        rho = np.zeros((spin_system.basis.dim, 1), dtype=complex)
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the unit state")
 
-    # Assign unit state coefficient
+    # Allocate the output state vector.
+    rho = _allocate_state_vector(spin_system.basis.dim)
+
+    # Set the identity-operator coefficient with the requested normalisation.
     if normalized:
         rho[0, 0] = 1 / np.sqrt(np.prod(spin_system.mults))
     else:
         rho[0, 0] = np.sqrt(np.prod(spin_system.mults))
 
-    # Convert to csc_array if requesting sparse
-    if parameters.sparse_state:
-        rho = rho.tocsc()
+    # Return the state in the configured output format.
+    return _finalise_state_vector(rho)
 
-    return rho
 
 def state(
     spin_system: SpinSystem,
-    operator: str
-) -> np.ndarray | sp.csc_array:
+    operator: str,
+) -> StateLike:
     """
-    This function returns a column vector representing the density matrix as a
-    linear combination of spin operators. Each element of the vector corresponds
-    to the coefficient of a specific spin operator in the expansion.
-    
-    Normalization:
-    The output of this function uses a normalised basis built from normalised
-    products of single-spin spherical tensor operators. However, the
-    coefficients are scaled so that the resulting linear combination represents
-    the non-normalised version of the requested operator.
+    Construct a state vector from an operator-string specification.
 
-    NOTE: This function is sometimes called often and is cached for high
-    performance.
+    The output uses the normalised spherical-tensor basis of the spin system,
+    but the coefficients are scaled so that the resulting linear combination
+    corresponds to the unnormalised version of the requested operator.
 
     Parameters
     ----------
@@ -152,69 +333,57 @@ def state(
     rho : ndarray or csc_array
         State vector corresponding to the requested state.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing a state.")
 
-    # Initialize the state vector
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing a state")
+
+    # Allocate the output state vector.
     dim = spin_system.basis.dim
-    if parameters.sparse_state:
-        rho = sp.lil_array((dim, 1), dtype=complex)
-    else:
-        rho = np.zeros((dim, 1), dtype=complex)
+    rho = _allocate_state_vector(dim)
 
-    # Get the operator definition and coefficients
+    # Parse the operator string into basis definitions and coefficients.
     op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
 
-    # Get the state indices
+    # Map the operator definitions to basis indices.
     idxs = [spin_system.basis.indexof(op_def) for op_def in op_defs]
 
-    # Assign the state
+    # Populate the state vector one operator term at a time.
     for idx, coeff, op_def in zip(idxs, coeffs, op_defs):
 
-        # Find indices of the active and inactive spins
-        idx_active = np.where(np.array(op_def) != 0)[0]
-        idx_inactive = np.where(np.array(op_def) == 0)[0]
+        # Separate active and inactive spins in the product operator.
+        op_array = np.asarray(op_def)
+        idx_active = np.where(op_array != 0)[0]
+        idx_inactive = np.where(op_array == 0)[0]
 
-        # Calculate the norm of the active operator part if there are active
-        # spins
+        # Compute the norm of the non-unit part of the operator.
         if len(idx_active) != 0:
-            if parameters.sparse_operator:
-                op_norm = sp.linalg.norm(
-                    op_prod(op_def, spin_system.spins, include_unit=False), ord='fro'
-                )
-            else:
-                op_norm = np.linalg.norm(
-                    op_prod(op_def, spin_system.spins, include_unit=False), ord='fro'
-                )
+            op_norm = _frobenius_norm(
+                op_prod(op_def, spin_system.spins, include_unit=False)
+            )
 
-        # Otherwise set it to one
+        # Use unit norm when the operator contains no active spin factors.
         else:
             op_norm = 1
-        
-        # Calculate the norm of the unit operator part
+
+        # Compute the norm contribution from inactive unit operators.
         unit_norm = np.sqrt(np.prod(spin_system.mults[idx_inactive]))
 
-        # Total norm of the operator
+        # Combine the norm factors and store the coefficient.
         norm = op_norm * unit_norm
-
-        # Set the properly normalized coefficient
         rho[idx, 0] = coeff * norm
 
-    # Convert to csc_array if requesting sparse
-    if parameters.sparse_state:
-        rho = rho.tocsc()
+    # Return the state in the configured output format.
+    return _finalise_state_vector(rho)
 
-    return rho
 
 def state_to_zeeman(
     spin_system: SpinSystem,
-    rho: np.ndarray | sp.csc_array
-) -> np.ndarray | sp.csc_array:
+    rho: StateLike,
+) -> StateLike:
     """
-    Takes the state vector defined in the normalized spherical tensor basis
-    and converts it into a density matrix written in the Zeeman eigenbasis.
-    Useful for error checking.
+    Convert a Liouville-space state vector to the Zeeman eigenbasis.
+
+    This function is mainly intended for validation and debugging.
 
     Parameters
     ----------
@@ -229,49 +398,46 @@ def state_to_zeeman(
     rho_zeeman : ndarray or csc_array
         Spin density matrix defined in the Zeeman eigenbasis.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before converting the "
-                         "state vector into density matrix.")
 
-    # Get the dimension of density matrix
-    dim = np.prod(spin_system.mults)
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "converting the state vector into density matrix")
 
-    # Initialize the spin density matrix
+    # Determine the Hilbert-space dimension of the density matrix.
+    dim = _liouville_dimension(spin_system)
+
+    # Allocate the density matrix in the configured storage format.
     if parameters.sparse_operator:
         rho_zeeman = sp.csc_array((dim, dim), dtype=complex)
     else:
         rho_zeeman = np.zeros((dim, dim), dtype=complex)
-    
-    # Obtain indices of the non-zero coefficients from the state vector
+
+    # Identify the non-zero coefficients of the Liouville-space state.
     idx_nonzero = rho.nonzero()[0]
 
-    # Loop over the nonzero indices
+    # Accumulate the corresponding normalised product operators.
     for idx in idx_nonzero:
 
-        # Get the corresponding operator definition
+        # Read the operator definition associated with the basis index.
         op_def = spin_system.basis.basis[idx]
 
-        # Get the normalized product operator in the Zeeman eigenbasis with
-        # normalization
+        # Construct and normalise the corresponding Zeeman-basis operator.
         oper = op_prod(op_def, spin_system.spins, include_unit=True)
-        if parameters.sparse_operator:
-            oper = oper / sp.linalg.norm(oper, ord='fro')
-        else:
-            oper = oper / np.linalg.norm(oper, ord='fro')
-        
-        # Add to the total density matrix
+        oper = oper / _frobenius_norm(oper)
+
+        # Add the weighted contribution to the density matrix.
         rho_zeeman += rho[idx, 0] * oper
-    
+
     return rho_zeeman
+
 
 def alpha_state(
     spin_system: SpinSystem,
-    index: int
-) -> np.ndarray | sp.csc_array:
+    index: int,
+) -> StateLike:
     """
-    Generates the alpha state for a given spin-1/2 nucleus. Unit state is
-    assigned to the other spins.
+    Generate the alpha state for a selected spin-$1/2$ nucleus.
+
+    The remaining spins are assigned the unit state.
 
     Parameters
     ----------
@@ -285,30 +451,31 @@ def alpha_state(
     rho : ndarray or csc_array
         State vector corresponding to the alpha state of the given spin index.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "alpha state.")
-    
-    # Calculate the dimension of the full Liouville space
-    dim = np.prod(spin_system.mults)
 
-    # Get states
-    E = unit_state(spin_system, normalized=False)
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the alpha state")
+
+    # Determine the full Hilbert-space dimension.
+    dim = _liouville_dimension(spin_system)
+
+    # Build the unit and longitudinal single-spin states.
+    unit = unit_state(spin_system, normalized=False)
     I_z = state(spin_system, f"I(z, {index})")
 
-    # Make the alpha state
-    rho = 1 / dim * E + 2 / dim * I_z
+    # Form the alpha-state density operator.
+    rho = 1 / dim * unit + 2 / dim * I_z
 
     return rho
 
+
 def beta_state(
     spin_system: SpinSystem,
-    index: int
-) -> np.ndarray | sp.csc_array:
+    index: int,
+) -> StateLike:
     """
-    Generates the beta state for a given spin-1/2 nucleus. Unit state is
-    assigned to the other spins.
+    Generate the beta state for a selected spin-$1/2$ nucleus.
+
+    The remaining spins are assigned the unit state.
 
     Parameters
     ----------
@@ -322,26 +489,28 @@ def beta_state(
     rho : ndarray or csc_array
         State vector corresponding to the beta state of the given spin index.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "beta state.")
-    
-    # Calculate the dimension of the full Liouville space
-    dim = np.prod(spin_system.mults)
 
-    # Get states
-    E = unit_state(spin_system, normalized=False)
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the beta state")
+
+    # Determine the full Hilbert-space dimension.
+    dim = _liouville_dimension(spin_system)
+
+    # Build the unit and longitudinal single-spin states.
+    unit = unit_state(spin_system, normalized=False)
     I_z = state(spin_system, f"I(z, {index})")
 
-    # Make the beta state
-    rho = 1 / dim * E - 2 / dim * I_z
+    # Form the beta-state density operator.
+    rho = 1 / dim * unit - 2 / dim * I_z
 
     return rho
 
-def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
+
+def equilibrium_state(
+    spin_system: SpinSystem,
+) -> StateLike:
     """
-    Creates the thermal equilibrium state for the spin system.
+    Construct the thermal-equilibrium state of the spin system.
 
     Parameters
     ----------
@@ -353,10 +522,11 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     rho : ndarray or csc_array
         Equilibrium state vector.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "equilibrium state.")
+
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the equilibrium state")
+
+    # Ensure that the thermodynamic parameters have been configured.
     if parameters.magnetic_field is None:
         raise ValueError("Please set the magnetic field before "
                          "constructing the equilibrium state.")
@@ -364,37 +534,39 @@ def equilibrium_state(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
         raise ValueError("Please set the temperature before "
                          "constructing the equilibrium state.")
 
-    # Build the left Hamiltonian superoperator
+    # Build the Boltzmann propagator and apply it to the unit state.
     with HidePrints():
         H_left = hamiltonian(spin_system, side="left")
 
-        # Get the matrix exponential corresponding to the Boltzmann distribution
+        # Evaluate the matrix exponential of the Boltzmann operator.
         T = parameters.temperature
         zv = parameters.zero_equilibrium
         with HidePrints():
             P = expm(-const.hbar / (const.k * T) * H_left, zv)
 
-        # Obtain the thermal equilibrium by propagating the unit state
+        # Propagate the unnormalised unit state to equilibrium.
         unit = unit_state(spin_system, normalized=False)
         rho = P @ unit
 
-        # Ensure the correct sparsity (might have changed during multiplication)
+        # Restore sparse storage if the matrix product densified the output.
         if parameters.sparse_state and not sp.issparse(rho):
             rho = sp.csc_array(rho)
 
-        # Normalize: the trace of the corresponding density matrix should be one
-        rho = rho / (rho[0, 0] * np.sqrt(np.prod(spin_system.mults)))
+        # Normalise the state so that the density-matrix trace equals one.
+        rho = rho / (rho[0, 0] * np.sqrt(_liouville_dimension(spin_system)))
 
     return rho
 
+
 def singlet_state(
     spin_system: SpinSystem,
-    index_1 : int,
-    index_2 : int
-) -> np.ndarray | sp.csc_array:
+    index_1: int,
+    index_2: int,
+) -> StateLike:
     """
-    Generates the singlet state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
+    Generate the singlet state of a spin-$1/2$ pair.
+
+    The remaining spins are assigned the unit state.
 
     Parameters
     ----------
@@ -410,33 +582,35 @@ def singlet_state(
     rho : ndarray or csc_array
         State vector corresponding to the singlet state.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "singlet state.")
 
-    # Calculate the dimension of the full Liouville space
-    dim = np.prod(spin_system.mults)
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the singlet state")
 
-    # Get states
-    E = unit_state(spin_system, normalized=False)
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
-    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})")
-    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})")
+    # Determine the full Hilbert-space dimension.
+    dim = _liouville_dimension(spin_system)
 
-    # Make the singlet
-    rho = 1 / dim * E - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
+    # Build the unit and two-spin correlation states.
+    unit, IzIz, IpIm, ImIp = _pair_correlation_states(
+        spin_system,
+        index_1,
+        index_2,
+    )
+
+    # Form the singlet-state density operator.
+    rho = 1 / dim * unit - 4 / dim * IzIz - 2 / dim * (IpIm + ImIp)
 
     return rho
+
 
 def triplet_zero_state(
     spin_system: SpinSystem,
     index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
+    index_2: int,
+) -> StateLike:
     """
-    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
+    Generate the triplet-zero state of a spin-$1/2$ pair.
+
+    The remaining spins are assigned the unit state.
 
     Parameters
     ----------
@@ -452,33 +626,35 @@ def triplet_zero_state(
     rho : ndarray or csc_array
         State vector corresponding to the triplet zero state.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "triplet zero state.")
-    
-    # Calculate the dimension of the full Liouville space
-    dim = np.prod(spin_system.mults)
 
-    # Get states
-    E = unit_state(spin_system, normalized=False)
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
-    IpIm = state(spin_system, f"I(+,{index_1}) * I(-, {index_2})")
-    ImIp = state(spin_system, f"I(-,{index_1}) * I(+, {index_2})")
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the triplet zero state")
 
-    # Make the triplet zero
-    rho = 1 / dim * E - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
+    # Determine the full Hilbert-space dimension.
+    dim = _liouville_dimension(spin_system)
+
+    # Build the unit and two-spin correlation states.
+    unit, IzIz, IpIm, ImIp = _pair_correlation_states(
+        spin_system,
+        index_1,
+        index_2,
+    )
+
+    # Form the triplet-zero density operator.
+    rho = 1 / dim * unit - 4 / dim * IzIz + 2 / dim * (IpIm + ImIp)
 
     return rho
+
 
 def triplet_plus_state(
     spin_system: SpinSystem,
     index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
+    index_2: int,
+) -> StateLike:
     """
-    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
+    Generate the triplet-plus state of a spin-$1/2$ pair.
+
+    The remaining spins are assigned the unit state.
 
     Parameters
     ----------
@@ -494,33 +670,32 @@ def triplet_plus_state(
     rho : ndarray or csc_array
         State vector corresponding to the triplet plus state.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "triplet plus state.")
-    
-    # Calculate the dimension of the full Liouville space
-    dim = np.prod(spin_system.mults)
 
-    # Get states
-    E = unit_state(spin_system, normalized=False)
-    IzE = state(spin_system, f"I(z, {index_1})")
-    EIz = state(spin_system, f"I(z, {index_2})")
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the triplet plus state")
 
-    # Make the triplet plus
-    rho = 1 / dim * E + 2 / dim * IzE + 2 / dim * EIz + 4 / dim * IzIz
+    # Determine the full Hilbert-space dimension.
+    dim = _liouville_dimension(spin_system)
+
+    # Build the unit, single-spin, and longitudinal correlation states.
+    unit, Iz_1, Iz_2 = _pair_longitudinal_states(spin_system, index_1, index_2)
+    IzIz = state(spin_system, f"I(z, {index_1}) * I(z, {index_2})")
+
+    # Form the triplet-plus density operator.
+    rho = 1 / dim * unit + 2 / dim * Iz_1 + 2 / dim * Iz_2 + 4 / dim * IzIz
 
     return rho
+
 
 def triplet_minus_state(
     spin_system: SpinSystem,
     index_1: int,
-    index_2: int
-) -> np.ndarray | sp.csc_array:
+    index_2: int,
+) -> StateLike:
     """
-    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is
-    assigned to the other spins.
+    Generate the triplet-minus state of a spin-$1/2$ pair.
+
+    The remaining spins are assigned the unit state.
 
     Parameters
     ----------
@@ -536,34 +711,33 @@ def triplet_minus_state(
     rho : ndarray or csc_array
         State vector corresponding to the triplet minus state.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing the "
-                         "triplet minus state.")
-    
-    # Calculate the dimension of the full Liouville space
-    dim = np.prod(spin_system.mults)
 
-    # Get states
-    E = unit_state(spin_system, normalized=False)
-    IzE = state(spin_system, f"I(z, {index_1})")
-    EIz = state(spin_system, f"I(z, {index_2})")
-    IzIz = state(spin_system, f"I(z,{index_1}) * I(z, {index_2})")
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "constructing the triplet minus state")
 
-    # Make the triplet minus
-    rho = 1 / dim * E - 2 / dim * IzE - 2 / dim * EIz + 4 / dim * IzIz
+    # Determine the full Hilbert-space dimension.
+    dim = _liouville_dimension(spin_system)
+
+    # Build the unit, single-spin, and longitudinal correlation states.
+    unit, Iz_1, Iz_2 = _pair_longitudinal_states(spin_system, index_1, index_2)
+    IzIz = state(spin_system, f"I(z, {index_1}) * I(z, {index_2})")
+
+    # Form the triplet-minus density operator.
+    rho = 1 / dim * unit - 2 / dim * Iz_1 - 2 / dim * Iz_2 + 4 / dim * IzIz
 
     return rho
 
+
 def measure(
     spin_system: SpinSystem,
-    rho: np.ndarray | sp.csc_array,
-    operator: str
+    rho: StateLike,
+    operator: str,
 ) -> complex:
     """
-    Computes the expectation value of the specified operator for a given state
-    vector. Assumes that the state vector `rho` represents a trace-normalized
-    density matrix.
+    Compute the expectation value of an operator for a given state.
+
+    The state vector `rho` is assumed to represent a trace-normalised density
+    matrix.
 
     Parameters
     ----------
@@ -609,15 +783,12 @@ def measure(
     ex : complex
         Expectation value.
     """
-    # Check that the required attributes are set
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before measuring an "
-                         "expectation value of an operator.")
 
-    # Get the "operator" to be measured
+    # Ensure that the basis is available.
+    _require_basis(spin_system, "measuring an expectation value of an operator")
+
+    # Construct the operator state vector in the system basis.
     oper = state(spin_system, operator)
 
-    # Perform the measurement
-    ex = (oper.conj().T @ rho).trace()
-
-    return ex
+    # Evaluate the inner product corresponding to the expectation value.
+    return (oper.conj().T @ rho).trace()

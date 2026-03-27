@@ -1,21 +1,31 @@
 """
-This module provides a status function that is used to print the status messages
-to the console in the program.
+status.py
+
+Provides a lightweight helper for printing status messages controlled by the
+global verbosity setting.
 """
 
-def status(msg: str):
+
+def status(
+    msg: str,
+) -> None:
     """
-    Prints the given input to the console if status messages are enabled in the
-    global parameters.
+    Print a status message when verbose output is enabled.
 
     Parameters
     ----------
-    msg: str
+    msg : str
         Message to be printed.
+
+    Returns
+    -------
+    None
+        The message is printed only when verbose output is enabled.
     """
-    # Avoid circular import
+
+    # Import the global parameters lazily to avoid a circular dependency.
     from spinguin._core._parameters import parameters
 
-    # Pring if status messages are enabled
-    if parameters.verbose == True:
+    # Print the message only when status output has been enabled.
+    if parameters.verbose:
         print(msg)
