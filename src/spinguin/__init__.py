@@ -1,37 +1,38 @@
 """
-Spinguin package is desined to be imported as `import spinguin as sg`, which
-reveals the main functionality of the package to the user in a user-friendly
-manner. For example, to create a SpinSystem object with one 1H nucleus, the user
-should::
+Public package namespace for Spinguin.
+
+Spinguin is intended to be imported as ``import spinguin as sg`` so that the
+main simulation functionality is available directly under the package
+namespace. For example, a one-spin system may be created as follows::
 
     import spinguin as sg
     spin_system = sg.SpinSystem(["1H"])
 """
 
-# Make the core functionality directly available under the spinguin namespace
+# Re-export the public core functionality under the package namespace.
 from spinguin._core import (
-    # cache
+    # Cache
     clear_cache,
 
-    # chem
+    # Chemistry
     associate,
     dissociate,
     permute_spins,
 
-    # hamiltonian
+    # Hamiltonian
     hamiltonian,
 
-    # liouvillian
+    # Liouvillian
     liouvillian,
 
-    # nmr_isotopes
+    # NMR isotopes
     atomic_mass,
     gamma,
     natural_abundance,
     quadrupole_moment,
     spin,
 
-    # operators
+    # Operators
     op_E,
     op_Sm,
     op_Sp,
@@ -42,24 +43,24 @@ from spinguin._core import (
     op_T_coupled,
     operator,
 
-    # molecule
+    # Molecule
     Molecule,
 
-    # parameters
+    # Parameters
     parameters,
 
-    # propagation
+    # Propagation
     propagator,
     propagator_to_rotframe,
     pulse,
 
-    # relaxation
+    # Relaxation
     relaxation,
 
-    # rotframe
+    # Rotating frame
     rotating_frame,
 
-    # specutils
+    # Spectral utilities
     fourier_transform,
     frequency_to_chemical_shift,
     resonance_frequency,
@@ -67,10 +68,10 @@ from spinguin._core import (
     spectrum,
     time_axis,
 
-    # spin_system
+    # Spin system
     SpinSystem,
 
-    # states
+    # States
     alpha_state,
     beta_state,
     equilibrium_state,
@@ -83,43 +84,46 @@ from spinguin._core import (
     triplet_zero_state,
     unit_state,
 
-    # superoperators
+    # Superoperators
     sop_T_coupled,
     superoperator,
 
-    # utils
+    # Utilities
     coherence_order,
     idx_to_lq,
     lq_to_idx,
 )
-from spinguin import sequences
 
+# Re-export the ready-to-use pulse-sequence namespace.
+from . import sequences
+
+# Define the public package interface for star imports and documentation.
 __all__ = [
-    # core: cache
+    # Core: cache
     "clear_cache",
 
-    # core: chem
+    # Core: chemistry
     "associate",
     "dissociate",
     "permute_spins",
 
-    # core: hamiltonian
+    # Core: hamiltonian
     "hamiltonian",
 
-    # core: liouvillian
+    # Core: liouvillian
     "liouvillian",
 
-    # core: molecule
+    # Core: molecule
     "Molecule",
 
-    # core: nmr_isotopes
+    # Core: NMR isotopes
     "atomic_mass",
     "gamma",
     "natural_abundance",
     "quadrupole_moment",
     "spin",
 
-    # core: operators
+    # Core: operators
     "op_E",
     "op_Sm",
     "op_Sp",
@@ -130,21 +134,21 @@ __all__ = [
     "op_T_coupled",
     "operator",
 
-    # core: parameters 
+    # Core: parameters
     "parameters",
 
-    # core: propagation
+    # Core: propagation
     "propagator",
     "propagator_to_rotframe",
     "pulse",
 
-    # core: relaxation
+    # Core: relaxation
     "relaxation",
 
-    # core: rotframe
+    # Core: rotating frame
     "rotating_frame",
 
-    # core: specutils
+    # Core: spectral utilities
     "fourier_transform",
     "frequency_to_chemical_shift",
     "resonance_frequency",
@@ -152,10 +156,10 @@ __all__ = [
     "spectrum",
     "time_axis",
 
-    # core: spin_system
+    # Core: spin system
     "SpinSystem",
 
-    # core: states
+    # Core: states
     "alpha_state",
     "beta_state",
     "equilibrium_state",
@@ -167,12 +171,12 @@ __all__ = [
     "triplet_plus_state",
     "triplet_zero_state",
     "unit_state",
-    
-    # core: superoperators
+
+    # Core: superoperators
     "sop_T_coupled",
     "superoperator",
 
-    # core: utils
+    # Core: utilities
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",

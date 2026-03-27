@@ -1,31 +1,35 @@
 # Changelog
 
 ## 0.1.0
-- Basis set improvements.
-- Small change to the implementation of zero-track elimination.
-- Add anisotropic rotational diffusion for the Redfield relaxation theory.
+- Improved basis-set handling.
+- Refined the implementation of zero-track elimination.
+- Added anisotropic rotational diffusion for Redfield relaxation theory.
 
 ## 0.0.4
-- It is possible to create a subsystem from a SpinSystem object.
+- Added support for creating a subsystem from a `SpinSystem` object.
 
 ## 0.0.3
-- Add possibility to enquire the index of a state from the basis set.
-- Add functions for converting between operator indices & rank and projection.
-- Add function for calculating the coherence order of a state
-- Fix bug when creating a state
-- Functions obey the dense/sparse rule faithfully irrespective of the input
-type.
-- Removed sparsity options for Hamiltonian, relaxation superoperator and pulse.
-These use the sparsity option of the superoperator.
-- Better tests.
-- Add cache clear functionality.
-- Add possibility to create single-spin and coupled spherical tensor operators.
+- Added the possibility to enquire the index of a state from the basis
+	set.
+- Added functions for converting between operator indices, rank, and
+	projection.
+- Added a function for calculating the coherence order of a state.
+- Fixed a bug in state creation.
+- Ensured that functions obey the dense/sparse rule irrespective of the
+	input type.
+- Removed separate sparsity options for the Hamiltonian, relaxation
+	superoperator, and pulse operators. These now follow the sparsity option
+	of the superoperator.
+- Improved the test suite.
+- Added cache-clearing functionality.
+- Added the possibility to create single-spin and coupled spherical tensor
+	operators.
 
 ## 0.0.2
-- Re-structure the program internally.
+- Restructured the program internally.
 - Improved documentation.
-- Pulse sequences moved to their own subpackage.
-- Add possibility to reset the parameters to defaults.
+- Moved pulse sequences to their own subpackage.
+- Added the possibility to reset the parameters to their default values.
 
 ## 0.0.1
 - Initial release of the Spinguin package.
