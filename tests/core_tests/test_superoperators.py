@@ -1,413 +1,515 @@
-import unittest
-import numpy as np
-import spinguin as sg
+"""
+Tests for superoperator construction, representation, and basis truncation.
+"""
+
 from typing import Literal
+
+import unittest
+
+import numpy as np
+
+import spinguin as sg
 from spinguin._core._la import cartesian_tensor_to_spherical_tensor
 from spinguin._core._superoperators import structure_coefficients
 
+
 class TestSuperoperators(unittest.TestCase):
+    """
+    Test superoperator generation against reference constructions.
+    """
+
+    def _assert_allclose(
+        self,
+        value,
+        reference,
+        rtol=1e-05,
+        atol=1e-08,
+    ):
+        """
+        Assert that two arrays or sparse matrices agree numerically.
+        """
+
+        # Convert sparse matrices to dense arrays when necessary.
+        if hasattr(value, "toarray"):
+            value = value.toarray()
+        if hasattr(reference, "toarray"):
+            reference = reference.toarray()
+
+        # Compare the tested and reference values.
+        self.assertTrue(np.allclose(value, reference, rtol=rtol, atol=atol))
+
+    def _build_superoperators_from_basis(
+        self,
+        spin_system,
+    ):
+        """
+        Build superoperators for every basis operator definition.
+        """
+
+        # Construct all superoperators from the current basis.
+        return [
+            sg.superoperator(spin_system, operator_definition)
+            for operator_definition in spin_system.basis.basis
+        ]
+
+    def _build_operator_strings(
+        self,
+        labels,
+    ):
+        """
+        Generate three-spin operator strings for the given labels.
+        """
+
+        # Build all three-spin product-operator strings.
+        operator_strings = []
+        for label_i in labels:
+            operator_i = "E" if label_i == "E" else f"I({label_i}, 0)"
+            for label_j in labels:
+                operator_j = "E" if label_j == "E" else f"I({label_j}, 1)"
+                for label_k in labels:
+                    operator_k = "E" if label_k == "E" else f"I({label_k}, 2)"
+                    operator_strings.append(
+                        f"{operator_i} * {operator_j} * {operator_k}"
+                    )
+
+        return operator_strings
+
+    def _build_manual_side_superoperator(
+        self,
+        spin_system,
+        operator_definition,
+        side,
+    ):
+        """
+        Build a left or right superoperator by explicit matrix algebra.
+        """
+
+        # Initialise the reference superoperator matrix.
+        superoperator_reference = np.zeros(
+            (spin_system.basis.dim, spin_system.basis.dim),
+            dtype=complex,
+        )
+
+        # Construct the operator that defines the superoperator.
+        operator_i = sg.operator(spin_system, operator_definition)
+
+        # Loop over the operator bras.
+        for bra_index, bra_definition in enumerate(spin_system.basis.basis):
+            operator_j = sg.operator(spin_system, bra_definition)
+
+            # Loop over the operator kets.
+            for ket_index, ket_definition in enumerate(spin_system.basis.basis):
+                operator_k = sg.operator(spin_system, ket_definition)
+
+                # Calculate the operator-space normalisation factor.
+                norm = np.sqrt(
+                    (operator_j.conj().T @ operator_j).trace() *
+                    (operator_k.conj().T @ operator_k).trace()
+                )
+
+                # Calculate the requested matrix element.
+                if side == "left":
+                    element = (operator_j.conj().T @ operator_i @ operator_k).trace()
+                else:
+                    element = (operator_j.conj().T @ operator_k @ operator_i).trace()
+
+                superoperator_reference[bra_index, ket_index] = element / norm
+
+        return superoperator_reference
 
     def test_superoperator_1(self):
         """
         Test that the operator sparsity does not influence the output.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the example spin system.
+        spin_system = sg.SpinSystem(["1H", "14N", "23Na"])
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
 
-        # Build all superoperators from the basis set using the dense operators
+        # Build all basis superoperators using dense operators.
         sg.parameters.sparse_operator = False
-        sops_dense = []
-        for op_def in ss.basis.basis:
-            sops_dense.append(sg.superoperator(ss, op_def))
+        superoperators_dense = self._build_superoperators_from_basis(spin_system)
 
-        # Clear the cache
+        # Clear the cache before rebuilding with sparse operators.
         sg.clear_cache()
 
-        # Build all superoperators from the basis set using the sparse operators
+        # Build all basis superoperators using sparse operators.
         sg.parameters.sparse_operator = True
-        sops_sparse = []
-        for op_def in ss.basis.basis:
-            sops_sparse.append(sg.superoperator(ss, op_def))
+        superoperators_sparse = self._build_superoperators_from_basis(spin_system)
 
-        # Compare
-        for sop_dense, sop_sparse in zip(sops_dense, sops_sparse):
-            self.assertTrue(np.allclose(
-                sop_dense.toarray(),
-                sop_sparse.toarray()
-            ))
+        # Compare the dense and sparse results.
+        for superoperator_dense, superoperator_sparse in zip(
+            superoperators_dense,
+            superoperators_sparse,
+        ):
+            self._assert_allclose(superoperator_dense, superoperator_sparse)
 
     def test_superoperator_2(self):
         """
         Test that the superoperator sparsity setting works as intended.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the example spin system.
+        spin_system = sg.SpinSystem(["1H", "14N", "23Na"])
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
 
-        # Test building dense superoperators
+        # Build dense superoperators.
         sg.parameters.sparse_superoperator = False
-        sops_dense = []
-        for op_def in ss.basis.basis:
-            sops_dense.append(sg.superoperator(ss, op_def))
+        superoperators_dense = self._build_superoperators_from_basis(spin_system)
 
-        # Test building sparse superoperators
+        # Build sparse superoperators.
         sg.parameters.sparse_superoperator = True
-        sops_sparse = []
-        for op_def in ss.basis.basis:
-            sops_sparse.append(sg.superoperator(ss, op_def))
+        superoperators_sparse = self._build_superoperators_from_basis(spin_system)
 
-        # Compare
-        for sop_dense, sop_sparse in zip(sops_dense, sops_sparse):
-            self.assertTrue(np.allclose(
-                sop_dense,
-                sop_sparse.toarray()
-            ))
+        # Compare the dense and sparse representations.
+        for superoperator_dense, superoperator_sparse in zip(
+            superoperators_dense,
+            superoperators_sparse,
+        ):
+            self._assert_allclose(superoperator_dense, superoperator_sparse)
 
     def test_superoperator_3(self):
         """
         Test that the superoperator created using the structure coefficients
-        matches with the trivial approach.
+        matches the explicit matrix-algebra construction.
         """
-        # Reset the parameters to defaults
+
+        # Reset the parameters to defaults.
         sg.parameters.default()
 
-        # Create a test spin system
-        ss = sg.SpinSystem(["1H", "14N"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the test spin system.
+        spin_system = sg.SpinSystem(["1H", "14N"])
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
 
-        # Test all product operators from the basis set
-        for op_def_i in ss.basis.basis:
+        # Test all product operators from the basis set.
+        for operator_definition in spin_system.basis.basis:
 
-            # Initialise left and right superoperators (for manual construction)
-            sop_L_ref = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
-            sop_R_ref = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
+            # Construct the reference left and right superoperators explicitly.
+            superoperator_left_reference = self._build_manual_side_superoperator(
+                spin_system,
+                operator_definition,
+                "left",
+            )
+            superoperator_right_reference = self._build_manual_side_superoperator(
+                spin_system,
+                operator_definition,
+                "right",
+            )
 
-            # Construct the operator
-            op_i = sg.operator(ss, op_def_i)
+            # Build the same superoperators using structure coefficients.
+            superoperator_left = sg.superoperator(
+                spin_system,
+                operator_definition,
+                "left",
+            )
+            superoperator_right = sg.superoperator(
+                spin_system,
+                operator_definition,
+                "right",
+            )
 
-            # Loop over the operator bras
-            for j in range(ss.basis.dim):
-
-                # Construct the operator bra
-                op_def_j = ss.basis.basis[j]
-                op_j = sg.operator(ss, op_def_j)
-
-                # Loop over the kets
-                for k in range(ss.basis.dim):
-
-                    # Construct the operator ket
-                    op_def_k = ss.basis.basis[k]
-                    op_k = sg.operator(ss, op_def_k)
-
-                    # Calculate the matrix elements
-                    norm = np.sqrt(
-                        (op_j.conj().T @ op_j).trace() * \
-                        (op_k.conj().T @ op_k).trace()
-                    )
-                    sop_L_ref[j, k] = (op_j.conj().T @ op_i @ op_k).trace()
-                    sop_L_ref[j, k] = sop_L_ref[j, k] / norm
-                    sop_R_ref[j, k] = (op_j.conj().T @ op_k @ op_i).trace()
-                    sop_R_ref[j, k] = sop_R_ref[j, k] / norm
-
-            # Build left and right superoperators using inbuilt function
-            # that uses the structure coefficients
-            sop_L = sg.superoperator(ss, op_def_i, "left")
-            sop_R = sg.superoperator(ss, op_def_i, "right")
-
-            # Compare
-            self.assertTrue(np.allclose(sop_L.toarray(), sop_L_ref))
-            self.assertTrue(np.allclose(sop_R.toarray(), sop_R_ref))
+            # Compare the reference and inbuilt constructions.
+            self._assert_allclose(
+                superoperator_left,
+                superoperator_left_reference,
+            )
+            self._assert_allclose(
+                superoperator_right,
+                superoperator_right_reference,
+            )
 
     def test_superoperator_4(self):
         """
-        Test the construction of superoperators at varying truncated basis sets
-        against the reference method.
+        Test superoperator construction for truncated basis sets against the
+        reference method.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Define test spin systems
-        ss1 = sg.SpinSystem(["1H"])
-        ss2 = sg.SpinSystem(["1H", "14N"])
-        test_systems = [ss1, ss2]
+        # Define the test spin systems.
+        test_systems = [
+            sg.SpinSystem(["1H"]),
+            sg.SpinSystem(["1H", "14N"]),
+        ]
 
-        # Test with both systems
-        for ss in test_systems:
+        # Test both spin systems.
+        for spin_system in test_systems:
 
-            # Test all possible spin orders
-            for max_so in range(1, ss.nspins + 1):
+            # Test every possible maximum spin order.
+            for max_spin_order in range(1, spin_system.nspins + 1):
 
-                # Create a basis set
-                ss.basis.max_spin_order = max_so
-                ss.basis.build()
+                # Build the corresponding basis set.
+                spin_system.basis.max_spin_order = max_spin_order
+                spin_system.basis.build()
 
-                # Test all possible operators
-                for op_def in ss.basis.basis:
+                # Test every basis operator definition.
+                for operator_definition in spin_system.basis.basis:
 
-                    # Create reference superoperators using an "idiot-proof"
-                    # function
-                    sop_L_ref = sop_prod_ref(
-                        op_def,
-                        ss.basis.basis,
-                        ss.spins,
-                        'left'
+                    # Build the reference superoperators.
+                    superoperator_left_reference = sop_prod_ref(
+                        operator_definition,
+                        spin_system.basis.basis,
+                        spin_system.spins,
+                        "left",
                     )
-                    sop_R_ref = sop_prod_ref(
-                        op_def,
-                        ss.basis.basis,
-                        ss.spins,
-                        'right'
+                    superoperator_right_reference = sop_prod_ref(
+                        operator_definition,
+                        spin_system.basis.basis,
+                        spin_system.spins,
+                        "right",
                     )
-                    sop_comm_ref = sop_prod_ref(
-                        op_def,
-                        ss.basis.basis,
-                        ss.spins,
-                        'comm'
+                    superoperator_comm_reference = sop_prod_ref(
+                        operator_definition,
+                        spin_system.basis.basis,
+                        spin_system.spins,
+                        "comm",
                     )
 
-                    # Create superoperators using the inbuilt function
-                    sop_L = sg.superoperator(ss, op_def, "left")
-                    sop_R = sg.superoperator(ss, op_def, "right")
-                    sop_comm = sg.superoperator(ss, op_def, "comm")
+                    # Build the superoperators using the public API.
+                    superoperator_left = sg.superoperator(
+                        spin_system,
+                        operator_definition,
+                        "left",
+                    )
+                    superoperator_right = sg.superoperator(
+                        spin_system,
+                        operator_definition,
+                        "right",
+                    )
+                    superoperator_comm = sg.superoperator(
+                        spin_system,
+                        operator_definition,
+                        "comm",
+                    )
 
-                    # Compare
-                    self.assertTrue(np.allclose(
-                        sop_L.toarray(),
-                        sop_L_ref
-                    ))
-                    self.assertTrue(np.allclose(
-                        sop_R.toarray(),
-                        sop_R_ref
-                    ))
-                    self.assertTrue(np.allclose(
-                        sop_comm.toarray(),
-                        sop_comm_ref
-                    ))
+                    # Compare the inbuilt and reference constructions.
+                    self._assert_allclose(
+                        superoperator_left,
+                        superoperator_left_reference,
+                    )
+                    self._assert_allclose(
+                        superoperator_right,
+                        superoperator_right_reference,
+                    )
+                    self._assert_allclose(
+                        superoperator_comm,
+                        superoperator_comm_reference,
+                    )
 
     def test_superoperator_5(self):
         """
-        Test caching behavior of the superoperator function when the basis
+        Test caching behaviour of the superoperator function when the basis
         changes.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H", "1H"])
+        # Create the example spin system.
+        spin_system = sg.SpinSystem(["1H", "1H", "1H"])
 
-        # Define an operator to be created
-        op_def = np.array([2, 0, 0])
+        # Define the operator whose superoperator is tested.
+        operator_definition = np.array([2, 0, 0])
 
-        # Construct the full basis
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-        
-        # Create the superoperator in the full basis
-        Iz = sg.superoperator(ss, op_def, "comm")
+        # Construct the full basis and superoperator.
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+        superoperator_full = sg.superoperator(
+            spin_system,
+            operator_definition,
+            "comm",
+        )
 
-        # Construct a truncated basis
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Construct the truncated basis and corresponding superoperator.
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
+        superoperator_truncated = sg.superoperator(
+            spin_system,
+            operator_definition,
+            "comm",
+        )
 
-        # Create the superoperator in the truncated basis
-        Iz_tr = sg.superoperator(ss, op_def, "comm")
-
-        # Resulting shapes should be different
-        self.assertNotEqual(Iz.shape, Iz_tr.shape)
+        # The resulting shapes should be different.
+        self.assertNotEqual(
+            superoperator_full.shape,
+            superoperator_truncated.shape,
+        )
 
     def test_superoperator_6(self):
         """
-        Test creating the superoperator from a string against creating the same
-        superoperator from an array.
+        Test creating the same superoperator from string and array inputs.
         """
-        # Reset to default parameters
+
+        # Reset to default parameters.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Create and build the example spin system.
+        spin_system = sg.SpinSystem(["1H", "1H"])
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
 
-        # Build a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create the same superoperator using the string and array inputs
-        self.assertTrue(np.allclose(
-            sg.superoperator(ss, "I(z,0)", "left").toarray(),
-            sg.superoperator(ss, [2, 0], "left").toarray()
-        ))
-        self.assertTrue(np.allclose(
-            sg.superoperator(ss, "I(z,0)", "right").toarray(),
-            sg.superoperator(ss, [2, 0], "right").toarray()
-        ))
-        self.assertTrue(np.allclose(
-            sg.superoperator(ss, "I(z,0)", "comm").toarray(),
-            sg.superoperator(ss, [2, 0], "comm").toarray()
-        ))
-        self.assertTrue(np.allclose(
-            sg.superoperator(ss, "I(z,0) + I(z,1)", "comm").toarray(),
-            sg.superoperator(ss, [2, 0], "comm").toarray() + \
-            sg.superoperator(ss, [0, 2], "comm").toarray()
-        ))
-        self.assertTrue(np.allclose(
-            sg.superoperator(ss, "I(+,0) * I(-,1)", "comm").toarray(),
-            -2 * sg.superoperator(ss, [1, 3], "comm").toarray()
-        ))
-        self.assertTrue(np.allclose(
-            sg.superoperator(ss, "I(x,0) + I(x,1)", "comm").toarray(),
+        # Compare string and array inputs for several superoperators.
+        self._assert_allclose(
+            sg.superoperator(spin_system, "I(z,0)", "left"),
+            sg.superoperator(spin_system, [2, 0], "left"),
+        )
+        self._assert_allclose(
+            sg.superoperator(spin_system, "I(z,0)", "right"),
+            sg.superoperator(spin_system, [2, 0], "right"),
+        )
+        self._assert_allclose(
+            sg.superoperator(spin_system, "I(z,0)", "comm"),
+            sg.superoperator(spin_system, [2, 0], "comm"),
+        )
+        self._assert_allclose(
+            sg.superoperator(spin_system, "I(z,0) + I(z,1)", "comm"),
+            sg.superoperator(spin_system, [2, 0], "comm") +
+            sg.superoperator(spin_system, [0, 2], "comm"),
+        )
+        self._assert_allclose(
+            sg.superoperator(spin_system, "I(+,0) * I(-,1)", "comm"),
+            -2 * sg.superoperator(spin_system, [1, 3], "comm"),
+        )
+        self._assert_allclose(
+            sg.superoperator(spin_system, "I(x,0) + I(x,1)", "comm"),
             (
-                - 1 / np.sqrt(2) * sg.superoperator(ss, [1, 0], "comm") \
-                + 1 / np.sqrt(2) * sg.superoperator(ss, [3, 0], "comm") \
-                - 1 / np.sqrt(2) * sg.superoperator(ss, [0, 1], "comm") \
-                + 1 / np.sqrt(2) * sg.superoperator(ss, [0, 3], "comm")
-            ).toarray()
-        ))
-        
+                -1 / np.sqrt(2) * sg.superoperator(spin_system, [1, 0], "comm") +
+                1 / np.sqrt(2) * sg.superoperator(spin_system, [3, 0], "comm") -
+                1 / np.sqrt(2) * sg.superoperator(spin_system, [0, 1], "comm") +
+                1 / np.sqrt(2) * sg.superoperator(spin_system, [0, 3], "comm")
+            ),
+        )
+
     def test_sop_T_coupled(self):
         """
-        Test creating the Hamiltonian term using "Cartesian" superoperators and
-        the coupled spherical tensor superoperator.
+        Test Cartesian and coupled-spherical constructions of a two-spin term.
         """
-        # Set parameters
+
+        # Set parameters.
         sg.parameters.default()
         sg.parameters.sparse_superoperator = False
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the example spin system.
+        spin_system = sg.SpinSystem(["1H", "1H"])
+        spin_system.basis.max_spin_order = 2
+        spin_system.basis.build()
 
-        # Make a random Cartesian interaction tensor
-        A = np.random.rand(3, 3)
+        # Generate a reproducible Cartesian interaction tensor.
+        interaction_tensor = np.random.default_rng(0).random((3, 3))
 
-        # Cartesian spin operators
-        I = np.array(['x', 'y', 'z'])
-        
-        # Perform the dot product manually
-        left = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
-        for i in range(A.shape[0]):
-            for s in range(A.shape[1]):
-                left += A[i, s]*sg.superoperator(ss, f"I({I[i]},0)*I({I[s]},1)")
+        # Define the Cartesian operator labels.
+        cartesian_labels = np.array(["x", "y", "z"])
 
-        # Convert A to spherical tensors
-        A = cartesian_tensor_to_spherical_tensor(A)
+        # Perform the Cartesian contraction explicitly.
+        left_hand_side = np.zeros(
+            (spin_system.basis.dim, spin_system.basis.dim),
+            dtype=complex,
+        )
+        for row_index in range(interaction_tensor.shape[0]):
+            for column_index in range(interaction_tensor.shape[1]):
+                left_hand_side += (
+                    interaction_tensor[row_index, column_index] *
+                    sg.superoperator(
+                        spin_system,
+                        f"I({cartesian_labels[row_index]},0)"
+                        f"*I({cartesian_labels[column_index]},1)",
+                    )
+                )
 
-        # Use spherical tensors
-        right = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
-        for l in range(0, 3):
-            for q in range(-l, l + 1):
-                right += (-1)**(q)*A[(l, q)] * sg.sop_T_coupled(ss, l, -q, 0, 1)
+        # Convert the interaction tensor to spherical components.
+        spherical_tensor = cartesian_tensor_to_spherical_tensor(
+            interaction_tensor
+        )
 
-        # Both conventions should give the same result
-        self.assertTrue(np.allclose(left, right))
+        # Perform the same contraction using coupled spherical tensors.
+        right_hand_side = np.zeros(
+            (spin_system.basis.dim, spin_system.basis.dim),
+            dtype=complex,
+        )
+        for rank in range(0, 3):
+            for projection in range(-rank, rank + 1):
+                right_hand_side += (
+                    (-1) ** projection *
+                    spherical_tensor[(rank, projection)] *
+                    sg.sop_T_coupled(
+                        spin_system,
+                        rank,
+                        -projection,
+                        0,
+                        1,
+                    )
+                )
+
+        # Both constructions should give the same result.
+        self._assert_allclose(left_hand_side, right_hand_side)
 
     def test_sop_to_truncated_basis(self):
         """
-        Test the transformation of superoperators to truncated basis.
+        Test the transformation of superoperators to a truncated basis.
         """
-        # Reset to defaults
+
+        # Reset to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "14N"])
+        # Create the example spin system.
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "14N"])
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        # Build the original basis set.
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
 
-        # Operators to test
-        operators = ['E', 'x', 'y', 'z', '+', '-']
+        # Define the operator labels to test.
+        operator_labels = ["E", "x", "y", "z", "+", "-"]
 
-        # Create the superoperators in the original basis set
-        sops_original = []
-        for i in operators:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
+        # Build the superoperators in the original basis.
+        operator_strings = self._build_operator_strings(operator_labels)
+        superoperators_original = [
+            sg.superoperator(spin_system, operator_string)
+            for operator_string in operator_strings
+        ]
 
-            for j in operators:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
+        # Truncate the basis set and the original superoperators.
+        superoperators_truncated = spin_system.basis.truncate_by_coherence(
+            [-2, 0, 2],
+            *superoperators_original,
+        )
 
-                for k in operators:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
+        # Rebuild the same superoperators directly in the truncated basis.
+        superoperators_truncated_reference = [
+            sg.superoperator(spin_system, operator_string)
+            for operator_string in operator_strings
+        ]
 
-                    # Create the operator string
-                    op_string = f"{op_i} * {op_j} * {op_k}"
+        # Compare the transformed and directly rebuilt superoperators.
+        for superoperator_truncated, superoperator_reference in zip(
+            superoperators_truncated,
+            superoperators_truncated_reference,
+        ):
+            self._assert_allclose(
+                superoperator_truncated,
+                superoperator_reference,
+            )
 
-                    # Create the superoperator
-                    sop = sg.superoperator(ss, op_string)
-                    sops_original.append(sop)
-
-        # Truncate the basis set and superoperators
-        sops_trunc = ss.basis.truncate_by_coherence([-2, 0, 2], *sops_original)
-
-        # Create the superoperators in the truncated basis directly
-        sops_trunc_ref = []
-        for i in operators:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
-
-            for j in operators:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
-
-                for k in operators:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
-
-                    # Create the operator string
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-
-                    # Create the superoperator
-                    sop = sg.superoperator(ss, op_string)
-                    sops_trunc_ref.append(sop)
-
-        # Compare
-        for sop_trunc, sop_trunc_ref in zip(sops_trunc, sops_trunc_ref):
-            self.assertTrue(np.allclose(
-                sop_trunc.toarray(),
-                sop_trunc_ref.toarray()
-            ))
 
 def sop_prod_ref(
     op_def: np.ndarray,
     basis: np.ndarray,
     spins: np.ndarray,
-    side: Literal["comm", "left", "right"]
+    side: Literal["comm", "left", "right"],
 ) -> np.ndarray:
     """
-    A reference method for calculating the superoperator.
-    
+    Calculate a reference superoperator using structure coefficients directly.
+
     NOTE:
     This implementation is very slow and should be used for testing purposes
     only.
@@ -426,10 +528,7 @@ def sop_prod_ref(
         A sequence of floats describing the spin quantum numbers of the spin
         system.
     side : {'comm', 'left', 'right'}
-        Specifies the type of superoperator:
-        - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        Specifies the type of superoperator.
 
     Returns
     -------
@@ -437,44 +536,46 @@ def sop_prod_ref(
         Superoperator defined by `op_def`.
     """
 
-    # If commutation superoperator, calculate left and right superoperators and
-    # return their difference
-    if side == 'comm':
-        sop = sop_prod_ref(op_def, basis, spins, 'left') \
-            - sop_prod_ref(op_def, basis, spins, 'right')
-        return sop
-    
-    # Obtain the basis dimension and number of spins
+    # Build commutation superoperators as left minus right multiplication.
+    if side == "comm":
+        return sop_prod_ref(op_def, basis, spins, "left") - sop_prod_ref(
+            op_def,
+            basis,
+            spins,
+            "right",
+        )
+
+    # Obtain the basis dimension and number of spins.
     dim = basis.shape[0]
     nspins = spins.shape[0]
-    
-    # Initialize the superoperator
+
+    # Initialise the superoperator.
     sop = np.zeros((dim, dim), dtype=complex)
 
-    # Loop over each matrix row j
-    for j in range(dim):
+    # Loop over each matrix row.
+    for row_index in range(dim):
 
-        # Loop over each matrix column k
-        for k in range(dim):
+        # Loop over each matrix column.
+        for column_index in range(dim):
 
-            # Initialize the matrix element
-            sop_jk = 1
+            # Initialise the matrix element.
+            element = 1
 
-            # Loop over the spins
-            for n in range(nspins):
+            # Loop over the spins.
+            for spin_index in range(nspins):
 
-                # Get the single-spin operator indices
-                i_ind = op_def[n]
-                j_ind = basis[j, n]
-                k_ind = basis[k, n]
+                # Get the single-spin operator indices.
+                i_ind = op_def[spin_index]
+                j_ind = basis[row_index, spin_index]
+                k_ind = basis[column_index, spin_index]
 
-                # Get the structure coefficients for the current spin
-                c = structure_coefficients(spins[n], side)
+                # Get the structure coefficients for the current spin.
+                coefficients = structure_coefficients(spins[spin_index], side)
 
-                # Add to the product
-                sop_jk = sop_jk * c[i_ind, j_ind, k_ind]
+                # Add the current single-spin contribution to the product.
+                element = element * coefficients[i_ind, j_ind, k_ind]
 
-            # Add to the superoperator
-            sop[j, k] = sop_jk
+            # Store the completed matrix element.
+            sop[row_index, column_index] = element
 
     return sop

@@ -6,7 +6,8 @@ Spinguin is a software package for spin physics and spin dynamics simulations of
 
 - Follow the existing coding style and structure of the codebase you are working on. This is the most important guideline. Always read the existing code carefully and understand its style before making any edits or additions.
 
-- Do not create overly complicated functions. Always break down complex series of operations into smaller, well-defined functions.
+- Do not create overly complicated functions. Always break down complex series of operations into smaller, well-defined functions. However, do not create functions that are too small and trivial. Do not create functions
+that are only wrappers around a single Python functionality. 
 
 - Use descriptive variable and function names that reflect their purpose and content. Names should be concise but informative. Use lowercase with underscores. Avoid vague names. The only exceptions are simple loop indices and one-letter variables commonly used in scientific literature.
 

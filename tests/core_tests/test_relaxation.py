@@ -1,448 +1,403 @@
+"""
+Tests for relaxation models and relaxation superoperators.
+"""
+
+import os
 import unittest
+
 import numpy as np
 import scipy.sparse as sp
-import os
+
 import spinguin as sg
-from spinguin._core._relaxation import dd_constant
 from spinguin._core._nmr_isotopes import ISOTOPES
+from spinguin._core._relaxation import dd_constant
+
 
 class TestRelaxation(unittest.TestCase):
+    """
+    Test dipolar constants and relaxation superoperator construction.
+    """
+
+    def _get_test_data_path(
+        self,
+        filename,
+    ):
+        """
+        Return the absolute path to a shared test-data file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the requested test-data file.
+
+        Returns
+        -------
+        str
+            Absolute path to the requested file.
+        """
+
+        # Locate the shared test-data directory.
+        test_data_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "test_data",
+        )
+
+        return os.path.join(test_data_dir, filename)
+
+    def _assert_allclose(
+        self,
+        value,
+        reference,
+        rtol=1e-05,
+        atol=1e-08,
+    ):
+        """
+        Check that two arrays or sparse matrices agree numerically.
+
+        Parameters
+        ----------
+        value : array-like or sparse matrix
+            Tested value.
+        reference : array-like or sparse matrix
+            Reference value.
+        rtol : float, optional
+            Relative tolerance passed to `numpy.allclose`.
+        atol : float, optional
+            Absolute tolerance passed to `numpy.allclose`.
+
+        Returns
+        -------
+        None
+            The assertion is evaluated in place.
+        """
+
+        # Convert sparse matrices to dense arrays when necessary.
+        if hasattr(value, "toarray"):
+            value = value.toarray()
+        if hasattr(reference, "toarray"):
+            reference = reference.toarray()
+
+        # Compare the tested and reference values.
+        self.assertTrue(np.allclose(value, reference, rtol=rtol, atol=atol))
+
+    def _build_redfield_spin_system(
+        self,
+    ):
+        """
+        Create the shared six-spin system used in Redfield tests.
+
+        Returns
+        -------
+        SpinSystem
+            Spin system with a built basis set and assigned interactions.
+        """
+
+        # Create the shared proton-nitrogen spin system.
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+
+        # Build the basis set used in the regression tests.
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+
+        # Define the chemical shifts in ppm.
+        spin_system.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+
+        # Define the scalar couplings in Hz.
+        spin_system.J_couplings = [
+            [0, 0, 0, 0, 0, 0],
+            [-1.04, 0, 0, 0, 0, 0],
+            [4.85, 1.05, 0, 0, 0, 0],
+            [1.05, 4.85, 0.71, 0, 0, 0],
+            [1.24, 1.24, 7.55, 7.55, 0, 0],
+            [8.16, 8.16, 0.87, 0.87, -0.19, 0],
+        ]
+
+        # Define the Cartesian coordinates of the nuclei.
+        spin_system.xyz = [
+            [2.0495335, 0.0000000, -1.4916842],
+            [-2.0495335, 0.0000000, -1.4916842],
+            [2.1458878, 0.0000000, 0.9846086],
+            [-2.1458878, 0.0000000, 0.9846086],
+            [0.0000000, 0.0000000, 2.2681296],
+            [0.0000000, 0.0000000, -1.5987077],
+        ]
+
+        # Define the shielding tensors.
+        shielding = np.zeros((6, 3, 3))
+        shielding[5] = np.array(
+            [
+                [-406.20, 0.00, 0.00],
+                [0.00, 299.44, 0.00],
+                [0.00, 0.00, -181.07],
+            ]
+        )
+        spin_system.shielding = shielding
+
+        # Define the electric-field-gradient tensors.
+        efg = np.zeros((6, 3, 3))
+        efg[5] = np.array(
+            [
+                [0.3069, 0.0000, 0.0000],
+                [0.0000, 0.7969, 0.0000],
+                [0.0000, 0.0000, -1.1037],
+            ]
+        )
+        spin_system.efg = efg
+
+        return spin_system
 
     def test_dd_constant(self):
         """
-        Test the dipole-dipole (DD) relaxation constant calculation.
-        Compares calculated values against tabulated values from the reference:
-        Apperley, Harris & Hodgkinson: Solid-state NMR: Basic principles and
-        practice.
+        Test the dipole-dipole relaxation constant against tabulated values.
         """
 
-        # Get gyromagnetic ratios (gamma) in Hz/T
-        y_13C = 2 * np.pi * ISOTOPES['13C'][1] * 1e6
-        y_1H = 2 * np.pi * ISOTOPES['1H'][1] * 1e6
-        y_15N = 2 * np.pi * ISOTOPES['15N'][1] * 1e6
+        # Get gyromagnetic ratios in rad s^-1 T^-1.
+        gamma_13c = 2 * np.pi * ISOTOPES["13C"][1] * 1e6
+        gamma_1h = 2 * np.pi * ISOTOPES["1H"][1] * 1e6
+        gamma_15n = 2 * np.pi * ISOTOPES["15N"][1] * 1e6
 
-        # Interatomic distances in meters
-        r_13C_13C = 0.153e-9
-        r_13C_1H = 0.106e-9
-        r_13C_15N = 0.147e-9
+        # Define interatomic distances in metres.
+        r_13c_13c = 0.153e-9
+        r_13c_1h = 0.106e-9
+        r_13c_15n = 0.147e-9
 
-        # Calculate DD constants and convert to Hz
-        dd_13C_13C = -dd_constant(y_13C, y_13C) / r_13C_13C**3 / (2 * np.pi)
-        dd_13C_1H = -dd_constant(y_13C, y_1H) / r_13C_1H**3 / (2 * np.pi)
-        dd_13C_15N = dd_constant(y_13C, y_15N) / r_13C_15N**3 / (2 * np.pi)
+        # Calculate the DD constants and convert them to hertz.
+        dd_13c_13c = (
+            -dd_constant(gamma_13c, gamma_13c) / r_13c_13c**3 /
+            (2 * np.pi)
+        )
+        dd_13c_1h = (
+            -dd_constant(gamma_13c, gamma_1h) / r_13c_1h**3 /
+            (2 * np.pi)
+        )
+        dd_13c_15n = (
+            dd_constant(gamma_13c, gamma_15n) / r_13c_15n**3 /
+            (2 * np.pi)
+        )
 
-        # Compare with tabulated values (in Hz)
-        self.assertTrue(np.allclose(2.12e3, dd_13C_13C, rtol=0.01))
-        self.assertTrue(np.allclose(25.44e3, dd_13C_1H, rtol=0.01))
-        self.assertTrue(np.allclose(0.97e3, dd_13C_15N, rtol=0.01))
+        # Compare with the tabulated reference values in hertz.
+        self._assert_allclose(2.12e3, dd_13c_13c, rtol=0.01)
+        self._assert_allclose(25.44e3, dd_13c_1h, rtol=0.01)
+        self._assert_allclose(0.97e3, dd_13c_15n, rtol=0.01)
 
     def test_ldb_thermalization(self):
         """
-        Test the thermalization of the relaxation superoperator. Simulates the
-        evolution of a spin system under relaxation and compares the final state
-        with the thermal equilibrium state.
+        Test that relaxation drives the system back to thermal equilibrium.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
         sg.parameters.temperature = 273
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        # Build the shared Redfield test system.
+        spin_system = self._build_redfield_spin_system()
 
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        # Define the relaxation model.
+        spin_system.relaxation.theory = "redfield"
+        spin_system.relaxation.tau_c = 50e-12
+        spin_system.relaxation.thermalization = True
+        spin_system.relaxation.sr2k = True
 
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ]
-
-        # Define Cartesian coordinates of nuclei
-        ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
-        ]
-
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
-        # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
-        ])
-        ss.efg = efg
-
-        # Define the relaxation theory
-        ss.relaxation.theory = "redfield"
-        ss.relaxation.tau_c = 50e-12
-        ss.relaxation.thermalization = True
-        ss.relaxation.sr2k = True
-
-        # Propagation parameters
+        # Define the propagation parameters.
         time_step = 2e-3
         nsteps = 50000
 
-        # Get the Hamiltonian
-        H = sg.hamiltonian(ss)
+        # Build the Hamiltonian, relaxation superoperator, and Liouvillian.
+        hamiltonian = sg.hamiltonian(spin_system)
+        relaxation_superoperator = sg.relaxation(spin_system)
+        liouvillian = sg.liouvillian(hamiltonian, relaxation_superoperator)
 
-        # Get the relaxation superoperator
-        R = sg.relaxation(ss)
+        # Create the thermal equilibrium state and invert the proton spins.
+        state = sg.equilibrium_state(spin_system)
+        pulse_operator = (
+            "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)"
+        )
+        pulse_180 = sg.pulse(spin_system, pulse_operator, 180)
+        state = pulse_180 @ state
 
-        # Construct the Liouvillian
-        L = sg.liouvillian(H, R)
+        # Restrict the evolution to the zero-quantum subspace.
+        liouvillian, state = spin_system.basis.truncate_by_coherence(
+            [0],
+            liouvillian,
+            state,
+        )
 
-        # Create the thermal equilibrium state
-        rho = sg.equilibrium_state(ss)
-
-        # Apply a 180-degree pulse (to all 1H)
-        op_string = "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)"
-        pul_180 = sg.pulse(ss, op_string, 180)
-        rho = pul_180 @ rho
-
-        # Switch to the zero-quantum (ZQ) subspace
-        L, rho = ss.basis.truncate_by_coherence([0], L, rho)
-
-        # Get the propagator
-        P = sg.propagator(L, time_step)
-        
-        # Simulate the evolution of the spin system
+        # Build the propagator and evolve the system.
+        propagator = sg.propagator(liouvillian, time_step)
         for _ in range(nsteps):
-            rho = P @ rho
+            state = propagator @ state
 
-        # Create an equilibrium state in the ZQ basis for reference
-        rho_ref = sg.equilibrium_state(ss)
+        # Construct the equilibrium reference in the same basis.
+        state_reference = sg.equilibrium_state(spin_system)
 
-        # Verify that the final state matches the thermal equilibrium state
-        self.assertTrue(np.allclose(rho, rho_ref))
+        # Verify that the final state matches thermal equilibrium.
+        self._assert_allclose(state, state_reference)
 
     def test_relaxation_redfield_1(self):
         """
-        Test that creates a relaxation superoperator using Redfield theory and
-        compares that to a previously calculated value.
+        Test the Redfield relaxation superoperator against reference data.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
 
-        # Load the previously calculated R for comparison
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        R_previous = sp.csc_array(sp.load_npz(os.path.join(
-            test_dir, 'test_data', 'relaxation.npz')
-        ))
+        # Load the previously calculated Redfield superoperator.
+        relaxation_reference = sp.csc_array(
+            sp.load_npz(self._get_test_data_path("relaxation.npz"))
+        )
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the shared Redfield test system.
+        spin_system = self._build_redfield_spin_system()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        # Define the relaxation model.
+        spin_system.relaxation.theory = "redfield"
+        spin_system.relaxation.tau_c = 50e-12
 
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        # Build the Redfield relaxation superoperator.
+        relaxation_superoperator = sg.relaxation(spin_system)
 
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ]
+        # Compare the calculated superoperator with the reference.
+        self._assert_allclose(relaxation_superoperator, relaxation_reference)
 
-        # Define Cartesian coordinates of nuclei
-        ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
-        ]
+        # Recalculate the same superoperator to exercise caching paths.
+        relaxation_superoperator = sg.relaxation(spin_system)
 
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
-        # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
-        ])
-        ss.efg = efg
-
-        # Define the relaxation theory
-        ss.relaxation.theory = "redfield"
-        ss.relaxation.tau_c = 50e-12
-        
-        # Get the Redfield relaxation superoperator
-        R = sg.relaxation(ss)
-
-        # Compare with the reference
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
-
-        # Obtain R again (to check possible errors from caches etc.)
-        R = sg.relaxation(ss)
-
-        # Compare with the reference
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the repeated calculation with the reference.
+        self._assert_allclose(relaxation_superoperator, relaxation_reference)
 
     def test_relaxation_redfield_2(self):
         """
-        Test that creates a relaxation superoperator using Redfield theory when
-        the basis set has been truncated such that some spin operators relevant
-        for relaxation no longer exist in the basis set.
+        Test Redfield relaxation after zero-quantum basis truncation.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the shared Redfield test system.
+        spin_system = self._build_redfield_spin_system()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        # Define the relaxation model.
+        spin_system.relaxation.theory = "redfield"
+        spin_system.relaxation.tau_c = 50e-12
 
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        # Truncate the basis set to zero-quantum terms only.
+        spin_system.basis.truncate_by_coherence([0])
 
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ]
-
-        # Define Cartesian coordinates of nuclei
-        ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
-        ]
-
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
-        # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
-        ])
-        ss.efg = efg
-
-        # Define the relaxation theory
-        ss.relaxation.theory = "redfield"
-        ss.relaxation.tau_c = 50e-12
-
-        # Truncate the basis set to include only zero-quantum terms
-        ss.basis.truncate_by_coherence([0])
-
-        # Build the relaxation superoperator (and see that no errors arise)
-        sg.relaxation(ss)
+        # Build the relaxation superoperator and verify that no error is raised.
+        sg.relaxation(spin_system)
 
     def test_relaxation_redfield_3(self):
         """
-        Test that creates the relaxation superoperator with isotropic and
-        anisotropic rotational diffusion and compares the obtained results.
+        Test isotropic and equivalent anisotropic Redfield diffusion models.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the shared Redfield test system.
+        spin_system = self._build_redfield_spin_system()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        # Define the Redfield relaxation model.
+        spin_system.relaxation.theory = "redfield"
 
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        # Build the superoperator using isotropic rotational diffusion.
+        spin_system.relaxation.tau_c = 50e-12
+        relaxation_isotropic = sg.relaxation(spin_system)
 
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ]
+        # Build the superoperator using equivalent anisotropic diffusion.
+        spin_system.relaxation.tau_c = [50e-12, 50e-12, 50e-12]
+        spin_system.relaxation.molecule = sg.Molecule(
+            spin_system.isotopes,
+            spin_system.xyz,
+        )
+        relaxation_anisotropic = sg.relaxation(spin_system)
 
-        # Define Cartesian coordinates of nuclei
-        ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
-        ]
-
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
-        # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
-        ])
-        ss.efg = efg
-
-        # Define the relaxation theory
-        ss.relaxation.theory = "redfield"
-        
-        # Obtain R using the isotropic rotational diffusion
-        ss.relaxation.tau_c = 50e-12
-        R_iso = sg.relaxation(ss)
-
-        # Obtain R using the anisotropic rotational diffusion
-        ss.relaxation.tau_c = [50e-12, 50e-12, 50e-12]
-        ss.relaxation.molecule = sg.Molecule(ss.isotopes, ss.xyz)
-        R_aniso = sg.relaxation(ss)
-
-        # Compare with each other
-        self.assertTrue(np.allclose(R_iso.toarray(), R_aniso.toarray()))
+        # Verify that both diffusion models give the same result.
+        self._assert_allclose(relaxation_isotropic, relaxation_anisotropic)
 
     def test_relaxation_phenomenological(self):
         """
-        Test that creates the phenomenological relaxation superoperator and
-        makes a comparison to a previously computed result.
+        Test the phenomenological relaxation superoperator against reference data.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
 
-        # Load the previously calculated R for comparison
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        R_previous = sp.csc_array(sp.load_npz(os.path.join(
-            test_dir, 'test_data', 'relaxation_phenomenological.npz')
-        ))
+        # Load the previously calculated phenomenological superoperator.
+        relaxation_reference = sp.csc_array(
+            sp.load_npz(
+                self._get_test_data_path("relaxation_phenomenological.npz")
+            )
+        )
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the spin system for the phenomenological relaxation test.
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-        
-        # Define the relaxation theory
-        ss.relaxation.theory = "phenomenological"
-        ss.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
-        ss.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
+        # Define the phenomenological relaxation model.
+        spin_system.relaxation.theory = "phenomenological"
+        spin_system.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
+        spin_system.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
 
-        # Obtain the relaxation superoperator
-        R = sg.relaxation(ss)
+        # Build the relaxation superoperator.
+        relaxation_superoperator = sg.relaxation(spin_system)
 
-        # Compare to the previous result
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the calculated superoperator with the reference.
+        self._assert_allclose(relaxation_superoperator, relaxation_reference)
 
-        # Obtain R again (check for cache errors etc.)
-        R = sg.relaxation(ss)
+        # Recalculate the same superoperator to exercise caching paths.
+        relaxation_superoperator = sg.relaxation(spin_system)
 
-        # Compare to the previous result
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the repeated calculation with the reference.
+        self._assert_allclose(relaxation_superoperator, relaxation_reference)
 
     def test_relaxation_sr2k(self):
         """
-        Test that adds the contribution from SR2K to a phenomenological
-        relaxation superoperator and compares the result to a pre-computed
-        value.
+        Test the SR2K contribution against pre-computed reference data.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 3e-6
 
-        # Load the previously calculated R for comparison
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        R_previous = sp.csc_array(sp.load_npz(
-            os.path.join(test_dir, 'test_data', 'relaxation_sr2k.npz')
-        ))
+        # Load the previously calculated SR2K superoperator.
+        relaxation_reference = sp.csc_array(
+            sp.load_npz(self._get_test_data_path("relaxation_sr2k.npz"))
+        )
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
-
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
-
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
+        # Build the spin system for the SR2K test.
+        spin_system = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
+        spin_system.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        spin_system.J_couplings = [
+            [0, 0, 0, 0, 0, 0],
+            [-1.04, 0, 0, 0, 0, 0],
+            [4.85, 1.05, 0, 0, 0, 0],
+            [1.05, 4.85, 0.71, 0, 0, 0],
+            [1.24, 1.24, 7.55, 7.55, 0, 0],
+            [8.16, 8.16, 0.87, 0.87, -0.19, 0],
         ]
 
-        # Define the relaxation theory
-        ss.relaxation.theory = "phenomenological"
-        ss.relaxation.sr2k = "true"
-        ss.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
-        ss.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
-        
-        # Get the relaxation superoperator
-        R = sg.relaxation(ss)
+        # Define the phenomenological relaxation model with SR2K enabled.
+        spin_system.relaxation.theory = "phenomenological"
+        spin_system.relaxation.sr2k = "true"
+        spin_system.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
+        spin_system.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
 
-        # Compare
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
-        
-        # Get the relaxation superoperator again (check for cache errors etc.)
-        R = sg.relaxation(ss)
-        
-        # Compare
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Build the relaxation superoperator.
+        relaxation_superoperator = sg.relaxation(spin_system)
+
+        # Compare the calculated superoperator with the reference.
+        self._assert_allclose(relaxation_superoperator, relaxation_reference)
+
+        # Recalculate the same superoperator to exercise caching paths.
+        relaxation_superoperator = sg.relaxation(spin_system)
+
+        # Compare the repeated calculation with the reference.
+        self._assert_allclose(relaxation_superoperator, relaxation_reference)
