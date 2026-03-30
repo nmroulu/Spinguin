@@ -29,7 +29,7 @@ from spinguin._core._la import (
 )
 from spinguin._core._operators import op_Sx, op_Sy, op_Sz
 from spinguin._core._parameters import parameters
-from spinguin._core._status import status
+from spinguin._core._status import status, status_section
 from spinguin._core._superoperators import sop_T_coupled, superoperator
 from spinguin._core._utils import idx_to_lq, parse_operator_string
 
@@ -758,7 +758,7 @@ def _rot_diff_gen(spin_system: SpinSystem) -> dict:
         values are 3x3 and 5x5 NumPy arrays, respectively.
     """
     # Report the start of the rotational-diffusion calculation.
-    status("Calculating rotational diffusion generator...")
+    status("Calculating the rotational diffusion generator...")
     time_start = time.time()
 
     # Obtain the rotational correlation time specification.
@@ -1404,6 +1404,10 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     R : ndarray or csc_array
         Relaxation superoperator. 
     """
+
+    # # Report the start of the relaxation superoperator construction.
+    # status_section("Relaxation superoperator")
+
     # Validate that all required inputs have been provided.
     _validate_relaxation_inputs(spin_system)
 
@@ -1436,6 +1440,10 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             H_left=H_left,
             T=parameters.temperature,
         )
+
+    # # Report the completion of the relaxation superoperator construction.
+    # status_section("Relaxation superoperator end.")
+    # status("\n")
 
     return R
 
@@ -1509,7 +1517,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     """
     # Report the start of the Redfield relaxation calculation.
     time_start_R = time.time()
-    status("Constructing relaxation superoperator using Redfield theory...\n")
+    status("Constructing the Redfield relaxation superoperator...\n")
 
     # Extract the basis dimension and the relative integration tolerance.
     dim = spin_system.basis.dim
@@ -1538,7 +1546,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     top_left = 1j * H
 
     # Initialise the Redfield relaxation superoperator accumulator.
-    status("Calculating the Redfield superoperator terms...")
+    status("Calculating the relaxation superoperator terms...")
     time_start = time.time()
     R = sp.csc_array((dim, dim), dtype=complex)
 
@@ -1599,7 +1607,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
 
     # Remove the dynamic frequency shifts unless they were requested.
     if not spin_system.relaxation.dynamic_frequency_shift:
-        status("Removing the dynamic frequency shifts...")
+        status("Removing dynamic frequency shifts...")
         time_start = time.time()
         R = R.real
         _report_completion(time_start)
@@ -1611,9 +1619,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     _report_completion(time_start)
     
     # Report the total time required for the Redfield construction.
-    status(
-        "Redfield relaxation superoperator constructed in "
-        f"{time.time() - time_start_R:.4f} seconds.\n"
-    )
+    status(f"Redfield relaxation superoperator constructed in "
+           f"{time.time() - time_start_R:.4f} seconds.\n")
 
     return R

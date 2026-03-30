@@ -16,7 +16,7 @@ from scipy.sparse import csc_array
 
 from spinguin._core._la import eliminate_small
 from spinguin._core._parameters import parameters
-from spinguin._core._status import status
+from spinguin._core._status import status, status_section
 from spinguin._core._superoperators import superoperator
 
 if TYPE_CHECKING:
@@ -227,7 +227,8 @@ def hamiltonian(
 
     # Record the start time for status reporting.
     time_start = time.time()
-    status("Constructing Hamiltonian...")
+    # status_section("Hamiltonian")
+    status("Constructing the Hamiltonian...")
 
     # Ensure that the basis has been built before constructing the Hamiltonian.
     if spin_system.basis.basis is None:
@@ -254,6 +255,9 @@ def hamiltonian(
     # Remove very small values to improve sparsity and numerical cleanliness.
     eliminate_small(sop_H, parameters.zero_hamiltonian)
 
-    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
+    # Status reporting for the Hamiltonian construction.
+    status(f"Hamiltonian constructed in {time.time() - time_start:.4f} seconds.\n")
+    # status_section("Hamiltonian end.")
+    # status("\n")
 
     return sop_H

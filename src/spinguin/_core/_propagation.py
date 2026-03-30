@@ -20,7 +20,7 @@ from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._la import expm
 from spinguin._core._parameters import parameters
-from spinguin._core._status import status
+from spinguin._core._status import status, status_section
 from spinguin._core._superoperators import superoperator
 
 if TYPE_CHECKING:
@@ -72,7 +72,7 @@ def propagator(
     """
 
     # Report the start of the propagator construction.
-    status("Constructing propagator...")
+    status("Constructing the time propagator...")
     time_start = time.time()
 
     # Evaluate the propagator from the Liouvillian matrix exponential.
@@ -87,11 +87,11 @@ def propagator(
 
     # Convert sparse propagators to dense form if they are sufficiently full.
     if sp.issparse(P) and density > parameters.propagator_density:
-        status("Density exceeds threshold. Converting to NumPy array.")
+        status("Propagator density exceeds threshold. Converting to dense array...")
         P = P.toarray()
 
     # Report the completion of the propagator construction.
-    _report_completion(time_start)
+    status(f"Time propagator constructed in {time.time() - time_start:.4f} seconds.\n")
 
     return P
 
@@ -156,6 +156,8 @@ def pulse(
         Raised if the pulse is generated from a product operator, for which the
         pulse angle is not uniquely defined.
     """
+    # # Status reporting for the pulse-superoperator construction.
+    # status_section("Pulse superoperator")
 
     # Ensure that the working basis has been constructed.
     if spin_system.basis.basis is None:
@@ -164,7 +166,7 @@ def pulse(
 
     # Report the start of the pulse-superoperator construction.
     time_start = time.time()
-    status("Creating a pulse superoperator...")
+    status("Constructing the pulse superoperator...")
 
     # Warn if the requested pulse uses a product operator.
     if '*' in operator:
@@ -183,6 +185,8 @@ def pulse(
 
     # Report the completion of the pulse-superoperator construction.
     _report_completion(time_start)
+    # status_section("Pulse superoperator end.")
+    # status("\n")
 
     return P
 

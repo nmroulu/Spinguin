@@ -1,6 +1,6 @@
 """
 Benchmarks Liouville-space superoperator construction as a function of
-spin-system size and basis truncation.
+spin-system size and basis-set truncation.
 
 For each selected maximum spin order and number of spins, the benchmark
 builds a Liouville-space basis and times the construction of all

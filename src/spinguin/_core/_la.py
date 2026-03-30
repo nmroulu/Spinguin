@@ -259,7 +259,7 @@ def expm(
         Matrix exponential of `A`.
     """
 
-    status("Calculating the matrix exponential...")
+    status("Computing the matrix exponential using Taylor series with scaling and squaring...")
 
     # Estimate the matrix magnitude to decide whether scaling is required.
     norm_A = norm_1(A, ord="col")
@@ -270,20 +270,17 @@ def expm(
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2**scaling_count
 
-        status(f"Scaling the matrix down {scaling_count} times.")
         A = A / scaling_factor
         expm_A = expm_taylor(A, zero_value)
 
+        status(f"Matrix squaring...")
         for step in range(scaling_count):
-            status(
-                f"Squaring the matrix. Step {step + 1} of "
-                f"{scaling_count}."
-            )
+            status(f"Step {step + 1}...")
             expm_A = custom_dot(expm_A, expm_A, zero_value)
     else:
         expm_A = expm_taylor(A, zero_value)
 
-    status("Matrix exponential completed.")
+    status("Matrix exponential computed.")
     return expm_A
 
 
@@ -310,7 +307,7 @@ def expm_taylor(
         Matrix exponential of `A`.
     """
 
-    status("Calculating the matrix exponential using Taylor series.")
+    status("Taylor series...")
 
     # Remove entries that are already below the effective numerical threshold.
     eliminate_small(A, zero_value)
@@ -323,7 +320,7 @@ def expm_taylor(
     k = 1
     cont = True
     while cont:
-        status(f"Taylor series term: {k}")
+        status(f"Term {k}...")
 
         # Form the next Taylor term and add it to the running sum.
         trm = custom_dot(trm, A / k, zero_value)

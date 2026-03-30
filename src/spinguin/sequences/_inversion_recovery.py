@@ -6,7 +6,7 @@ Inversion-recovery pulse sequence with continuous recovery detection.
 from copy import deepcopy
 import numpy as np
 import spinguin._core as sg
-
+from tqdm import tqdm
 
 def inversion_recovery(
     spin_system: sg.SpinSystem,
@@ -110,7 +110,8 @@ def inversion_recovery(
     magnetizations = np.zeros((nspins, npoints), dtype=complex)
 
     # Propagate the state and record the longitudinal magnetisation.
-    for step in range(npoints):
+    # for step in range(npoints):
+    for step in tqdm(range(npoints), desc="Time propagation"):
         for i, idx in enumerate(indices):
             magnetizations[i, step] = sg.measure(
                 spin_system,

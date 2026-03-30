@@ -2,7 +2,7 @@
 Benchmarks the construction of a single Liouville-space superoperator for a
 large spin-1/2 system.
 
-The benchmark creates a restricted basis and constructs a left-acting
+The benchmark creates a restricted basis and constructs a left-multiplication
 superoperator corresponding to a single-spin rank-1 spherical tensor operator
 on the first spin.
 """
@@ -17,7 +17,7 @@ from spinguin._core._parameters import parameters
 # Suppress status messages during benchmarking
 parameters.verbose = False
 
-# Use sparse representation for superoperator construction
+# Use sparse matrices for superoperator construction
 parameters.sparse_superoperator = True
 
 print("Benchmark started.")

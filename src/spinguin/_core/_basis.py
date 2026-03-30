@@ -708,7 +708,7 @@ def _sop_or_state_to_truncated_basis(
         objects are supplied.
     """
 
-    status("Converting superoperators or state vectors to the "
+    status("Converting superoperators and/or state vectors to the "
            "truncated basis...")
     time_start = time.time()
 

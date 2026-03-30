@@ -1,6 +1,6 @@
 """
 Benchmarks the construction of a Redfield relaxation superoperator for an
-artificial proton spin system.
+artificial proton many-spin system.
 
 The benchmark builds a simple helical-like geometry, assigns approximate
 chemical shifts and distance-based scalar couplings, and then evaluates
@@ -15,14 +15,14 @@ import numpy as np
 from time import perf_counter
 import spinguin as sg
 
-# Suppress status output for cleaner benchmark timing
+# Suppress verbose output during benchmarking
 sg.parameters.verbose = False
 
 # Define benchmark parameters
 nspins = 12
 max_spin_order = 3
 
-# Set magnetic field strength in tesla
+# Set magnetic field strength in Tesla
 sg.parameters.magnetic_field = 1
 
 # Create the spin system and construct the Liouville-space basis
@@ -49,14 +49,14 @@ distances = np.linalg.norm(connectors, axis=2)
 # Assign simple alternating chemical shifts in ppm
 spin_system.chemical_shifts = [5 + 0.25 * i * (-1) ** i for i in range(nspins)]
 
-# Assign scalar couplings using a distance-cubed scaling model
+# Assign scalar couplings using an arbitrary distance-cubed scaling
 j_couplings = np.zeros((nspins, nspins))
 for i in range(nspins):
     for j in range(i):
         j_couplings[i, j] = 20 / distances[i, j] ** 3
 spin_system.J_couplings = j_couplings
 
-# Set Redfield relaxation model parameters
+# Set Redfield relaxation theory parameters
 spin_system.relaxation.tau_c = 50e-12
 spin_system.relaxation.theory = "redfield"
 
@@ -65,4 +65,4 @@ t_start = perf_counter()
 sg.relaxation(spin_system)
 t_end = perf_counter()
 
-print(f"Constructing the relaxation superoperator took {t_end - t_start} s.")
+print(f"Constructing the relaxation superoperator took {t_end - t_start} seconds.")

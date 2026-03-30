@@ -1,23 +1,29 @@
 name: build wheels and sdist
 
 on:
+  # Allow this workflow to be started manually from the Actions tab.
   workflow_dispatch:
 
 jobs:
   build_wheels:
+    # Build binary wheels on each OS defined in the matrix.
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        # Build on Linux and Windows.
         os: [ubuntu-latest, windows-latest]
 
     steps:
+      # Fetch the repository contents.
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Build wheels using cibuildwheel.
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.0.0
 
+      # Store the built wheel files as workflow artifacts.
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -25,23 +31,29 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_sdist:
+    # Build a source distribution on Ubuntu.
     name: Build sdist (tar.gz)
     runs-on: ubuntu-latest
     steps:
+      # Fetch the repository contents.
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Install Python for the sdist build step.
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # Install the standard Python build frontend.
       - name: Install build tool
         run: pip install build
 
+      # Create the source distribution archive.
       - name: Build sdist
         run: python -m build --sdist
 
+      # Store the generated sdist as a workflow artifact.
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:

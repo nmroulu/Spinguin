@@ -1,12 +1,13 @@
 """
 Benchmarks the performance of constructing Hilbert-space operators for
-varying spin systems. All spins are taken as spin-1/2, and for each
+varying spin-system sizes. All spins are taken as spin-1/2, and for each
 spin all four single-spin spherical tensor operators are generated
 using both the dense and sparse back-ends. The operator index is
-given by N = l^2 + l - q, where l is the rank and q is the projection.
+given by N = l^2 + l - q, where l is the rank and q is the projection
+of the spherical tensor operator.
 
 This benchmark is useful for determining the crossover point in
-spin-system size at which the sparse formalism becomes more efficient
+spin-system size at which the sparse-array formalism becomes more efficient
 than the dense formalism for constructing operators.
 
 On a laptop with 11th gen. i5 processor and 16 GB RAM, this benchmark
