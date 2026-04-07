@@ -1,5 +1,5 @@
 """
-Linear algebra utilities used throughout the spin-dynamics code base.
+Linear algebra utilities used throughout the Spinguin code base.
 
 The module contains helper routines for sparse-memory sharing, matrix
 exponentials, tensor manipulations, and small conversion utilities needed by
@@ -24,14 +24,13 @@ from spinguin._core._intersect_indices import intersect_indices
 from spinguin._core._sparse_dot import sparse_dot as _sparse_dot
 from spinguin._core._status import status
 
-DenseOrSparse = np.ndarray | csc_array
-SharedSparseMetadata = dict[str, str | np.dtype | tuple[int, ...]]
-SharedSparseHandles = tuple[SharedMemory, SharedMemory, SharedMemory]
-
 
 def write_shared_sparse(
     A: csc_array,
-) -> tuple[SharedSparseMetadata, SharedSparseHandles]:
+) -> tuple[
+    dict[str, str | np.dtype | tuple[int, ...]],
+    tuple[SharedMemory, SharedMemory, SharedMemory],
+]:
     """
     Create a shared-memory representation of a CSC sparse array.
 
@@ -94,8 +93,8 @@ def write_shared_sparse(
 
 
 def read_shared_sparse(
-    A_shared: SharedSparseMetadata,
-) -> tuple[csc_array, SharedSparseHandles]:
+    A_shared: dict[str, str | np.dtype | tuple[int, ...]],
+) -> tuple[csc_array, tuple[SharedMemory, SharedMemory, SharedMemory]]:
     """
     Reconstruct a CSC sparse array from shared-memory metadata.
 
@@ -155,7 +154,7 @@ def read_shared_sparse(
 
 
 def isvector(
-    v: DenseOrSparse,
+    v: np.ndarray | csc_array,
     ord: str="col",
 ) -> bool:
     """
@@ -197,7 +196,7 @@ def isvector(
 
 
 def norm_1(
-    A: DenseOrSparse,
+    A: np.ndarray | csc_array,
     ord: str="row",
 ) -> float:
     """
@@ -235,9 +234,9 @@ def norm_1(
 
 
 def expm(
-    A: DenseOrSparse,
+    A: np.ndarray | csc_array,
     zero_value: float,
-) -> DenseOrSparse:
+) -> np.ndarray | csc_array:
     """
     Evaluate the matrix exponential with scaling, squaring, and Taylor series.
 
@@ -259,7 +258,10 @@ def expm(
         Matrix exponential of `A`.
     """
 
-    status("Computing the matrix exponential using Taylor series with scaling and squaring...")
+    status(
+        "Computing the matrix exponential using Taylor series with scaling "
+        "and squaring..."
+    )
 
     # Estimate the matrix magnitude to decide whether scaling is required.
     norm_A = norm_1(A, ord="col")
@@ -285,9 +287,9 @@ def expm(
 
 
 def expm_taylor(
-    A: DenseOrSparse,
+    A: np.ndarray | csc_array,
     zero_value: float,
-) -> DenseOrSparse:
+) -> np.ndarray | csc_array:
     """
     Evaluate the matrix exponential by direct Taylor summation.
 
@@ -339,7 +341,7 @@ def expm_taylor(
 
 
 def eliminate_small(
-    A: DenseOrSparse,
+    A: np.ndarray | csc_array,
     zero_value: float,
 ) -> None:
     """
@@ -410,14 +412,14 @@ def bytes_to_sparse(
     bytes_io = BytesIO(A_bytes)
 
     # Read the sparse matrix from the Matrix Market representation.
-    A = mmread(bytes_io)
+    A = mmread(bytes_io).tocsc()
     return A
 
 
 def comm(
-    A: DenseOrSparse,
-    B: DenseOrSparse,
-) -> DenseOrSparse:
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+) -> np.ndarray | csc_array:
     """
     Calculate the commutator $[A, B] = AB - BA$.
 
@@ -483,12 +485,12 @@ def find_common_rows(
 
 
 def auxiliary_matrix_expm(
-    A: DenseOrSparse,
-    B: DenseOrSparse,
-    C: DenseOrSparse,
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+    C: np.ndarray | csc_array,
     t: float,
     zero_value: float,
-) -> csc_array:
+) -> np.ndarray | csc_array:
     """
     Exponentiate the auxiliary matrix used in the Redfield integral.
 
@@ -805,10 +807,10 @@ def CG_coeff(
 
 
 def custom_dot(
-    A: DenseOrSparse,
-    B: DenseOrSparse,
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
     zero_value: float,
-) -> csc_array:
+) -> np.ndarray | csc_array:
     """
     Multiply two arrays using the sparse-optimised backend when possible.
 
@@ -917,10 +919,10 @@ def arraylike_to_array(
 
 
 def expm_vec_taylor(
-    A: DenseOrSparse,
-    v: DenseOrSparse,
+    A: np.ndarray | csc_array,
+    v: np.ndarray | csc_array,
     zero_value: float,
-) -> DenseOrSparse:
+) -> np.ndarray | csc_array:
     """
     Apply the matrix exponential to a vector by Taylor summation.
 
@@ -961,10 +963,10 @@ def expm_vec_taylor(
 
 
 def expm_vec(
-    A: DenseOrSparse,
-    v: DenseOrSparse,
+    A: np.ndarray | csc_array,
+    v: np.ndarray | csc_array,
     zero_value: float,
-) -> DenseOrSparse:
+) -> np.ndarray | csc_array:
     """
     Apply the matrix exponential to a vector with matrix scaling.
 
@@ -1010,6 +1012,10 @@ def expm_vec(
 def clear_cache_CG_coeff() -> None:
     """
     Clear the memoisation cache used by `CG_coeff`.
+
+    Returns
+    -------
+    None
     """
 
     # Reset the cached symbolic Clebsch-Gordan evaluations.

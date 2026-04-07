@@ -16,6 +16,9 @@ class Parameters:
     """
     Store the global settings used throughout the Spinguin package.
 
+    A single module-level instance is created when Spinguin is imported and is
+    exposed as `spinguin.parameters`.
+
     Usage: ``Parameters()``.
     """
 
@@ -74,8 +77,8 @@ class Parameters:
         """
 
         # Set the default experimental conditions.
-        self._magnetic_field: float = None
-        self._temperature: float = None
+        self._magnetic_field: float | None = None
+        self._temperature: float | None = None
 
         # Set the default parallelisation threshold.
         self._parallel_dim: int = 1000
@@ -110,9 +113,11 @@ class Parameters:
     @property
     def magnetic_field(
         self,
-    ) -> float:
+    ) -> float | None:
         """
         Return the external magnetic field in tesla.
+
+        A value of `None` indicates that no magnetic field has been assigned.
         """
 
         return self._magnetic_field
@@ -120,7 +125,7 @@ class Parameters:
     @magnetic_field.setter
     def magnetic_field(
         self,
-        magnetic_field: float,
+        magnetic_field: float | None,
     ) -> None:
         # Store the new magnetic-field value.
         self._magnetic_field = magnetic_field
@@ -133,9 +138,11 @@ class Parameters:
     @property
     def temperature(
         self,
-    ) -> float:
+    ) -> float | None:
         """
         Return the sample temperature in kelvin.
+
+        A value of `None` indicates that no temperature has been assigned.
         """
 
         return self._temperature
@@ -143,7 +150,7 @@ class Parameters:
     @temperature.setter
     def temperature(
         self,
-        temperature: float,
+        temperature: float | None,
     ) -> None:
         # Store the new temperature value.
         self._temperature = temperature

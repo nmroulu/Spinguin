@@ -7,6 +7,9 @@ namespace. For example, a one-spin system may be created as follows::
 
     import spinguin as sg
     spin_system = sg.SpinSystem(["1H"])
+
+The package also re-exports the ready-to-use pulse-sequence namespace as
+``sg.sequences``.
 """
 
 # Re-export the public core functionality under the package namespace.

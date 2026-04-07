@@ -20,7 +20,7 @@ from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._hide_prints import HidePrints
 from spinguin._core._la import expm
 from spinguin._core._parameters import parameters
-from spinguin._core._status import status, status_section
+from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
 
 if TYPE_CHECKING:
@@ -49,9 +49,10 @@ def _report_completion(
     # Report the elapsed wall-clock time of the completed operation.
     status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
+
 def propagator(
     L: np.ndarray | sp.csc_array,
-    t: float
+    t: float,
 ) -> np.ndarray | sp.csc_array:
     """
     Construct the time propagator ``exp(L*t)``.
@@ -91,7 +92,7 @@ def propagator(
         P = P.toarray()
 
     # Report the completion of the propagator construction.
-    status(f"Time propagator constructed in {time.time() - time_start:.4f} seconds.\n")
+    _report_completion(time_start)
 
     return P
 
@@ -99,7 +100,7 @@ def propagator(
 def pulse(
     spin_system: SpinSystem,
     operator: str,
-    angle: float
+    angle: float,
 ) -> np.ndarray | sp.csc_array:
     """
     Construct a pulse superoperator that acts from the left on a state.
@@ -156,9 +157,6 @@ def pulse(
         Raised if the pulse is generated from a product operator, for which the
         pulse angle is not uniquely defined.
     """
-    # # Status reporting for the pulse-superoperator construction.
-    # status_section("Pulse superoperator")
-
     # Ensure that the working basis has been constructed.
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before constructing pulse "
@@ -177,7 +175,7 @@ def pulse(
     op = superoperator(spin_system, operator, side="comm")
 
     # Convert the pulse angle from degrees to radians.
-    angle = angle / 180 * np.pi
+    angle = angle * np.pi / 180
 
     # Evaluate the pulse propagator while silencing nested status messages.
     with HidePrints():
@@ -185,8 +183,6 @@ def pulse(
 
     # Report the completion of the pulse-superoperator construction.
     _report_completion(time_start)
-    # status_section("Pulse superoperator end.")
-    # status("\n")
 
     return P
 
@@ -195,7 +191,7 @@ def propagator_to_rotframe(
     spin_system: SpinSystem,
     P: np.ndarray | sp.csc_array,
     t: float,
-    center_frequencies: dict=None
+    center_frequencies: dict[str, float] | None=None,
 ) -> np.ndarray | sp.csc_array:
     """
     Transform a time propagator to the rotating frame.
@@ -230,8 +226,9 @@ def propagator_to_rotframe(
     # Assemble the isotope-dependent centre-frequency array.
     center = np.zeros(spin_system.nspins)
     for spin in range(spin_system.nspins):
-        if spin_system.isotopes[spin] in center_frequencies:
-            center[spin] = center_frequencies[spin_system.isotopes[spin]]
+        isotope = spin_system.isotopes[spin]
+        if isotope in center_frequencies:
+            center[spin] = center_frequencies[isotope]
 
     # Copy the spin system and insert the rotating-frame reference shifts.
     with HidePrints():
@@ -251,5 +248,5 @@ def propagator_to_rotframe(
 
     # Report the completion of the rotating-frame transformation.
     _report_completion(time_start)
-    
+
     return P_rot

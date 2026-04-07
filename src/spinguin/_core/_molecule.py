@@ -1,7 +1,5 @@
 """
-molecule.py
-
-Representation of a molecule used by relaxation-property calculations.
+Molecular container used in relaxation-property calculations.
 
 The `Molecule` class stores isotope labels together with Cartesian nuclear
 coordinates and provides access to isotope masses.
@@ -14,8 +12,6 @@ from spinguin._core._data_io import read_array, read_xyz
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._nmr_isotopes import ISOTOPES
 
-# Define a type alias for the allowed input types of the molecule data.
-ArrayInput = list | tuple | np.ndarray | str
 
 class Molecule:
     """
@@ -70,8 +66,8 @@ class Molecule:
 
     def __init__(
         self,
-        isotopes: ArrayInput,
-        xyz: ArrayInput,
+        isotopes: list | tuple | np.ndarray | str,
+        xyz: list | tuple | np.ndarray | str,
     ):
         """
         Initialise the molecule from isotope labels and coordinates.
@@ -96,7 +92,7 @@ class Molecule:
 
     @staticmethod
     def _parse_isotopes(
-        isotopes: ArrayInput,
+        isotopes: list | tuple | np.ndarray | str,
     ) -> np.ndarray:
         """
         Parse isotope labels from an array-like object or a file path.
@@ -125,12 +121,12 @@ class Molecule:
             return arraylike_to_array(isotopes)
 
         raise TypeError(
-            "Isotopes should be a 1-dimensional array or a string."
+            "Isotopes should be a one-dimensional array or a string."
         )
 
     @staticmethod
     def _parse_xyz(
-        xyz: ArrayInput,
+        xyz: list | tuple | np.ndarray | str,
     ) -> np.ndarray:
         """
         Parse Cartesian coordinates from an array-like object or file path.
@@ -158,7 +154,9 @@ class Molecule:
         if isinstance(xyz, (list, tuple, np.ndarray)):
             return arraylike_to_array(xyz)
 
-        raise TypeError("XYZ should be a 2-dimensional array or a string.")
+        raise TypeError(
+            "XYZ should be a two-dimensional array or a string."
+        )
 
     @property
     def isotopes(self) -> np.ndarray:

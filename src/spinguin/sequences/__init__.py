@@ -1,5 +1,8 @@
 """
 Ready-to-use pulse-sequence helpers provided by Spinguin.
+
+This package exposes the public sequence constructors that implement common
+NMR simulation workflows.
 """
 
 from ._inversion_recovery import inversion_recovery

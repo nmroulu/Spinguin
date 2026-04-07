@@ -1,24 +1,18 @@
 """
-cache.py
+Cache-management utilities for selected core Spinguin routines.
 
-Provides utility functions for clearing the internal caches used by selected
-core Spinguin routines.
+This module collects the cache-clearing helpers of several internal
+submodules and exposes a single convenience function for resetting them.
 """
 
-# Import cache-clearing helpers from the chemistry module.
+# Import cache-clearing helpers from the core submodules.
 from spinguin._core._chem import (
     clear_cache_associate_index_map,
     clear_cache_dissociate_index_map,
     clear_cache_permutation_matrix,
 )
-
-# Import the cache-clearing helper for Clebsch-Gordan coefficients.
 from spinguin._core._la import clear_cache_CG_coeff
-
-# Import the cache-clearing helper for tensor operators.
 from spinguin._core._operators import clear_cache_op_T
-
-# Import cache-clearing helpers from the superoperator module.
 from spinguin._core._superoperators import (
     clear_cache_sop_prod,
     clear_cache_sop_T_coupled,
@@ -30,8 +24,9 @@ def clear_cache() -> None:
     """
     Clear the internal caches used by selected core routines.
 
-    This function resets cached results from chemistry, linear algebra,
-    operator, and superoperator helper functions.
+    This function resets cached results from the chemistry, linear algebra,
+    operator, and superoperator helper functions that expose explicit
+    cache-clearing entry points.
 
     Returns
     -------

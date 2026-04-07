@@ -21,7 +21,7 @@ If an isotope is not listed, it can be added by following the existing format.
 from typing import Literal
 import numpy as np
 
-# Define type aliases for the isotope properties.
+# Define index constants for the isotope-property table.
 SPIN_INDEX = 0
 GAMMA_INDEX = 1
 QUADRUPOLE_INDEX = 2
@@ -211,9 +211,17 @@ def gamma(isotope: str, unit: Literal["Hz", "rad/s"]) -> float:
     -------
     gamma : float
         Gyromagnetic ratio in the requested units.
+
+    Raises
+    ------
+    ValueError
+        Raised if `unit` is neither `'Hz'` nor `'rad/s'`.
     """
+
+    # Convert the tabulated value from MHz/T to Hz/T.
     gamma_value = ISOTOPES[isotope][GAMMA_INDEX] * 1e6
 
+    # Return the requested unit representation.
     if unit == "Hz":
         return gamma_value
 
@@ -235,8 +243,10 @@ def quadrupole_moment(isotope: str) -> float:
     Returns
     -------
     quadrupole_moment : float
-        Quadrupole moment in the units of m^2.
+        Quadrupole moment in units of m^2.
     """
+
+    # Convert the tabulated value from barns to square metres.
     return ISOTOPES[isotope][QUADRUPOLE_INDEX] * 1e-28
 
 

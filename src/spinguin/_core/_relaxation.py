@@ -1,7 +1,7 @@
 """
-Relaxation-theory utilities for spin-dynamics simulations.
+Relaxation-theory helpers for Spinguin spin-dynamics simulations.
 
-The module provides helper functions for constructing phenomenological and
+This module provides helper functions for constructing phenomenological and
 Redfield relaxation superoperators together with supporting routines for
 interaction tensors and rotational diffusion.
 """
@@ -29,7 +29,7 @@ from spinguin._core._la import (
 )
 from spinguin._core._operators import op_Sx, op_Sy, op_Sz
 from spinguin._core._parameters import parameters
-from spinguin._core._status import status, status_section
+from spinguin._core._status import status
 from spinguin._core._superoperators import sop_T_coupled, superoperator
 from spinguin._core._utils import idx_to_lq, parse_operator_string
 
@@ -263,7 +263,7 @@ def shielding_intr_tensors(
     shielding_tensors = shielding * 1e-6
 
     # Construct the Larmor frequencies that scale the shielding tensors.
-    # TODO: Check the sign of the Larmor frequency (Perttu?)
+    # TODO: Confirm the sign convention of the Larmor frequency.
     w0s = -gammas * B
 
     # Scale each shielding tensor by the corresponding Larmor frequency.
@@ -272,7 +272,7 @@ def shielding_intr_tensors(
 
     return shielding_tensors
 
-# TODO: Check the sign (Perttu?)
+# TODO: Confirm the sign convention of the quadrupolar interaction.
 def Q_intr_tensors(
     efg: np.ndarray,
     spins: np.ndarray,
@@ -371,10 +371,12 @@ def rotational_correlation_time(
 
     return tau_c
 
-def rotational_correlation_time_SED(T: float,
-                                    eta: float,
-                                    r: float | np.ndarray,
-                                    l: int) -> float | np.ndarray:
+def rotational_correlation_time_SED(
+    T: float,
+    eta: float,
+    r: float | np.ndarray,
+    l: int,
+) -> float | np.ndarray:
     """
     Calculate the rotational correlation time from the SED relation.
 
@@ -417,17 +419,17 @@ def center_of_mass(
     ----------
     masses : ndarray
         A 1-dimensional array specifying the atomic masses of each atom
-        in the molecule. 
+        in the molecule.
         Must be given in atomic mass units (u).
     coords : ndarray
         A 2-dimensional array specifying the cartesian coordinates in
-        the XYZ format for each atom in the molecule. 
+        the XYZ format for each atom in the molecule.
         Must be given in the units of Å.
 
     Returns
     -------
     center_of_mass : ndarray
-        Center of mass coordinates in units of Å.
+        Centre-of-mass coordinates in units of Å.
     """
     # Compute the total molecular mass.
     total_mass = np.sum(masses)
@@ -448,11 +450,11 @@ def moment_of_inertia_tensor(
     ----------
     masses : ndarray
         A 1-dimensional array specifying the atomic masses of each atom
-        in the molecule. 
+        in the molecule.
         Must be given in atomic mass units (u).
     coords : ndarray
         A 2-dimensional array specifying the cartesian coordinates in
-        the XYZ format for each atom in the molecule. 
+        the XYZ format for each atom in the molecule.
         Must be given in the units of Å.
 
     Returns
@@ -493,8 +495,10 @@ def moment_of_inertia_tensor(
 
     return I
 
-def moment_of_inertia_equivalent_ellipsoid(masses: np.ndarray,
-                                           coords: np.ndarray) -> np.ndarray:
+def moment_of_inertia_equivalent_ellipsoid(
+    masses: np.ndarray,
+    coords: np.ndarray,
+) -> np.ndarray:
     """
     Calculate the semi-axes of the mass-equivalent ellipsoid.
 
@@ -533,8 +537,8 @@ def moment_of_inertia_equivalent_ellipsoid(masses: np.ndarray,
     total_mass = np.sum(masses)
 
     # Define the nonlinear system for the equivalent ellipsoid semi-axes.
-    def equations(vars):
-        a_x, a_y, a_z = vars
+    def equations(semi_axes: np.ndarray) -> list[float]:
+        a_x, a_y, a_z = semi_axes
         eq1 = (1/5) * total_mass * (a_y**2 + a_z**2) - eigenvalues[0]
         eq2 = (1/5) * total_mass * (a_x**2 + a_z**2) - eigenvalues[1]
         eq3 = (1/5) * total_mass * (a_x**2 + a_y**2) - eigenvalues[2]
@@ -546,7 +550,12 @@ def moment_of_inertia_equivalent_ellipsoid(masses: np.ndarray,
     # Solve the nonlinear system while suppressing numerical warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        a_x, a_y, a_z = fsolve(equations, initial_guess, maxfev=10000, xtol=1e-15)
+        a_x, a_y, a_z = fsolve(
+            equations,
+            initial_guess,
+            maxfev=10000,
+            xtol=1e-15,
+        )
 
     return np.array([a_x, a_y, a_z])
 
@@ -647,11 +656,13 @@ def Perrin_factors(
 
     return np.array([f_x, f_y, f_z])
 
-def rotational_diffusion_constants_Perrin(T: float,
-                                         eta: float,
-                                         a_x: float,
-                                         a_y: float,
-                                         a_z: float) -> np.ndarray:
+def rotational_diffusion_constants_Perrin(
+    T: float,
+    eta: float,
+    a_x: float,
+    a_y: float,
+    a_z: float,
+) -> np.ndarray:
     """
     Calculate Perrin rotational diffusion constants along the principal axes.
 
@@ -679,18 +690,20 @@ def rotational_diffusion_constants_Perrin(T: float,
     perrin_factors = Perrin_factors(a_x, a_y, a_z)
 
     # Convert the Perrin factors from ``Å^3`` to ``m^3``.
-    perrin_factors *= 1e-30  # Convert from Å^3 to m^3
+    perrin_factors *= 1e-30
 
     # Convert the Perrin factors to rotational diffusion constants.
     D_rs = (const.k * T / perrin_factors) / (16 * np.pi * eta / 3)
 
     return D_rs
 
-def rotational_correlation_times_Perrin(masses: np.ndarray,
-                                        coords: np.ndarray,
-                                        T: float,
-                                        eta: float,
-                                        l: int) -> np.ndarray:
+def rotational_correlation_times_Perrin(
+    masses: np.ndarray,
+    coords: np.ndarray,
+    T: float,
+    eta: float,
+    l: int,
+) -> np.ndarray:
     """
     Calculate Perrin rotational correlation times for a given tensor rank.
 
@@ -723,7 +736,7 @@ def rotational_correlation_times_Perrin(masses: np.ndarray,
     semi_axes = moment_of_inertia_equivalent_ellipsoid(masses, coords)
 
     # Add a minimum hydrodynamic thickness to avoid unrealistically thin axes.
-    semi_axes += 1.0  # Minimum thickness
+    semi_axes += 1.0
 
     # Calculate the principal-axis rotational diffusion constants.
     D_rs = rotational_diffusion_constants_Perrin(
@@ -785,12 +798,12 @@ def _rot_diff_gen(spin_system: SpinSystem) -> dict:
         tau_cl = tau_c_l(tau_c, l)
 
         # Assemble the isotropic rotational diffusion generator.
-        if isinstance(spin_system.relaxation.tau_c, float):
+        if np.isscalar(tau_c):
             D = 1 / (tau_cl * l * (l + 1))
             G[l] = D * (Jx @ Jx + Jy @ Jy + Jz @ Jz)
 
         # Assemble the symmetric-top rotational diffusion generator.
-        elif len(spin_system.relaxation.tau_c) == 2:
+        elif len(tau_c) == 2:
             D1 = 1 / (tau_cl[0] * l * (l + 1))
             D2 = 1 / (tau_cl[1] * l * (l + 1))
             G[l] = D1 * Jz @ Jz + D2 * (Jx @ Jx + Jy @ Jy)
@@ -840,7 +853,8 @@ def _process_interaction_tensor(
     -------
     V_lp : dict
         Interaction tensor as a dictionary of dictionaries. The first keys are
-        the interaction rank `l`, and the second keys are the components `p`.
+        the interaction rank ``l``, and the second keys are the components
+        ``p``.
     """
     # Initialise the dictionary that stores the rank-resolved tensor parts.
     V_lp = {}
@@ -894,7 +908,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     Returns
     -------
     interactions : dict
-        A dictionary where the interactions are organized by rank `l`. The
+        A dictionary where the interactions are organized by rank ``l``. The
         values are lists containing all interactions with meaningful
         strength. The interactions are tuples in the format::
         
@@ -905,7 +919,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     time_start = time.time()
 
     # Determine whether isotropic or anisotropic rotational diffusion is used.
-    iso = isinstance(spin_system.relaxation.tau_c, float)
+    iso = np.isscalar(spin_system.relaxation.tau_c)
 
     # Build the rotation from the laboratory frame to the rotational axes.
     if iso:
@@ -924,7 +938,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     # Process all dipole-dipole interaction tensors.
     if spin_system.xyz is not None:
 
-        # Get the DD-coupling tensors
+        # Get the dipole-dipole coupling tensors.
         dd_tensors = dd_coupling_tensors(spin_system.xyz, spin_system.gammas)
 
         # Add all non-negligible dipole-dipole interaction components.
@@ -938,7 +952,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     # Process all shielding interaction tensors.
     if spin_system.shielding is not None:
 
-        # Get the shielding tensors
+        # Get the shielding interaction tensors.
         sh_tensors = shielding_intr_tensors(
             spin_system.shielding,
             spin_system.gammas,
@@ -958,7 +972,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     # Process all quadrupolar interaction tensors.
     if spin_system.efg is not None:
 
-        # Get the quadrupole coupling tensors
+        # Get the quadrupolar interaction tensors.
         q_tensors = Q_intr_tensors(
             spin_system.efg,
             spin_system.spins,
@@ -989,7 +1003,7 @@ def _get_sop_T(
     q: int,
     interaction_type: Literal["CSA", "Q", "DD"],
     spin_1: int,
-    spin_2: int = None,
+    spin_2: int | None = None,
 ) -> np.ndarray | sp.csc_array:
     """
     Calculate the coupled spherical tensor superoperator for one interaction.
@@ -1017,7 +1031,8 @@ def _get_sop_T(
     Returns
     -------
     sop : ndarray or csc_array
-        Coupled spherical tensor superoperator of rank `l` and projection `q`.
+        Coupled spherical tensor superoperator of rank ``l`` and projection
+        ``q``.
     """
 
     # Construct the superoperator for single-spin linear interactions.
@@ -1034,17 +1049,23 @@ def _get_sop_T(
 
     # Reject unsupported interaction labels explicitly.
     else:
-        raise ValueError(f"Invalid interaction type '{interaction_type}' for "
-                         "relaxation superoperator. Possible options are " 
-                         "'CSA', 'Q', and 'DD'.")
+        raise ValueError(
+            f"Invalid interaction type '{interaction_type}' for relaxation "
+            "superoperator. Possible options are 'CSA', 'Q', and 'DD'."
+        )
 
     return sop
 
-def sop_R_random_field():
+def sop_R_random_field() -> None:
     """
     Placeholder for a random-field relaxation superoperator.
 
     The implementation has not yet been added.
+
+    Returns
+    -------
+    None
+        Placeholder return value until the functionality is implemented.
     """
 
     # This functionality has not yet been implemented.
@@ -1067,11 +1088,11 @@ def _sop_R_phenomenological(
         of integers describing the Kronecker products of irreducible spherical
         tensors.
     R1 : ndarray
-        A one dimensional array containing the longitudinal relaxation rates
-        in 1/s for each spin. For example: `np.array([1.0, 2.0, 2.5])`
+        A one-dimensional array containing the longitudinal relaxation rates
+        in 1/s for each spin. For example: ``np.array([1.0, 2.0, 2.5])``.
     R2 : ndarray
-        A one dimensional array containing the transverse relaxation rates
-        in 1/s for each spin. For example: `np.array([2.0, 4.0, 5.0])`
+        A one-dimensional array containing the transverse relaxation rates
+        in 1/s for each spin. For example: ``np.array([2.0, 4.0, 5.0])``.
 
     Returns
     -------
@@ -1165,10 +1186,11 @@ def _sop_R_sr2k(
     R2 = np.zeros(spin_system.nspins)
 
     # Identify all quadrupolar nuclei in the spin system.
-    quadrupolar = []
-    for i, spin in enumerate(spin_system.spins):
-        if spin > 0.5:
-            quadrupolar.append(i)
+    quadrupolar = [
+        i
+        for i, spin in enumerate(spin_system.spins)
+        if spin > 0.5
+    ]
     
     # Accumulate SR2K contributions from each quadrupolar nucleus.
     for quad in quadrupolar:
@@ -1373,25 +1395,25 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     - spin_system.relaxation.theory : must be specified
     - spin_system.basis : must be built
 
-    If `phenomenological` relaxation theory is requested, the following must
+    If ``phenomenological`` relaxation theory is requested, the following must
     be set:
 
     - spin_system.relaxation.T1
     - spin_system.relaxation.T2
 
-    If `redfield` relaxation theory is requested, the following must be set:
+    If ``redfield`` relaxation theory is requested, the following must be set:
 
     - spin_system.relaxation.tau_c
     - parameters.magnetic_field
 
-    If `sr2k` is requested, the following must be set:
+    If ``sr2k`` is requested, the following must be set:
 
     - parameters.magnetic_field
 
-    If `thermalization` is requested, the following must be set:
+    If ``thermalization`` is requested, the following must be set:
 
     - parameters.magnetic_field
-    - parameters.thermalization
+    - parameters.temperature
 
     Parameters
     ----------
@@ -1402,11 +1424,8 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     Returns
     -------
     R : ndarray or csc_array
-        Relaxation superoperator. 
+        Relaxation superoperator.
     """
-
-    # # Report the start of the relaxation superoperator construction.
-    # status_section("Relaxation superoperator")
 
     # Validate that all required inputs have been provided.
     _validate_relaxation_inputs(spin_system)
@@ -1441,10 +1460,6 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
             T=parameters.temperature,
         )
 
-    # # Report the completion of the relaxation superoperator construction.
-    # status_section("Relaxation superoperator end.")
-    # status("\n")
-
     return R
 
 def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
@@ -1478,10 +1493,10 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
     # Build the required superoperators for each interaction rank.
     for l in interactions.keys():
 
-        # Iterate over the interactions
+        # Iterate over the interactions.
         for interaction in interactions[l]:
 
-            # Extract the interaction information
+            # Extract the interaction information.
             itype = interaction[0]
             spin1 = interaction[1]
             spin2 = interaction[2]
@@ -1575,7 +1590,7 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
                 sop_X_lpq = sp.csc_array((dim, dim), dtype=complex)
                 for interaction in interactions[l]:
 
-                    # Extract the interaction information
+                    # Extract the interaction information.
                     itype = interaction[0]
                     spin1 = interaction[1]
                     spin2 = interaction[2]
@@ -1619,7 +1634,9 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     _report_completion(time_start)
     
     # Report the total time required for the Redfield construction.
-    status(f"Redfield relaxation superoperator constructed in "
-           f"{time.time() - time_start_R:.4f} seconds.\n")
+    status(
+        f"Redfield relaxation superoperator constructed in "
+        f"{time.time() - time_start_R:.4f} seconds.\n"
+    )
 
     return R

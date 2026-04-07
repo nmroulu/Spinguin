@@ -1,22 +1,19 @@
 """
 Construction of the Liouvillian superoperator.
 
-This module provides a small helper for combining Hamiltonian, relaxation, and
-exchange contributions into a single Liouvillian.
+This module provides a small helper for combining Hamiltonian, relaxation,
+and exchange contributions into a single Liouvillian.
 """
 
 # Imports
 import numpy as np
 from scipy.sparse import csc_array
 
-# Define a type alias for the allowed input types of the superoperators.
-DenseOrSparse = np.ndarray | csc_array
-
 def liouvillian(
-    H: DenseOrSparse=None,
-    R: DenseOrSparse=None,
-    K: DenseOrSparse=None,
-) -> DenseOrSparse:
+    H: np.ndarray | csc_array | None=None,
+    R: np.ndarray | csc_array | None=None,
+    K: np.ndarray | csc_array | None=None,
+) -> np.ndarray | csc_array:
     """
     Construct the Liouvillian superoperator.
 

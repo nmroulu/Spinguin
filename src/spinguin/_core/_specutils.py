@@ -1,12 +1,11 @@
 """
-specutils.py
+Spectral utilities for common NMR post-processing tasks.
 
-Provides spectral utility functions for common NMR post-processing tasks,
-including resonance-frequency evaluation, Fourier transformation, chemical
-shift conversion, and construction of uniformly sampled time axes.
+This module provides helper functions for resonance-frequency evaluation,
+Fourier transformation, chemical-shift conversion, and construction of
+uniformly sampled time axes.
 """
 
-# Imports
 from typing import Literal
 
 import numpy as np
@@ -14,18 +13,17 @@ import numpy as np
 from spinguin._core._nmr_isotopes import gamma
 from spinguin._core._parameters import parameters
 
-# Define a constant for converting chemical shifts in ppm to fractional offsets.
-PPM_TO_FRACTION = 1e-6
-
 def _resolve_magnetic_field(B: float | None) -> float:
     """
     Return the magnetic field to be used in a spectral calculation.
 
+    Usage: ``_resolve_magnetic_field(B)``.
+
     Parameters
     ----------
     B : float or None
-        Magnetic field in T. If `None`, the value is taken from
-        `parameters.magnetic_field`.
+        Magnetic field in T. If ``None``, the value is taken from
+        ``parameters.magnetic_field``.
 
     Returns
     -------
@@ -35,7 +33,7 @@ def _resolve_magnetic_field(B: float | None) -> float:
     Raises
     ------
     ValueError
-        Raised if `B` is `None` and the global magnetic field has not been
+        Raised if ``B`` is ``None`` and the global magnetic field has not been
         configured.
     """
 
@@ -60,14 +58,16 @@ def resonance_frequency(
     """
     Compute the resonance frequency at a given magnetic field and shift.
 
+    Usage: ``resonance_frequency(isotope, B=None, delta=0, unit='Hz')``.
+
     Parameters
     ----------
     isotope : str
-        Nucleus symbol, for example `'1H'`, used to select the gyromagnetic
+        Nucleus symbol, for example ``'1H'``, used to select the gyromagnetic
         ratio.
     B : float, default=None
         Magnetic field strength in T. If not supplied, the value stored in
-        `parameters.magnetic_field` is used.
+        ``parameters.magnetic_field`` is used.
     delta : float, default=0
         Chemical shift in ppm.
     unit : {'Hz', 'rad/s'}
@@ -86,10 +86,14 @@ def resonance_frequency(
     """
 
     # Resolve the magnetic field used for the frequency calculation.
-    B = _resolve_magnetic_field(B)
+    magnetic_field = _resolve_magnetic_field(B)
 
     # Evaluate the resonance frequency including the chemical-shift offset.
-    omega = -gamma(isotope, unit) * B * (1 + delta * PPM_TO_FRACTION)
+    omega = (
+        -gamma(isotope, unit)
+        * magnetic_field
+        * (1 + delta * 1e-6)
+    )
 
     return omega
 
@@ -102,6 +106,8 @@ def fourier_transform(
     """
     Compute the discrete Fourier transform of a time-domain signal.
 
+    Usage: ``fourier_transform(signal, dt, normalize=True)``.
+
     The returned frequency axis and transformed signal are both shifted so that
     zero frequency is centred in the output arrays.
 
@@ -112,15 +118,15 @@ def fourier_transform(
     dt : float
         Time step between consecutive samples in the signal.
     normalize : bool, default=True
-        Whether to normalize the Fourier transform.
+        Whether to normalise the Fourier transform.
 
     Returns
     -------
     freqs : ndarray
         Frequency axis corresponding to the Fourier-transformed signal.
     fft_signal : ndarray
-        Fourier-transformed signal in the frequency domain. If `normalize` is
-        `True`, the result is scaled by the sampling interval.
+        Fourier-transformed signal in the frequency domain. If ``normalize``
+        is ``True``, the result is scaled by the sampling interval.
     """
 
     # Construct the unshifted frequency axis.
@@ -149,6 +155,8 @@ def spectrum(
     """
     Return one component of the Fourier-domain spectrum.
 
+    Usage: ``spectrum(signal, dt, normalize=True, part='real')``.
+
     Parameters
     ----------
     signal : ndarray
@@ -156,7 +164,7 @@ def spectrum(
     dt : float
         Time step between consecutive samples in the signal.
     normalize : bool, default=True
-        Whether to normalize the Fourier transform.
+        Whether to normalise the Fourier transform.
     part : {'real', 'imag'}
         Selects which component of the Fourier transform to return.
 
@@ -170,7 +178,7 @@ def spectrum(
     Raises
     ------
     ValueError
-        Raised if `part` is not `'real'` or `'imag'`.
+        Raised if ``part`` is not ``'real'`` or ``'imag'``.
     """
 
     # Compute the shifted Fourier transform of the input signal.
@@ -195,6 +203,9 @@ def frequency_to_chemical_shift(
     """
     Convert frequencies in Hz to chemical shifts in ppm.
 
+    Usage: ``frequency_to_chemical_shift(frequency, reference_frequency,
+    spectrometer_frequency)``.
+
     Parameters
     ----------
     frequency : float or ndarray
@@ -211,7 +222,11 @@ def frequency_to_chemical_shift(
     """
 
     # Convert the frequency offset to the chemical-shift scale.
-    return (frequency - reference_frequency) / spectrometer_frequency * 1e6
+    return (
+        (frequency - reference_frequency)
+        / spectrometer_frequency
+        * 1e6
+    )
 
 
 def spectral_width_to_dwell_time(
@@ -222,16 +237,18 @@ def spectral_width_to_dwell_time(
     """
     Convert a spectral width in ppm to a dwell time in seconds.
 
+    Usage: ``spectral_width_to_dwell_time(spectral_width, isotope, B=None)``.
+
     Parameters
     ----------
     spectral_width : float
         Spectral width in ppm.
     isotope : str
-        Nucleus symbol, for example `'1H'`, used to select the gyromagnetic
+        Nucleus symbol, for example ``'1H'``, used to select the gyromagnetic
         ratio required for the conversion.
     B : float, default=None
         Magnetic field of the spectrometer in T. If not supplied, the magnetic
-        field is obtained from `parameters.magnetic_field`.
+        field is obtained from ``parameters.magnetic_field``.
 
     Returns
     -------
@@ -246,11 +263,14 @@ def spectral_width_to_dwell_time(
     """
 
     # Resolve the magnetic field used for the conversion.
-    B = _resolve_magnetic_field(B)
+    magnetic_field = _resolve_magnetic_field(B)
 
     # Convert the spectral width from ppm to Hz.
     spectral_width_hz = (
-        spectral_width * PPM_TO_FRACTION * gamma(isotope, "Hz") * B
+        spectral_width
+        * 1e-6
+        * gamma(isotope, "Hz")
+        * magnetic_field
     )
 
     # Invert the spectral width to obtain the dwell time.
@@ -266,25 +286,22 @@ def time_axis(
     """
     Generate a uniformly spaced time axis.
 
+    Usage: ``time_axis(npoints, time_step)``.
+
     Parameters
     ----------
     npoints : int
         Number of points.
     time_step : float
-        Time step (in seconds).
+        Time step in seconds.
 
     Returns
     -------
     ndarray
-        One-dimensional time axis with `npoints` samples.
+        One-dimensional time axis with ``npoints`` samples.
     """
 
-    # Define the start, stop, and number of samples of the time axis.
-    start = 0
-    stop = npoints * time_step
-    num = npoints
-
     # Construct the uniformly sampled time axis.
-    t_axis = np.linspace(start, stop, num, endpoint=False)
+    t_axis = np.linspace(0, npoints * time_step, npoints, endpoint=False)
 
     return t_axis

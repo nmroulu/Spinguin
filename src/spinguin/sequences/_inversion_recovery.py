@@ -1,12 +1,16 @@
 """
-Inversion-recovery pulse sequence with continuous recovery detection.
+Inversion-recovery sequence with continuous recovery monitoring.
+
+This module provides a simplified inversion-recovery experiment in which the
+longitudinal recovery is sampled directly at each simulated time step.
 """
 
-# Imports
 from copy import deepcopy
+
 import numpy as np
 import spinguin._core as sg
 from tqdm import tqdm
+
 
 def inversion_recovery(
     spin_system: sg.SpinSystem,
@@ -17,35 +21,37 @@ def inversion_recovery(
     """
     Perform an inversion-recovery experiment with direct recovery monitoring.
 
+    Usage: ``inversion_recovery(spin_system, isotope, npoints, time_step)``.
+
     This implementation differs slightly from a conventional spectrometer
     experiment. The inversion pulse is applied only once, and the recovery is
     monitored continuously by measuring the longitudinal magnetisation at each
     simulated time step.
 
     If a traditional inversion-recovery experiment is desired, use
-    `inversion_recovery_fid()`.
+    ``inversion_recovery_fid()``.
 
     This experiment requires the following spin system properties to be defined:
 
-    - spin_system.basis : must be built
-    - spin_system.relaxation.theory
-    - spin_system.relaxation.thermalization : must be True
+    - ``spin_system.basis``: must be built
+    - ``spin_system.relaxation.theory``
+    - ``spin_system.relaxation.thermalization``: must be ``True``
 
     This experiment requires the following parameters to be defined:
 
-    - parameters.magnetic_field : magnetic field of the spectrometer in Tesla
-    - parameters.temperature : temperature of the sample in Kelvin
+    - ``parameters.magnetic_field``: magnetic field of the spectrometer in T
+    - ``parameters.temperature``: temperature of the sample in K
 
     Parameters
     ----------
     spin_system : SpinSystem
         Spin system on which the inversion-recovery experiment is performed.
     isotope : str
-        Isotope, for example `'1H'`, whose longitudinal magnetisation is
+        Isotope, for example ``'1H'``, whose longitudinal magnetisation is
         inverted and detected. Hard pulses are applied.
     npoints : int
         Number of points in the simulation. Defines the total simulation time
-        together with `time_step`.
+        together with ``time_step``.
     time_step : float
         Time step in the simulation, in seconds. This should usually be kept
         relatively short, for example 1 ms.
@@ -60,7 +66,8 @@ def inversion_recovery(
     ------
     ValueError
         Raised if the basis, relaxation settings, magnetic field, or
-        temperature required by the sequence have not been defined.
+        temperature required by the sequence have not been defined, or if the
+        requested isotope is not present in the spin system.
     """
 
     # Operate on a copy so that truncation does not modify the input object.
@@ -93,12 +100,16 @@ def inversion_recovery(
 
     # Identify the spins whose magnetisation is inverted and detected.
     indices = np.where(spin_system.isotopes == isotope)[0]
+    if indices.size == 0:
+        raise ValueError(
+            f"Isotope {isotope} is not present in the spin system."
+        )
     nspins = indices.shape[0]
 
     # Apply a hard 180-degree pulse to the selected isotope channel.
-    operator = "+".join(f"I(x,{i})" for i in indices)
-    P180 = sg.pulse(spin_system, operator, 180)
-    rho = P180 @ rho
+    pulse_operator = "+".join(f"I(x,{i})" for i in indices)
+    inversion_pulse = sg.pulse(spin_system, pulse_operator, 180)
+    rho = inversion_pulse @ rho
 
     # Restrict the dynamics to the zero-quantum basis for efficiency.
     L, rho = spin_system.basis.truncate_by_coherence([0], L, rho)
@@ -110,7 +121,6 @@ def inversion_recovery(
     magnetizations = np.zeros((nspins, npoints), dtype=complex)
 
     # Propagate the state and record the longitudinal magnetisation.
-    # for step in range(npoints):
     for step in tqdm(range(npoints), desc="Time propagation"):
         for i, idx in enumerate(indices):
             magnetizations[i, step] = sg.measure(

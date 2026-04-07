@@ -1,19 +1,20 @@
 """
-Internal core namespace for Spinguin.
+Internal core namespace of Spinguin.
 
-This module re-exports the internal core functionality of Spinguin. In normal
-use, the public package namespace should be preferred::
+This module centralises the re-export of the internal core functionality of
+Spinguin. In normal use, the public package namespace should be preferred::
 
 	import spinguin as sg
 
-Direct imports from :mod:`spinguin._core` are possible but intended primarily
-for internal use and advanced development workflows.
+Direct imports from :mod:`spinguin._core` remain possible, but they are
+intended primarily for internal use, testing, and advanced development
+workflows.
 """
 from ._cache import clear_cache
 from ._chem import (
     associate,
     dissociate,
-    permute_spins
+    permute_spins,
 )
 from ._hamiltonian import hamiltonian
 from ._liouvillian import liouvillian
@@ -23,7 +24,7 @@ from ._nmr_isotopes import (
     gamma,
     natural_abundance,
     quadrupole_moment,
-    spin
+    spin,
 )
 from ._operators import (
     op_E,
@@ -34,13 +35,13 @@ from ._operators import (
     op_Sz,
     op_T,
     op_T_coupled,
-    operator
+    operator,
 )
 from ._parameters import parameters
 from ._propagation import (
     propagator,
     propagator_to_rotframe,
-    pulse
+    pulse,
 )
 from ._relaxation import relaxation
 from ._rotframe import rotating_frame
@@ -50,7 +51,7 @@ from ._specutils import (
     resonance_frequency,
     spectral_width_to_dwell_time,
     spectrum,
-    time_axis
+    time_axis,
 )
 from ._spin_system import SpinSystem
 from ._states import (
@@ -73,7 +74,7 @@ from ._superoperators import (
 from ._utils import (
     coherence_order,
     idx_to_lq,
-    lq_to_idx
+    lq_to_idx,
 )
 
 __all__ = [

@@ -1,8 +1,8 @@
 """
-hide_prints.py
+Context manager for temporarily suppressing standard output.
 
-Provides a small context manager for temporarily redirecting standard output to
-`os.devnull`.
+This module provides a small helper that redirects `sys.stdout` to
+`os.devnull` within a `with` block.
 """
 
 # Imports
@@ -37,8 +37,9 @@ class HidePrints:
         # Store the original output stream before redirecting it.
         self.stdout = sys.stdout
 
-        # Redirect standard output to the null device.
-        sys.stdout = open(os.devnull, 'w')
+        # Open the null-device stream and redirect standard output to it.
+        self._null_stream = open(os.devnull, 'w', encoding='utf-8')
+        sys.stdout = self._null_stream
 
         return self
 
@@ -52,7 +53,7 @@ class HidePrints:
         """
 
         # Close the temporary null-device stream.
-        sys.stdout.close()
+        self._null_stream.close()
 
         # Restore the original standard output stream.
         sys.stdout = self.stdout

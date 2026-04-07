@@ -34,6 +34,9 @@ class RelaxationProperties:
     Store the relaxation settings associated with a spin system.
 
     Usage: ``RelaxationProperties(spin_system)``.
+
+    The class stores the theory selection and auxiliary parameters required
+    for Redfield and phenomenological relaxation calculations.
     """
 
     # Store the default relaxation settings at class level.
@@ -41,12 +44,12 @@ class RelaxationProperties:
     _dynamic_frequency_shift: bool = False
     _relative_error: float = 1e-6
     _sr2k: bool = False
-    _tau_c: float | np.ndarray = None
-    _theory: Literal["redfield", "phenomenological"] = None
+    _tau_c: float | np.ndarray | None = None
+    _theory: Literal["redfield", "phenomenological"] | None = None
     _thermalization: bool = False
-    _T1: np.ndarray = None
-    _T2: np.ndarray = None
-    _molecule: Molecule = None
+    _T1: np.ndarray | None = None
+    _T2: np.ndarray | None = None
+    _molecule: Molecule | None = None
 
     def __init__(
         self,
@@ -249,9 +252,12 @@ class RelaxationProperties:
     @property
     def tau_c(
         self,
-    ) -> float | np.ndarray:
+    ) -> float | np.ndarray | None:
         """
         Return the rotational correlation time or times.
+
+        The value is ``None`` until it is assigned explicitly or through
+        :meth:`auto_tau_c`.
 
         For isotropic rotational diffusion, a single value is used. Example::
 
@@ -298,7 +304,7 @@ class RelaxationProperties:
         T: float,
         eta: float,
         model: Literal["iso", "aniso"] = "iso",
-        r: float = None,
+        r: float | None = None,
         scaling_factor: float = 1.0,
     ) -> None:
         """
@@ -370,11 +376,12 @@ class RelaxationProperties:
     @property
     def theory(
         self,
-    ) -> str:
+    ) -> Literal["redfield", "phenomenological"] | None:
         """
         Return the selected relaxation theory.
 
         Supported values are ``"redfield"`` and ``"phenomenological"``.
+        The value is ``None`` until a theory is selected explicitly.
         """
 
         return self._theory
@@ -422,7 +429,7 @@ class RelaxationProperties:
     @property
     def T1(
         self,
-    ) -> np.ndarray:
+    ) -> np.ndarray | None:
         """
         Return the longitudinal relaxation time constants for each spin.
 
@@ -433,7 +440,8 @@ class RelaxationProperties:
           ``T1`` values.
         - If `str`: path to the file containing the ``T1`` values.
 
-        The input is converted and stored as a NumPy array.
+        The input is converted and stored as a NumPy array. The value is
+        ``None`` until it is assigned.
 
         Examples::
 
@@ -464,7 +472,7 @@ class RelaxationProperties:
     @property
     def T2(
         self,
-    ) -> np.ndarray:
+    ) -> np.ndarray | None:
         """
         Return the transverse relaxation time constants for each spin.
 
@@ -475,7 +483,8 @@ class RelaxationProperties:
           ``T2`` values.
         - If `str`: path to the file containing the ``T2`` values.
 
-        The input is converted and stored as a NumPy array.
+        The input is converted and stored as a NumPy array. The value is
+        ``None`` until it is assigned.
 
         Examples::
 
@@ -590,11 +599,12 @@ class RelaxationProperties:
     @property
     def molecule(
         self,
-    ) -> Molecule:
+    ) -> Molecule | None:
         """
         Return the molecule associated with the spin system.
 
-        The molecule is used to define the rotational principal axes.
+        The molecule is used to define the rotational principal axes. The
+        value is ``None`` until a molecule is assigned explicitly.
         """
 
         return self._molecule

@@ -1,8 +1,10 @@
 """
-Simple pulse-and-acquire sequence for simulating an FID.
+Simple pulse-and-acquire sequence for simulating a free induction decay.
+
+This module provides a basic hard-pulse excitation sequence followed by
+direct detection of the transverse signal in the rotating frame.
 """
 
-# Imports
 import numpy as np
 import spinguin._core as sg
 
@@ -18,23 +20,27 @@ def pulse_and_acquire(
     """
     Perform a simple pulse-and-acquire experiment.
 
+    Usage:
+    ``pulse_and_acquire(spin_system, isotope, center_frequency, npoints,
+    dwell_time, angle)``.
+
     This experiment requires the following spin system properties to be defined:
 
-    - spin_system.basis : must be built
-    - spin_system.relaxation.theory
-    - spin_system.relaxation.thermalization : must be True
+    - ``spin_system.basis``: must be built
+    - ``spin_system.relaxation.theory``
+    - ``spin_system.relaxation.thermalization``: must be ``True``
 
     This experiment requires the following parameters to be defined:
 
-    - parameters.magnetic_field : magnetic field of the spectrometer in Tesla
-    - parameters.temperature : temperature of the sample in Kelvin
+    - ``parameters.magnetic_field``: magnetic field of the spectrometer in T
+    - ``parameters.temperature``: temperature of the sample in K
 
     Parameters
     ----------
     spin_system : SpinSystem
         Spin system on which the pulse-and-acquire experiment is performed.
     isotope : str
-        Isotope, for example `'1H'`, that is excited and observed.
+        Isotope, for example ``'1H'``, that is excited and observed.
     center_frequency : float
         Rotating-frame centre frequency in Hz for the observed isotope
         channel.
@@ -54,7 +60,8 @@ def pulse_and_acquire(
     ------
     ValueError
         Propagated if the underlying Hamiltonian, relaxation, or equilibrium
-        state calculations are missing required settings.
+        state calculations are missing required settings, or if the requested
+        isotope is not present in the spin system.
     """
 
     # Construct the Liouvillian governing the spin dynamics.
@@ -67,10 +74,14 @@ def pulse_and_acquire(
 
     # Identify the spins belonging to the observed isotope channel.
     indices = np.where(spin_system.isotopes == isotope)[0]
+    if indices.size == 0:
+        raise ValueError(
+            f"Isotope {isotope} is not present in the spin system."
+        )
 
     # Apply the hard excitation pulse to the selected isotope channel.
-    op_pulse = "+".join(f"I(y,{i})" for i in indices)
-    pulse_operator = sg.pulse(spin_system, op_pulse, angle)
+    pulse_operator_string = "+".join(f"I(y,{i})" for i in indices)
+    pulse_operator = sg.pulse(spin_system, pulse_operator_string, angle)
     rho = pulse_operator @ rho
 
     # Construct the propagator for one dwell-time step.
@@ -86,9 +97,9 @@ def pulse_and_acquire(
     fid = np.zeros(npoints, dtype=complex)
 
     # Propagate the state and record the detected transverse signal.
-    op_measure = "+".join(f"I(-,{i})" for i in indices)
+    measurement_operator = "+".join(f"I(-,{i})" for i in indices)
     for step in range(npoints):
-        fid[step] = sg.measure(spin_system, rho, op_measure)
+        fid[step] = sg.measure(spin_system, rho, measurement_operator)
         rho = P @ rho
 
     return fid

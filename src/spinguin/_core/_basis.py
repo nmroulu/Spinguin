@@ -1,9 +1,9 @@
 """
-basis.py
+Basis-set machinery for `SpinSystem`.
 
-Defines the basis-set machinery used by `SpinSystem`. The `Basis` class
-constructs Liouville-space basis states and provides multiple truncation
-strategies for reducing the working basis before simulation.
+The `Basis` class constructs Liouville-space basis states and provides
+multiple truncation strategies for reducing the working basis before
+simulation.
 
 The basis functionality is intended to be accessed through the owning
 `SpinSystem` instance. Example::
@@ -45,9 +45,6 @@ from spinguin._core._utils import coherence_order
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Define shared type aliases for truncation inputs and outputs
-TruncationObject = np.ndarray | sp.csc_array
-TruncationResult = None | TruncationObject | tuple[TruncationObject, ...]
 
 class Basis:
     """
@@ -239,9 +236,14 @@ class Basis:
 
     def truncate_by_coherence(
         self,
-        coherence_orders: list,
-        *objs: TruncationObject,
-    ) -> TruncationResult:
+        coherence_orders: list[int],
+        *objs: np.ndarray | sp.csc_array,
+    ) -> (
+        None
+        | np.ndarray
+        | sp.csc_array
+        | tuple[np.ndarray | sp.csc_array, ...]
+    ):
         """
         Truncate the basis set by coherence order.
 
@@ -297,8 +299,13 @@ class Basis:
         self,
         threshold_J: float=0.01,
         threshold_DD: float=500,
-        *objs: TruncationObject,
-    ) -> TruncationResult:
+        *objs: np.ndarray | sp.csc_array,
+    ) -> (
+        None
+        | np.ndarray
+        | sp.csc_array
+        | tuple[np.ndarray | sp.csc_array, ...]
+    ):
         """
         Truncate the basis using scalar and dipole-dipole couplings.
 
@@ -427,10 +434,10 @@ class Basis:
 
     def truncate_by_zte(
         self,
-        L: TruncationObject,
-        rho: TruncationObject,
-        *objs: TruncationObject,
-    ) -> tuple[TruncationObject, ...]:
+        L: np.ndarray | sp.csc_array,
+        rho: np.ndarray | sp.csc_array,
+        *objs: np.ndarray | sp.csc_array,
+    ) -> tuple[np.ndarray | sp.csc_array, ...]:
         """
         Truncate the basis using Zero-Track Elimination (ZTE).
 
@@ -512,7 +519,7 @@ class Basis:
             self.basis = self.basis[index_map]
 
         status(f"\tTruncated dimension: {self.dim}")
-        status(f"Completed in: {time.time() - time_start:.4f} seconds.\n")
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Transform the Liouvillian, the state, and any extra objects
         all_objs = (L, rho, *objs)
@@ -521,9 +528,14 @@ class Basis:
 
     def truncate_by_indices(
         self,
-        indices: list | np.ndarray,
-        *objs: TruncationObject,
-    ) -> TruncationResult:
+        indices: list[int] | np.ndarray,
+        *objs: np.ndarray | sp.csc_array,
+    ) -> (
+        None
+        | np.ndarray
+        | sp.csc_array
+        | tuple[np.ndarray | sp.csc_array, ...]
+    ):
         """
         Truncate the basis to a user-specified set of indices.
 
@@ -584,8 +596,7 @@ def _make_basis(spins: np.ndarray, max_spin_order: int) -> np.ndarray:
         A one-dimensional array that specifies the spin quantum numbers of the
         spin system.
     max_spin_order : int
-        Defines the maximum spin entanglement that is considered in the basis
-        set.
+        Defines the maximum spin order that is considered in the basis set.
 
     Returns
     -------
@@ -605,9 +616,8 @@ def _make_basis(spins: np.ndarray, max_spin_order: int) -> np.ndarray:
             "spins in the system."
         )
 
-    # Enumerate all subsystems with the requested spin order
-    indices = [i for i in range(nspins)]
-    subsystems = combinations(indices, max_spin_order)
+    # Enumerate all subsystems with the requested spin order.
+    subsystems = combinations(range(nspins), max_spin_order)
 
     # Collect unique basis states in insertion order
     basis = {}
@@ -630,7 +640,7 @@ def _make_basis(spins: np.ndarray, max_spin_order: int) -> np.ndarray:
     # Convert the collected basis states to a NumPy array
     basis = np.array(list(basis.keys()))
 
-    # Sort the basis so that the first spin index changes slowest
+    # Sort the basis so that the first spin index changes slowest.
     sorted_indices = np.lexsort(
         tuple(basis[:, i] for i in reversed(range(basis.shape[1]))))
     basis = basis[sorted_indices]
@@ -638,7 +648,10 @@ def _make_basis(spins: np.ndarray, max_spin_order: int) -> np.ndarray:
     return basis
 
 
-def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
+def _make_subsystem_basis(
+    spins: np.ndarray,
+    subsystem: tuple,
+) -> Iterator[tuple[int, ...]]:
     """
     Generate the basis set for a given subsystem.
 
@@ -652,8 +665,8 @@ def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
 
     Returns
     -------
-    basis : Iterator
-        An iterator over the basis set for the given subsystem, represented as
+    Iterator of tuple of int
+        Iterator over the basis set for the given subsystem, represented as
         tuples.
 
         For example, identity operator and z-operator for the 3rd spin:
@@ -687,9 +700,13 @@ def _make_subsystem_basis(spins: np.ndarray, subsystem: tuple) -> Iterator:
 
 
 def _sop_or_state_to_truncated_basis(
-    objs: tuple,
-    index_map: list,
-) -> TruncationObject | tuple[TruncationObject, ...]:
+    objs: tuple[np.ndarray | sp.csc_array, ...],
+    index_map: list[int],
+) -> (
+    np.ndarray
+    | sp.csc_array
+    | tuple[np.ndarray | sp.csc_array, ...]
+):
     """
     Convert superoperators or state vectors into a truncated basis.
 
@@ -708,8 +725,10 @@ def _sop_or_state_to_truncated_basis(
         objects are supplied.
     """
 
-    status("Converting superoperators and/or state vectors to the "
-           "truncated basis...")
+    status(
+        "Converting superoperators and/or state vectors to the truncated "
+        "basis..."
+    )
     time_start = time.time()
 
     # Transform each supplied object according to whether it is a state or SOP

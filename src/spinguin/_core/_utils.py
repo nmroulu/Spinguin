@@ -1,11 +1,10 @@
 """
-utils.py
+Shared utility helpers for tensor indices, operator parsing, and basis analysis.
 
-Provides shared utility functions for tensor-index conversions, operator
-parsing, and simple basis-set analysis.
+This module provides small helper functions for irreducible-tensor index
+conversions, operator-string parsing, and simple basis-set analysis.
 """
 
-# Imports
 import math
 import re
 
@@ -21,19 +20,24 @@ def _extract_arguments(
     Parameters
     ----------
     operator_term : str
-        Operator term such as `I(z,0)` or `T(1,-1,2)`.
+        Operator term such as ``I(z,0)`` or ``T(1,-1,2)``.
 
     Returns
     -------
     list of str
         Arguments extracted from inside the parentheses.
+
+    Raises
+    ------
+    ValueError
+        Raised if the operator term does not contain a valid argument list.
     """
 
     # Extract the comma-separated arguments enclosed in parentheses.
     match = re.search(r'\(([^)]*)\)', operator_term)
     if match is None:
         raise ValueError(
-            f"Cannot parse the following invalid operator: {operator_term}"
+            f"Cannot parse the following invalid operator: {operator_term}."
         )
 
     return match.group(1).split(',')
@@ -58,16 +62,16 @@ def _split_sum_terms(
 
     # Track the additive terms and the current parenthesis depth.
     prod_ops = []
-    inside_parentheses = False
+    parenthesis_depth = 0
     start = 0
 
     # Split only at plus signs that are outside parentheses.
     for i, char in enumerate(operator):
         if char == '(':
-            inside_parentheses = True
+            parenthesis_depth += 1
         elif char == ')':
-            inside_parentheses = False
-        elif char == '+' and not inside_parentheses:
+            parenthesis_depth -= 1
+        elif char == '+' and parenthesis_depth == 0:
             prod_ops.append(operator[start:i])
             start = i + 1
 
@@ -123,7 +127,7 @@ def _expand_global_operator(
 
     # Reject unsupported operator expressions explicitly.
     raise ValueError(
-        f"Cannot parse the following invalid operator: {prod_op}"
+        f"Cannot parse the following invalid operator: {prod_op}."
     )
 
 
@@ -136,7 +140,7 @@ def _operator_component_to_terms(
     Parameters
     ----------
     operator_component : str
-        Single-spin operator label such as `E`, `I_x`, or `T_1_0`.
+        Single-spin operator label such as ``E``, ``I_x``, or ``T_1_0``.
 
     Returns
     -------
@@ -203,7 +207,7 @@ def coherence_order(op_def: np.ndarray) -> int:
 
 def idx_to_lq(idx: int) -> tuple[int, int]:
     """
-    Convert a tensor index to rank `l` and projection `q`.
+    Convert a tensor index to rank ``l`` and projection ``q``.
 
     Parameters
     ----------
@@ -285,12 +289,12 @@ def parse_operator_string(
             operator = "E * I(component, index)"
             operator = "I(component, index)"
 
-        Special case: An empty `operator` string is considered as unit
+        Special case: An empty ``operator`` string is considered as the unit
         operator.
 
         Whitespace is ignored in the input.
 
-        NOTE: Indexing starts from 0.
+        Note that indexing starts from 0.
     nspins : int
         Number of spins in the system.
 
@@ -298,7 +302,7 @@ def parse_operator_string(
     -------
     op_defs : list of ndarray
         Arrays that describe the requested operator with integers. Example:
-        `[[2, 0, 1]]` corresponds to `T_1_0 * E * T_1_1`.
+        ``[[2, 0, 1]]`` corresponds to ``T_1_0 * E * T_1_1``.
     coeffs : list of complex
         Coefficients that account for the different norms of operator
         relations.
@@ -331,7 +335,7 @@ def parse_operator_string(
     for prod_op in prod_ops:
 
         # Start from the all-unit product operator.
-        op = np.array(['E' for _ in range(nspins)], dtype='<U10')
+        op = np.array(["E" for _ in range(nspins)], dtype="<U10")
 
         # Split the product into single-spin operator terms.
         op_terms = prod_op.split('*')
@@ -346,6 +350,11 @@ def parse_operator_string(
             # Parse Cartesian and ladder operators.
             elif op_term[0] == 'I':
                 component_and_index = _extract_arguments(op_term)
+                if len(component_and_index) != 2:
+                    raise ValueError(
+                        f"Cannot parse the following invalid operator: "
+                        f"{op_term}."
+                    )
                 component = component_and_index[0]
                 index = int(component_and_index[1])
                 op[index] = f"I_{component}"
@@ -353,6 +362,11 @@ def parse_operator_string(
             # Parse spherical tensor operators.
             elif op_term[0] == 'T':
                 component_and_index = _extract_arguments(op_term)
+                if len(component_and_index) != 3:
+                    raise ValueError(
+                        f"Cannot parse the following invalid operator: "
+                        f"{op_term}."
+                    )
                 l = component_and_index[0]
                 q = component_and_index[1]
                 index = int(component_and_index[2])
@@ -361,7 +375,7 @@ def parse_operator_string(
             # Reject unsupported operator terms explicitly.
             else:
                 raise ValueError(
-                    f"Cannot parse the following invalid operator: {op_term}"
+                    f"Cannot parse the following invalid operator: {op_term}."
                 )
 
         # Initialise the current basis-expansion lists.

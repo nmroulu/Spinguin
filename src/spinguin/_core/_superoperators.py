@@ -1,8 +1,8 @@
 """
-superoperators.py
+Liouville-space superoperator utilities for spin-dynamics calculations.
 
-Provides utilities for constructing Liouville-space superoperators in either
-the full basis or a truncated basis.
+This module provides helper functions for constructing superoperators in the
+full basis or in a truncated basis.
 """
 
 # Reference the SpinSystem class for type checking.
@@ -25,10 +25,6 @@ from spinguin._core import _la
 from spinguin._core._operators import op_T
 from spinguin._core._parameters import parameters
 from spinguin._core._utils import idx_to_lq, parse_operator_string
-
-
-SuperoperatorLike = np.ndarray | sp.csc_array
-OperatorInput = str | list | np.ndarray | tuple
 
 
 def _require_basis(
@@ -59,7 +55,7 @@ def _require_basis(
 def _allocate_superoperator(
     dim: int,
     sparse: bool,
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Allocate a square superoperator matrix in the requested storage format.
 
@@ -68,7 +64,7 @@ def _allocate_superoperator(
     dim : int
         Dimension of the basis set.
     sparse : bool
-        If `True`, allocate sparse CSC storage; otherwise allocate a dense
+        If ``True``, allocate sparse CSC storage; otherwise allocate a dense
         NumPy array.
 
     Returns
@@ -85,9 +81,9 @@ def _allocate_superoperator(
 
 
 def _finalise_superoperator(
-    sop: SuperoperatorLike,
+    sop: np.ndarray | sp.csc_array,
     sparse: bool,
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Return a superoperator in the requested output storage format.
 
@@ -132,7 +128,7 @@ def structure_coefficients(
         Spin quantum number.
     side : {'left', 'right'}
         Specifies the side of the multiplication.
-    
+
     Returns
     -------
     c : ndarray
@@ -186,7 +182,7 @@ def structure_coefficients(
 
 def sop_E(
     dim: int,
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Return the unit superoperator.
 
@@ -209,6 +205,7 @@ def sop_E(
 
     return unit
 
+
 @lru_cache(maxsize=4096)
 def _sop_prod(
     op_def_bytes: bytes,
@@ -216,7 +213,7 @@ def _sop_prod(
     spins_bytes: bytes,
     side: Literal["comm", "left", "right"],
     sparse: bool=True,
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Construct a product superoperator from hashable byte representations.
 
@@ -231,7 +228,7 @@ def _sop_prod(
     side : {'comm', 'left', 'right'}
         Type of superoperator to be constructed.
     sparse : bool, default=True
-        If `True`, return a sparse CSC array.
+        If ``True``, return a sparse CSC array.
 
     Returns
     -------
@@ -320,7 +317,7 @@ def _sop_prod(
             sop_k.append(k_op[ind_k])
 
     # Concatenate the collected sparse matrix data.
-    # NOTE: Thirty-two-bit integer indices are sufficient here.
+    # Thirty-two-bit integer indices are sufficient here.
     sop_j = np.concatenate(sop_j, dtype=np.int32)
     sop_k = np.concatenate(sop_k, dtype=np.int32)
     sop_vals = np.concatenate(sop_vals, dtype=complex)
@@ -336,7 +333,7 @@ def sop_prod(
     basis: np.ndarray,
     spins: np.ndarray,
     side: Literal["comm", "left", "right"],
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Generate a product superoperator from an operator definition array.
 
@@ -346,9 +343,9 @@ def sop_prod(
     ----------
     op_def : ndarray
         Specifies the product operator to be generated. For example,
-        input `np.array([0, 2, 0, 1])` will generate `E*T_10*E*T_11`. The
-        indices are given by `N = l^2 + l - q`, where `l` is the rank and `q` is
-        the projection.
+        input ``np.array([0, 2, 0, 1])`` generates ``E*T_10*E*T_11``. The
+        indices are given by ``N = l^2 + l - q``, where ``l`` is the rank and
+        ``q`` is the projection.
     basis : ndarray
         A two-dimensional array where each row contains integers that represent
         a Kronecker product of single-spin irreducible spherical tensors.
@@ -364,7 +361,7 @@ def sop_prod(
     Returns
     -------
     sop : ndarray or csc_array
-        Superoperator defined by `op_def`.
+        Superoperator defined by ``op_def``.
     """
 
     # Convert the inputs to byte strings so they can be cached.
@@ -378,7 +375,7 @@ def sop_prod(
         basis_bytes,
         spins_bytes,
         side,
-        parameters.sparse_superoperator
+        parameters.sparse_superoperator,
     ).copy()
 
     return sop
@@ -389,7 +386,7 @@ def sop_from_string(
     basis: np.ndarray,
     spins: np.ndarray,
     side: Literal["comm", "left", "right"],
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Generate a superoperator from an operator string.
 
@@ -399,31 +396,33 @@ def sop_from_string(
         Defines the operator to be generated. The operator string must
         follow the rules below:
 
-        - Cartesian and ladder operators: `I(component,index)` or
-          `I(component)`. Examples:
+                - Cartesian and ladder operators: ``I(component, index)`` or
+                    ``I(component)``. Examples:
 
-            - `I(x,4)` --> Creates x-operator for spin at index 4.
-            - `I(x)`--> Creates x-operator for all spins.
+                        - ``I(x, 4)`` creates the x-operator for spin index 4.
+                        - ``I(x)`` creates the x-operator for all spins.
 
-        - Spherical tensor operators: `T(l,q,index)` or `T(l,q)`. Examples:
+                - Spherical tensor operators: ``T(l, q, index)`` or ``T(l, q)``.
+                    Examples:
 
-            - `T(1,-1,3)` --> \
-              Creates operator with `l=1`, `q=-1` for spin at index 3.
-            - `T(1, -1)` --> \
-              Creates operator with `l=1`, `q=-1` for all spins.
-            
-        - Product operators have `*` in between the single-spin operators:
-          `I(z,0) * I(z,1)`
-        - Sums of operators have `+` in between the operators:
-          `I(x,0) + I(x,1)`
+                        - ``T(1, -1, 3)`` creates the operator with ``l=1`` and ``q=-1``
+                            for spin index 3.
+                        - ``T(1, -1)`` creates the operator with ``l=1`` and ``q=-1`` for
+                            all spins.
+
+                - Product operators have ``*`` between the single-spin operators:
+                    ``I(z, 0) * I(z, 1)``.
+                - Sums of operators have ``+`` between the operators:
+                    ``I(x, 0) + I(x, 1)``.
         - Unit operators are ignored in the input. Interpretation of these
-          two is identical: `E * I(z,1)`, `I(z,1)`
-        
-        Special case: An empty `operator` string is considered as unit operator.
+                    two expressions is identical: ``E * I(z, 1)``, ``I(z, 1)``.
+
+                Special case: An empty ``operator`` string is considered as the unit
+                operator.
 
         Whitespace will be ignored in the input.
 
-        NOTE: Indexing starts from 0!
+                Note that indexing starts from 0.
     basis : ndarray
         A two-dimensional array where each row contains integers that represent
         a Kronecker product of single-spin irreducible spherical tensors.
@@ -458,6 +457,7 @@ def sop_from_string(
 
     return sop
 
+
 @lru_cache(maxsize=4096)
 def _sop_T_coupled(
     basis_bytes: bytes,
@@ -465,9 +465,9 @@ def _sop_T_coupled(
     l: int,
     q: int,
     spin_1: int,
-    spin_2: int=None,
+    spin_2: int | None=None,
     sparse: bool=True,
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Construct a coupled spherical-tensor superoperator from cached inputs.
 
@@ -483,10 +483,10 @@ def _sop_T_coupled(
         Projection of the coupled tensor.
     spin_1 : int
         Index of the first spin.
-    spin_2 : int, default=None
-        Index of the second spin, or `None` for a linear interaction.
+    spin_2 : int or None, default=None
+        Index of the second spin, or ``None`` for a linear interaction.
     sparse : bool, default=True
-        If `True`, return a sparse CSC array.
+        If ``True``, return a sparse CSC array.
 
     Returns
     -------
@@ -506,7 +506,7 @@ def _sop_T_coupled(
     sop = _allocate_superoperator(dim, sparse)
 
     # Handle bilinear two-spin interactions.
-    if isinstance(spin_2, int):
+    if spin_2 is not None:
 
         # Sum over the projections of the coupled rank-1 tensors.
         for q1 in range(-1, 2):
@@ -543,8 +543,8 @@ def sop_T_coupled(
     l: int,
     q: int,
     spin_1: int,
-    spin_2: int=None,
-) -> SuperoperatorLike:
+    spin_2: int | None=None,
+) -> np.ndarray | sp.csc_array:
     """
     Compute the coupled spherical-tensor superoperator of rank `l`.
 
@@ -568,7 +568,8 @@ def sop_T_coupled(
     Returns
     -------
     sop : ndarray or csc_array
-        Coupled spherical tensor superoperator of rank `l` and projection `q`.
+        Coupled spherical-tensor superoperator of rank ``l`` and projection
+        ``q``.
     """
 
     # Ensure that the basis is available.
@@ -593,9 +594,9 @@ def sop_T_coupled(
 
 
 def sop_to_truncated_basis(
-    index_map: list,
-    sop: SuperoperatorLike,
-) -> SuperoperatorLike:
+    index_map: list[int],
+    sop: np.ndarray | sp.csc_array,
+) -> np.ndarray | sp.csc_array:
     """
     Transform a superoperator to a truncated basis.
 
@@ -604,7 +605,7 @@ def sop_to_truncated_basis(
     index_map : list
         Index mapping from the original basis to the truncated basis.
     sop : ndarray or csc_array
-        Superoperators to be transformed.
+        Superoperator to be transformed.
 
     Returns
     -------
@@ -618,9 +619,9 @@ def sop_to_truncated_basis(
 
 def superoperator(
     spin_system: SpinSystem,
-    operator: OperatorInput,
+    operator: str | list | np.ndarray | tuple,
     side: Literal["comm", "left", "right"]="comm",
-) -> SuperoperatorLike:
+) -> np.ndarray | sp.csc_array:
     """
     Generate a Liouville-space superoperator for a spin system.
 
@@ -630,12 +631,12 @@ def superoperator(
         Spin system for which the superoperator is going to be generated.
     operator : str or list or ndarray or tuple
         Defines the superoperator to be generated.
-        
+
         **The operator can be defined with two different approaches:**
 
-        - A string. Example: `I(z,0) * I(z,1)`
-        - An array of integers. Example: `[2, 2]`
-        
+        - A string. Example: ``I(z, 0) * I(z, 1)``.
+        - An array of integers. Example: ``[2, 2]``.
+
         **The operator string must follow the rules below:**
 
         - Cartesian or ladder operator at specific index or for all spins::
@@ -655,13 +656,14 @@ def superoperator(
         - Sum of operators::
 
             operator = "I(component1, index1) + I(component2, index2)"
-            
+
         - Unit operators are ignored in the input. These are identical::
 
             operator = "E * I(component, index)"
             operator = "I(component, index)"
-        
-        Special case: An empty `operator` string is considered as unit operator.
+
+        Special case: An empty ``operator`` string is considered as the unit
+        operator.
 
         Whitespace will be ignored in the input.
 
@@ -671,7 +673,7 @@ def superoperator(
         - Each integer corresponds to a spherical tensor operator of rank *l*
           and projection *q*: *N* = *l*^2 + *l* - *q*
 
-        NOTE: Indexing starts from 0!
+        Note that indexing starts from 0.
 
     side : {'comm', 'left', 'right'}
         The type of superoperator:
@@ -704,9 +706,9 @@ def superoperator(
         operator = np.asarray(operator)
 
         # Validate the dimensionality and length of the operator definition.
-        if not operator.ndim == 1:
-            raise ValueError("The input array must be one-dimensional")
-        if not operator.shape[0] == spin_system.nspins:
+        if operator.ndim != 1:
+            raise ValueError("The input array must be one-dimensional.")
+        if operator.shape[0] != spin_system.nspins:
             raise ValueError(
                 "Length of the operator array must match the number of spins."
             )
@@ -721,14 +723,20 @@ def superoperator(
 
     # Reject unsupported operator specifications.
     else:
-        raise ValueError("Invalid input type for 'operator'")
+        raise ValueError(
+            "Invalid input type for 'operator'. Use a string or a 1D array."
+        )
 
     return sop
 
 
 def clear_cache_structure_coefficients() -> None:
     """
-    Clear the cache of `structure_coefficients()`.
+    Clear the cache of ``structure_coefficients()``.
+
+    Returns
+    -------
+    None
     """
 
     # Clear the cached structure-coefficient tensors.
@@ -737,7 +745,11 @@ def clear_cache_structure_coefficients() -> None:
 
 def clear_cache_sop_prod() -> None:
     """
-    Clear the cache of `_sop_prod()`.
+    Clear the cache of ``_sop_prod()``.
+
+    Returns
+    -------
+    None
     """
 
     # Clear the cached product superoperators.
@@ -746,7 +758,11 @@ def clear_cache_sop_prod() -> None:
 
 def clear_cache_sop_T_coupled() -> None:
     """
-    Clear the cache of `_sop_T_coupled()`.
+    Clear the cache of ``_sop_T_coupled()``.
+
+    Returns
+    -------
+    None
     """
 
     # Clear the cached coupled spherical-tensor superoperators.

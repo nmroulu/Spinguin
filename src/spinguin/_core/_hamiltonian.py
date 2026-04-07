@@ -1,8 +1,8 @@
 """
-hamiltonian.py
+Hamiltonian-construction helpers for spin systems.
 
-Provides helper functions for constructing Hamiltonian superoperators from the
-interactions present in a spin system.
+This module provides helper functions for constructing Hamiltonian
+superoperators from the interactions present in a spin system.
 """
 
 # Imports
@@ -16,15 +16,15 @@ from scipy.sparse import csc_array
 
 from spinguin._core._la import eliminate_small
 from spinguin._core._parameters import parameters
-from spinguin._core._status import status, status_section
+from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Define type aliases for interaction labels and their default values.
-INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
-INTERACTIONDEFAULT = ("zeeman", "chemical_shift", "J_coupling")
+# Define the default set of Hamiltonian interactions.
+DEFAULT_INTERACTIONS = ("zeeman", "chemical_shift", "J_coupling")
+
 
 def _empty_hamiltonian(
     spin_system: SpinSystem,
@@ -52,7 +52,9 @@ def _empty_hamiltonian(
     return np.zeros((dim, dim), dtype=complex)
 
 
-def _validate_interactions(interactions: list[INTERACTIONTYPE]) -> None:
+def _validate_interactions(
+    interactions: list[Literal["zeeman", "chemical_shift", "J_coupling"]],
+) -> None:
     """
     Validate the list of requested Hamiltonian interactions.
 
@@ -78,10 +80,10 @@ def _validate_interactions(interactions: list[INTERACTIONTYPE]) -> None:
 
     # Check that every requested interaction is recognised.
     for interaction in interactions:
-        if interaction not in INTERACTIONDEFAULT:
+        if interaction not in DEFAULT_INTERACTIONS:
             raise ValueError(
                 f"Invalid interaction: {interaction}. "
-                f"Valid interactions are: {INTERACTIONDEFAULT}."
+                f"Valid interactions are: {DEFAULT_INTERACTIONS}."
             )
 
 
@@ -140,7 +142,7 @@ def _sop_H_Z_CS(
         elif cs:
             omega = omega_0 * spin_system.chemical_shifts[n] * 1e-6
         else:
-            raise ValueError("zeeman or cs must be True")
+            raise ValueError("zeeman or cs must be True.")
 
         # Build the z-superoperator for the current spin.
         sop_Iz = superoperator(spin_system, f"I(z, {n})", side)
@@ -196,7 +198,8 @@ def _sop_H_J(
 
 def hamiltonian(
     spin_system: SpinSystem,
-    interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
+    interactions: list[Literal["zeeman", "chemical_shift", "J_coupling"]]
+    = DEFAULT_INTERACTIONS,
     side: Literal["comm", "left", "right"] = "comm",
 ) -> np.ndarray | csc_array:
     """
@@ -227,7 +230,6 @@ def hamiltonian(
 
     # Record the start time for status reporting.
     time_start = time.time()
-    # status_section("Hamiltonian")
     status("Constructing the Hamiltonian...")
 
     # Ensure that the basis has been built before constructing the Hamiltonian.
@@ -255,9 +257,10 @@ def hamiltonian(
     # Remove very small values to improve sparsity and numerical cleanliness.
     eliminate_small(sop_H, parameters.zero_hamiltonian)
 
-    # Status reporting for the Hamiltonian construction.
-    status(f"Hamiltonian constructed in {time.time() - time_start:.4f} seconds.\n")
-    # status_section("Hamiltonian end.")
-    # status("\n")
+    # Report the completion of the Hamiltonian construction.
+    status(
+        f"Hamiltonian constructed in {time.time() - time_start:.4f} "
+        "seconds.\n"
+    )
 
     return sop_H

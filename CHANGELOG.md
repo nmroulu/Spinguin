@@ -4,6 +4,7 @@
 - Improved basis-set handling.
 - Refined the implementation of zero-track elimination.
 - Added anisotropic rotational diffusion for Redfield relaxation theory.
+- General documentation and comment updates.
 
 ## 0.0.4
 - Added support for creating a subsystem from a `SpinSystem` object.

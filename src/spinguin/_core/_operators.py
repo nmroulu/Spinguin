@@ -38,7 +38,8 @@ def _finalise_single_spin_operator(
     Returns
     -------
     operator : ndarray or csc_array
-        The input operator returned either unchanged or converted to CSC format.
+        The input operator returned either unchanged or converted to CSC
+        format.
     """
 
     # Convert sparse work arrays to the configured output format.
@@ -587,8 +588,7 @@ def operator(
     return op
 
 
-def clear_cache_op_T(
-) -> None:
+def clear_cache_op_T() -> None:
     """
     Clear the internal cache used by ``_op_T``.
 

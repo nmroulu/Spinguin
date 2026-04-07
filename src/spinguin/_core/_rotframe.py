@@ -45,50 +45,50 @@ def _report_completion(
     """
 
     # Report the elapsed wall-clock time of the completed operation.
-    status(f"Completed in {time.time() - time_start:.4f} seconds.")
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
 
 def _prepare_rotating_frame_inputs(
-    isotopes: list,
-    center_frequencies: list,
-    orders: list,
-) -> tuple[list, list, list]:
+    isotopes: list[str],
+    center_frequencies: list[float] | None,
+    orders: list[int] | None,
+) -> tuple[list[float], list[int]]:
     """
     Fill missing rotating-frame input lists with default values.
 
-    Usage: ``_prepare_rotating_frame_inputs(isotopes, center_frequencies, orders)``.
+    Usage:
+    ``_prepare_rotating_frame_inputs(isotopes, center_frequencies, orders)``.
 
     Parameters
     ----------
     isotopes : list
         List of isotopes for which rotating frames are requested.
-    center_frequencies : list
+    center_frequencies : list of float or None
         Centre frequencies in ppm.
-    orders : list
+    orders : list of int or None
         Rotating-frame correction orders.
 
     Returns
     -------
-    center_frequencies : list
+    center_frequencies : list of float
         Centre frequencies with defaults inserted where needed.
-    orders : list
+    orders : list of int
         Rotating-frame orders with defaults inserted where needed.
-    isotopes : list
-        Unmodified isotope list.
     """
 
     # Fill missing correction orders with the global default value.
-    if len(orders) == 0:
+    if orders is None or len(orders) == 0:
         orders = [
             parameters.rotating_frame_order
             for _ in range(len(isotopes))
         ]
 
     # Fill missing centre frequencies with zeros.
-    if len(center_frequencies) == 0:
-        center_frequencies = [0 for _ in range(len(isotopes))]
+    if center_frequencies is None or len(center_frequencies) == 0:
+        center_frequencies = [0.0 for _ in range(len(isotopes))]
 
-    return center_frequencies, orders, isotopes
+    return center_frequencies, orders
+
 
 def _auxiliary_matrix_rotframe_expm(
     A: np.ndarray | sp.csc_array,
@@ -106,11 +106,11 @@ def _auxiliary_matrix_rotframe_expm(
     Parameters
     ----------
     A : ndarray or csc_array
-        Diagonal elements of the auxiliary matrix (L0)
+        Diagonal elements of the auxiliary matrix ``L0``.
     B : ndarray or csc_array
-        Superdiagonal elements of the auxiliary matrix (L1)
+        Superdiagonal elements of the auxiliary matrix ``L1``.
     T : float
-        Time
+        Interaction-frame period.
     order : int
         Rotating frame correction order.
 
@@ -153,14 +153,16 @@ def _auxiliary_matrix_rotframe_expm(
 def rotating_frame(
     spin_system: SpinSystem,
     L: np.ndarray | sp.csc_array,
-    isotopes: list,
-    center_frequencies: list = [],
-    orders: list = [],
+    isotopes: list[str],
+    center_frequencies: list[float] | None=None,
+    orders: list[int] | None=None,
 ) -> np.ndarray | sp.csc_array:
     """
     Transform a Liouvillian into one or more rotating frames.
 
-    Usage: ``rotating_frame(spin_system, L, isotopes, center_frequencies=[], orders=[])``.
+    Usage:
+    ``rotating_frame(spin_system, L, isotopes, center_frequencies=None,
+    orders=None)``.
 
     Parameters
     ----------
@@ -168,15 +170,15 @@ def rotating_frame(
         Spin system whose Liouvillian is going to be transformed.
     L : ndarray or csc_array
         Liouvillian superoperator in the laboratory frame.
-    isotopes : list
+    isotopes : list of str
         List of isotopes whose rotating frames are applied.
-    center_frequencies : list, default=[]
-        List of center frequencies (in ppm) for each isotope. If empty, zero is
-        used for all isotopes.
-    orders : list, default=[]
+    center_frequencies : list of float or None, default=None
+        List of centre frequencies in ppm for each isotope. If `None` or
+        empty, zero is used for all isotopes.
+    orders : list of int or None, default=None
         List of integers that define the order of the rotating frame for each
-        isotope. If empty, the default value defined in
-        `parameters.rotating_frame_order` is used for all isotopes.
+        isotope. If `None` or empty, the default value defined in
+        ``parameters.rotating_frame_order`` is used for all isotopes.
 
     Returns
     -------
@@ -188,66 +190,80 @@ def rotating_frame(
     status("Transforming Liouvillian to the rotating frame...")
     time_start = time.time()
 
+    # Ensure that the working basis has been built.
+    if spin_system.basis.basis is None:
+        raise ValueError(
+            "Please build the basis before transforming to the rotating "
+            "frame."
+        )
+
     # Validate the basic input list lengths.
     if len(isotopes) == 0:
-        raise ValueError("must specify at least one isotope")
-    if not (len(orders) == len(isotopes) or len(orders) == 0):
-        raise ValueError("lengths of orders and isotopes must match")
+        raise ValueError("Must specify at least one isotope.")
+    if orders is not None and len(orders) not in (0, len(isotopes)):
+        raise ValueError("Lengths of orders and isotopes must match.")
     if not (
-        len(center_frequencies) == len(isotopes) or
-        len(center_frequencies) == 0
+        center_frequencies is None
+        or len(center_frequencies) == 0
+        or len(center_frequencies) == len(isotopes)
     ):
-        raise ValueError("center_frequencies and isotopes must have same length")
+        raise ValueError(
+            "Lengths of centre frequencies and isotopes must match."
+        )
     
     # Check that each requested isotope exists in the spin system.
     for isotope in isotopes:
         if isotope not in spin_system.isotopes:
-            raise ValueError(f"isotope {isotope} is not in the spin system")
+            raise ValueError(
+                f"Isotope {isotope} is not present in the spin system."
+            )
         
     # Check that the requested isotope labels are unique.
-    if not len(isotopes) == len(set(isotopes)):
-        raise ValueError("given isotopes must be unique")
+    if len(isotopes) != len(set(isotopes)):
+        raise ValueError("Given isotopes must be unique.")
 
     # Fill optional inputs with default values when needed.
-    center_frequencies, orders, isotopes = _prepare_rotating_frame_inputs(
+    center_frequencies, orders = _prepare_rotating_frame_inputs(
         isotopes,
         center_frequencies,
         orders,
     )
 
     # Calculate the resonance frequencies that define the interaction frames.
-    freqs = []
-    for i in range(len(isotopes)):
-        freq = resonance_frequency(
-            isotope=isotopes[i],
-            delta = center_frequencies[i],
+    freqs = [
+        resonance_frequency(
+            isotope=isotope,
+            delta=center_frequency,
             unit="rad/s",
         )
-        freqs.append(freq)
+        for isotope, center_frequency in zip(isotopes, center_frequencies)
+    ]
 
     # Build the Hamiltonians associated with the requested rotating frames.
     H0s = []
-    for i in range(len(isotopes)):
-        spins = np.where(spin_system.isotopes == isotopes[i])[0]
-        dim = spin_system.basis.dim
+    dim = spin_system.basis.dim
+    for isotope, freq in zip(isotopes, freqs):
+
+        # Identify the spins that belong to the current isotope.
+        spins = np.where(spin_system.isotopes == isotope)[0]
+
+        # Allocate the Hamiltonian contribution for the current frame.
         if parameters.sparse_superoperator:
             H = sp.csc_array((dim, dim))
         else:
             H = np.zeros((dim, dim))
+
+        # Add the z-Hamiltonian term of each spin of the current isotope.
         for n in spins:
             Iz_n = superoperator(spin_system, f"I(z, {n})")
-            H = H + freqs[i] * Iz_n
+            H = H + freq * Iz_n
         H0s.append(H)
 
     # Convert the frame Hamiltonians to Liouvillians.
-    L0s = []
-    for H in H0s:
-        L0s.append(-1j * H)
+    L0s = [-1j * H for H in H0s]
 
     # Calculate the norms used to determine the transformation order.
-    norms = []
-    for L0 in L0s:
-        norms.append(norm_1(L0))
+    norms = [norm_1(L0) for L0 in L0s]
 
     # Reorder the transformations from largest to smallest norm.
     sort = np.flip(np.argsort(norms))
@@ -257,17 +273,12 @@ def rotating_frame(
     isotopes = [isotopes[i] for i in sort]
 
     # Convert the frequencies to periods.
-    Ts = []
-    for freq in freqs:
-        Ts.append(2 * np.pi / freq)
+    Ts = [2 * np.pi / freq for freq in freqs]
 
     # Apply the requested rotating-frame transformations sequentially.
-    for i in range(len(L0s)):
-        status(f"\tApplying rotating frame for {isotopes[i]}...")
-        L0 = L0s[i]
+    for isotope, L0, T, order in zip(isotopes, L0s, Ts, orders):
+        status(f"\tApplying rotating frame for {isotope}...")
         L1 = L - L0
-        T = Ts[i]
-        order = orders[i]
         L = _sop_L_to_rotframe(L0, L1, T, order)
 
     # Report the completion of the rotating-frame transformation.
@@ -294,9 +305,10 @@ def _sop_L_to_rotframe(
         Liouvillian containing the largest interaction (must be a single
         frequency).
     L1 : ndarray or csc_array
-        Rest of the Liouvillian. Must be a perturbation: `||L1|| < ||L0||`.
+        Rest of the Liouvillian. Must be a perturbation:
+        ``||L1|| < ||L0||``.
     T : float
-        Period of the Liouvillian: `expm(L0*T) = I`.
+        Period of the Liouvillian, for which ``expm(L0*T) = I``.
     order : int
         Order to which the series is truncated.
 

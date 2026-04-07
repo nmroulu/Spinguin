@@ -1,8 +1,8 @@
 """
-status.py
+Status-message helpers controlled by the global verbosity setting.
 
-Provides a lightweight helper for printing status messages controlled by the
-global verbosity setting.
+This module provides lightweight helper functions for printing status
+messages and section headers when verbose output is enabled.
 """
 
 
@@ -12,10 +12,14 @@ def status(
     """
     Print a status message when verbose output is enabled.
 
+    Usage
+    -----
+    ``status(msg)``
+
     Parameters
     ----------
     msg : str
-        Message to be printed.
+        Message to print.
 
     Returns
     -------
@@ -26,30 +30,38 @@ def status(
     # Import the global parameters lazily to avoid a circular dependency.
     from spinguin._core._parameters import parameters
 
-    # Print the message only when status output has been enabled.
+    # Print the message only when verbose output is enabled.
     if parameters.verbose:
         print(msg)
 
 
 def status_section(title: str) -> None:
     """
-    Begin a clean new section in the status output, with a separator and a title.
+    Print a titled separator for a new section in the status output.
 
-    This function is intended to be used for visually separating different stages
-    of the computation in the status output when verbose mode is enabled. It
-    prints a separator line followed by the provided title, and another
-    separator line.
+    Usage
+    -----
+    ``status_section(title)``
+
+    This function is intended for visually separating different stages of the
+    computation when verbose output is enabled. It prints a separator line,
+    the centred title, and a second separator line.
 
     Parameters
     ----------
     title : str
-        Title to be printed for the new section in the status output.
+        Title to print for the new section in the status output.
+
+    Returns
+    -------
+    None
+        The section header is printed only when verbose output is enabled.
     """
 
     # Import the global parameters lazily to avoid a circular dependency.
     from spinguin._core._parameters import parameters
 
-    # Print the section header only when status output has been enabled.
+    # Print the section header only when verbose output is enabled.
     if parameters.verbose:
         print("#" * 80)
         print(title.center(80))

@@ -1,9 +1,10 @@
 """
-chem.py
+Chemical-exchange helpers for Liouville-space simulations.
 
-Provides helper functions for simple chemical exchange operations in Liouville
-space, including association, dissociation, and spin-order permutation.
-Non-linear chemical kinetics is also supported by these functions.
+This module provides helper functions for simple chemical exchange operations
+in Liouville space, including association, dissociation, and spin-order
+permutation. These helpers also support non-linear chemical-kinetic
+workflows.
 """
 
 # Imports
@@ -21,16 +22,12 @@ from spinguin._core._parameters import parameters
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Define type aliases for improved readability.
-SpinMap = list | tuple | np.ndarray
-StateVector = np.ndarray | sp.csc_array
-
 def _validate_bipartite_spin_maps(
     spin_system_A: SpinSystem,
     spin_system_B: SpinSystem,
     spin_system_C: SpinSystem,
-    spin_map_A: SpinMap,
-    spin_map_B: SpinMap,
+    spin_map_A: list[int] | tuple[int, ...] | np.ndarray,
+    spin_map_B: list[int] | tuple[int, ...] | np.ndarray,
 ) -> None:
     """
     Validate spin maps used for association and dissociation.
@@ -70,12 +67,14 @@ def _validate_bipartite_spin_maps(
     # Check that both maps form a complete non-overlapping partition of C.
     spin_map_C = set(spin_map_A).union(set(spin_map_B))
     if spin_map_C != set(range(spin_system_C.nspins)):
-        raise ValueError("spin maps have incorrect or have overlapping indices")
+        raise ValueError(
+            "spin maps contain incorrect indices or overlapping indices"
+        )
 
 
 def _validate_permutation_spin_map(
     spin_system: SpinSystem,
-    spin_map: SpinMap,
+    spin_map: list[int] | tuple[int, ...] | np.ndarray,
 ) -> None:
     """
     Validate a spin map used for spin permutation.
@@ -420,7 +419,7 @@ def _permutation_matrix(
 
 def permutation_matrix(
     spin_system: SpinSystem,
-    spin_map: SpinMap,
+    spin_map: list[int] | tuple[int, ...] | np.ndarray,
 ) -> sp.csc_array:
     """
     Create a permutation matrix that reorders spins in a spin system.
@@ -469,10 +468,10 @@ def dissociate(
     spin_system_A: SpinSystem,
     spin_system_B: SpinSystem,
     spin_system_C: SpinSystem,
-    rho_C: StateVector,
-    spin_map_A: SpinMap,
-    spin_map_B: SpinMap,
-) -> tuple[StateVector, StateVector]:
+    rho_C: np.ndarray | sp.csc_array,
+    spin_map_A: list[int] | tuple[int, ...] | np.ndarray,
+    spin_map_B: list[int] | tuple[int, ...] | np.ndarray,
+) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array]:
     """
     Dissociate a composite density vector into two subsystem vectors.
 
@@ -569,11 +568,11 @@ def associate(
     spin_system_A: SpinSystem,
     spin_system_B: SpinSystem,
     spin_system_C: SpinSystem,
-    rho_A: StateVector,
-    rho_B: StateVector,
-    spin_map_A: SpinMap,
-    spin_map_B: SpinMap,
-) -> StateVector:
+    rho_A: np.ndarray | sp.csc_array,
+    rho_B: np.ndarray | sp.csc_array,
+    spin_map_A: list[int] | tuple[int, ...] | np.ndarray,
+    spin_map_B: list[int] | tuple[int, ...] | np.ndarray,
+) -> np.ndarray | sp.csc_array:
     """
     Combine two subsystem density vectors into a composite vector.
 
@@ -586,8 +585,8 @@ def associate(
     spin systems A and B will be indexed in spin system C by defining the spin
     maps as follows::
 
-        spin_map_A = np.ndarray([0, 2])
-        spin_map_B = np.ndarray([1, 3, 4])
+        spin_map_A = np.array([0, 2])
+        spin_map_B = np.array([1, 3, 4])
 
     Parameters
     ----------
@@ -663,9 +662,9 @@ def associate(
 
 def permute_spins(
     spin_system: SpinSystem,
-    rho: StateVector,
-    spin_map: SpinMap,
-) -> StateVector:
+    rho: np.ndarray | sp.csc_array,
+    spin_map: list[int] | tuple[int, ...] | np.ndarray,
+) -> np.ndarray | sp.csc_array:
     """
     Permute a state vector to match a reordering of spins.
 

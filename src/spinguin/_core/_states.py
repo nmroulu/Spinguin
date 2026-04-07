@@ -1,11 +1,11 @@
 """
-states.py
+State-vector utilities for Liouville-space spin dynamics.
 
-Provides utilities for constructing Liouville-space state vectors, converting
-them between representations, and evaluating expectation values.
+This module provides helper functions for constructing Liouville-space state
+vectors, converting them between representations, and evaluating expectation
+values.
 """
 
-# Referencing the SpinSystem class for type checking.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Imports
 import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
@@ -24,10 +23,6 @@ from spinguin._core._la import expm
 from spinguin._core._operators import op_prod
 from spinguin._core._parameters import parameters
 from spinguin._core._utils import parse_operator_string
-
-
-StateLike = np.ndarray | sp.csc_array
-
 
 def _require_basis(
     spin_system: SpinSystem,
@@ -85,7 +80,7 @@ def _allocate_state_vector(
 
 def _finalise_state_vector(
     rho: np.ndarray | sp.lil_array | sp.csc_array,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
     Return a state vector in the configured output storage format.
 
@@ -156,7 +151,8 @@ def _pair_longitudinal_states(
     spin_system: SpinSystem,
     index_1: int,
     index_2: int,
-) -> tuple[StateLike, StateLike, StateLike]:
+) -> tuple[np.ndarray | sp.csc_array, np.ndarray | sp.csc_array,
+           np.ndarray | sp.csc_array]:
     """
     Construct the longitudinal basis states for a two-spin pair.
 
@@ -171,8 +167,8 @@ def _pair_longitudinal_states(
 
     Returns
     -------
-    tuple of state-like
-        Unit-state, first-spin `Iz`, and second-spin `Iz` contributions.
+    tuple of ndarray or csc_array
+        Unit state, first-spin ``Iz``, and second-spin ``Iz`` contributions.
     """
 
     # Build the unit and single-spin longitudinal states.
@@ -187,7 +183,12 @@ def _pair_correlation_states(
     spin_system: SpinSystem,
     index_1: int,
     index_2: int,
-) -> tuple[StateLike, StateLike, StateLike, StateLike]:
+) -> tuple[
+    np.ndarray | sp.csc_array,
+    np.ndarray | sp.csc_array,
+    np.ndarray | sp.csc_array,
+    np.ndarray | sp.csc_array,
+]:
     """
     Construct the pair-correlation states for a two-spin manifold.
 
@@ -202,8 +203,8 @@ def _pair_correlation_states(
 
     Returns
     -------
-    tuple of state-like
-        Unit state, `IzIz`, `IpIm`, and `ImIp` contributions.
+    tuple of ndarray or csc_array
+        Unit state, ``IzIz``, ``IpIm``, and ``ImIp`` contributions.
     """
 
     # Build the unit and two-spin correlation states.
@@ -216,9 +217,9 @@ def _pair_correlation_states(
 
 
 def state_to_truncated_basis(
-    index_map: list,
-    rho: StateLike,
-) -> StateLike:
+    index_map: list[int],
+    rho: np.ndarray | sp.csc_array,
+) -> np.ndarray | sp.csc_array:
     """
     Transform a state vector to a truncated basis.
 
@@ -242,7 +243,7 @@ def state_to_truncated_basis(
 def unit_state(
     spin_system: SpinSystem,
     normalized: bool=True,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
     Return the Liouville-space representation of the unit operator.
 
@@ -252,11 +253,11 @@ def unit_state(
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system to which the unit state is created.
+        Spin system for which the unit state is created.
     normalized : bool, default=True
-        If set to True, the function will return a state vector that represents
-        the trace-normalized density matrix. If False, returns a state vector
-        that corresponds to the identity operator.
+        If set to ``True``, the function returns a state vector that
+        represents the trace-normalised density matrix. If ``False``, it
+        returns a state vector corresponding to the identity operator.
 
     Returns
     -------
@@ -283,7 +284,7 @@ def unit_state(
 def state(
     spin_system: SpinSystem,
     operator: str,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
     Construct a state vector from an operator-string specification.
 
@@ -316,17 +317,18 @@ def state(
         - Sum of operators::
 
             operator = "I(component1, index1) + I(component2, index2)"
-            
+
         - Unit operators are ignored in the input. These are identical::
 
             operator = "E * I(component, index)"
             operator = "I(component, index)"
-        
-        Special case: An empty `operator` string is considered as unit operator.
+
+        Special case: An empty ``operator`` string is considered as the unit
+        operator.
 
         Whitespace will be ignored in the input.
 
-        NOTE: Indexing starts from 0!
+        Note that indexing starts from 0.
 
     Returns
     -------
@@ -378,8 +380,8 @@ def state(
 
 def state_to_zeeman(
     spin_system: SpinSystem,
-    rho: StateLike,
-) -> StateLike:
+    rho: np.ndarray | sp.csc_array,
+) -> np.ndarray | sp.csc_array:
     """
     Convert a Liouville-space state vector to the Zeeman eigenbasis.
 
@@ -391,7 +393,7 @@ def state_to_zeeman(
         Spin system whose state vector is going to be converted into a density
         matrix.
     rho : ndarray or csc_array
-        State vector defined in the normalized spherical tensor basis.
+        State vector defined in the normalised spherical-tensor basis.
 
     Returns
     -------
@@ -400,7 +402,10 @@ def state_to_zeeman(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "converting the state vector into density matrix")
+    _require_basis(
+        spin_system,
+        "converting the state vector into a density matrix",
+    )
 
     # Determine the Hilbert-space dimension of the density matrix.
     dim = _liouville_dimension(spin_system)
@@ -433,15 +438,15 @@ def state_to_zeeman(
 def alpha_state(
     spin_system: SpinSystem,
     index: int,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
-    Generate the alpha state for a selected spin-$1/2$ nucleus.
+    Generate the alpha state for a selected spin-1/2 nucleus.
 
     The remaining spins are assigned the unit state.
 
     Parameters
     ----------
-    spin_system: SpinSystem
+    spin_system : SpinSystem
         Spin system for which the alpha state is created.
     index : int
         Index of the spin that has the alpha state.
@@ -471,15 +476,15 @@ def alpha_state(
 def beta_state(
     spin_system: SpinSystem,
     index: int,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
-    Generate the beta state for a selected spin-$1/2$ nucleus.
+    Generate the beta state for a selected spin-1/2 nucleus.
 
     The remaining spins are assigned the unit state.
 
     Parameters
     ----------
-    spin_system: SpinSystem
+    spin_system : SpinSystem
         Spin system for which the beta state is created.
     index : int
         Index of the spin that has the beta state.
@@ -508,7 +513,7 @@ def beta_state(
 
 def equilibrium_state(
     spin_system: SpinSystem,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
     Construct the thermal-equilibrium state of the spin system.
 
@@ -541,8 +546,7 @@ def equilibrium_state(
         # Evaluate the matrix exponential of the Boltzmann operator.
         T = parameters.temperature
         zv = parameters.zero_equilibrium
-        with HidePrints():
-            P = expm(-const.hbar / (const.k * T) * H_left, zv)
+        P = expm(-const.hbar / (const.k * T) * H_left, zv)
 
         # Propagate the unnormalised unit state to equilibrium.
         unit = unit_state(spin_system, normalized=False)
@@ -562,9 +566,9 @@ def singlet_state(
     spin_system: SpinSystem,
     index_1: int,
     index_2: int,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
-    Generate the singlet state of a spin-$1/2$ pair.
+    Generate the singlet state of a spin-1/2 pair.
 
     The remaining spins are assigned the unit state.
 
@@ -606,15 +610,15 @@ def triplet_zero_state(
     spin_system: SpinSystem,
     index_1: int,
     index_2: int,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
-    Generate the triplet-zero state of a spin-$1/2$ pair.
+    Generate the triplet-zero state of a spin-1/2 pair.
 
     The remaining spins are assigned the unit state.
 
     Parameters
     ----------
-    spin_system: SpinSystem
+    spin_system : SpinSystem
         Spin system for which the triplet zero state is created.
     index_1 : int
         Index of the first spin in the triplet zero state.
@@ -650,9 +654,9 @@ def triplet_plus_state(
     spin_system: SpinSystem,
     index_1: int,
     index_2: int,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
-    Generate the triplet-plus state of a spin-$1/2$ pair.
+    Generate the triplet-plus state of a spin-1/2 pair.
 
     The remaining spins are assigned the unit state.
 
@@ -691,9 +695,9 @@ def triplet_minus_state(
     spin_system: SpinSystem,
     index_1: int,
     index_2: int,
-) -> StateLike:
+) -> np.ndarray | sp.csc_array:
     """
-    Generate the triplet-minus state of a spin-$1/2$ pair.
+    Generate the triplet-minus state of a spin-1/2 pair.
 
     The remaining spins are assigned the unit state.
 
@@ -730,13 +734,13 @@ def triplet_minus_state(
 
 def measure(
     spin_system: SpinSystem,
-    rho: StateLike,
+    rho: np.ndarray | sp.csc_array,
     operator: str,
 ) -> complex:
     """
     Compute the expectation value of an operator for a given state.
 
-    The state vector `rho` is assumed to represent a trace-normalised density
+    The state vector ``rho`` is assumed to represent a trace-normalised density
     matrix.
 
     Parameters
@@ -766,17 +770,18 @@ def measure(
         - Sum of operators::
 
             operator = "I(component1, index1) + I(component2, index2)"
-            
+
         - Unit operators are ignored in the input. These are identical::
 
             operator = "E * I(component, index)"
             operator = "I(component, index)"
-        
-        Special case: An empty `operator` string is considered as unit operator.
+
+        Special case: An empty ``operator`` string is considered as the unit
+        operator.
 
         Whitespace will be ignored in the input.
 
-        NOTE: Indexing starts from 0!
+        Note that indexing starts from 0.
 
     Returns
     -------

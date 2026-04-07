@@ -37,6 +37,8 @@ that are only wrappers around a single Python or Python library functionality.
 
 - Do not make edits just for the sake of making edits. Only make edits that improve the code in terms of quality, readability, documentation, or structure. If there are no such improvements to be made, do not make any edits. 
 
+- Do not use shared aliases for function input and output data types because this does not work well with Pylance function documentation window.
+
 - When you are asked to go through a piece of code, for example using the "Tidy up" command, and update and/or improve it in terms of code quality, documentation, readability, commenting, or code structure, you are only allowed to edit the existing code and suggest improvements to it, which the user can then choose to accept or reject. You must not suggest to replace the entire piece of code with a new code that only contains the part that needs to be changed. Always go through the entire code and suggest improvements to all of it, including the parts that do not necessarily need to be changed, if this improves the overall quality and readability of the code. 
 
 2. Specific commands for GitHub Copilot

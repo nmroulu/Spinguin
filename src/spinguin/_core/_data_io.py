@@ -1,8 +1,8 @@
 """
-data_io.py
+Data-input helpers for plain-text arrays and Cartesian tensor data.
 
-Provides helper functions for reading plain-text arrays, XYZ coordinates, and
-Cartesian interaction tensors from files.
+This module provides helper functions for reading plain-text arrays, XYZ
+coordinates, and Cartesian interaction tensors from files.
 """
 
 import numpy as np
@@ -26,7 +26,7 @@ def read_array(file_path: str, data_type: type) -> np.ndarray:
     """
 
     # Open the input file and pass it to NumPy.
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
 
         # Read the whitespace-separated values into an array.
         value_array = np.loadtxt(file, delimiter=None, dtype=data_type)
@@ -54,7 +54,7 @@ def read_xyz(file_path: str) -> np.ndarray:
     """
 
     # Open the XYZ file for line-by-line parsing.
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
 
         # Collect the Cartesian coordinates in a temporary list.
         xyz = []
@@ -104,11 +104,15 @@ def read_tensors(file_path: str) -> np.ndarray:
     current_index = None
 
     # Open the tensor file for line-by-line parsing.
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
 
         # Process each line and group rows into individual tensors.
         for line in file:
             values = line.strip().split()
+
+            # Skip empty lines between tensor blocks if they are present.
+            if not values:
+                continue
 
             # Detect the first row of a new tensor block.
             if values[0].isdigit() and len(values) == 4:
