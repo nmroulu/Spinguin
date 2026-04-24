@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
   
   <!-- So that users can add custom icons -->
@@ -285,26 +285,26 @@
 <span class="sd">either in full or truncated basis set.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Referencing SpinSystem class</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">spinguin._core._spin_system</span> <span class="kn">import</span> <span class="n">SpinSystem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
-<span class="kn">from</span> <span class="nn">spinguin._core</span> <span class="kn">import</span> <span class="n">_la</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._utils</span> <span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">parse_operator_string</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._operators</span> <span class="kn">import</span> <span class="n">op_T</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._parameters</span> <span class="kn">import</span> <span class="n">parameters</span>
-<span class="kn">from</span> <span class="nn">spinguin._core._status</span> <span class="kn">import</span> <span class="n">status</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core</span><span class="w"> </span><span class="kn">import</span> <span class="n">_la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">parse_operator_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">op_T</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._status</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">structure_coefficients</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">structure_coefficients</span><span class="p">(</span>
     <span class="n">spin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
@@ -376,7 +376,7 @@
 
     <span class="k">return</span> <span class="n">c</span>
 
-<span class="k">def</span> <span class="nf">sop_E</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_E</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the unit superoperator.</span>
 
@@ -400,7 +400,7 @@
     <span class="k">return</span> <span class="n">unit</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">4096</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_sop_prod</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sop_prod</span><span class="p">(</span>
     <span class="n">op_def_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
@@ -508,7 +508,7 @@
 
     <span class="k">return</span> <span class="n">sop</span>
 
-<span class="k">def</span> <span class="nf">sop_prod</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_prod</span><span class="p">(</span>
     <span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -563,7 +563,7 @@
 
     <span class="k">return</span> <span class="n">sop</span>
 
-<span class="k">def</span> <span class="nf">sop_from_string</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_from_string</span><span class="p">(</span>
     <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -641,7 +641,7 @@
     <span class="k">return</span> <span class="n">sop</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">4096</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_sop_T_coupled</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sop_T_coupled</span><span class="p">(</span>
     <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -701,7 +701,7 @@
 
 <div class="viewcode-block" id="sop_T_coupled">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.sop_T_coupled">[docs]</a>
-<span class="k">def</span> <span class="nf">sop_T_coupled</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_T_coupled</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -752,7 +752,7 @@
     <span class="k">return</span> <span class="n">sop</span></div>
 
 
-<span class="k">def</span> <span class="nf">sop_to_truncated_basis</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_to_truncated_basis</span><span class="p">(</span>
     <span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">sop</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
@@ -780,7 +780,7 @@
 
 <div class="viewcode-block" id="superoperator">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.superoperator">[docs]</a>
-<span class="k">def</span> <span class="nf">superoperator</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">superoperator</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span>
     <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;comm&quot;</span>
@@ -893,21 +893,21 @@
     <span class="k">return</span> <span class="n">sop</span></div>
 
 
-<span class="k">def</span> <span class="nf">clear_cache_structure_coefficients</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_structure_coefficients</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Clears the cache of the `structure_coefficients()` function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Clear the cache</span>
     <span class="n">structure_coefficients</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">clear_cache_sop_prod</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_sop_prod</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Clears the cache of the `_sop_prod()` function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Clear the cache</span>
     <span class="n">_sop_prod</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">clear_cache_sop_T_coupled</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_sop_T_coupled</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Clears the cache of the `_sop_T_coupled()` function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

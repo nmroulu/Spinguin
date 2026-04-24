@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
   
   <!-- So that users can add custom icons -->
@@ -284,13 +284,13 @@
 <span class="sd">This module contains utility functions that are shared across several modules.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Imports</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <div class="viewcode-block" id="coherence_order">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.coherence_order">[docs]</a>
-<span class="k">def</span> <span class="nf">coherence_order</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">coherence_order</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines the coherence order of a given product operator in the basis set,</span>
 <span class="sd">    defined by an array of integers `op_def`.</span>
@@ -319,7 +319,7 @@
 
 <div class="viewcode-block" id="idx_to_lq">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.idx_to_lq">[docs]</a>
-<span class="k">def</span> <span class="nf">idx_to_lq</span><span class="p">(</span><span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idx_to_lq</span><span class="p">(</span><span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts the given operator index to rank `l` and projection `q`.</span>
 
@@ -347,7 +347,7 @@
 
 <div class="viewcode-block" id="lq_to_idx">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.lq_to_idx">[docs]</a>
-<span class="k">def</span> <span class="nf">lq_to_idx</span><span class="p">(</span><span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lq_to_idx</span><span class="p">(</span><span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the index of a single-spin irreducible spherical tensor operator</span>
 <span class="sd">    determined by rank `l` and projection `q`.</span>
@@ -371,7 +371,7 @@
     <span class="k">return</span> <span class="n">idx</span></div>
 
 
-<span class="k">def</span> <span class="nf">parse_operator_string</span><span class="p">(</span><span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">nspins</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_operator_string</span><span class="p">(</span><span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">nspins</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parses operator strings and represents them as a linear combination of the</span>
 <span class="sd">    basis set operators (product operators of single-spin spherical tensor</span>
@@ -594,7 +594,7 @@
 
     <span class="k">return</span> <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span>
 
-<span class="k">def</span> <span class="nf">spin_order</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spin_order</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds out the spin order of a given operator defined by `op_def`.</span>
 

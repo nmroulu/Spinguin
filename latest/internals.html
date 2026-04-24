@@ -30,7 +30,7 @@
   <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
   
   <!-- So that users can add custom icons -->
@@ -403,7 +403,7 @@ basis set contains the information on the truncation of the basis set and is
 responsible for building and making changes to the basis set.</p>
 <p>The <cite>Basis</cite> instance is designed to be created and accessed through the
 <cite>SpinSystem</cite> object. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">spinguin</span> <span class="k">as</span> <span class="nn">sg</span>                   <span class="c1"># Import the package</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">spinguin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>                   <span class="c1"># Import the package</span>
 <span class="n">spin_system</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">SpinSystem</span><span class="p">([</span><span class="s2">&quot;1H&quot;</span><span class="p">])</span>     <span class="c1"># Create an example spin system</span>
 <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">max_spin_order</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c1"># Set the maximum spin order</span>
 <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>               <span class="c1"># Build the basis set</span>
