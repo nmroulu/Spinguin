@@ -9,7 +9,8 @@ authors = [
 ]
 description = "Spinguin is an intuitive Python package for versatile numerical spin-dynamics simulations."
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 
 [build-system]
 requires = ["setuptools>=74.1", "wheel", "cython >= 3.0.11", "numpy >= 1.26.4", "cibuildwheel"]
