@@ -20,6 +20,7 @@ from typing import Literal
 from spinguin._core._data_io import read_array
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._molecule import Molecule
+from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 from spinguin._core._relaxation import rotational_correlation_time_SED, rotational_correlation_times_Perrin
 
@@ -132,8 +133,7 @@ class RelaxationProperties:
                              "of shape (3,).")
         status("Rotational correlation time(s) set to: " f"{self.tau_c}\n")
         
-    def auto_tau_c(self, 
-                   T: float, 
+    def auto_tau_c(self,
                    eta: float, 
                    model: Literal["iso", "aniso"] = "iso",
                    r: float = None, 
@@ -145,8 +145,6 @@ class RelaxationProperties:
 
         Parameters
         ----------
-        T : float
-            Temperature in Kelvin.
         eta : float
             Viscosity of the solvent in Pascal-seconds (Pa·s).
         model : str, optional
@@ -167,7 +165,7 @@ class RelaxationProperties:
         if model == "iso":
             if r is None:
                 raise ValueError("Hydrodynamic radius 'r' must be provided for isotropic model.")
-            self.tau_c = rotational_correlation_time_SED(T, eta, r, 2) * scaling_factor
+            self.tau_c = rotational_correlation_time_SED(parameters.temperature, eta, r, 2) * scaling_factor
         elif model == "aniso":
             if self.molecule is None:
                 raise ValueError("Molecule must be assigned to the 'molecule' attribute "
@@ -175,7 +173,7 @@ class RelaxationProperties:
             self.tau_c = rotational_correlation_times_Perrin(
                 self.molecule.masses, 
                 self.molecule.xyz,
-                T,
+                parameters.temperature,
                 eta,
                 2
             ) * scaling_factor
