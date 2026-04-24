@@ -16,42 +16,47 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="_static/documentation_options.js?v=b1def801"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'internals';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Sequences" href="sequences.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -67,19 +72,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -87,7 +81,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -95,8 +88,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -112,7 +105,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -142,46 +136,38 @@
     
     
     <img src="_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
-    <script>document.write(`<img src="_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+    <img src="_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">Spinguin documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
@@ -202,9 +188,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -287,7 +278,7 @@ document.write(`
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -301,25 +292,17 @@ document.write(`
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -357,12 +340,15 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters"><code class="docutils literal notranslate"><span class="pre">Parameters</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.default"><code class="docutils literal notranslate"><span class="pre">Parameters.default()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.magnetic_field"><code class="docutils literal notranslate"><span class="pre">Parameters.magnetic_field</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.nsteps_zte"><code class="docutils literal notranslate"><span class="pre">Parameters.nsteps_zte</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.parallel_dim"><code class="docutils literal notranslate"><span class="pre">Parameters.parallel_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.propagator_density"><code class="docutils literal notranslate"><span class="pre">Parameters.propagator_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.rotating_frame_order"><code class="docutils literal notranslate"><span class="pre">Parameters.rotating_frame_order</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_operator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_operator</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_state"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_superoperator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_superoperator</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.temperature"><code class="docutils literal notranslate"><span class="pre">Parameters.temperature</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.verbose"><code class="docutils literal notranslate"><span class="pre">Parameters.verbose</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.zero_aux"><code class="docutils literal notranslate"><span class="pre">Parameters.zero_aux</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.zero_equilibrium"><code class="docutils literal notranslate"><span class="pre">Parameters.zero_equilibrium</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.zero_hamiltonian"><code class="docutils literal notranslate"><span class="pre">Parameters.zero_hamiltonian</span></code></a></li>
@@ -381,7 +367,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.T1"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.T1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.T2"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.T2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.antisymmetric</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.auto_tau_c"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.auto_tau_c()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.dynamic_frequency_shift"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.dynamic_frequency_shift</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.molecule"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.molecule</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.relative_error"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.relative_error</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.sr2k"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.sr2k</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.tau_c"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.tau_c</span></code></a></li>
@@ -453,7 +441,7 @@ set equal to the number of spins in the system (may be very slow)!</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.indexof">
-<span class="sig-name descname"><span class="pre">indexof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.indexof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.indexof" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">indexof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.indexof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.indexof" title="Link to this definition">#</a></dt>
 <dd><p>Finds the index of the basis state defined by <cite>op_def</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -506,24 +494,19 @@ basis.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.truncate_by_coupling">
-<span class="sig-name descname"><span class="pre">truncate_by_coupling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'weakest_link'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'network_strength'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'weakest_link'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.truncate_by_coupling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.truncate_by_coupling" title="Link to this definition">#</a></dt>
-<dd><p>Removes basis states based on the scalar J-couplings. Whenever there
-exists a J-coupling network of sufficient strength between spins that
-constitute a product state, the particular state is kept in the basis.
-Otherwise, the state is removed. The coupling strength is evaluated
-either by the weakest link or by the overall network strength.</p>
+<span class="sig-name descname"><span class="pre">truncate_by_coupling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold_J</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_DD</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.truncate_by_coupling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.truncate_by_coupling" title="Link to this definition">#</a></dt>
+<dd><p>Removes basis states based on the scalar J-couplings and DD-couplings.
+Whenever there exists a coupling network of sufficient strength between
+spins that constitute a product state, the particular state is kept in
+the basis. Otherwise, the state is removed.</p>
 <p>Optionally, superoperators or state vectors can be given as input. These
 will be converted to the truncated basis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>threshold</strong> (<em>float</em>) – Coupling strength must be above this value in order for the product
-state to be considered in the basis set.</p></li>
-<li><p><strong>method</strong> (<em>{&quot;weakest_link&quot;</em><em>, </em><em>&quot;network_strength&quot;}</em>) – Decides how the importance of a product state is evaluated. Weakest
-link method considers a J-coupling network invalid based on the
-smallest J-coupling within that network. Network strength method
-calculates the effective coupling as a geometric mean scaled by the
-factorial of the number of couplings within the network.</p></li>
+<li><p><strong>threshold_J</strong> (<em>float</em>) – J-couplings less than this value (in Hz) are considered to be zero.</p></li>
+<li><p><strong>threshold_DD</strong> (<em>float</em>) – Dipole-dipole couplings less than this value (in Hz) are considered
+to be zero.</p></li>
 <li><p><strong>*objs</strong> (<em>tuple</em><em> of </em><em>{ndarray</em><em>, </em><em>csc_array}</em>) – Superoperators or state vectors defined in the original basis. These
 will be converted into the truncated basis.</p></li>
 </ul>
@@ -563,7 +546,7 @@ basis.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spinguin._core._basis.Basis.truncate_by_zte">
-<span class="sig-name descname"><span class="pre">truncate_by_zte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.truncate_by_zte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.truncate_by_zte" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">truncate_by_zte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/spinguin/_core/_basis.html#Basis.truncate_by_zte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._basis.Basis.truncate_by_zte" title="Link to this definition">#</a></dt>
 <dd><p>Removes basis states using the Zero-Track Elimination (ZTE) described
 in:</p>
 <p>Kuprov, I. (2008):
@@ -573,15 +556,14 @@ in:</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>L</strong> (<em>ndarray</em><em> or </em><em>csc_array</em>) – Liouvillian superoperator, L = -iH - R + K.</p></li>
 <li><p><strong>rho</strong> (<em>ndarray</em><em> or </em><em>csc_array</em>) – Initial spin density vector.</p></li>
-<li><p><strong>time_step</strong> (<em>float</em>) – Time step of the propagation within the ZTE.</p></li>
-<li><p><strong>nsteps</strong> (<em>int</em>) – Number of steps to take in the ZTE.</p></li>
 <li><p><strong>*objs</strong> (<em>tuple</em><em> of </em><em>{ndarray</em><em>, </em><em>csc_array}</em>) – Superoperators or state vectors defined in the original basis. These
 will be converted into the truncated basis.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>objs_transformed</strong> – Superoperators and state vectors transformed into the truncated
-basis.</p>
+basis. The Liouvillian and the density vector, which are given as
+the input, are always returned.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple of {ndarray, csc_array}</p>
@@ -608,6 +590,13 @@ basis.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.nsteps_zte">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nsteps_zte</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.nsteps_zte" title="Link to this definition">#</a></dt>
+<dd><p>Defines the maximum number of steps to be performed in the zero-track
+elimination (ZTE) basis truncation. Default: 10.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.parallel_dim">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">parallel_dim</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.parallel_dim" title="Link to this definition">#</a></dt>
 <dd><p>If the number of items in the basis is larger than this value,
@@ -621,6 +610,14 @@ relaxation superoperator.</p>
 <dd><p>Threshold (between 0 and 1) that specifies the array type of the time
 propagator. If the density of the progagator is greater than this value,
 dense array is returned. Otherwise, sparse array is returned.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.rotating_frame_order">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rotating_frame_order</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.rotating_frame_order" title="Link to this definition">#</a></dt>
+<dd><p>Order of the Taylor series expansion used when applying the rotating
+frame transformation. Higher order gives more accurate results but takes
+more time to compute. Default = 5.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -647,6 +644,12 @@ arrays.</p>
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.temperature">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">temperature</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.temperature" title="Link to this definition">#</a></dt>
 <dd><p>Temperature of the sample (in Kelvin).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.verbose">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">verbose</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.verbose" title="Link to this definition">#</a></dt>
+<dd><p>Can be used to turn on/off status messages to the console.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -719,7 +722,8 @@ the state vector forward for one time step.</p>
 <dt class="sig sig-object py" id="spinguin._core._parameters.Parameters.zero_zte">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">zero_zte</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._parameters.Parameters.zero_zte" title="Link to this definition">#</a></dt>
 <dd><p>Threshold under which a value is considered to be zero when performing
-the zero-track elimination (ZTE) basis truncation.</p>
+the zero-track elimination (ZTE) basis truncation. The default value is
+1e-33, designed to eliminate only basis states that remain exactly zero.</p>
 </dd></dl>
 
 </dd></dl>
@@ -731,13 +735,45 @@ the zero-track elimination (ZTE) basis truncation.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.R1">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">R1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.R1" title="Link to this definition">#</a></dt>
-<dd><p>Contains the longitudinal relaxation rates for each spin in the system.</p>
+<dd><p>Specifies the longitudinal relaxation rates for each spin. These are
+used to create the phenomenological relaxation superoperator. Two input
+types are supported:</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 1D array of size N containing R1 rates.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the R1 rates.</p></li>
+</ul>
+<p>The input will be stored as a NumPy array. Note that this attribute is
+linked with T1 by the following relation: R1 = 1/T1.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using array input</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">R1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">])</span>
+
+<span class="c1"># Using string input</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">R1</span> <span class="o">=</span> <span class="s2">&quot;/path/to/the/file/R1.txt&quot;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.R2">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">R2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.R2" title="Link to this definition">#</a></dt>
-<dd><p>Contains the transverse relaxation rates for each spin in the system.</p>
+<dd><p>Specifies the transverse relaxation rates for each spin. These are used
+to create the phenomenological relaxation superoperator. Two input types
+are supported:</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 1D array of size N containing R2 rates.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the R2 rates.</p></li>
+</ul>
+<p>The input will be stored as a NumPy array. Note that this attribute is
+linked with T2 by the following relation: R2 = 1/T2.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using array input</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">])</span>
+
+<span class="c1"># Using string input</span>
+<span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">R2</span> <span class="o">=</span> <span class="s2">&quot;/path/to/the/file/R2.txt&quot;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py property">
@@ -768,10 +804,10 @@ Two input types are supported:</p>
 are used to create the phenomenological relaxation superoperator.
 Two input types are supported:</p>
 <ul class="simple">
-<li><p>If <cite>ArrayLike</cite>: A 1D array of size N containing T2 times. Example:</p></li>
+<li><p>If <cite>ArrayLike</cite>: A 1D array of size N containing T2 times.</p></li>
 <li><p>If <cite>str</cite>: Path to the file containing the T2 times.</p></li>
 </ul>
-<p>The input will be stored as a NumPy array.</p>
+<p>The input will be converted and stored as a NumPy array.</p>
 <p>Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using array input</span>
 <span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">T2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">])</span>
@@ -786,7 +822,35 @@ Two input types are supported:</p>
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">antisymmetric</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to consider the antisymmetric part of the interaction
-tensors in the Redfield relaxation theory.</p>
+tensors in the Redfield relaxation theory. Default: False.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.auto_tau_c">
+<span class="sig-name descname"><span class="pre">auto_tau_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'iso'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'aniso'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'iso'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_relaxation_properties.html#RelaxationProperties.auto_tau_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.auto_tau_c" title="Link to this definition">#</a></dt>
+<dd><p>Automatically calculates the rotational correlation time(s) for the relaxation theory
+using either the Stokes-Einstein-Debye relation for isotropic rotational diffusion
+or the Perrin theory for anisotropic rotational diffusion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (<em>float</em>) – Temperature in Kelvin.</p></li>
+<li><p><strong>eta</strong> (<em>float</em>) – Viscosity of the solvent in Pascal-seconds (Pa·s).</p></li>
+<li><p><strong>model</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies the model to use for calculating the rotational correlation time(s).
+Can be either “iso” for isotropic or “aniso” for anisotropic. Default is “iso”.</p></li>
+<li><p><strong>r</strong> (<em>float</em><em>, </em><em>optional</em>) – Effective hydrodynamic radius of the molecule in meters (m). Required for isotropic model.</p></li>
+<li><p><strong>scaling_factor</strong> (<em>float</em><em>, </em><em>optional</em>) – Scaling factor for the rotational diffusion constants. Default is 1.0.
+Useful for adjusting the correlation times to better match experimental data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tau_c</strong> – Rotational correlation time(s) in seconds (s). A single float for isotropic
+diffusion or a NumPy array of shape (3,) for anisotropic diffusion.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -794,28 +858,44 @@ tensors in the Redfield relaxation theory.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dynamic_frequency_shift</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.dynamic_frequency_shift" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to include the dynamic frequency shift in the Redfield
 relaxation theory. This corresponds to the imaginary part of the
-relaxation superoperator.</p>
+relaxation superoperator. Default: False.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.molecule">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">molecule</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="spinguin.html#spinguin.Molecule" title="spinguin._core._molecule.Molecule"><span class="pre">Molecule</span></a></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.molecule" title="Link to this definition">#</a></dt>
+<dd><p>Molecule that the spin system to be simulated is part of. Used to
+define the rotational principal axes.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.relative_error">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">relative_error</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.relative_error" title="Link to this definition">#</a></dt>
 <dd><p>Specifies the relative error for the Redfield relaxation theory. This
-corresponds to the convergence criterion for the Redfield integral.</p>
+corresponds to the convergence criterion for the Redfield integral.
+Default: 1e-6.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.sr2k">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sr2k</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.sr2k" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to include the scalar relaxation of the second kind
-(SR2K) in the relaxation superoperator.</p>
+(SR2K) in the relaxation superoperator. Default: False.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.tau_c">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tau_c</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.tau_c" title="Link to this definition">#</a></dt>
-<dd><p>Specifies the correlation time (in seconds) for the Redfield relaxation
-theory.</p>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tau_c</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.tau_c" title="Link to this definition">#</a></dt>
+<dd><p>Specifies the correlation time(s) for the Redfield relaxation theory.</p>
+<p>For isotropic rotational diffusion, a single value is used. Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">tau_c</span> <span class="o">=</span> <span class="mf">50e-12</span>
+</pre></div>
+</div>
+<p>For anisotropic rotational diffusion, an array of three values is used,
+corresponding to the principal components of the diffusion tensor. Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">relaxation</span><span class="o">.</span><span class="n">tau_c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">50e-12</span><span class="p">,</span> <span class="mf">100e-12</span><span class="p">,</span> <span class="mf">150e-12</span><span class="p">]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py property">
@@ -829,7 +909,7 @@ theory.</p>
 <dt class="sig sig-object py" id="spinguin._core._relaxation_properties.RelaxationProperties.thermalization">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">thermalization</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#spinguin._core._relaxation_properties.RelaxationProperties.thermalization" title="Link to this definition">#</a></dt>
 <dd><p>Specifies whether to apply Levitt-di Bari thermalization to the
-relaxation superoperator.</p>
+relaxation superoperator. Default: False.</p>
 </dd></dl>
 
 </dd></dl>
@@ -863,14 +943,16 @@ relaxation superoperator.</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis"><code class="docutils literal notranslate"><span class="pre">Basis</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._basis.Basis.basis"><code class="docutils literal notranslate"><span class="pre">Basis.basis</span></code></a></li>
@@ -887,12 +969,15 @@ relaxation superoperator.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters"><code class="docutils literal notranslate"><span class="pre">Parameters</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.default"><code class="docutils literal notranslate"><span class="pre">Parameters.default()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.magnetic_field"><code class="docutils literal notranslate"><span class="pre">Parameters.magnetic_field</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.nsteps_zte"><code class="docutils literal notranslate"><span class="pre">Parameters.nsteps_zte</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.parallel_dim"><code class="docutils literal notranslate"><span class="pre">Parameters.parallel_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.propagator_density"><code class="docutils literal notranslate"><span class="pre">Parameters.propagator_density</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.rotating_frame_order"><code class="docutils literal notranslate"><span class="pre">Parameters.rotating_frame_order</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_operator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_operator</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_state"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.sparse_superoperator"><code class="docutils literal notranslate"><span class="pre">Parameters.sparse_superoperator</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.temperature"><code class="docutils literal notranslate"><span class="pre">Parameters.temperature</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.verbose"><code class="docutils literal notranslate"><span class="pre">Parameters.verbose</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.zero_aux"><code class="docutils literal notranslate"><span class="pre">Parameters.zero_aux</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.zero_equilibrium"><code class="docutils literal notranslate"><span class="pre">Parameters.zero_equilibrium</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._parameters.Parameters.zero_hamiltonian"><code class="docutils literal notranslate"><span class="pre">Parameters.zero_hamiltonian</span></code></a></li>
@@ -911,7 +996,9 @@ relaxation superoperator.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.T1"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.T1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.T2"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.T2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.antisymmetric"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.antisymmetric</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.auto_tau_c"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.auto_tau_c()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.dynamic_frequency_shift"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.dynamic_frequency_shift</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.molecule"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.molecule</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.relative_error"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.relative_error</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.sr2k"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.sr2k</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin._core._relaxation_properties.RelaxationProperties.tau_c"><code class="docutils literal notranslate"><span class="pre">RelaxationProperties.tau_c</span></code></a></li>
@@ -967,8 +1054,8 @@ By Joni Eronen, Perttu Hilla
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

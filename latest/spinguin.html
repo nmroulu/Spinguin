@@ -16,36 +16,40 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="_static/documentation_options.js?v=b1def801"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'spinguin';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,6 +57,7 @@
     <link rel="prev" title="Basics" href="basics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -68,19 +73,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -88,7 +82,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -96,8 +89,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -113,7 +106,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -143,46 +137,38 @@
     
     
     <img src="_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
-    <script>document.write(`<img src="_static/spinguin_logo.png" class="logo__image only-dark" alt=""/>`);</script>
+    <img src="_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">Spinguin documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
@@ -203,9 +189,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -288,7 +279,7 @@ document.write(`
 
 
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -302,25 +293,17 @@ document.write(`
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
 </div></div>
@@ -343,16 +326,27 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule"><code class="docutils literal notranslate"><span class="pre">Molecule</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule.isotopes"><code class="docutils literal notranslate"><span class="pre">Molecule.isotopes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule.masses"><code class="docutils literal notranslate"><span class="pre">Molecule.masses</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule.xyz"><code class="docutils literal notranslate"><span class="pre">Molecule.xyz</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem"><code class="docutils literal notranslate"><span class="pre">SpinSystem</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.J_couplings"><code class="docutils literal notranslate"><span class="pre">SpinSystem.J_couplings</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.basis"><code class="docutils literal notranslate"><span class="pre">SpinSystem.basis</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.chemical_shifts"><code class="docutils literal notranslate"><span class="pre">SpinSystem.chemical_shifts</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.efg"><code class="docutils literal notranslate"><span class="pre">SpinSystem.efg</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.gammas"><code class="docutils literal notranslate"><span class="pre">SpinSystem.gammas</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.isotopes"><code class="docutils literal notranslate"><span class="pre">SpinSystem.isotopes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.mults"><code class="docutils literal notranslate"><span class="pre">SpinSystem.mults</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.nspins"><code class="docutils literal notranslate"><span class="pre">SpinSystem.nspins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.quad"><code class="docutils literal notranslate"><span class="pre">SpinSystem.quad</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.relaxation"><code class="docutils literal notranslate"><span class="pre">SpinSystem.relaxation</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.shielding"><code class="docutils literal notranslate"><span class="pre">SpinSystem.shielding</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.spins"><code class="docutils literal notranslate"><span class="pre">SpinSystem.spins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.subsystem"><code class="docutils literal notranslate"><span class="pre">SpinSystem.subsystem()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.xyz"><code class="docutils literal notranslate"><span class="pre">SpinSystem.xyz</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.alpha_state"><code class="docutils literal notranslate"><span class="pre">alpha_state()</span></code></a></li>
@@ -386,6 +380,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.quadrupole_moment"><code class="docutils literal notranslate"><span class="pre">quadrupole_moment()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.relaxation"><code class="docutils literal notranslate"><span class="pre">relaxation()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.resonance_frequency"><code class="docutils literal notranslate"><span class="pre">resonance_frequency()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.rotating_frame"><code class="docutils literal notranslate"><span class="pre">rotating_frame()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.singlet_state"><code class="docutils literal notranslate"><span class="pre">singlet_state()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.sop_T_coupled"><code class="docutils literal notranslate"><span class="pre">sop_T_coupled()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spectral_width_to_dwell_time"><code class="docutils literal notranslate"><span class="pre">spectral_width_to_dwell_time()</span></code></a></li>
@@ -421,6 +416,67 @@ should:</p>
 </pre></div>
 </div>
 <dl class="py class">
+<dt class="sig sig-object py" id="spinguin.Molecule">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xyz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_molecule.html#Molecule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.Molecule" title="Link to this definition">#</a></dt>
+<dd><p>Initializes a molecule with the given <cite>isotopes</cite> and <cite>xyz</cite>. Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">molecule</span> <span class="o">=</span> <span class="n">Molecule</span><span class="p">(</span>
+    <span class="n">isotopes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1H&#39;</span><span class="p">,</span> <span class="s1">&#39;15N&#39;</span><span class="p">,</span> <span class="s1">&#39;19F&#39;</span><span class="p">],</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="mf">1.0527</span><span class="p">,</span> <span class="mf">2.2566</span><span class="p">,</span> <span class="mf">0.9925</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0014</span><span class="p">,</span> <span class="mf">1.5578</span><span class="p">,</span> <span class="mf">2.1146</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">1.3456</span><span class="p">,</span> <span class="mf">0.3678</span><span class="p">,</span> <span class="mf">1.4251</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">molecule</span> <span class="o">=</span> <span class="n">Molecule</span><span class="p">(</span>
+    <span class="n">isotopes</span> <span class="o">=</span> <span class="s2">&quot;/path/to/isotopes.txt&quot;</span><span class="p">,</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="s2">&quot;/path/to/xyz.txt&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>isotopes</strong> (<em>list</em><em> or </em><em>tuple</em><em> or </em><em>ndarray</em><em> or </em><em>str</em>) – <p>Specifies the isotopes in the molecule.</p>
+<p>Two input types are supported:</p>
+<ul>
+<li><p>If <cite>ArrayLike</cite>: A 1D array of size N containing isotope names as
+strings.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the isotopes.</p></li>
+</ul>
+</p></li>
+<li><p><strong>xyz</strong> (<em>list</em><em> or </em><em>tuple</em><em> or </em><em>ndarray</em><em> or </em><em>str</em>) – <p>Coordinates in the XYZ format for each nucleus in the molecule.</p>
+<ul>
+<li><p>If <cite>ArrayLike</cite>: A 2D array of size (N, 3) containing the Cartesian
+coordinates in Å.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the XYZ coordinates.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin.Molecule.isotopes">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">isotopes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.Molecule.isotopes" title="Link to this definition">#</a></dt>
+<dd><p>Specifies the isotopes in the molecule. They are set during the
+initialization of the molecule.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin.Molecule.masses">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">masses</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.Molecule.masses" title="Link to this definition">#</a></dt>
+<dd><p>Atomic masses of each isotope in atomic mass units (u).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin.Molecule.xyz">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">xyz</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.Molecule.xyz" title="Link to this definition">#</a></dt>
+<dd><p>Coordinates in the XYZ format for each isotope in the molecule. They
+are set during the initialization of the molecule.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spinguin.SpinSystem">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SpinSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spinguin/_core/_spin_system.html#SpinSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.SpinSystem" title="Link to this definition">#</a></dt>
 <dd><p>Initializes a spin system with the given <cite>isotopes</cite>. Examples:</p>
@@ -444,11 +500,78 @@ strings.</p></li>
 </dd>
 </dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="spinguin.SpinSystem.J_couplings">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">J_couplings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.J_couplings" title="Link to this definition">#</a></dt>
+<dd><p>Specifies the J-coupling constants between each spin pair in the spin
+system. Used when calculating the coherent Hamiltonian. Only the lower
+triangle is specified.</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 2D array of size (N, N) specifying the scalar
+couplings between nuclei in Hz.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the scalar couplings.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>    <span class="mi">0</span><span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The input will be stored as a NumPy array.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.basis">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">basis</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="internals.html#spinguin._core._basis.Basis" title="spinguin._core._basis.Basis"><span class="pre">Basis</span></a></span><a class="headerlink" href="#spinguin.SpinSystem.basis" title="Link to this definition">#</a></dt>
 <dd><p>Contains the basis set for the <cite>SpinSystem</cite>. Includes functionality for
 restricting the maximum spin order, building the basis set, and applying
 more advanced truncation to the basis set.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin.SpinSystem.chemical_shifts">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">chemical_shifts</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.chemical_shifts" title="Link to this definition">#</a></dt>
+<dd><p>Chemical shifts arising from the isotropic component of the nuclear
+shielding tensors. Used when calculating the coherent Hamiltonian.</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 1D array of size N containing the chemical shifts
+in ppm.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the chemical shifts.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.49</span><span class="p">,</span> <span class="mf">7.78</span><span class="p">,</span> <span class="mf">7.46</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The input will be stored as a NumPy array.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin.SpinSystem.efg">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">efg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.efg" title="Link to this definition">#</a></dt>
+<dd><p>Electric field gradient tensors used for incorporating the quadrupolar
+interaction relaxation mechanism.</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 3D array of size (N, 3, 3) containing the 3x3 EFG
+tensors in atomic units.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the EFG tensors.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">efg</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="p">[</span> <span class="mf">0.31</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.87</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The input will be stored as a NumPy array.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -496,6 +619,35 @@ times, etc.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="spinguin.SpinSystem.shielding">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shielding</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.shielding" title="Link to this definition">#</a></dt>
+<dd><p>Specifies the nuclear shielding tensors for each nucleus. Note that the
+isotropic part of the tensor is handled by <cite>chemical_shifts</cite>. The
+shielding tensors are used only for Redfield relaxation theory.</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 3D array of size (N, 3, 3) containing the 3x3
+shielding tensors in ppm.</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the shielding tensors.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">shielding</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">101.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">75.2</span><span class="p">,</span> <span class="mf">11.1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">30.5</span><span class="p">,</span>   <span class="mf">10.1</span><span class="p">,</span> <span class="mf">87.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">99.7</span><span class="p">,</span>  <span class="o">-</span><span class="mf">21.1</span><span class="p">,</span> <span class="mf">11.2</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The input will be stored as a NumPy array.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="spinguin.SpinSystem.spins">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">spins</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.spins" title="Link to this definition">#</a></dt>
 <dd><p>Spin quantum numbers for each isotope the spin system.</p>
@@ -519,6 +671,26 @@ relaxation properties are not copied to the new spin system.</p>
 <dd class="field-odd"><p><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem">SpinSystem</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spinguin.SpinSystem.xyz">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">xyz</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#spinguin.SpinSystem.xyz" title="Link to this definition">#</a></dt>
+<dd><p>Coordinates in the XYZ format for each nucleus in the spin system. Used
+in Redfield relaxation theory when calculating the dipole-dipole
+coupling tensors. The coordinates are defined in Å.</p>
+<ul class="simple">
+<li><p>If <cite>ArrayLike</cite>: A 2D array of size (N, 3).</p></li>
+<li><p>If <cite>str</cite>: Path to the file containing the XYZ coordinates.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spin_system</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mf">1.025</span><span class="p">,</span> <span class="mf">2.521</span><span class="p">,</span> <span class="mf">1.624</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.667</span><span class="p">,</span> <span class="mf">2.754</span><span class="p">,</span> <span class="mf">0.892</span><span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The input will be stored as a NumPy array.</p>
 </dd></dl>
 
 </dd></dl>
@@ -748,7 +920,7 @@ frequency.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spinguin.hamiltonian">
 <span class="sig-name descname"><span class="pre">hamiltonian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">INTERACTIONTYPE</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['zeeman',</span> <span class="pre">'chemical_shift',</span> <span class="pre">'J_coupling']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'comm'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'comm'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_hamiltonian.html#hamiltonian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.hamiltonian" title="Link to this definition">#</a></dt>
-<dd><p>Creates the requested Hamiltonian superoperator for the spin system.</p>
+<dd><p>Creates the Hamiltonian superoperator for the spin system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -853,29 +1025,34 @@ density matrix.</p>
 <li><p><strong>operator</strong> (<em>str</em>) – <p>Defines the operator to be measured. The operator string must follow the
 rules below:</p>
 <ul>
-<li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
-<cite>I(component)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>I(x,4)</cite> –&gt; Creates x-operator for spin at index 4.</p></li>
-<li><p><cite>I(x)</cite> –&gt; Creates x-operator for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Cartesian or ladder operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for spin at index 3.</p></li>
-<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Spherical tensor operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Product operators have <cite>*</cite> in between the single-spin operators:
-<cite>I(z,0) * I(z,1)</cite></p></li>
-<li><p>Sums of operators have <cite>+</cite> in between the operators:
-<cite>I(x,0) + I(x,1)</cite></p></li>
-<li><p>Unit operators are ignored in the input. Interpretation of these
-two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
+<li><p>Product operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) * I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Sum of operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) + I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Unit operators are ignored in the input. These are identical:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;E * I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+</pre></div>
+</div>
+</li>
 </ul>
 <p>Special case: An empty <cite>operator</cite> string is considered as unit operator.</p>
 <p>Whitespace will be ignored in the input.</p>
@@ -1195,29 +1372,34 @@ from the left.</p>
 <li><p><strong>operator</strong> (<em>str</em>) – <p>Defines the pulse to be generated. The operator string must
 follow the rules below:</p>
 <ul>
-<li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
-<cite>I(component)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>I(x,4)</cite> –&gt; Creates x-operator for spin at index 4.</p></li>
-<li><p><cite>I(x)</cite>–&gt; Creates x-operator for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Cartesian or ladder operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for spin at index 3.</p></li>
-<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Spherical tensor operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Product operators have <cite>*</cite> in between the single-spin operators:
-<cite>I(z,0) * I(z,1)</cite></p></li>
-<li><p>Sums of operators have <cite>+</cite> in between the operators:
-<cite>I(x,0) + I(x,1)</cite></p></li>
-<li><p>Unit operators are ignored in the input. Interpretation of these
-two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
+<li><p>Product operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) * I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Sum of operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) + I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Unit operators are ignored in the input. These are identical:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;E * I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+</pre></div>
+</div>
+</li>
 </ul>
 <p>Special case: An empty <cite>operator</cite> string is considered as unit operator.</p>
 <p>Whitespace will be ignored in the input.</p>
@@ -1315,6 +1497,32 @@ uses the magnetic field determined in parameters.magnetic_field.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spinguin.rotating_frame">
+<span class="sig-name descname"><span class="pre">rotating_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_frequencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_rotframe.html#rotating_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.rotating_frame" title="Link to this definition">#</a></dt>
+<dd><p>Transforms the Liouvillian into the rotating frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spin_system</strong> (<a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><em>SpinSystem</em></a>) – Spin system whose Liouvillian is going to be transformed.</p></li>
+<li><p><strong>L</strong> (<em>ndarray</em><em> or </em><em>csc_array</em>) – Liouvillian superoperator in the laboratory frame.</p></li>
+<li><p><strong>isotopes</strong> (<em>list</em>) – List of isotopes whose rotating frames are applied.</p></li>
+<li><p><strong>center_frequencies</strong> (<em>list</em><em>, </em><em>default=</em><em>[</em><em>]</em>) – List of center frequencies (in ppm) for each isotope. If empty, zero is
+used for all isotopes.</p></li>
+<li><p><strong>orders</strong> (<em>list</em><em>, </em><em>default=</em><em>[</em><em>]</em>) – List of integers that define the order of the rotating frame for each
+isotope. If empty, the default value defined in
+<cite>parameters.rotating_frame_order</cite> is used for all isotopes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>L_rot</strong> – Liouvillian superoperator in the rotating frame.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray or csc_array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1459,29 +1667,34 @@ performance.</p>
 <li><p><strong>operator</strong> (<em>str</em>) – <p>Defines the state to be generated. The operator string must follow the
 rules below:</p>
 <ul>
-<li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
-<cite>I(component)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>I(x,4)</cite> –&gt; Creates x-operator for spin at index 4.</p></li>
-<li><p><cite>I(x)</cite>–&gt; Creates x-operator for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Cartesian or ladder operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for spin at index 3.</p></li>
-<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <cite>l=1</cite>, <cite>q=-1</cite> for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Spherical tensor operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Product operators have <cite>*</cite> in between the single-spin operators:
-<cite>I(z,0) * I(z,1)</cite></p></li>
-<li><p>Sums of operators have <cite>+</cite> in between the operators:
-<cite>I(x,0) + I(x,1)</cite></p></li>
-<li><p>Unit operators are ignored in the input. Interpretation of these
-two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
+<li><p>Product operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) * I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Sum of operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) + I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Unit operators are ignored in the input. These are identical:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;E * I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+</pre></div>
+</div>
+</li>
 </ul>
 <p>Special case: An empty <cite>operator</cite> string is considered as unit operator.</p>
 <p>Whitespace will be ignored in the input.</p>
@@ -1502,7 +1715,8 @@ two is identical: <cite>E * I(z,1)</cite>, <cite>I(z,1)</cite></p></li>
 <dt class="sig sig-object py" id="spinguin.state_to_zeeman">
 <span class="sig-name descname"><span class="pre">state_to_zeeman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin_system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#spinguin.SpinSystem" title="spinguin.SpinSystem"><span class="pre">SpinSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">sp.csc_array</span></span></span><a class="reference internal" href="_modules/spinguin/_core/_states.html#state_to_zeeman"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spinguin.state_to_zeeman" title="Link to this definition">#</a></dt>
 <dd><p>Takes the state vector defined in the normalized spherical tensor basis
-and converts it into the Zeeman eigenbasis. Useful for error checking.</p>
+and converts it into a density matrix written in the Zeeman eigenbasis.
+Useful for error checking.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1535,34 +1749,38 @@ user-specified <cite>operator</cite> string.</p>
 <li><p>A string. Example: <cite>I(z,0) * I(z,1)</cite></p></li>
 <li><p>An array of integers. Example: <cite>[2, 2]</cite></p></li>
 </ul>
-<p><strong>The string input must follow the rules below:</strong></p>
+<p><strong>The operator string must follow the rules below:</strong></p>
 <ul>
-<li><p>Cartesian and ladder operators: <cite>I(component,index)</cite> or
-<cite>I(component)</cite>, with the indexing starting from zero. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>I(x,4)</cite> –&gt; Creates <em>x</em>-operator for spin at index 4.</p></li>
-<li><p><cite>I(x)</cite>–&gt; Creates <em>x</em>-operator for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Cartesian or ladder operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Spherical tensor operators: <cite>T(l,q,index)</cite> or <cite>T(l,q)</cite>. Examples:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>T(1,-1,3)</cite> –&gt;               Creates operator with <a href="#id10"><span class="problematic" id="id11">*</span></a>l*=1, <a href="#id12"><span class="problematic" id="id13">*</span></a>q*=-1 for spin at index 3.</p></li>
-<li><p><cite>T(1, -1)</cite> –&gt;               Creates operator with <a href="#id14"><span class="problematic" id="id15">*</span></a>l*=1, <a href="#id16"><span class="problematic" id="id17">*</span></a>q*=-1 for all spins.</p></li>
-</ul>
-</div></blockquote>
+<li><p>Spherical tensor operator at specific index or for all spins:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;T(l, q)&quot;</span>
+</pre></div>
+</div>
 </li>
-<li><p>Product operators have <cite>*</cite> in between the single-spin operators:
-<cite>I(z,0) * I(z,1)</cite></p></li>
-<li><p>Sums of operators have <cite>+</cite> in between the operators:
-<cite>I(x,0) + I(x,1)</cite></p></li>
-<li><p>Unit operators are ignored in the input. Interpretation of these
-two is identical: <cite>E * I(z,1)</cite> and <cite>I(z,1)</cite></p></li>
+<li><p>Product operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) * I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Sum of operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component1, index1) + I(component2, index2)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Unit operators are ignored in the input. These are identical:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;E * I(component, index)&quot;</span>
+<span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;I(component, index)&quot;</span>
+</pre></div>
+</div>
+</li>
 </ul>
-<p>Special case: An empty <cite>operator</cite> string is considered as unit
-operator.</p>
+<p>Special case: An empty <cite>operator</cite> string is considered as unit operator.</p>
 <p>Whitespace will be ignored in the input.</p>
 <p><strong>The array input is defined as follows:</strong></p>
 <ul>
@@ -1570,6 +1788,7 @@ operator.</p>
 <li><p>Each integer corresponds to a spherical tensor operator of rank <em>l</em>
 and projection <em>q</em>: <em>N</em> = <em>l*^2 + *l</em> - <em>q</em></p></li>
 </ul>
+<p>NOTE: Indexing starts from 0!</p>
 </p></li>
 <li><p><strong>side</strong> (<em>{'comm'</em><em>, </em><em>'left'</em><em>, </em><em>'right'}</em>) – The type of superoperator:
 - ‘comm’ – commutation superoperator (default)
@@ -1728,25 +1947,38 @@ that corresponds to the identity operator.</p></li>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule"><code class="docutils literal notranslate"><span class="pre">Molecule</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule.isotopes"><code class="docutils literal notranslate"><span class="pre">Molecule.isotopes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule.masses"><code class="docutils literal notranslate"><span class="pre">Molecule.masses</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.Molecule.xyz"><code class="docutils literal notranslate"><span class="pre">Molecule.xyz</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem"><code class="docutils literal notranslate"><span class="pre">SpinSystem</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.J_couplings"><code class="docutils literal notranslate"><span class="pre">SpinSystem.J_couplings</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.basis"><code class="docutils literal notranslate"><span class="pre">SpinSystem.basis</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.chemical_shifts"><code class="docutils literal notranslate"><span class="pre">SpinSystem.chemical_shifts</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.efg"><code class="docutils literal notranslate"><span class="pre">SpinSystem.efg</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.gammas"><code class="docutils literal notranslate"><span class="pre">SpinSystem.gammas</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.isotopes"><code class="docutils literal notranslate"><span class="pre">SpinSystem.isotopes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.mults"><code class="docutils literal notranslate"><span class="pre">SpinSystem.mults</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.nspins"><code class="docutils literal notranslate"><span class="pre">SpinSystem.nspins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.quad"><code class="docutils literal notranslate"><span class="pre">SpinSystem.quad</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.relaxation"><code class="docutils literal notranslate"><span class="pre">SpinSystem.relaxation</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.shielding"><code class="docutils literal notranslate"><span class="pre">SpinSystem.shielding</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.spins"><code class="docutils literal notranslate"><span class="pre">SpinSystem.spins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.subsystem"><code class="docutils literal notranslate"><span class="pre">SpinSystem.subsystem()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.SpinSystem.xyz"><code class="docutils literal notranslate"><span class="pre">SpinSystem.xyz</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.alpha_state"><code class="docutils literal notranslate"><span class="pre">alpha_state()</span></code></a></li>
@@ -1780,6 +2012,7 @@ that corresponds to the identity operator.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.quadrupole_moment"><code class="docutils literal notranslate"><span class="pre">quadrupole_moment()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.relaxation"><code class="docutils literal notranslate"><span class="pre">relaxation()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.resonance_frequency"><code class="docutils literal notranslate"><span class="pre">resonance_frequency()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.rotating_frame"><code class="docutils literal notranslate"><span class="pre">rotating_frame()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.singlet_state"><code class="docutils literal notranslate"><span class="pre">singlet_state()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.sop_T_coupled"><code class="docutils literal notranslate"><span class="pre">sop_T_coupled()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinguin.spectral_width_to_dwell_time"><code class="docutils literal notranslate"><span class="pre">spectral_width_to_dwell_time()</span></code></a></li>
@@ -1841,8 +2074,8 @@ By Joni Eronen, Perttu Hilla
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

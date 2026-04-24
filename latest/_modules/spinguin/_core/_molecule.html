@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>spinguin._core._liouvillian &#8212; Spinguin latest documentation</title>
+    <title>spinguin._core._molecule &#8212; Spinguin latest documentation</title>
   
   
   
@@ -42,7 +42,7 @@
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_liouvillian';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_molecule';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
@@ -279,57 +279,105 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for spinguin._core._liouvillian</h1><div class="highlight"><pre>
+  <h1>Source code for spinguin._core._molecule</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides a function for calculating the Liouvillian.</span>
+<span class="sd">_molecule.py</span>
+
+<span class="sd">Defines a Molecule class, which can be assigned as a part of the</span>
+<span class="sd">RelaxationProperties of a SpinSystem.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._data_io</span> <span class="kn">import</span> <span class="n">read_array</span><span class="p">,</span> <span class="n">read_xyz</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._la</span> <span class="kn">import</span> <span class="n">arraylike_to_array</span>
+<span class="kn">from</span> <span class="nn">spinguin._core._nmr_isotopes</span> <span class="kn">import</span> <span class="n">ISOTOPES</span>
 
-<div class="viewcode-block" id="liouvillian">
-<a class="viewcode-back" href="../../../spinguin.html#spinguin.liouvillian">[docs]</a>
-<span class="k">def</span> <span class="nf">liouvillian</span><span class="p">(</span>
-    <span class="n">H</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">R</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">K</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<div class="viewcode-block" id="Molecule">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.Molecule">[docs]</a>
+<span class="k">class</span> <span class="nc">Molecule</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Constructs the Liouvillian superoperator from the Hamiltonian, relaxation</span>
-<span class="sd">    superoperator, and exchange superoperator.</span>
+<span class="sd">    Initializes a molecule with the given `isotopes` and `xyz`. Examples::</span>
+
+<span class="sd">        molecule = Molecule(</span>
+<span class="sd">            isotopes = [&#39;1H&#39;, &#39;15N&#39;, &#39;19F&#39;],</span>
+<span class="sd">            xyz = [</span>
+<span class="sd">                [1.0527, 2.2566, 0.9925],</span>
+<span class="sd">                [0.0014, 1.5578, 2.1146],</span>
+<span class="sd">                [1.3456, 0.3678, 1.4251]</span>
+<span class="sd">            ]</span>
+<span class="sd">        )</span>
+<span class="sd">        molecule = Molecule(</span>
+<span class="sd">            isotopes = &quot;/path/to/isotopes.txt&quot;,</span>
+<span class="sd">            xyz = &quot;/path/to/xyz.txt&quot;</span>
+<span class="sd">        )</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    H : ndarray or csc_array</span>
-<span class="sd">        Hamiltonian superoperator.</span>
-<span class="sd">    R : ndarray or csc_array</span>
-<span class="sd">        Relaxation superoperator</span>
-<span class="sd">    K : ndarray or csc_array</span>
-<span class="sd">        Exchange superoperator.</span>
+<span class="sd">    isotopes : list or tuple or ndarray or str</span>
+<span class="sd">        Specifies the isotopes in the molecule.</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    L : ndarray or csc_array</span>
-<span class="sd">        Liouvillian superoperator.</span>
+<span class="sd">        Two input types are supported:</span>
+
+<span class="sd">        - If `ArrayLike`: A 1D array of size N containing isotope names as</span>
+<span class="sd">          strings. </span>
+<span class="sd">        - If `str`: Path to the file containing the isotopes.</span>
+<span class="sd">    </span>
+<span class="sd">    xyz : list or tuple or ndarray or str</span>
+<span class="sd">        Coordinates in the XYZ format for each nucleus in the molecule.</span>
+<span class="sd">    </span>
+<span class="sd">        - If `ArrayLike`: A 2D array of size (N, 3) containing the Cartesian</span>
+<span class="sd">          coordinates in Å.</span>
+<span class="sd">        - If `str`: Path to the file containing the XYZ coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># Check for totally empty input</span>
-    <span class="k">if</span> <span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">K</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;H, R and K cannot all be None simultaneously.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> 
+        <span class="n">isotopes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">xyz</span> <span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span>
+    <span class="p">):</span>
 
-    <span class="c1"># Assign zeroes if None</span>
-    <span class="k">if</span> <span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">R</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">K</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">K</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Assign the isotopes</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span> <span class="o">=</span> <span class="n">read_array</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">isotopes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Isotopes should be a 1-dimensional array or a &quot;</span>
+                            <span class="s2">&quot;string.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Assign the XYZ</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="o">=</span> <span class="n">read_xyz</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;XYZ should be a 2-dimensional array or a string.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Ensure that the input is consistent</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mismatch between the assigned isotopes and XYZ.&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Construct the Liouvillian</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">H</span> <span class="o">-</span> <span class="n">R</span> <span class="o">+</span> <span class="n">K</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isotopes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Specifies the isotopes in the molecule. They are set during the</span>
+<span class="sd">        initialization of the molecule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span>
 
-    <span class="k">return</span> <span class="n">L</span></div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Coordinates in the XYZ format for each isotope in the molecule. They</span>
+<span class="sd">        are set during the initialization of the molecule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">masses</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Atomic masses of each isotope in atomic mass units (u).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span></div>
 
 </pre></div>
 
