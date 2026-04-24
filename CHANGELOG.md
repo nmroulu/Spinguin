@@ -1,9 +1,11 @@
 # Changelog
 
 ## 0.1.0
-- Basis set improvements.
-- Small change to the implementation of zero-track elimination.
-- Add anisotropic rotational diffusion for the Redfield relaxation theory.
+- Improved basis set handling.
+- Refined the implementation of zero-track elimination.
+- Added anisotropic rotational diffusion for Redfield relaxation theory.
+- Added a verbosity option to parameters (to disable printing).
+- General documentation and comment updates.
 
 ## 0.0.4
 - It is possible to create a subsystem from a SpinSystem object.
