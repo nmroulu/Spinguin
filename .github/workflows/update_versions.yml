@@ -23,18 +23,18 @@ jobs:
 
     steps:
       - name: Check out the current branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Copy the update_versions.py script
         run: cp docs/source/update_versions.py /tmp/update_versions.py
 
       - name: Check out gh-pages branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: gh-pages
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
