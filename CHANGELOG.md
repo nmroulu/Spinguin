@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.1
+- Added quadrupolar moments to several isotopes.
+
 ## 0.1.0
 - Improved basis set handling.
 - Refined the implementation of zero-track elimination.
