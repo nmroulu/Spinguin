@@ -6,6 +6,8 @@
 - Added anisotropic rotational diffusion for Redfield relaxation theory.
 - Added a verbosity option to parameters (to disable printing).
 - General documentation and comment updates.
+- Added more general rotating frame implementation.
+- Improved basis set truncation options.
 
 ## 0.0.4
 - It is possible to create a subsystem from a SpinSystem object.
