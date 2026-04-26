@@ -39,29 +39,6 @@ class Parameters:
         # Populate the object with the default parameter values.
         self.default()
 
-    def _report_update(
-        self,
-        message: str,
-    ) -> None:
-        """
-        Print a status message for a parameter update.
-
-        Usage: ``self._report_update(message)``.
-
-        Parameters
-        ----------
-        message : str
-            Status message to be printed.
-
-        Returns
-        -------
-        None
-            The message is forwarded to the package status printer.
-        """
-
-        # Forward the update message through the standard status channel.
-        status(message)
-
     def default(
         self,
     ) -> None:
@@ -131,7 +108,7 @@ class Parameters:
         self._magnetic_field = magnetic_field
 
         # Report the updated magnetic-field value.
-        self._report_update(
+        status(
             f"Magnetic field set to: {self.magnetic_field} T\n"
         )
 
@@ -156,7 +133,7 @@ class Parameters:
         self._temperature = temperature
 
         # Report the updated temperature value.
-        self._report_update(f"Temperature set to: {self.temperature} K\n")
+        status(f"Temperature set to: {self.temperature} K\n")
 
     @property
     def parallel_dim(
@@ -180,7 +157,7 @@ class Parameters:
         self._parallel_dim = parallel_dim
 
         # Report the updated parallelisation threshold.
-        self._report_update(
+        status(
             f"Threshold for parallel Redfield set to: {self.parallel_dim}\n"
         )
 
@@ -206,7 +183,7 @@ class Parameters:
         self._rotating_frame_order = rotating_frame_order
 
         # Report the updated rotating-frame expansion order.
-        self._report_update(
+        status(
             f"Rotating frame order set to: {self.rotating_frame_order}\n"
         )
 
@@ -229,7 +206,7 @@ class Parameters:
         self._sparse_operator = sparse_operator
 
         # Report the updated Hilbert-space operator sparsity setting.
-        self._report_update(
+        status(
             f"Sparsity setting of operator set to: {self.sparse_operator}\n"
         )
 
@@ -252,7 +229,7 @@ class Parameters:
         self._sparse_superoperator = sparse_superoperator
 
         # Report the updated superoperator sparsity setting.
-        self._report_update(
+        status(
             "Sparsity setting of superoperator set to: "
             f"{self.sparse_superoperator}\n"
         )
@@ -276,7 +253,7 @@ class Parameters:
         self._sparse_state = sparse_state
 
         # Report the updated state-vector sparsity setting.
-        self._report_update(
+        status(
             f"Sparsity setting of state set to: {self.sparse_state}\n"
         )
 
@@ -302,7 +279,7 @@ class Parameters:
         self._propagator_density = propagator_density
 
         # Report the updated propagator-density threshold.
-        self._report_update(
+        status(
             "Propagator density threshold set to: "
             f"{self.propagator_density}\n"
         )
@@ -312,7 +289,8 @@ class Parameters:
         self,
     ) -> bool:
         """
-        Return whether status messages are printed to the console.
+        Return whether status and other informational messages are
+        printed to the console.
         """
 
         return self._verbose
@@ -347,7 +325,7 @@ class Parameters:
         self._zero_hamiltonian = zero_hamiltonian
 
         # Report the updated Hamiltonian zero-value threshold.
-        self._report_update(
+        status(
             "Hamiltonian zero-value threshold set to: "
             f"{self.zero_hamiltonian}\n"
         )
@@ -359,7 +337,7 @@ class Parameters:
         """
         Return the zero-value threshold used in the auxiliary-matrix method.
 
-        This threshold is used in the Redfield relaxation treatment.
+        This threshold is used in the Redfield integral evaluation.
         """
 
         return self._zero_aux
@@ -373,7 +351,7 @@ class Parameters:
         self._zero_aux = zero_aux
 
         # Report the updated auxiliary-method zero-value threshold.
-        self._report_update(
+        status(
             f"Auxiliary zero-value threshold set to: {self.zero_aux}\n"
         )
 
@@ -396,7 +374,7 @@ class Parameters:
         self._zero_relaxation = zero_relaxation
 
         # Report the updated relaxation zero-value threshold.
-        self._report_update(
+        status(
             "Relaxation zero-value threshold set to: "
             f"{self.zero_relaxation}\n"
         )
@@ -424,7 +402,7 @@ class Parameters:
         self._zero_interaction = zero_interaction
 
         # Report the updated interaction zero-value threshold.
-        self._report_update(
+        status(
             "Interaction zero-value threshold set to: "
             f"{self.zero_interaction}\n"
         )
@@ -451,7 +429,7 @@ class Parameters:
         self._zero_propagator = zero_propagator
 
         # Report the updated propagator zero-value threshold.
-        self._report_update(
+        status(
             "Propagator zero-value threshold set to: "
             f"{self.zero_propagator}\n"
         )
@@ -478,7 +456,7 @@ class Parameters:
         self._zero_pulse = zero_pulse
 
         # Report the updated pulse zero-value threshold.
-        self._report_update(
+        status(
             f"Pulse zero-value threshold set to: {self.zero_pulse}\n"
         )
 
@@ -504,7 +482,7 @@ class Parameters:
         self._zero_thermalization = zero_thermalization
 
         # Report the updated thermalization zero-value threshold.
-        self._report_update(
+        status(
             "Thermalization zero-value threshold set to: "
             f"{self.zero_thermalization}\n"
         )
@@ -528,7 +506,7 @@ class Parameters:
         self._zero_equilibrium = zero_equilibrium
 
         # Report the updated equilibrium zero-value threshold.
-        self._report_update(
+        status(
             "Equilibrium zero-value threshold set to: "
             f"{self.zero_equilibrium}\n"
         )
@@ -552,7 +530,7 @@ class Parameters:
         self._zero_time_step = zero_time_step
 
         # Report the updated time-step zero-value threshold.
-        self._report_update(
+        status(
             "Time step zero-value threshold set to: "
             f"{self.zero_time_step}\n"
         )
@@ -579,7 +557,7 @@ class Parameters:
         self._zero_zte = zero_zte
 
         # Report the updated zero-track-elimination threshold.
-        self._report_update(
+        status(
             f"ZTE zero-value threshold set to: {self.zero_zte}\n"
         )
 
@@ -604,7 +582,7 @@ class Parameters:
         self._nsteps_zte = nsteps_zte
 
         # Report the updated ZTE propagation-step limit.
-        self._report_update(
+        status(
             f"Maximum number of steps in ZTE set to: {self.nsteps_zte}\n"
         )
 

@@ -1,5 +1,5 @@
 """
-Rotating-frame transformation utilities for Liouville-space dynamics.
+Rotating-frame transformation utilities.
 
 The module contains helper functions for transforming Liouvillian
 superoperators into one or more rotating frames.
@@ -23,29 +23,6 @@ from spinguin._core._superoperators import superoperator
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
-
-
-def _report_completion(
-    time_start: float,
-) -> None:
-    """
-    Report the elapsed wall-clock time of a completed task.
-
-    Usage: ``_report_completion(time_start)``.
-
-    Parameters
-    ----------
-    time_start : float
-        Start time returned by ``time.time()``.
-
-    Returns
-    -------
-    None
-        The elapsed wall-clock time is reported via the status printer.
-    """
-
-    # Report the elapsed wall-clock time of the completed operation.
-    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
 
 def _prepare_rotating_frame_inputs(
@@ -97,7 +74,8 @@ def _auxiliary_matrix_rotframe_expm(
     order: int,
 ) -> sp.csc_array:
     """
-    Compute the auxiliary-matrix exponential used in rotating-frame theory.
+    Compute the auxiliary-matrix exponential used in rotating-frame
+    transformations.
 
     Usage: ``_auxiliary_matrix_rotframe_expm(A, B, T, order)``.
 
@@ -193,8 +171,7 @@ def rotating_frame(
     # Ensure that the working basis has been built.
     if spin_system.basis.basis is None:
         raise ValueError(
-            "Please build the basis before transforming to the rotating "
-            "frame."
+            "Basis must be built before transforming to the rotating frame."
         )
 
     # Validate the basic input list lengths.
@@ -282,7 +259,7 @@ def rotating_frame(
         L = _sop_L_to_rotframe(L0, L1, T, order)
 
     # Report the completion of the rotating-frame transformation.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return L
 

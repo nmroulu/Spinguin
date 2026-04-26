@@ -1,5 +1,5 @@
 """
-Time-propagation utilities for Hilbert-space and Liouville-space calculations.
+Time-propagation utilities for Hilbert-space and Liouville-space simulations.
 
 The module contains helpers for constructing time propagators, pulse
 superoperators, and rotating-frame propagators used in spin-dynamics
@@ -25,29 +25,6 @@ from spinguin._core._superoperators import superoperator
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
-
-
-def _report_completion(
-    time_start: float,
-) -> None:
-    """
-    Print the elapsed run time of a completed propagation task.
-
-    Usage: ``_report_completion(time_start)``.
-
-    Parameters
-    ----------
-    time_start : float
-        Start time returned by ``time.time()``.
-
-    Returns
-    -------
-    None
-        The elapsed wall-clock time is reported via the status printer.
-    """
-
-    # Report the elapsed wall-clock time of the completed operation.
-    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
 
 def propagator(
@@ -84,15 +61,15 @@ def propagator(
         density = P.nnz / (P.shape[0] ** 2)
     else:
         density = np.count_nonzero(P) / (P.shape[0] ** 2)
-    status(f"Propagator density: {density:.4f}")
+    status(f"Propagator density: {100 * density:.2f}%")
 
     # Convert sparse propagators to dense form if they are sufficiently full.
     if sp.issparse(P) and density > parameters.propagator_density:
-        status("Propagator density exceeds threshold. Converting to dense array...")
+        status("Propagator density exceeds threshold. Converting from sparse to dense array...")
         P = P.toarray()
 
     # Report the completion of the propagator construction.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return P
 
@@ -113,7 +90,7 @@ def pulse(
         Spin system for which the pulse superoperator is created.
     operator : str
         Operator definition of the pulse. The supported syntax is summarised
-        below:
+        below (see documentation of the `superoperator` function for details):
 
         - Cartesian or ladder operator at specific index or for all spins::
 
@@ -142,7 +119,7 @@ def pulse(
 
         Whitespace will be ignored in the input.
 
-        NOTE: Indexing starts from 0!
+        NOTE: Python indexing starting from 0 is used.
     angle : float
         Pulse angle in degrees.
 
@@ -154,13 +131,13 @@ def pulse(
     Warns
     -----
     UserWarning
-        Raised if the pulse is generated from a product operator, for which the
-        pulse angle is not uniquely defined.
+        Raised if the pulse is generated from a product operator, which does
+        not straightforwardly correspond to a rotation operator.
     """
     # Ensure that the working basis has been constructed.
     if spin_system.basis.basis is None:
         raise ValueError("Please build the basis before constructing pulse "
-                         "superoperators.")
+                         "superoperators. Use `spin_system.basis.build()`.")
 
     # Report the start of the pulse-superoperator construction.
     time_start = time.time()
@@ -168,8 +145,8 @@ def pulse(
 
     # Warn if the requested pulse uses a product operator.
     if '*' in operator:
-        warnings.warn("Applying a pulse using a product operator does not have "
-                      "a well-defined angle.")
+        warnings.warn("Using a product operator to define a pulse does "
+                      "not straightforwardly correspond to a rotation operator.")
 
     # Construct the commutation superoperator for the pulse generator.
     op = superoperator(spin_system, operator, side="comm")
@@ -182,7 +159,7 @@ def pulse(
         P = expm(-1j * angle * op, parameters.zero_pulse)
 
     # Report the completion of the pulse-superoperator construction.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return P
 
@@ -194,7 +171,9 @@ def propagator_to_rotframe(
     center_frequencies: dict[str, float] | None=None,
 ) -> np.ndarray | sp.csc_array:
     """
-    Transform a time propagator to the rotating frame.
+    Transform a time propagator to the rotating frame defined by the
+    center frequencies (Zeeman + chemical shift interactions) 
+    of each spin.
 
     Usage: ``propagator_to_rotframe(spin_system, P, t, center_frequencies)``.
 
@@ -247,6 +226,6 @@ def propagator_to_rotframe(
     P_rot = expm_H0t @ P
 
     # Report the completion of the rotating-frame transformation.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return P_rot

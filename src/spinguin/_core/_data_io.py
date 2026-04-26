@@ -87,6 +87,16 @@ def read_tensors(file_path: str) -> np.ndarray:
     The first column identifies the spin entry, and the remaining columns
     contain the tensor components.
 
+    Example:
+    ```
+    1 0.1 0.2 0.3
+      0.4 0.5 0.6
+      0.7 0.8 0.9
+    2 0.2 0.3 0.4
+      0.5 0.6 0.7
+      0.8 0.9 1.0
+    ```
+
     Parameters
     ----------
     file_path : str

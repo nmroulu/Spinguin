@@ -2,8 +2,8 @@
 Basis-set machinery for `SpinSystem`.
 
 The `Basis` class constructs Liouville-space basis states and provides
-multiple truncation strategies for reducing the working basis before
-simulation.
+multiple truncation strategies for reducing the basis-set dimension
+before simulation.
 
 The basis functionality is intended to be accessed through the owning
 `SpinSystem` instance. Example::
@@ -37,10 +37,9 @@ from spinguin._core._la import (
     norm_1,
 )
 from spinguin._core._parameters import parameters
-from spinguin._core._states import state_to_truncated_basis
 from spinguin._core._status import status
-from spinguin._core._superoperators import sop_to_truncated_basis
 from spinguin._core._utils import coherence_order
+from spinguin._core._relaxation import dd_constant
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -96,7 +95,8 @@ class Basis:
     @property
     def max_spin_order(self) -> int | None:
         """
-        Maximum number of active spins allowed in basis operators.
+        Maximum number of active spins (spin order)
+        allowed in basis operators.
 
         Returns
         -------
@@ -109,7 +109,7 @@ class Basis:
     @property
     def basis(self) -> np.ndarray | None:
         """
-        Return the current basis definitions.
+        Return the current basis-state definitions.
 
         The basis is stored as an array of shape `(N, M)`, where `N` is the
         number of basis states and `M` is the number of spins. Each row encodes
@@ -143,10 +143,11 @@ class Basis:
         """
 
         # Validate the type and shape of the supplied basis array
-        if not isinstance(basis, np.ndarray):
-            raise ValueError("Basis set must be a NumPy array.")
-        if basis.ndim != 2:
-            raise ValueError("Basis set must be a two-dimensional array.")
+        if not isinstance(basis, np.ndarray) or basis.ndim != 2:
+            raise ValueError("Basis set must be a two-dimensional NumPy array "
+                             "of shape (N, M), where N is the number of "
+                             "basis states and M is the number of spins.")
+
         if basis.shape[1] != self._spin_system.nspins:
             raise ValueError("Mismatch between basis set and number of spins.")
 
@@ -157,7 +158,7 @@ class Basis:
         self._basis = basis
         self._basis_dict = {tuple(state): i for i, state in enumerate(basis)}
 
-        status(f"Basis set has been set. Dimension: {self.dim}.\n")
+        status(f"Basis set has been set with dimension: {self.dim}.\n")
 
     @max_spin_order.setter
     def max_spin_order(self, max_spin_order: int) -> None:
@@ -170,18 +171,18 @@ class Basis:
             Largest number of active spins allowed in any product operator.
         """
 
-        # Validate the supplied maximum spin order against the parent spin system
+        # Validate the supplied maximum spin order against the system size
         if max_spin_order < 1:
             raise ValueError("Maximum spin order must be at least 1.")
         if max_spin_order > self._spin_system.nspins:
-            raise ValueError("Maximum spin order must not be larger than "
+            raise ValueError("Maximum spin order can not be larger than "
                              "the number of spins in the system.")
         self._max_spin_order = max_spin_order
-        status(f"Maximum spin order set to: {self.max_spin_order}\n")
+        status(f"Maximum spin order set to {self.max_spin_order}.\n")
 
     def build(self) -> None:
         """
-        Build the basis set for the parent spin system.
+        Build the basis set for the parent spin system (see `SpinSystem`).
 
         If `max_spin_order` has not been specified explicitly, it is set to the
         total number of spins in the system.
@@ -190,7 +191,9 @@ class Basis:
         # Default to the full spin order if no truncation limit was specified
         if self.max_spin_order is None:
             warnings.warn("Maximum spin order not specified. "
-                          "Defaulting to the number of spins.")
+                          "Using the number of spins in the system.")
+            # status("Maximum spin order not specified. "
+            #        "Using the number of spins in the system.\n")
             self.max_spin_order = self._spin_system.nspins
 
         # Construct and store the basis for the current spin system
@@ -221,7 +224,8 @@ class Basis:
 
         # Ensure that a basis exists before attempting the lookup
         if self.basis is None:
-            raise ValueError("Basis must be built before obtaining indices.")
+            raise ValueError("Basis must be built before obtaining indices. "
+                             "Call 'build()' on the basis object first.")
 
         # Convert the operator definition to the internal tuple format
         op_def = arraylike_to_tuple(op_def)
@@ -245,7 +249,9 @@ class Basis:
         | tuple[np.ndarray | sp.csc_array, ...]
     ):
         """
-        Truncate the basis set by coherence order.
+        Truncate the basis set by coherence order. Coherence order
+        of a basis state is defined as the sum of the projections `q` of its
+        constituent spherical tensor operators.
 
         Only basis states whose coherence order belongs to
         `coherence_orders` are retained. Optionally supplied state vectors and
@@ -265,8 +271,8 @@ class Basis:
             supplied, `None` is returned.
         """
 
-        status("Truncating the basis set...")
-        status(f"\tRetaining coherence orders {coherence_orders}")
+        status("Truncating the basis set by coherence order...")
+        status(f"\tRetaining coherence orders: {coherence_orders}")
         status(f"\tOriginal dimension: {self.dim}")
         time_start = time.time()
 
@@ -287,7 +293,7 @@ class Basis:
         with HidePrints():
             self.basis = truncated_basis
 
-        status(f"\tTruncated dimension: {len(truncated_basis)}")
+        status(f"\tDimension after truncation: {self.dim}")
         status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Transform any supplied objects into the truncated basis
@@ -307,10 +313,11 @@ class Basis:
         | tuple[np.ndarray | sp.csc_array, ...]
     ):
         """
-        Truncate the basis using scalar and dipole-dipole couplings.
+        Truncate the basis based on the J- and dipole-dipole
+        couplings between the spins. 
 
         A basis state is retained if its participating spins form a connected
-        coupling network once weak J-couplings and dipole-dipole couplings have
+        coupling network once weak J- and dipole-dipole couplings have
         been discarded.
 
         Optionally supplied state vectors and superoperators are converted into
@@ -334,9 +341,9 @@ class Basis:
             supplied, `None` is returned.
         """
 
-        status("Truncating the basis set based on couplings...")
-        status(f"\tJ-couplings <{threshold_J} Hz are considered zero.")
-        status(f"\tDD-couplings <{threshold_DD} Hz are considered zero.")
+        status("Truncating the basis set based on spin-spin couplings...")
+        status(f"\tNeglecting J-couplings below {threshold_J} Hz.")
+        status(f"\tNeglecting dipole-dipole couplings below {threshold_DD} Hz.")
         status(f"\tOriginal dimension: {self.dim}")
         time_start = time.time()
 
@@ -354,7 +361,7 @@ class Basis:
             # Convert the molecular coordinates from Å to metres
             xyz = self._spin_system.xyz * 1e-10
 
-            # Build the inter-spin displacement and distance arrays
+            # Build the inter-spin vectors and distances
             connectors = xyz[:, np.newaxis] - xyz
             r = np.linalg.norm(connectors, axis=2)
 
@@ -362,9 +369,13 @@ class Basis:
             y = self._spin_system.gammas
             for i in range(nspins):
                 for j in range(i):
+                    # dd_couplings[i, j] = (
+                    #     - mu_0 * y[i] * y[j] * hbar
+                    #     / (8*np.pi**2 * r[i, j]**3)
+                    # )
                     dd_couplings[i, j] = (
-                        - mu_0 * y[i] * y[j] * hbar
-                        / (8*np.pi**2 * r[i, j]**3)
+                        dd_constant(y[i], y[j]) / r[i, j]**3 
+                        / (2 * np.pi) # In Hz
                     )
 
         # Build the binary connectivity matrix from scalar couplings
@@ -420,7 +431,7 @@ class Basis:
         # Pack the retained basis states into a NumPy array
         truncated_basis = np.array(truncated_basis)
 
-        status(f"\tTruncated dimension: {len(truncated_basis)}")
+        status(f"\tDimension after truncation: {len(truncated_basis)}")
         status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Replace the basis without printing duplicate status information
@@ -443,13 +454,13 @@ class Basis:
 
         The method follows:
 
-        Kuprov, I. (2008):
+        I. Kuprov (2008):
         https://doi.org/10.1016/j.jmr.2008.08.008
 
         Parameters
         ----------
         L : ndarray or csc_array
-            Liouvillian superoperator, L = -iH - R + K.
+            Liouvillian superoperator
         rho : ndarray or csc_array
             Initial spin density vector.
         *objs : tuple of {ndarray, csc_array}
@@ -464,7 +475,7 @@ class Basis:
             included in the returned tuple.
         """
 
-        status("Truncating the basis set using zero-track elimination...")
+        status("Truncating the basis set using zero-track elimination (ZTE)...")
         status(f"\tOriginal dimension: {self.dim}")
         time_start = time.time()
 
@@ -484,10 +495,7 @@ class Basis:
 
         # Estimate the number of basis states required initially
         dim = np.sum(rho_max > zero_zte)
-        status(
-            "\tBefore ZTE. "
-            f"Current required basis dimension: {dim}"
-        )
+        status(f"\tBasis dimension before ZTE: {self.dim}")
 
         # Propagate until the required basis dimension stops changing
         for i in range(parameters.nsteps_zte):
@@ -499,14 +507,12 @@ class Basis:
 
             # Re-estimate the required basis dimension after propagation
             dim_curr = np.sum(rho_max > zero_zte)
-            status(
-                f"\tZTE step {i+1} of {parameters.nsteps_zte}. "
-                f"Current required basis dimension: {dim_curr}"
-            )
+            status(f"\tZTE step {i+1} of {parameters.nsteps_zte}. "
+                   f"\tCurrent basis dimension: {dim_curr}")
 
             # Stop once the required dimension has converged
             if dim == dim_curr:
-                status("\tDimension remained the same. Finishing ZTE.")
+                status("\tBasis dimension converged. Finishing ZTE.")
                 break
             else:
                 dim = dim_curr
@@ -518,7 +524,7 @@ class Basis:
         with HidePrints():
             self.basis = self.basis[index_map]
 
-        status(f"\tTruncated dimension: {self.dim}")
+        status(f"\tDimension after ZTE: {self.dim}")
         status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Transform the Liouvillian, the state, and any extra objects
@@ -565,7 +571,7 @@ class Basis:
         with HidePrints():
             self.basis = self.basis[indices]
 
-        status(f"\tTruncated dimension: {self.dim}")
+        status(f"\tDimension after truncation: {self.dim}")
         status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
         # Transform any supplied objects into the truncated basis
@@ -580,12 +586,15 @@ def _make_basis(spins: np.ndarray, max_spin_order: int) -> np.ndarray:
 
     The basis is spanned by Kronecker products of irreducible spherical tensor
     operators up to the specified maximum spin order. The products themselves
-    are not formed explicitly. Instead, each state is represented as a tuple of
-    integer indices.
+    are not formed explicitly. Instead, each product operator (basis state) 
+    is represented as a tuple of integer indices.
 
     Each integer corresponds to a spherical tensor operator of rank `l` and
-    projection `q` through the relation `N = l^2 + l - q`. The indexing scheme
-    follows:
+    projection `q` through the relation 
+    
+    `N = l^2 + l - q`. 
+    
+    The indexing scheme follows:
 
     Hogben, H. J., Hore, P. J., & Kuprov, I. (2010):
     https://doi.org/10.1063/1.3398146
@@ -608,11 +617,13 @@ def _make_basis(spins: np.ndarray, max_spin_order: int) -> np.ndarray:
     nspins = spins.shape[0]
 
     # Reject invalid maximum spin-order values
+    if not isinstance(max_spin_order, int):
+        raise TypeError("'max_spin_order' must be an integer.")
     if max_spin_order < 1:
         raise ValueError("'max_spin_order' must be at least 1.")
     if max_spin_order > nspins:
         raise ValueError(
-            "'max_spin_order' must not be larger than number of"
+            "'max_spin_order' must not be larger than number of "
             "spins in the system."
         )
 
@@ -670,7 +681,11 @@ def _make_subsystem_basis(
         tuples.
 
         For example, identity operator and z-operator for the 3rd spin:
+
         `[(0, 0, 0), (0, 0, 2), ...]`
+
+        where the number 2 comes from the indexing scheme `N = l^2 + l - q` 
+        for the T_{1, 0} operator of the 3rd spin.
     """
 
     # Determine the system size and spin multiplicities
@@ -735,17 +750,13 @@ def _sop_or_state_to_truncated_basis(
     objs_transformed = []
     for obj in objs:
 
-        # Transform state vectors with the state-basis helper
+        # Retain only the selected coefficients for state vectors.
         if isvector(obj):
-            objs_transformed.append(
-                state_to_truncated_basis(index_map=index_map, rho=obj)
-            )
+            objs_transformed.append(obj[index_map])
 
-        # Transform superoperators with the SOP-basis helper
+        # Retain only the selected rows and columns for superoperators.
         else:
-            objs_transformed.append(
-                sop_to_truncated_basis(index_map=index_map, sop=obj)
-            )
+            objs_transformed.append(obj[np.ix_(index_map, index_map)])
 
     # Match the return shape to the number of supplied input objects
     if len(objs_transformed) == 1:

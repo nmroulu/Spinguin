@@ -2,10 +2,11 @@
 Linear algebra utilities used throughout the Spinguin code base.
 
 The module contains helper routines for sparse-memory sharing, matrix
-exponentials, tensor manipulations, and small conversion utilities needed by
-the NMR simulation workflow.
+exponentials, tensor manipulations, and small conversion utilities needed
+across multiple Spinguin modules. 
 """
 
+# Imports
 import math
 from functools import lru_cache
 from io import BytesIO
@@ -269,17 +270,25 @@ def expm(
     # Scale large matrices before the Taylor expansion and undo the scaling by
     # repeated squaring afterwards.
     if norm_A > 1:
+
+        # Calculate the number of squaring steps needed based on the matrix norm.
+        status(f"Matrix scaling...")
         scaling_count = int(math.ceil(math.log2(norm_A)))
         scaling_factor = 2**scaling_count
 
+        # Divide the matrix by the scaling factor to improve Taylor convergence.
         A = A / scaling_factor
+
+        # Compute the matrix exponential of the scaled matrix using Taylor series.
         expm_A = expm_taylor(A, zero_value)
 
+        # Apply repeated squaring to undo the scaling: exp(A) = [exp(A/2^n)]^(2^n).
         status(f"Matrix squaring...")
         for step in range(scaling_count):
             status(f"Step {step + 1}...")
             expm_A = custom_dot(expm_A, expm_A, zero_value)
     else:
+        # For small matrices, compute the exponential directly without scaling.
         expm_A = expm_taylor(A, zero_value)
 
     status("Matrix exponential computed.")
@@ -421,7 +430,8 @@ def comm(
     B: np.ndarray | csc_array,
 ) -> np.ndarray | csc_array:
     """
-    Calculate the commutator $[A, B] = AB - BA$.
+    Calculate the commutator [A, B] = AB - BA
+    of two operators.
 
     Parameters
     ----------
@@ -438,6 +448,30 @@ def comm(
 
     # Evaluate the commutator directly from the matrix products.
     return A @ B - B @ A
+
+def anti_comm(
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+) -> np.ndarray | csc_array:
+    """
+    Calculate the anti-commutator {A, B} = AB + BA
+    of two operators.
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        First operator.
+    B : ndarray or csc_array
+        Second operator.
+
+    Returns
+    -------
+    C : ndarray or csc_array
+        Anti-commutator of the two operators.
+    """
+
+    # Evaluate the anti-commutator directly from the matrix products.
+    return A @ B + B @ A
 
 
 def find_common_rows(
@@ -619,7 +653,7 @@ def Wigner_D_matrix(
     """
 
     # Convert the Cartesian rotation matrix to Euler angles in the ZYZ
-    # convention expected by SymPy.
+    # convention expected by SymPy wigner_d. 
     rotation = Rotation.from_matrix(rotation_matrix)
     alpha, beta, gamma = rotation.as_euler("ZYZ", degrees=False)
 
@@ -632,7 +666,12 @@ def decompose_matrix(
     matrix: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Decompose a matrix into isotropic, antisymmetric, and traceless parts.
+    Decompose a matrix into isotropic, antisymmetric, and traceless parts:
+
+    - Isotropic: Tr(M) / dim(M) * I
+    - Antisymmetric: (M - M.T) / 2
+    - Symmetric traceless: (M + M.T) / 2 - Isotropic
+
 
     Parameters
     ----------
@@ -700,7 +739,8 @@ def cartesian_tensor_to_spherical_tensor(
     C: np.ndarray,
 ) -> dict:
     """
-    Convert a rank-2 Cartesian tensor to spherical-tensor components.
+    Convert a rank-2 Cartesian tensor to irreducible
+    spherical-tensor components.
 
     The implementation follows the double outer-product convention from
     Eqs. 293--298 of Man, https://doi.org/10.1002/cmr.a.21289.
@@ -713,8 +753,8 @@ def cartesian_tensor_to_spherical_tensor(
     Returns
     -------
     spherical_tensor : dict
-        Dictionary whose keys are `(l, q)` and whose values are the spherical
-        tensor components.
+        Dictionary whose keys are `(l, q)` and whose values are the 
+        irreducible spherical tensor components.
     """
 
     # Read out the Cartesian tensor elements once for compact formulas.
@@ -722,7 +762,7 @@ def cartesian_tensor_to_spherical_tensor(
     C_yx, C_yy, C_yz = C[1, :]
     C_zx, C_zy, C_zz = C[2, :]
 
-    # Assemble the spherical tensor components.
+    # Assemble the irreducible spherical tensor components.
     spherical_tensor = {
         (0, 0): -1 / math.sqrt(3) * (C_xx + C_yy + C_zz),
         (1, 0): -1j / math.sqrt(2) * (C_xy - C_yx),
@@ -741,7 +781,8 @@ def vector_to_spherical_tensor(
     vector: np.ndarray,
 ) -> dict:
     """
-    Convert a Cartesian vector to a rank-1 spherical tensor.
+    Convert a Cartesian vector to a rank-1 irreducible spherical tensor
+    components.
 
     The covariant-component convention follows Eq. 230 of Man,
     https://doi.org/10.1002/cmr.a.21289.
@@ -754,11 +795,11 @@ def vector_to_spherical_tensor(
     Returns
     -------
     spherical_tensor : dict
-        Dictionary whose keys are `(l, q)` and whose values are the spherical
-        tensor components.
+        Dictionary whose keys are `(l, q)` and whose values are the 
+        irreducible spherical tensor components.
     """
 
-    # Assemble the spherical rank-1 components.
+    # Assemble the irreducible spherical rank-1 components.
     spherical_tensor = {
         (1, 1): -1 / math.sqrt(2) * (vector[0] + 1j * vector[1]),
         (1, 0): vector[2],
@@ -777,7 +818,8 @@ def CG_coeff(
     m3: float,
 ) -> float:
     """
-    Compute a Clebsch-Gordan coefficient.
+    Compute a Clebsch-Gordan coefficient using SymPy's symbolic
+    implementation.
 
     Parameters
     ----------
@@ -851,7 +893,10 @@ def custom_dot(
 
     # Reject unsupported input combinations explicitly.
     else:
-        raise ValueError("Invalid input type for custom dot.")
+        raise ValueError(
+            "Invalid input type for custom dot. Both inputs must be either "
+            "sparse or dense arrays."
+        )
 
     return C
 
@@ -918,6 +963,55 @@ def arraylike_to_array(
     return A
 
 
+def expm_vec(
+    A: np.ndarray | csc_array,
+    v: np.ndarray | csc_array,
+    zero_value: float,
+) -> np.ndarray | csc_array:
+    """
+    Apply the matrix exponential to a vector with matrix scaling.
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        Square matrix of shape (N, N).
+    v : ndarray or csc_array
+        Column vector of shape (N, 1).
+    zero_value : float
+        Threshold used when testing convergence of the Taylor series.
+
+    Returns
+    -------
+    eAv : ndarray or csc_array
+        Result of `expm(A) @ v`.
+    """
+
+    status("Computing matrix exponential applied to a vector using Taylor "
+           "series with scaling and squaring...")
+
+    # Determine the matrix scaling factor from the column-wise 1-norm.
+    norm_A = norm_1(A, ord="col")
+    scaling_A = int(math.ceil(norm_A))
+
+    # Scale the matrix before repeated Taylor applications.
+    A = A / scaling_A
+
+    # Scale the convergence threshold relative to the largest vector element.
+    scaling_zv = np.abs(v).max()
+    zero_value = zero_value / scaling_zv
+
+    # Repeatedly apply the Taylor propagator for the scaled matrix.
+    status("Taylor series...")
+    eAv = v
+    for step in range(scaling_A):
+        status(f"Step {step + 1}...")
+        eAv = expm_vec_taylor(A, eAv, zero_value)
+
+    status("Taylor series converged. "
+           "Matrix exponential applied to a vector computed.")
+    return eAv
+
+
 def expm_vec_taylor(
     A: np.ndarray | csc_array,
     v: np.ndarray | csc_array,
@@ -925,6 +1019,9 @@ def expm_vec_taylor(
 ) -> np.ndarray | csc_array:
     """
     Apply the matrix exponential to a vector by Taylor summation.
+
+    NOTE: Status messages are suppressed in this routine since
+    it is called repeatedly by `expm_vec`.
 
     Parameters
     ----------
@@ -949,62 +1046,20 @@ def expm_vec_taylor(
     k = 1
     cont = True
     while cont:
+
+        # Form the next Taylor term and add it to the running sum.
+        # Eliminate small values on the fly.
         trm = A @ (trm / k)
         eliminate_small(trm, zero_value)
         eAv = eAv + trm
         k += 1
 
+        # Continue until the newly generated term is exactly zero after the
+        # thresholding step.
         if issparse(trm):
             cont = trm.nnz != 0
         else:
             cont = np.count_nonzero(trm) != 0
-
-    return eAv
-
-
-def expm_vec(
-    A: np.ndarray | csc_array,
-    v: np.ndarray | csc_array,
-    zero_value: float,
-) -> np.ndarray | csc_array:
-    """
-    Apply the matrix exponential to a vector with matrix scaling.
-
-    Parameters
-    ----------
-    A : ndarray or csc_array
-        Square matrix of shape (N, N).
-    v : ndarray or csc_array
-        Column vector of shape (N, 1).
-    zero_value : float
-        Threshold used when testing convergence of the Taylor series.
-
-    Returns
-    -------
-    eAv : ndarray or csc_array
-        Result of `expm(A) @ v`.
-    """
-
-    status("Calculating the action of matrix exponential on a vector...")
-
-    # Determine the matrix scaling factor from the column-wise 1-norm.
-    norm_A = norm_1(A, ord="col")
-    scaling_A = int(math.ceil(norm_A))
-
-    # Scale the matrix before repeated Taylor applications.
-    status(f"Scaling the matrix by {scaling_A}.")
-    A = A / scaling_A
-
-    # Scale the convergence threshold relative to the largest vector element.
-    scaling_zv = np.abs(v).max()
-    status(f"Scaling the zero-value by {scaling_zv}.")
-    zero_value = zero_value / scaling_zv
-
-    # Repeatedly apply the Taylor propagator for the scaled matrix.
-    eAv = v
-    for step in range(scaling_A):
-        status(f"Calculating expm(A)*vec. Step {step + 1} of {scaling_A}.")
-        eAv = expm_vec_taylor(A, eAv, zero_value)
 
     return eAv
 

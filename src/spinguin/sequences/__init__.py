@@ -1,5 +1,5 @@
 """
-Ready-to-use pulse-sequence helpers provided by Spinguin.
+Ready-to-use pulse-sequences in Spinguin.
 
 This package exposes the public sequence constructors that implement common
 NMR simulation workflows.

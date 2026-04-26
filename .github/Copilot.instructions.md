@@ -39,6 +39,10 @@ that are only wrappers around a single Python or Python library functionality.
 
 - Do not use shared aliases for function input and output data types because this does not work well with Pylance function documentation window.
 
+- Do not add error handling where it is not absolutely necessary or specifically requested by the user. Assume that the user of the code has a basic understanding of programming and does not try to use the code in an obviously incorrect way. If you are unsure about whether error handling is necessary in a specific case, you should ask the user for clarification.
+
+- If you are asked to remove a piece of code, check the entire codebase to see if that piece of code is used anywhere else in addition to the file you are editing to avoid breaking dependencies. If the code to be removed is used elsewhere, you must ask the user for further instructions on how to proceed.
+
 - When you are asked to go through a piece of code, for example using the "Tidy up" command, and update and/or improve it in terms of code quality, documentation, readability, commenting, or code structure, you are only allowed to edit the existing code and suggest improvements to it, which the user can then choose to accept or reject. You must not suggest to replace the entire piece of code with a new code that only contains the part that needs to be changed. Always go through the entire code and suggest improvements to all of it, including the parts that do not necessarily need to be changed, if this improves the overall quality and readability of the code. 
 
 2. Specific commands for GitHub Copilot

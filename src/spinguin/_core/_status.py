@@ -1,5 +1,5 @@
 """
-Status-message helpers controlled by the global verbosity setting.
+Status message functions used throughout Spinguin.
 
 This module provides lightweight helper functions for printing status
 messages and section headers when verbose output is enabled.

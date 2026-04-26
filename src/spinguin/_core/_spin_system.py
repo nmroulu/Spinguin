@@ -1,5 +1,6 @@
 """
-Spin-system container for Hamiltonian and relaxation calculations.
+Spin-system container for the Spinguin package. This is the central
+class used throughout Spinguin.
 
 This module defines the ``SpinSystem`` class, which stores isotope identities
 together with the spin-resolved data required for Hamiltonian and relaxation
@@ -412,7 +413,8 @@ class SpinSystem:
         Cartesian coordinates of the nuclei in Å.
 
         The coordinates are used in Redfield relaxation theory when evaluating
-        dipole-dipole coupling tensors.
+        dipole-dipole coupling tensors and determining properties of the
+        parent molecule.
 
         - If ``ArrayLike``: A 2D array of size (N, 3).
         - If ``str``: Path to the file containing the XYZ coordinates.

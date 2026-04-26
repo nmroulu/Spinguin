@@ -2,8 +2,7 @@
 Spin-operator construction utilities for Hilbert-space calculations.
 
 The module provides single-spin Cartesian, ladder, and spherical tensor
-operators together with helpers for assembling many-spin product operators in
-the Zeeman eigenbasis.
+operators together with helpers for assembling many-spin product operators.
 """
 
 from __future__ import annotations
@@ -22,34 +21,6 @@ if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
 
-def _finalise_single_spin_operator(
-    operator: np.ndarray | sp.lil_array,
-) -> np.ndarray | sp.csc_array:
-    """
-    Return a single-spin operator in the configured storage format.
-
-    Usage: ``_finalise_single_spin_operator(operator)``.
-
-    Parameters
-    ----------
-    operator : ndarray or lil_array
-        Mutable operator assembled element by element.
-
-    Returns
-    -------
-    operator : ndarray or csc_array
-        The input operator returned either unchanged or converted to CSC
-        format.
-    """
-
-    # Convert sparse work arrays to the configured output format.
-    if parameters.sparse_operator:
-        return operator.tocsc()
-
-    # Return dense arrays without modification.
-    return operator
-
-
 def op_E(
     S: float,
 ) -> np.ndarray | sp.csc_array:
@@ -66,7 +37,8 @@ def op_E(
     Returns
     -------
     E : ndarray or csc_array
-        Unit operator of dimension ``2*S + 1``.
+        Unit operator of dimension ``2*S + 1`` in the configured storage
+        format.
     """
 
     # Determine the Hilbert-space dimension of the spin.
@@ -164,7 +136,7 @@ def op_Sz(
         Sz[i, i] = m_i
 
     # Return the operator in the configured output format.
-    return _finalise_single_spin_operator(Sz)
+    return Sz.tocsc() if parameters.sparse_operator else Sz
 
 
 def op_Sp(
@@ -200,7 +172,7 @@ def op_Sp(
         Sp[i, i + 1] = np.sqrt(S * (S + 1) - m[i] * (m[i] + 1))
 
     # Return the operator in the configured output format.
-    return _finalise_single_spin_operator(Sp)
+    return Sp.tocsc() if parameters.sparse_operator else Sp
 
 
 def op_Sm(
@@ -236,7 +208,7 @@ def op_Sm(
         Sm[i, i - 1] = np.sqrt(S * (S + 1) - m[i] * (m[i] - 1))
 
     # Return the operator in the configured output format.
-    return _finalise_single_spin_operator(Sm)
+    return Sm.tocsc() if parameters.sparse_operator else Sm
 
 
 @lru_cache(maxsize=1024)
@@ -265,10 +237,10 @@ def _op_T(
     Returns
     -------
     T : ndarray or csc_array
-        Cached spherical tensor operator.
+        Cached spherical tensor operator in the requested storage format.
     """
 
-    # Start from the maximum-projection tensor ``T_l^l``.
+    # Start from the maximum-projection tensor component ``T_l^l``.
     if sparse:
         T = (-1) ** l * 2 ** (-l / 2) * sp.linalg.matrix_power(op_Sp(S), l)
     else:
@@ -297,6 +269,8 @@ def op_T(
     The operator is constructed by sequentially lowering the maximum-projection
     tensor. The implementation follows Kuprov, *Spin: From Basic Symmetries to
     Quantum Optimal Control* (2023), p. 94.
+
+    See the internal ``_op_T`` function for actual implementation.
 
     Parameters
     ----------

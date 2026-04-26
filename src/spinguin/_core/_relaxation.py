@@ -1,9 +1,9 @@
 """
-Relaxation-theory helpers for Spinguin spin-dynamics simulations.
+Relaxation-theory functions for Spinguin spin-dynamics simulations.
 
 This module provides helper functions for constructing phenomenological and
 Redfield relaxation superoperators together with supporting routines for
-interaction tensors and rotational diffusion.
+interaction tensors and different motional models. 
 """
 
 from __future__ import annotations
@@ -35,57 +35,6 @@ from spinguin._core._utils import idx_to_lq, parse_operator_string
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
-
-
-def _report_completion(
-    time_start: float,
-) -> None:
-    """
-    Report the elapsed wall-clock time of a completed task.
-
-    Usage: ``_report_completion(time_start)``.
-
-    Parameters
-    ----------
-    time_start : float
-        Start time returned by ``time.time()``.
-
-    Returns
-    -------
-    None
-        The elapsed wall-clock time is reported through the status printer.
-    """
-
-    # Report the elapsed wall-clock time of the completed operation.
-    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
-
-
-def _larmor_frequency(
-    gamma: float,
-    chemical_shift: float,
-) -> float:
-    """
-    Return the Larmor frequency of a spin in the static magnetic field.
-
-    Usage: ``_larmor_frequency(gamma, chemical_shift)``.
-
-    Parameters
-    ----------
-    gamma : float
-        Gyromagnetic ratio in rad/s/T.
-    chemical_shift : float
-        Chemical shift in ppm.
-
-    Returns
-    -------
-    omega : float
-        Larmor frequency in rad/s.
-    """
-
-    # Combine the magnetic field and chemical shift into a Larmor frequency.
-    omega = gamma * parameters.magnetic_field * (1 + chemical_shift * 1e-6)
-
-    return omega
 
 def dd_constant(y1: float, y2: float) -> float:
     """
@@ -140,7 +89,13 @@ def Q_constant(S: float, Q_moment: float) -> float:
 
 def tau_c_l(tau_c: float | np.ndarray, l: int) -> float | np.ndarray:
     """
-    Calculate the rank-dependent rotational correlation time.
+    Calculate the rank-dependent rotational correlation time from the
+    "molecular tumbling" correlation time, which is commonly used in
+    NMR literature but actually refers to the rank-2 correlation time.
+
+    This function is used to convert the input molecular correlation
+    time to the rank-dependent correlation times required for the relaxation
+    superoperator construction. 
 
     Usage: ``tau_c_l(tau_c, l)``.
 
@@ -547,6 +502,7 @@ def moment_of_inertia_equivalent_ellipsoid(
     # Build an initial guess from a sphere with the same largest inertia.
     initial_guess = np.sqrt(5/2 * eigenvalues[2] / total_mass) * np.ones(3)
 
+    # TODO: Check this
     # Solve the nonlinear system while suppressing numerical warnings.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -736,6 +692,7 @@ def rotational_correlation_times_Perrin(
     semi_axes = moment_of_inertia_equivalent_ellipsoid(masses, coords)
 
     # Add a minimum hydrodynamic thickness to avoid unrealistically thin axes.
+    # TODO: Calibrate this
     semi_axes += 1.0
 
     # Calculate the principal-axis rotational diffusion constants.
@@ -816,7 +773,7 @@ def _rot_diff_gen(spin_system: SpinSystem) -> dict:
             G[l] = D1 * Jx @ Jx + D2 * Jy @ Jy + D3 * Jz @ Jz
 
     # Report the completion of the rotational-diffusion calculation.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return G
 
@@ -993,7 +950,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
             del interactions[l]
 
     # Report the completion of the interaction processing.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return interactions
 
@@ -1056,6 +1013,7 @@ def _get_sop_T(
 
     return sop
 
+# TODO
 def sop_R_random_field() -> None:
     """
     Placeholder for a random-field relaxation superoperator.
@@ -1144,7 +1102,7 @@ def _sop_R_phenomenological(
         sop_R = sop_R.tocsc()
 
     # Report the completion of the phenomenological construction.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return sop_R
 
@@ -1217,9 +1175,10 @@ def _sop_R_sr2k(
         T2 = np.real(T2)
 
         # Evaluate the Larmor frequency of the quadrupolar nucleus.
-        omega_quad = _larmor_frequency(
-            spin_system.gammas[quad],
-            spin_system.chemical_shifts[quad],
+        omega_quad = (
+            spin_system.gammas[quad]
+            * parameters.magnetic_field
+            * (1 + spin_system.chemical_shifts[quad] * 1e-6)
         )
 
         # Get the spin quantum number of the quadrupolar nucleus.
@@ -1232,9 +1191,10 @@ def _sop_R_sr2k(
             if not spin_system.gammas[quad] == gamma:
 
                 # Evaluate the Larmor frequency of the target spin.
-                omega_target = _larmor_frequency(
-                    spin_system.gammas[target],
-                    spin_system.chemical_shifts[target],
+                omega_target = (
+                    spin_system.gammas[target]
+                    * parameters.magnetic_field
+                    * (1 + spin_system.chemical_shifts[target] * 1e-6)
                 )
 
                 # Convert the scalar coupling from hertz to rad/s.
@@ -1259,7 +1219,7 @@ def _sop_R_sr2k(
         sop_R = _sop_R_phenomenological(spin_system.basis.basis, R1, R2)
 
     # Report the completion of the SR2K calculation.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     
     return sop_R
 
@@ -1302,7 +1262,7 @@ def _ldb_thermalization(
     R = R @ P
 
     # Report the completion of the thermalization step.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     return R
 
@@ -1386,7 +1346,8 @@ def _validate_relaxation_inputs(
 
 def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     """
-    Create the relaxation superoperator using the requested theory.
+    Create the relaxation superoperator using the requested level
+    of theory.
 
     Usage: ``relaxation(spin_system)``.
 
@@ -1511,7 +1472,7 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
                 sop_Ts[(l, q, itype, spin1, spin2)] = sop_T
 
     # Report the completion of the coupled-superoperator construction.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     return sop_Ts
 
 def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
@@ -1618,20 +1579,20 @@ def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
                 R = R + (1 / (2*l + 1)) * sop_X_lpq @ integral
 
     # Report the completion of the Redfield-term accumulation.
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     # Remove the dynamic frequency shifts unless they were requested.
     if not spin_system.relaxation.dynamic_frequency_shift:
         status("Removing dynamic frequency shifts...")
         time_start = time.time()
         R = R.real
-        _report_completion(time_start)
+        status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
 
     # Remove numerically negligible matrix elements.
     status("Eliminating small values from the relaxation superoperator...")
     time_start = time.time()
     eliminate_small(R, parameters.zero_relaxation)
-    _report_completion(time_start)
+    status(f"Completed in {time.time() - time_start:.4f} seconds.\n")
     
     # Report the total time required for the Redfield construction.
     status(

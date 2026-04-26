@@ -10,9 +10,7 @@ Each entry in `ISOTOPES` stores the following quantities in this order:
 - Natural abundance in per cent.
 
 Naturally absent, extinct, or synthetic isotopes are assigned a natural
-abundance of `0.0`. The data were compiled primarily from the original NMR
-table used by the project together with standard isotope abundance values for
-the naturally occurring isotopes listed here.
+abundance of `0.0`.
 
 If an isotope is not listed, it can be added by following the existing format.
 """
@@ -270,9 +268,6 @@ def atomic_mass(isotope: str) -> float:
 def natural_abundance(isotope: str) -> float:
     """
     Return the natural abundance of the requested isotope in per cent.
-
-    Naturally absent, extinct, or synthetic isotopes are assigned a value of
-    `0.0`.
 
     Parameters
     ----------

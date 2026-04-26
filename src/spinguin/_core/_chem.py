@@ -22,6 +22,11 @@ from spinguin._core._parameters import parameters
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
+
+###############################################################################
+# Helper functions
+###############################################################################    
+
 def _validate_bipartite_spin_maps(
     spin_system_A: SpinSystem,
     spin_system_B: SpinSystem,
@@ -30,7 +35,8 @@ def _validate_bipartite_spin_maps(
     spin_map_B: list[int] | tuple[int, ...] | np.ndarray,
 ) -> None:
     """
-    Validate spin maps used for association and dissociation.
+    Validate spin maps used for association and dissociation
+    (error handling).
 
     Parameters
     ----------
@@ -77,7 +83,7 @@ def _validate_permutation_spin_map(
     spin_map: list[int] | tuple[int, ...] | np.ndarray,
 ) -> None:
     """
-    Validate a spin map used for spin permutation.
+    Validate a spin map used for spin permutation (error handling).
 
     Parameters
     ----------
@@ -158,6 +164,9 @@ def _basis_and_spin_map_bytes(
         spin_map_B.tobytes(),
     )
 
+###############################################################################
+# "Actual" functions
+###############################################################################
 
 @lru_cache(maxsize=16)
 def _dissociate_index_map(
@@ -172,7 +181,7 @@ def _dissociate_index_map(
 
     This helper is used internally by `dissociate()`.
 
-    Example. Basis set C contains five spins, which are indexed as
+    Example: Basis set C contains five spins, which are indexed as
     (0, 1, 2, 3, 4). We want to dissociate this into two subsystems A and B.
     Spins 0 and 2 should go to subsystem A and the rest to subsystem B. In this
     case, we define the following spin maps::
@@ -286,12 +295,11 @@ def _associate_index_map(
 
     This helper is used internally by `associate()`.
 
-    Example. We have spin system A that has two spins and spin system B that has
+    Example: We have spin system A that has two spins and spin system B that has
     three spins. These systems associate to form a composite spin system C that
     has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
-    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
-    spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows::
+    from subsystem A and (1, 3, 4) from subsystem B. 
+    In this case, the spin maps are defined as follows::
 
         spin_map_A = np.ndarray([0, 2])
         spin_map_B = np.ndarray([1, 3, 4])
@@ -366,6 +374,7 @@ def _permutation_matrix(
 ) -> sp.csc_array:
     """
     Build a cached permutation matrix for a specific basis and spin map.
+    (See `permutation_matrix()` for the public interface.)
 
     Parameters
     ----------
@@ -424,14 +433,14 @@ def permutation_matrix(
     """
     Create a permutation matrix that reorders spins in a spin system.
 
-    Example. Our spin system has three spins, which are indexed (0, 1, 2). We
-    want to perform the following permutation:
+    Example: The spin system has three spins, which are indexed (0, 1, 2). 
+    We want to perform the following permutation:
 
     - 0 --> 2 (Spin 0 goes to position 2)
     - 1 --> 0 (Spin 1 goes to position 0)
     - 2 --> 1 (Spin 2 goes to position 1)
 
-    In this case, we want to assign the following map::
+    In this case, the spin map is defined as follows::
 
         spin_map = np.array([2, 0, 1])
 
@@ -475,9 +484,9 @@ def dissociate(
     """
     Dissociate a composite density vector into two subsystem vectors.
 
-    This function models the chemical step `C -> A + B`.
+    This function models the chemical step or reaction `C -> A + B`.
 
-    Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).
+    Example: Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).
     We want to dissociate this into two subsystems A and B. Spins 0 and 2 should
     go to subsystem A and the rest to subsystem B. In this case, we define the
     following spin maps::
@@ -557,7 +566,8 @@ def dissociate(
     rho_A = rho_A / (rho_A[0, 0] * np.sqrt(np.prod(spin_system_A.mults)))
     rho_B = rho_B / (rho_B[0, 0] * np.sqrt(np.prod(spin_system_B.mults)))
 
-    # Convert sparse results to CSC format for consistency.
+    # Convert results to sparse format if desired.
+    # TODO: Consistency with permute_spins function?
     if parameters.sparse_state:
         rho_A = rho_A.tocsc()
         rho_B = rho_B.tocsc()
@@ -576,14 +586,13 @@ def associate(
     """
     Combine two subsystem density vectors into a composite vector.
 
-    This function models the chemical step `A + B -> C`.
+    This function models the chemical step or reaction `A + B -> C`.
 
-    Example. We have spin system A that has two spins and spin system B that has
+    Example: We have spin system A that has two spins and spin system B that has
     three spins. These systems associate to form a composite spin system C that
     has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are
-    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the
-    spin systems A and B will be indexed in spin system C by defining the spin
-    maps as follows::
+    from subsystem A and (1, 3, 4) from subsystem B. 
+    In this case, the spin maps are defined as follows::
 
         spin_map_A = np.array([0, 2])
         spin_map_B = np.array([1, 3, 4])
@@ -654,7 +663,8 @@ def associate(
     # Combine the subsystem amplitudes in the composite basis.
     rho_C[idx_C, [0]] = rho_A[idx_A, [0]] * rho_B[idx_B, [0]]
 
-    # Convert sparse results to CSC format for consistency.
+    # Convert results to sparse format if desired.
+    # TODO: Consistency with permute_spins function?
     if parameters.sparse_state:
         rho_C = rho_C.tocsc()
 
@@ -668,14 +678,14 @@ def permute_spins(
     """
     Permute a state vector to match a reordering of spins.
 
-    Example. Our spin system has three spins, which are indexed (0, 1, 2). We
+    Example: Our spin system has three spins, which are indexed (0, 1, 2). We
     want to perform the following permutation:
 
     - 0 --> 2 (Spin 0 goes to position 2)
     - 1 --> 0 (Spin 1 goes to position 0)
     - 2 --> 1 (Spin 2 goes to position 1)
 
-    In this case, we want to assign the following map::
+    In this case, the spin map is defined as follows::
 
         spin_map = np.array([2, 0, 1])
 
@@ -703,7 +713,7 @@ def permute_spins(
     # Apply the permutation matrix to the state vector.
     rho = perm @ rho
 
-    # Convert the result to the configured sparse or dense representation.
+    # Convert to sparse if the result is dense and sparsity is desired.
     if parameters.sparse_state and not sp.issparse(rho):
         rho = sp.csc_array(rho)
     if not parameters.sparse_state and sp.issparse(rho):

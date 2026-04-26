@@ -10,6 +10,7 @@ Direct imports from :mod:`spinguin._core` remain possible, but they are
 intended primarily for internal use, testing, and advanced development
 workflows.
 """
+
 from ._cache import clear_cache
 from ._chem import (
     associate,
@@ -81,7 +82,7 @@ __all__ = [
     # Cache
     "clear_cache",
 
-    # Chemistry
+    # Chemistry and chemical exchange
     "associate",
     "dissociate",
     "permute_spins",
@@ -95,7 +96,7 @@ __all__ = [
     # Molecule
     "Molecule",
 
-    # NMR isotopes
+    # NMR isotopes and their properties
     "atomic_mass",
     "gamma",
     "natural_abundance",

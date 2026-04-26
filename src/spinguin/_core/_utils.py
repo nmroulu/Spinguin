@@ -1,5 +1,6 @@
 """
-Shared utility helpers for tensor indices, operator parsing, and basis analysis.
+Shared utility helpers for tensor indices, operator parsing, basis analysis,
+and other small tasks.
 
 This module provides small helper functions for irreducible-tensor index
 conversions, operator-string parsing, and simple basis-set analysis.
@@ -415,7 +416,8 @@ def parse_operator_string(
 
 def spin_order(op_def: np.ndarray) -> int:
     """
-    Determine the spin order of a product operator.
+    Determine the spin order (number of non-unit single-spin operators)
+    of a product operator.
 
     Parameters
     ----------

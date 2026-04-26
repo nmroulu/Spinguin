@@ -1,5 +1,5 @@
 """
-Hamiltonian-construction helpers for spin systems.
+Hamiltonian-construction functions.
 
 This module provides helper functions for constructing Hamiltonian
 superoperators from the interactions present in a spin system.
@@ -35,7 +35,8 @@ def _empty_hamiltonian(
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system whose basis dimension determines the operator size.
+        Spin system whose basis dimension determines
+        the size of the Hamiltonian superoperator.
 
     Returns
     -------
@@ -94,7 +95,8 @@ def _sop_H_Z_CS(
     cs: bool,
 ) -> np.ndarray | csc_array:
     """
-    Construct the Zeeman and chemical-shift contributions to the Hamiltonian.
+    Constructs the Zeeman (bare nucleus-field interaction) and chemical-shift
+    (isotropic shielding interaction) contributions to the Hamiltonian superoperator. 
 
     Parameters
     ----------
@@ -104,8 +106,9 @@ def _sop_H_Z_CS(
         Type of superoperator:
 
         - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
+
     zeeman : bool
         If True, include the Zeeman Hamiltonian.
     cs : bool
@@ -121,8 +124,9 @@ def _sop_H_Z_CS(
     # Ensure that the magnetic field has been defined.
     if parameters.magnetic_field is None:
         raise ValueError(
-            "Please set the magnetic field before constructing the Zeeman or "
-            "chemical shift Hamiltonian."
+            "Magnetic field must be defined to construct the Zeeman and/or "
+            "chemical shift Hamiltonian. Use parameters.magnetic_field to "
+            "set the magnetic field strength."
         )
 
     # Initialise the requested Hamiltonian contribution.
@@ -132,6 +136,7 @@ def _sop_H_Z_CS(
     for n in range(spin_system.nspins):
 
         # Compute the bare Larmor frequency of the current nucleus.
+        # NOTE: The negative sign definition is used
         omega_0 = -spin_system.gammas[n] * parameters.magnetic_field
 
         # Select the requested frequency contribution.
@@ -142,7 +147,7 @@ def _sop_H_Z_CS(
         elif cs:
             omega = omega_0 * spin_system.chemical_shifts[n] * 1e-6
         else:
-            raise ValueError("zeeman or cs must be True.")
+            raise ValueError("arguments zeeman and/or cs must be True.")
 
         # Build the z-superoperator for the current spin.
         sop_Iz = superoperator(spin_system, f"I(z, {n})", side)
@@ -158,7 +163,8 @@ def _sop_H_J(
     side: Literal["comm", "left", "right"],
 ) -> np.ndarray | csc_array:
     """
-    Construct the scalar J-coupling contribution to the Hamiltonian.
+    Construct the scalar J-coupling (isotropic indirect spin-spin coupling)
+    contribution to the Hamiltonian.
 
     Parameters
     ----------
@@ -168,8 +174,8 @@ def _sop_H_J(
         Type of superoperator:
 
         - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
 
     Returns
     -------
@@ -181,6 +187,8 @@ def _sop_H_J(
     sop_H = _empty_hamiltonian(spin_system)
 
     # Accumulate pairwise scalar-coupling terms over unique spin pairs.
+    # NOTE: It is assumed that the J-coupling matrix in spin_system.J_couplings
+    # contains the coupling constants on the lower triangle.
     for n in range(spin_system.nspins):
         for k in range(n):
 
@@ -208,19 +216,20 @@ def hamiltonian(
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system for which the Hamiltonian is generated.
+        Spin system for which the Hamiltonian is constructed.
     interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
         Interactions to include in the Hamiltonian. The available options are:
 
         - 'zeeman' -- Zeeman interaction
         - 'chemical_shift' -- Isotropic chemical shift
         - 'J_coupling' -- Scalar J-coupling
+        
     side : {'comm', 'left', 'right'}
         Type of superoperator:
 
         - 'comm' -- commutation superoperator (default)
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
 
     Returns
     -------
@@ -235,7 +244,8 @@ def hamiltonian(
     # Ensure that the basis has been built before constructing the Hamiltonian.
     if spin_system.basis.basis is None:
         raise ValueError(
-            "Please build basis before constructing the Hamiltonian."
+            "Basis must be built before constructing the Hamiltonian. Use "
+            "`spin_system.build_basis()` to build the basis."
         )
 
     # Validate the list of requested interactions.

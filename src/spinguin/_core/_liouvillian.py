@@ -2,7 +2,7 @@
 Construction of the Liouvillian superoperator.
 
 This module provides a small helper for combining Hamiltonian, relaxation,
-and exchange contributions into a single Liouvillian.
+and exchange superoperators into a single Liouvillian superoperator.
 """
 
 # Imports
@@ -17,7 +17,7 @@ def liouvillian(
     """
     Construct the Liouvillian superoperator.
 
-    The Liouvillian is assembled according to
+    The Liouvillian is assembled according to the definition
 
     $$
     L = -iH - R + K,
@@ -48,7 +48,7 @@ def liouvillian(
 
     # Require at least one physical contribution for the Liouvillian.
     if H is None and R is None and K is None:
-        raise ValueError("H, R and K cannot all be None simultaneously.")
+        raise ValueError("At least one of H, R and K must be provided.")
 
     # Replace omitted contributions by zero so that the algebra below remains
     # uniform.

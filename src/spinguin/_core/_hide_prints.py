@@ -20,8 +20,8 @@ class HidePrints:
 
     Notes
     -----
-    The implementation redirects `sys.stdout` to `os.devnull` for the duration
-    of the context.
+    The implementation redirects `sys.stdout` to `os.devnull` 
+    for the duration of the context.
     """
 
     def __enter__(self):

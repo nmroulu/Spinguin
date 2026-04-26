@@ -1,5 +1,5 @@
 """
-Relaxation-property definitions attached to a spin system.
+Relaxation-property definitions associated with a spin system.
 
 The module provides the `RelaxationProperties` class, which stores the
 relaxation-theory settings associated with a `SpinSystem` instance. The
@@ -36,17 +36,20 @@ class RelaxationProperties:
     Usage: ``RelaxationProperties(spin_system)``.
 
     The class stores the theory selection and auxiliary parameters required
-    for Redfield and phenomenological relaxation calculations.
+    for Redfield and phenomenological relaxation superoperator construction. 
     """
 
     # Store the default relaxation settings at class level.
     _antisymmetric: bool = False
+    # _antisymmetric: bool = True
     _dynamic_frequency_shift: bool = False
+    # _dynamic_frequency_shift: bool = True
     _relative_error: float = 1e-6
     _sr2k: bool = False
     _tau_c: float | np.ndarray | None = None
     _theory: Literal["redfield", "phenomenological"] | None = None
     _thermalization: bool = False
+    # _thermalization: bool = True
     _T1: np.ndarray | None = None
     _T2: np.ndarray | None = None
     _molecule: Molecule | None = None
@@ -183,7 +186,7 @@ class RelaxationProperties:
 
         This option applies to Redfield relaxation theory and corresponds to the
         imaginary part of the relaxation superoperator. The default value is
-        ``False``.
+        ``True``.
         """
 
         return self._dynamic_frequency_shift
@@ -616,7 +619,8 @@ class RelaxationProperties:
     ) -> None:
         # Validate the assigned molecule object.
         if not isinstance(molecule, Molecule):
-            raise ValueError("Invalid input type for molecule.")
+            raise ValueError("Invalid input type for molecule. "
+                             "Must be a Molecule instance.")
 
         # Store the molecular structure used in relaxation calculations.
         self._molecule = molecule

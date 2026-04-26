@@ -1,5 +1,5 @@
 """
-Liouville-space superoperator utilities for spin-dynamics calculations.
+Liouville-space superoperator utilities for spin-dynamics simulations.
 
 This module provides helper functions for constructing superoperators in the
 full basis or in a truncated basis.
@@ -50,61 +50,6 @@ def _require_basis(
     # Reject operations that require a built basis when none is present.
     if spin_system.basis.basis is None:
         raise ValueError(f"Please build the basis before {action}.")
-
-
-def _allocate_superoperator(
-    dim: int,
-    sparse: bool,
-) -> np.ndarray | sp.csc_array:
-    """
-    Allocate a square superoperator matrix in the requested storage format.
-
-    Parameters
-    ----------
-    dim : int
-        Dimension of the basis set.
-    sparse : bool
-        If ``True``, allocate sparse CSC storage; otherwise allocate a dense
-        NumPy array.
-
-    Returns
-    -------
-    ndarray or csc_array
-        Zero-initialised superoperator matrix.
-    """
-
-    # Allocate sparse or dense storage according to the requested format.
-    if sparse:
-        return sp.csc_array((dim, dim), dtype=complex)
-
-    return np.zeros((dim, dim), dtype=complex)
-
-
-def _finalise_superoperator(
-    sop: np.ndarray | sp.csc_array,
-    sparse: bool,
-) -> np.ndarray | sp.csc_array:
-    """
-    Return a superoperator in the requested output storage format.
-
-    Parameters
-    ----------
-    sop : ndarray or csc_array
-        Superoperator to be finalised.
-    sparse : bool
-        Desired storage format of the output.
-
-    Returns
-    -------
-    ndarray or csc_array
-        Final superoperator.
-    """
-
-    # Convert sparse matrices to dense arrays when requested.
-    if not sparse and sp.issparse(sop):
-        return sop.toarray()
-
-    return sop
 
 
 @lru_cache(maxsize=16)
@@ -259,7 +204,11 @@ def _sop_prod(
 
     # Return the identity superoperator for the unit operator.
     if len(idx_spins) == 0:
-        return _finalise_superoperator(sop_E(dim), sparse)
+        sop = sop_E(dim)
+        if not sparse and sp.issparse(sop):
+            return sop.toarray()
+
+        return sop
 
     # Collect non-zero structure coefficients and their tensor indices.
     c_jk = []
@@ -325,7 +274,10 @@ def _sop_prod(
     # Construct the sparse superoperator matrix.
     sop = sp.csc_array((sop_vals, (sop_j, sop_k)), shape=(dim, dim))
 
-    return _finalise_superoperator(sop, sparse)
+    if not sparse and sp.issparse(sop):
+        return sop.toarray()
+
+    return sop
 
 
 def sop_prod(
@@ -344,7 +296,8 @@ def sop_prod(
     op_def : ndarray
         Specifies the product operator to be generated. For example,
         input ``np.array([0, 2, 0, 1])`` generates ``E*T_10*E*T_11``. The
-        indices are given by ``N = l^2 + l - q``, where ``l`` is the rank and
+        indices for each spin
+        are given by ``N = l^2 + l - q``, where ``l`` is the rank and
         ``q`` is the projection.
     basis : ndarray
         A two-dimensional array where each row contains integers that represent
@@ -396,33 +349,33 @@ def sop_from_string(
         Defines the operator to be generated. The operator string must
         follow the rules below:
 
-                - Cartesian and ladder operators: ``I(component, index)`` or
-                    ``I(component)``. Examples:
+            - Cartesian and ladder operators: ``I(component, index)`` or ``I(component)``. 
+                Examples:
 
-                        - ``I(x, 4)`` creates the x-operator for spin index 4.
-                        - ``I(x)`` creates the x-operator for all spins.
+                - ``I(x, 4)`` creates the x-operator for spin index 4.
+                - ``I(x)`` creates the x-operator for all spins.
 
-                - Spherical tensor operators: ``T(l, q, index)`` or ``T(l, q)``.
-                    Examples:
+            - Spherical tensor operators: ``T(l, q, index)`` or ``T(l, q)``.
+                Examples:
 
-                        - ``T(1, -1, 3)`` creates the operator with ``l=1`` and ``q=-1``
-                            for spin index 3.
-                        - ``T(1, -1)`` creates the operator with ``l=1`` and ``q=-1`` for
-                            all spins.
+                - ``T(1, -1, 3)`` creates the operator with ``l=1`` and ``q=-1``
+                    for spin index 3.
+                - ``T(1, -1)`` creates the operator with ``l=1`` and ``q=-1`` for
+                    all spins.
 
-                - Product operators have ``*`` between the single-spin operators:
-                    ``I(z, 0) * I(z, 1)``.
-                - Sums of operators have ``+`` between the operators:
-                    ``I(x, 0) + I(x, 1)``.
-        - Unit operators are ignored in the input. Interpretation of these
-                    two expressions is identical: ``E * I(z, 1)``, ``I(z, 1)``.
+            - Product operators have ``*`` between the single-spin operators:
+                ``I(z, 0) * I(z, 1)``.
+            - Sums of operators have ``+`` between the operators:
+                ``I(x, 0) + I(x, 1)``.
+            - Unit operators are ignored in the input. Interpretation of these
+                two expressions is identical: ``E * I(z, 1)``, ``I(z, 1)``.
 
-                Special case: An empty ``operator`` string is considered as the unit
-                operator.
+            Special case: An empty ``operator`` string is considered as the unit
+            operator.
 
         Whitespace will be ignored in the input.
 
-                Note that indexing starts from 0.
+        Note that indexing starts from 0.
     basis : ndarray
         A two-dimensional array where each row contains integers that represent
         a Kronecker product of single-spin irreducible spherical tensors.
@@ -446,7 +399,10 @@ def sop_from_string(
     nspins = spins.shape[0]
 
     # Allocate the output superoperator.
-    sop = _allocate_superoperator(dim, parameters.sparse_superoperator)
+    if parameters.sparse_superoperator:
+        sop = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        sop = np.zeros((dim, dim), dtype=complex)
 
     # Parse the operator string into basis definitions and coefficients.
     op_defs, coeffs = parse_operator_string(operator, nspins)
@@ -503,7 +459,10 @@ def _sop_T_coupled(
     nspins = spins.shape[0]
 
     # Allocate the coupled superoperator.
-    sop = _allocate_superoperator(dim, sparse)
+    if sparse:
+        sop = sp.csc_array((dim, dim), dtype=complex)
+    else:
+        sop = np.zeros((dim, dim), dtype=complex)
 
     # Handle bilinear two-spin interactions.
     if spin_2 is not None:
@@ -591,30 +550,6 @@ def sop_T_coupled(
     ).copy()
 
     return sop
-
-
-def sop_to_truncated_basis(
-    index_map: list[int],
-    sop: np.ndarray | sp.csc_array,
-) -> np.ndarray | sp.csc_array:
-    """
-    Transform a superoperator to a truncated basis.
-
-    Parameters
-    ----------
-    index_map : list
-        Index mapping from the original basis to the truncated basis.
-    sop : ndarray or csc_array
-        Superoperator to be transformed.
-
-    Returns
-    -------
-    sop_transformed : ndarray or csc_array
-        Superoperator transformed into the truncated basis.
-    """
-
-    # Retain only the rows and columns selected by the truncation map.
-    return sop[np.ix_(index_map, index_map)]
 
 
 def superoperator(

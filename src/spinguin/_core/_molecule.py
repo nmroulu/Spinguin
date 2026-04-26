@@ -1,8 +1,9 @@
 """
-Molecular container used in relaxation-property calculations.
+Molecule container used in multiple Spinguin modules.
 
-The `Molecule` class stores isotope labels together with Cartesian nuclear
-coordinates and provides access to isotope masses.
+The `Molecule` class stores information about the
+"parent" molecule of a spin system, such as isotope 
+labels, Cartesian nuclear coordinates, and isotope masses.
 """
 
 # Imports
@@ -15,7 +16,8 @@ from spinguin._core._nmr_isotopes import ISOTOPES
 
 class Molecule:
     """
-    Store isotope labels and Cartesian coordinates for a molecule.
+    Store various properties of a molecule that are relevant for
+    spin dynamics simulations.
 
     Examples
     --------
@@ -27,14 +29,14 @@ class Molecule:
                 [1.0527, 2.2566, 0.9925],
                 [0.0014, 1.5578, 2.1146],
                 [1.3456, 0.3678, 1.4251],
-            ],
+                ],
         )
 
     Construct a molecule from text files::
 
         molecule = Molecule(
             isotopes="/path/to/isotopes.txt",
-            xyz="/path/to/xyz.txt",
+            xyz="/path/to/xyz.xyz",
         )
 
     Parameters
@@ -46,7 +48,7 @@ class Molecule:
 
         - `ArrayLike`: one-dimensional array of length `N` containing isotope
           names.
-        - `str`: path to a file containing the isotope names.
+        - `str`: path to a file containing the isotope names (see read_array).
     xyz : list or tuple or ndarray or str
         Cartesian coordinates for the nuclei.
 
@@ -54,7 +56,7 @@ class Molecule:
 
         - `ArrayLike`: two-dimensional array of shape `(N, 3)` containing the
           coordinates in Å.
-        - `str`: path to an XYZ file containing the coordinates.
+        - `str`: path to an XYZ file containing the coordinates (see read_xyz).
 
     Raises
     ------
@@ -88,7 +90,9 @@ class Molecule:
 
         # Confirm that each isotope has exactly one Cartesian coordinate.
         if self.xyz.shape != (len(self.isotopes), 3):
-            raise ValueError("Mismatch between the assigned isotopes and XYZ.")
+            raise ValueError(
+                "Shape mismatch between isotopes and xyz coordinates."
+            )
 
     @staticmethod
     def _parse_isotopes(
@@ -121,7 +125,8 @@ class Molecule:
             return arraylike_to_array(isotopes)
 
         raise TypeError(
-            "Isotopes should be a one-dimensional array or a string."
+            "Isotopes must be a one-dimensional array-like object or "
+            "a string."
         )
 
     @staticmethod
@@ -155,7 +160,7 @@ class Molecule:
             return arraylike_to_array(xyz)
 
         raise TypeError(
-            "XYZ should be a two-dimensional array or a string."
+            "xyz must be a two-dimensional array-like object or a string."
         )
 
     @property
