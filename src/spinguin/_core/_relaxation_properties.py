@@ -19,6 +19,7 @@ import numpy as np
 from spinguin._core._data_io import read_array
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._molecule import Molecule
+from spinguin._core._parameters import parameters
 from spinguin._core._relaxation import (
     rotational_correlation_time_SED,
     rotational_correlation_times_Perrin,
@@ -304,7 +305,6 @@ class RelaxationProperties:
 
     def auto_tau_c(
         self,
-        T: float,
         eta: float,
         model: Literal["iso", "aniso"] = "iso",
         r: float | None = None,
@@ -313,7 +313,7 @@ class RelaxationProperties:
         """
         Automatically assign rotational correlation time or times.
 
-        Usage: ``auto_tau_c(T, eta, model="iso", r=None, scaling_factor=1.0)``.
+        Usage: ``auto_tau_c(eta, model="iso", r=None, scaling_factor=1.0)``.
 
         The correlation time is evaluated either from the
         Stokes-Einstein-Debye relation for isotropic rotational diffusion or
@@ -321,8 +321,6 @@ class RelaxationProperties:
 
         Parameters
         ----------
-        T : float
-            Temperature in kelvin.
         eta : float
             Viscosity of the solvent in pascal-seconds.
         model : {"iso", "aniso"}, default="iso"
@@ -349,12 +347,13 @@ class RelaxationProperties:
         if model == "iso":
             if r is None:
                 raise ValueError(
-                    "Hydrodynamic radius 'r' must be provided for the isotropic "
-                    "model."
+                    "Hydrodynamic radius 'r' must be provided for the "
+                    "isotropic model."
                 )
             self.tau_c = (
-                rotational_correlation_time_SED(T, eta, r, 2)
-                * scaling_factor
+                rotational_correlation_time_SED(
+                    parameters.temperature, eta, r, 2
+                ) * scaling_factor
             )
 
         # Use Perrin theory for anisotropic rotational diffusion.
@@ -367,7 +366,7 @@ class RelaxationProperties:
             self.tau_c = rotational_correlation_times_Perrin(
                 self.molecule.masses,
                 self.molecule.xyz,
-                T,
+                parameters.temperature,
                 eta,
                 2,
             ) * scaling_factor

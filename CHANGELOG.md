@@ -1,10 +1,16 @@
 # Changelog
 
+## 0.1.1
+- Added quadrupolar moments to several isotopes.
+
 ## 0.1.0
-- Improved basis-set handling.
+- Improved basis set handling.
 - Refined the implementation of zero-track elimination.
 - Added anisotropic rotational diffusion for Redfield relaxation theory.
+- Added a verbosity option to parameters (to disable printing).
 - General documentation and comment updates.
+- Added more general rotating frame implementation.
+- Improved basis set truncation options.
 
 ## 0.0.4
 - Added support for creating a subsystem from a `SpinSystem` object.

@@ -16,7 +16,7 @@ jobs:
     steps:
       # Check out the full repository history so tags are available.
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -35,7 +35,9 @@ jobs:
 
       # Install Python for the documentation build.
       - name: Set-up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
 
       # Install the package itself and the Sphinx dependencies.
       - name: Install dependencies
