@@ -1,25 +1,31 @@
 """
-This module provides the core functionality of Spinguin. The module is not meant
-to be imported. The preferred way to use Spinguin is to use the functionality
-directly under `spinguin` namespace, using::
+Internal core namespace of Spinguin.
 
-    import spinguin as sg
+This module centralises the re-export of the internal core functionality of
+Spinguin. In normal use, the public package namespace should be preferred::
 
-If you still wish to import the _core module, continue with precaution!
+	import spinguin as sg
+
+Direct imports from :mod:`spinguin._core` remain possible, but they are
+intended primarily for internal use, testing, and advanced development
+workflows.
 """
+
 from ._cache import clear_cache
 from ._chem import (
     associate,
     dissociate,
-    permute_spins
+    permute_spins,
 )
 from ._hamiltonian import hamiltonian
 from ._liouvillian import liouvillian
 from ._molecule import Molecule
 from ._nmr_isotopes import (
+    atomic_mass,
     gamma,
+    natural_abundance,
     quadrupole_moment,
-    spin
+    spin,
 )
 from ._operators import (
     op_E,
@@ -30,13 +36,13 @@ from ._operators import (
     op_Sz,
     op_T,
     op_T_coupled,
-    operator
+    operator,
 )
 from ._parameters import parameters
 from ._propagation import (
     propagator,
     propagator_to_rotframe,
-    pulse
+    pulse,
 )
 from ._relaxation import relaxation
 from ._rotframe import rotating_frame
@@ -46,7 +52,7 @@ from ._specutils import (
     resonance_frequency,
     spectral_width_to_dwell_time,
     spectrum,
-    time_axis
+    time_axis,
 )
 from ._spin_system import SpinSystem
 from ._states import (
@@ -69,33 +75,35 @@ from ._superoperators import (
 from ._utils import (
     coherence_order,
     idx_to_lq,
-    lq_to_idx
+    lq_to_idx,
 )
 
 __all__ = [
-    #cache
+    # cache
     "clear_cache",
 
-    #chem
+    # chem
     "associate",
     "dissociate",
     "permute_spins",
 
-    #hamiltonian
+    # hamiltonian
     "hamiltonian",
 
-    #liouvillian
+    # liouvillian
     "liouvillian",
 
-    #molecule
+    # molecule
     "Molecule",
 
-    #nmr_isotopes
+    # nmr_isotopes
+    "atomic_mass",
     "gamma",
+    "natural_abundance",
     "quadrupole_moment",
     "spin",
 
-    #operators
+    # operators
     "op_E",
     "op_Sm",
     "op_Sp",
@@ -106,21 +114,21 @@ __all__ = [
     "op_T_coupled",
     "operator",
 
-    #parameters 
+    # parameters
     "parameters",
 
-    #propagation
+    # propagation
     "propagator",
     "propagator_to_rotframe",
     "pulse",
 
-    #relaxation
+    # relaxation
     "relaxation",
 
-    #rotframe
+    # rotframe
     "rotating_frame",
 
-    #specutils
+    # specutils
     "fourier_transform",
     "frequency_to_chemical_shift",
     "resonance_frequency",
@@ -128,10 +136,10 @@ __all__ = [
     "spectrum",
     "time_axis",
 
-    #spin_system
+    # spin_system
     "SpinSystem",
 
-    #states
+    # states
     "alpha_state",
     "beta_state",
     "equilibrium_state",
@@ -143,12 +151,12 @@ __all__ = [
     "triplet_plus_state",
     "triplet_zero_state",
     "unit_state",
-    
-    #superoperators
+
+    # superoperators
     "sop_T_coupled",
     "superoperator",
 
-    #utils
+    # utils
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",

@@ -1,18 +1,27 @@
+/*
+Implementation of the low-level sparse matrix multiplication kernels used
+by the Cython wrapper in `_sparse_dot.pyx`. The routines operate on CSC-form
+matrix data and use thread-local work buffers together with OpenMP
+parallelisation to construct the product matrix column by column.
+*/
+
 #ifndef CSPDOT_HPP
 #define CSPDOT_HPP
 
-#include <vector>
+#include <cmath>
 #include <complex>
 #include <omp.h>
+#include <type_traits>
+#include <vector>
 
-// Real numbers
+// Return the absolute value of a real number.
 template <typename T>
 typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 my_abs(T x) {
     return x < T(0) ? -x : x;
 }
 
-// Complex numbers
+// Return the magnitude of a complex number.
 template <typename T>
 typename std::enable_if<std::is_floating_point<T>::value, T>::type
 my_abs(const std::complex<T>& z) {
@@ -35,79 +44,83 @@ void c_sparse_dot_indptr(
     const double zero_value
 )
 {
+    // Define sentinels for the sparse linked-list representation.
+    const I unseen = static_cast<I>(-1);
+    const I list_end = static_cast<I>(-2);
+
     #pragma omp parallel
     {
-        // Thread-local memory for results of current column
+        // Allocate thread-local buffers for one output column at a time.
         std::vector<T> C_col_data(A_nrows, 0);
-        std::vector<I> C_col_nonzero(A_nrows, -1);
+        std::vector<I> C_col_nonzero(A_nrows, unseen);
 
-        // Iterate through the columns of matrix B
+        // Process the columns of matrix B in parallel.
         #pragma omp for
-        for (I i = 0; i < B_ncols; i++){
+        for (I i = 0; i < B_ncols; i++) {
 
-            // Current head of the column
-            I C_col_head = -2;
+            // Initialise the linked list of non-zero candidates.
+            I C_col_head = list_end;
 
-            // Obtain the starting and ending indices of the current column of B
+            // Obtain the CSC bounds of the current column of B.
             I start_B = B_indptr[i];
-            I end_B = B_indptr[i+1];
+            I end_B = B_indptr[i + 1];
 
-            // Loop through the column of B
-            for (I j = start_B; j < end_B; j++){
+            // Accumulate A times the current column of B into the work array.
+            for (I j = start_B; j < end_B; j++) {
 
-                // Get the row index and value
+                // Read the current non-zero entry of B.
                 I ind_j = B_indices[j];
                 T val_j = B_data[j];
 
-                // Find the column from A that the current element is multiplying
+                // Locate the corresponding column of A.
                 I start_A = A_indptr[ind_j];
                 I end_A = A_indptr[ind_j + 1];
 
-                // Loop through the column of A
-                for (I k = start_A; k < end_A; k++){
+                // Scatter the product contribution into the output column.
+                for (I k = start_A; k < end_A; k++) {
 
-                    // Get the row index and the value
+                    // Read the current non-zero entry of A.
                     I ind_k = A_indices[k];
                     T val_k = A_data[k];
 
-                    // Multiply and add to the array
+                    // Accumulate the product contribution at the output row.
                     C_col_data[ind_k] = C_col_data[ind_k] + val_j * val_k;
 
-                    // Check if a non-zero value is found for the matrix element for the first time
-                    if (C_col_nonzero[ind_k] == -1){
+                    // Insert the row into the linked list on first visit.
+                    if (C_col_nonzero[ind_k] == unseen) {
                         C_col_nonzero[ind_k] = C_col_head;
                         C_col_head = ind_k;
                     }
                 }
             }
 
-            // Counter for the number of non-zeros
+            // Count how many retained non-zero entries the column contains.
             I nnz = 0;
 
-            // Once a complete column is calculated, iterate through the possible non-zero values
-            while (C_col_head != -2) {
+            // Traverse the linked list of candidate rows.
+            while (C_col_head != list_end) {
 
-                // Get the value
+                // Read the accumulated value at the current output row.
                 T val_k = C_col_data[C_col_head];
 
-                // Increment the counter if the value is larger than the threshold
-                if (my_abs(val_k) > zero_value){
+                // Count entries whose magnitude exceeds the threshold.
+                if (my_abs(val_k) > zero_value) {
                     nnz++;
                 }
 
-                // Get the next index
+                // Advance to the next linked-list node.
                 I C_col_head_temp = C_col_head;
                 C_col_head = C_col_nonzero[C_col_head];
 
-                // Clear the arrays
+                // Clear the work buffers for reuse in the next column.
                 C_col_data[C_col_head_temp] = 0;
-                C_col_nonzero[C_col_head_temp] = -1;
+                C_col_nonzero[C_col_head_temp] = unseen;
             }
 
-            // Append the number of non-zeros to the index pointer array
-            C_indptr[i+1] = nnz;
+            // Store the column non-zero count in the index pointer array.
+            C_indptr[i + 1] = nnz;
         }
-    }    
+    }
 }
 
 template <typename I, typename T>
@@ -126,75 +139,79 @@ void c_sparse_dot(
     const double zero_value
 )
 {
+    // Define sentinels for the sparse linked-list representation.
+    const I unseen = static_cast<I>(-1);
+    const I list_end = static_cast<I>(-2);
+
     #pragma omp parallel
     {
-        // Thread-local memory for results of current column
+        // Allocate thread-local buffers for one output column at a time.
         std::vector<T> C_col_data(A_nrows, 0);
-        std::vector<I> C_col_nonzero(A_nrows, -1);
+        std::vector<I> C_col_nonzero(A_nrows, unseen);
 
-        // Iterate through the columns of matrix B
+        // Process the columns of matrix B in parallel.
         #pragma omp for
-        for (I i = 0; i < B_ncols; i++){
+        for (I i = 0; i < B_ncols; i++) {
 
-            // Current head of the column
-            I C_col_head = -2;
+            // Initialise the linked list of non-zero candidates.
+            I C_col_head = list_end;
 
-            // Obtain the starting and ending indices of the current column of B
+            // Obtain the CSC bounds of the current column of B.
             I start_B = B_indptr[i];
-            I end_B = B_indptr[i+1];
+            I end_B = B_indptr[i + 1];
 
-            // Loop through the column of B
-            for (I j = start_B; j < end_B; j++){
+            // Accumulate A times the current column of B into the work array.
+            for (I j = start_B; j < end_B; j++) {
 
-                // Get the row index and value
+                // Read the current non-zero entry of B.
                 I ind_j = B_indices[j];
                 T val_j = B_data[j];
 
-                // Find the column from A that the current element is multiplying
+                // Locate the corresponding column of A.
                 I start_A = A_indptr[ind_j];
                 I end_A = A_indptr[ind_j + 1];
 
-                // Loop through the column of A
-                for (I k = start_A; k < end_A; k++){
+                // Scatter the product contribution into the output column.
+                for (I k = start_A; k < end_A; k++) {
 
-                    // Get the row index and the value
+                    // Read the current non-zero entry of A.
                     I ind_k = A_indices[k];
                     T val_k = A_data[k];
 
-                    // Multiply and add to the array
+                    // Accumulate the product contribution at the output row.
                     C_col_data[ind_k] = C_col_data[ind_k] + val_j * val_k;
 
-                    // Check if a non-zero value is found for the matrix element for the first time
-                    if (C_col_nonzero[ind_k] == -1){
+                    // Insert the row into the linked list on first visit.
+                    if (C_col_nonzero[ind_k] == unseen) {
                         C_col_nonzero[ind_k] = C_col_head;
                         C_col_head = ind_k;
                     }
                 }
             }
 
-            // Counter for the number of non-zeros
+            // Initialise the write cursor for the current output column.
             I nnz = C_indptr[i];
 
-            // Once a complete column is calculated, iterate through the possible non-zero values
-            while (C_col_head != -2) {
+            // Traverse the linked list of candidate rows.
+            while (C_col_head != list_end) {
 
-                // Get the value
+                // Read the accumulated value at the current output row.
                 T val_k = C_col_data[C_col_head];
 
-                // Add to the array if the value is larger than the threshold
-                if (my_abs(val_k) > zero_value){
+                // Write entries whose magnitude exceeds the threshold.
+                if (my_abs(val_k) > zero_value) {
                     C_data[nnz] = val_k;
                     C_indices[nnz] = C_col_head;
                     nnz++;
                 }
 
-                // Get the next index
+                // Advance to the next linked-list node.
                 I C_col_head_temp = C_col_head;
                 C_col_head = C_col_nonzero[C_col_head];
 
-                // Clear the arrays
+                // Clear the work buffers for reuse in the next column.
                 C_col_data[C_col_head_temp] = 0;
-                C_col_nonzero[C_col_head_temp] = -1;
+                C_col_nonzero[C_col_head_temp] = unseen;
             }
         }
     }

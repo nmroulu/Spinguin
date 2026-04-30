@@ -1,11 +1,14 @@
 """
-This script benchmarks the performance of creating Liouville space
-superoperators for varying spin systems and basis set sizes. In this
-test, every spherical tensor superoperator up to two-spin correlation
-is created from the basis set.
+Benchmarks Liouville-space superoperator construction as a function of
+spin-system size and basis-set truncation.
 
-On a laptop with 11th gen. i5 processor and 16 GB ram, this bench-
-mark takes two minutes to run with `max_nspins=14`, and `max_spin_order=4`.
+For each selected maximum spin order and number of spins, the benchmark
+builds a Liouville-space basis and times the construction of all
+superoperators whose operator definition has spin order below three.
+
+On a laptop with an 11th generation i5 processor and 16 GB RAM, this
+benchmark takes roughly two minutes with ``max_nspins = 14`` and
+``max_spin_order = 4``.
 """
 
 # Imports
@@ -16,54 +19,60 @@ from spinguin._core._superoperators import sop_prod
 from spinguin._core._basis import make_basis
 from spinguin._core._utils import spin_order
 
-# Testing parameters
+# Define benchmark limits
 max_nspins = 14
 max_spin_order = 4
 
-# Create empty arrays for the testing results
+# Allocate array for average construction times
 avg = np.empty((max_spin_order, max_nspins), dtype=float)
 
-# Test with various maximum spin orders
-for max_so in range(1, max_spin_order+1):
+# Loop over maximum basis spin orders
+for max_so in range(1, max_spin_order + 1):
 
     print(f"Current spin order: {max_so}")
 
-    # Test with various spin system sizes
-    for nspins in range(max_so, max_nspins+1):
+    # Loop over spin-system sizes compatible with current truncation
+    for nspins in range(max_so, max_nspins + 1):
 
         print(f"Current number of spins: {nspins}")
 
-        # Create the spin system
+        # Build the spin-system description and Liouville-space basis
         spins = np.array([1/2 for _ in range(nspins)])
         basis = make_basis(spins, max_so)
 
-        # Number of operators tested
+        # Initialise the number of timed operators
         nopers = 0
 
-        # Runtime for current max_so and nspins
+        # Initialise cumulative runtime for current configuration
         tot_curr = 0
 
-        # Go through the operators in basis
+        # Time superoperator construction for selected basis operators
         for op_def in basis:
 
-            # Build only two-spin operators at most
+            # Restrict timed operators to at most two-spin correlations
             so = spin_order(op_def)
             if so < 3:
 
-                # Measure the time it takes to build the superoperator
+                # Measure superoperator construction wall time
                 ts = perf_counter()
                 sop_prod(op_def, basis, spins, "comm", sparse=True)
                 te = perf_counter()
                 nopers += 1
-                tot_curr += te-ts
+                tot_curr += te - ts
 
-        # Save the results
-        avg[max_so-1, nspins-1] = tot_curr/nopers
+        # Store the mean construction time for this configuration
+        avg[max_so - 1, nspins - 1] = tot_curr/nopers
 
-# Plot the results
-for max_so in range(1, max_spin_order+1):
-    nspins = np.linspace(max_so, max_nspins, num=max_nspins-max_so)
-    plt.plot(nspins, avg[max_so-1][max_so-1:max_nspins-1], label=f"Spin order: {max_so}")
+# Plot average runtime as a function of spin-system size
+for max_so in range(1, max_spin_order + 1):
+    nspins = np.linspace(max_so, max_nspins, num=max_nspins - max_so)
+    plt.plot(
+        nspins,
+        avg[max_so - 1][max_so - 1:max_nspins - 1],
+        label=f"Spin order: {max_so}"
+    )
+
+# Finalise and show the benchmark figure
 plt.xlabel("Number of spins")
 plt.ylabel("Time (s)")
 plt.legend()

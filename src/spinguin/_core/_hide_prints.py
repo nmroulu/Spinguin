@@ -1,5 +1,8 @@
 """
-This module contains a class that can be used to hide printing to the console.
+Context manager for temporarily suppressing standard output.
+
+This module provides a small helper that redirects `sys.stdout` to
+`os.devnull` within a `with` block.
 """
 
 # Imports
@@ -8,23 +11,37 @@ import sys
 
 class HidePrints:
     """
-    This class can be used to hide printing to the console. Usage::
+    Temporarily suppress printing to standard output.
+
+    Usage::
 
         with HidePrints():
             do_something()
 
-    Solution from:
-    https://stackoverflow.com/questions/8391411/how-to-block-calls-to-print
+    Notes
+    -----
+    The implementation redirects `sys.stdout` to `os.devnull` 
+    for the duration of the context.
     """
 
     def __enter__(self):
-        
-        # Disable stdout
+        """
+        Redirect standard output to `os.devnull`.
+        """
+
+        # Store the original output stream before redirecting it.
         self.stdout = sys.stdout
+
+        # Open the null-device stream and redirect standard output to it.
         sys.stdout = open(os.devnull, 'w')
 
     def __exit__(self, *_):
+        """
+        Restore the original standard output stream.
+        """
 
-        # Restore the original stdout
+        # Close the temporary null-device stream.
         sys.stdout.close()
+
+        # Restore the original standard output stream.
         sys.stdout = self.stdout

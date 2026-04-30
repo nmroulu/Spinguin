@@ -1,74 +1,144 @@
 """
-This module provides functions for calculating Hamiltonian superoperators.
+Hamiltonian-construction functions.
+
+This module provides helper functions for constructing Hamiltonian
+superoperators from the interactions present in a spin system.
 """
-# Referencing SpinSystem class
+
+# Imports
 from __future__ import annotations
-from typing import TYPE_CHECKING
+
+import time
+from typing import TYPE_CHECKING, Literal
+
+import numpy as np
+from scipy.sparse import csc_array
+
+from spinguin._core._la import eliminate_small
+from spinguin._core._parameters import parameters
+from spinguin._core._status import status
+from spinguin._core._superoperators import superoperator
+
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
 
-# Imports
-import numpy as np
-import time
-from typing import Literal
-from scipy.sparse import csc_array
-from spinguin._core._la import eliminate_small
-from spinguin._core._superoperators import superoperator
-from spinguin._core._parameters import parameters
-from spinguin._core._status import status
+
+def _empty_hamiltonian(spin_system: SpinSystem) -> np.ndarray | csc_array:
+    """
+    Create an empty Hamiltonian superoperator.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system whose basis dimension determines
+        the size of the Hamiltonian superoperator.
+
+    Returns
+    -------
+    ndarray or csc_array
+        Empty Hamiltonian superoperator.
+    """
+
+    # Obtain the Liouville-space dimension from the current basis.
+    dim = spin_system.basis.dim
+
+    # Allocate the Hamiltonian in sparse or dense format.
+    if parameters.sparse_superoperator:
+        return csc_array((dim, dim), dtype=complex)
+    return np.zeros((dim, dim), dtype=complex)
+
+
+def _validate_interactions(
+    interactions: list[Literal["zeeman", "chemical_shift", "J_coupling"]],
+) -> None:
+    """
+    Validate the list of requested Hamiltonian interactions.
+
+    Parameters
+    ----------
+    interactions : list
+        Requested interaction labels.
+
+    Returns
+    -------
+    None
+    """
+
+    # Check that each requested interaction appears only once.
+    if len(set(interactions)) != len(interactions):
+        raise ValueError("Duplicate interactions were specified.")
+
+    # Check that at least one interaction has been requested.
+    if len(interactions) == 0:
+        raise ValueError(
+            "Cannot compute Hamiltonian, as no interactions were specified."
+        )
+    
+    # Define the set of valid interactions
+    valid_interactions = ("zeeman", "chemical_shift", "J_coupling")
+
+    # Check that every requested interaction is recognised.
+    for interaction in interactions:
+        if interaction not in valid_interactions:
+            raise ValueError(
+                f"Invalid interaction: {interaction}. "
+                f"Valid interactions are: {valid_interactions}."
+            )
+
 
 def _sop_H_Z_CS(
     spin_system: SpinSystem,
     side: Literal["comm", "left", "right"],
     zeeman: bool,
-    cs: bool
+    cs: bool,
 ) -> np.ndarray | csc_array:
     """
-    Computes the Hamiltonian superoperator for the Zeeman interaction and the
-    chemical shift.
+    Constructs the Zeeman (bare nucleus-field interaction) and chemical-shift
+    (isotropic shielding interaction) contributions to the Hamiltonian
+    superoperator. 
 
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system for which to calculate the Zeeman and chemical shift
-        Hamiltonian.
+        Spin system for which to calculate the Hamiltonian.
     side : {'comm', 'left', 'right'}
-        Specifies the type of superoperator:
+        Type of superoperator:
+
         - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
+
     zeeman : bool
-        If True, the Zeeman Hamiltonian is included.
+        If True, include the Zeeman Hamiltonian.
     cs : bool
-        If True, the chemical shift Hamiltonian is included.
+        If True, include the chemical-shift Hamiltonian.
 
     Returns
     -------
     sop_H : ndarray or csc_array
-        The Hamiltonian superoperator for the Zeeman interaction and the
-        chemical shift.
+        Hamiltonian superoperator contribution from the Zeeman interaction and
+        the chemical shift.
     """
-    # Check that the magnetic field has been set
+
+    # Ensure that the magnetic field has been defined.
     if parameters.magnetic_field is None:
         raise ValueError(
-            "Please set the magnetic field before constructing the Zeeman or "
-            "chemical shift Hamiltonian."
+            "Magnetic field must be defined to construct the Zeeman and/or "
+            "chemical shift Hamiltonian. Use parameters.magnetic_field to "
+            "set the magnetic field strength."
         )
 
-    # Initialize the Hamiltonian
-    dim = spin_system.basis.dim
-    if parameters.sparse_superoperator:
-        sop_H = csc_array((dim, dim), dtype=complex)
-    else:
-        sop_H = np.zeros((dim, dim), dtype=complex)
+    # Initialise the requested Hamiltonian contribution.
+    sop_H = _empty_hamiltonian(spin_system)
 
-    # Iterate over each spin
+    # Accumulate the single-spin Zeeman and chemical-shift terms.
     for n in range(spin_system.nspins):
 
-        # Obtain the bare nucleus frequency
+        # Compute the bare Larmor frequency of the current nucleus.
+        # NOTE: The negative sign definition is used
         omega_0 = -spin_system.gammas[n] * parameters.magnetic_field
 
-        # Obtain the requested frequency
+        # Select the requested frequency contribution.
         if zeeman and cs:
             omega = omega_0 * (1 + spin_system.chemical_shifts[n] * 1e-6)
         elif zeeman:
@@ -76,138 +146,131 @@ def _sop_H_Z_CS(
         elif cs:
             omega = omega_0 * spin_system.chemical_shifts[n] * 1e-6
         else:
-            raise ValueError("zeeman or cs must be True")
+            raise ValueError("arguments zeeman and/or cs must be True.")
 
-        # Get the z-operator for the current spin
-        Iz = superoperator(spin_system, f"I(z, {n})", side)
+        # Build the z-superoperator for the current spin.
+        sop_Iz = superoperator(spin_system, f"I(z, {n})", side)
 
-        # Add the Hamiltonian term for the current spin
-        sop_H += omega * Iz
+        # Add the single-spin contribution to the Hamiltonian.
+        sop_H += omega * sop_Iz
 
     return sop_H
+
 
 def _sop_H_J(
     spin_system: SpinSystem,
     side: Literal["comm", "left", "right"],
 ) -> np.ndarray | csc_array:
     """
-    Computes the J-coupling term of the Hamiltonian.
+    Construct the scalar J-coupling (isotropic indirect spin-spin coupling)
+    contribution to the Hamiltonian.
 
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system for which to calculate the J-coupling Hamiltonian.
+        Spin system for which to calculate the Hamiltonian.
     side : {'comm', 'left', 'right'}
-        Specifies the type of superoperator:
+        Type of superoperator:
+
         - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
 
     Returns
     -------
     sop_H : ndarray or csc_array
-        The J-coupling Hamiltonian superoperator.
+        J-coupling Hamiltonian superoperator contribution.
     """
-    # Initialise the J-coupling Hamiltonian
-    dim = spin_system.basis.dim
-    if parameters.sparse_superoperator:
-        sop_H = csc_array((dim, dim), dtype=complex)
-    else:
-        sop_H = np.zeros((dim, dim), dtype=complex)
 
-    # Loop over the spin pairs (consider only lower triangular part)
+    # Initialise the J-coupling contribution.
+    sop_H = _empty_hamiltonian(spin_system)
+
+    # Accumulate pairwise scalar-coupling terms over unique spin pairs.
+    # NOTE: It is assumed that the J-coupling matrix in spin_system.J_couplings
+    # contains the coupling constants on the lower triangle.
     for n in range(spin_system.nspins):
         for k in range(n):
 
-            # Obtain the spin operators and the J-coupling
+            # Obtain the coupling constant and the required operator products.
             J = spin_system.J_couplings[n][k]
             IzIz = superoperator(spin_system, f"I(z,{n})*I(z,{k})", side)
             IpIm = superoperator(spin_system, f"I(+,{n})*I(-,{k})", side)
             ImIp = superoperator(spin_system, f"I(-,{n})*I(+,{k})", side)
 
-            # Compute the J-coupling term
-            sop_H += 2 * np.pi * J * (IzIz + 1/2*(IpIm + ImIp))
-            
+            # Add the isotropic scalar-coupling term for the spin pair.
+            sop_H += 2 * np.pi * J * (IzIz + 1 / 2 * (IpIm + ImIp))
+
     return sop_H
 
-INTERACTIONTYPE = Literal["zeeman", "chemical_shift", "J_coupling"]
-INTERACTIONDEFAULT = ["zeeman", "chemical_shift", "J_coupling"]
+
 def hamiltonian(
     spin_system: SpinSystem,
-    interactions: list[INTERACTIONTYPE] = INTERACTIONDEFAULT,
-    side: Literal["comm", "left", "right"] = "comm"
+    interactions: list[
+        Literal["zeeman", "chemical_shift", "J_coupling"]
+    ] = ["zeeman", "chemical_shift", "J_coupling"],
+    side: Literal["comm", "left", "right"] = "comm",
 ) -> np.ndarray | csc_array:
     """
-    Creates the Hamiltonian superoperator for the spin system.
+    Construct the Hamiltonian superoperator for a spin system.
 
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system for which the Hamiltonian is going to be generated.
+        Spin system for which the Hamiltonian is constructed.
     interactions : list, default=["zeeman", "chemical_shift", "J_coupling"]
-        Specifies which interactions are taken into account. The options are:
+        Interactions to include in the Hamiltonian. The available options are:
 
         - 'zeeman' -- Zeeman interaction
         - 'chemical_shift' -- Isotropic chemical shift
         - 'J_coupling' -- Scalar J-coupling
-
-    side : {'comm', 'left', 'right'}
-        The type of superoperator:
         
+    side : {'comm', 'left', 'right'}
+        Type of superoperator:
+
         - 'comm' -- commutation superoperator (default)
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
 
     Returns
     -------
     H : ndarray or csc_array
         Hamiltonian superoperator.
     """
+
+    # Record the start time for status reporting.
     time_start = time.time()
-    status("Constructing Hamiltonian...")
-        
-    # Check that the basis has been built
+    status("Constructing the Hamiltonian...")
+
+    # Ensure that the basis has been built before constructing the Hamiltonian.
     if spin_system.basis.basis is None:
-        raise ValueError("Please build basis before constructing " 
-                         "the Hamiltonian.")
+        raise ValueError(
+            "Basis must be built before constructing the Hamiltonian. Use "
+            "`spin_system.build_basis()` to build the basis."
+        )
 
-    # Check that each item in the interactions list is unique
-    if not len(set(interactions)) == len(interactions):
-        raise ValueError("Duplicate interactions were specified.")
-    
-    # Check that at least one interaction has been specified
-    if len(interactions) == 0:
-        raise ValueError("Cannot compute Hamiltonian, as no interactions were "
-                         "specified.")
-    
-    # Check that each requested interaction is valid
-    for interaction in interactions:
-        if interaction not in INTERACTIONDEFAULT:
-            raise ValueError(
-                f"Invalid interaction: {interaction}. "
-                f"Valid interactions are: {INTERACTIONDEFAULT}."
-            )
+    # Validate the list of requested interactions.
+    _validate_interactions(interactions)
 
-    # Initialize the Hamiltonian
-    dim = spin_system.basis.dim
-    if parameters.sparse_superoperator:
-        sop_H = csc_array((dim, dim), dtype=complex)
-    else:
-        sop_H = np.zeros((dim, dim), dtype=complex)
+    # Initialise the full Hamiltonian superoperator.
+    sop_H = _empty_hamiltonian(spin_system)
 
-    # Calculate the Zeeman and chemical shift Hamiltonian
+    # Add the Zeeman and chemical-shift contributions if requested.
     zeeman = "zeeman" in interactions
     cs = "chemical_shift" in interactions
     if zeeman or cs:
         sop_H += _sop_H_Z_CS(spin_system, side, zeeman, cs)
-        
-    # Calculate the J-coupling Hamiltonian
+
+    # Add the scalar J-coupling contribution if requested.
     if "J_coupling" in interactions:
         sop_H += _sop_H_J(spin_system, side)
 
-    # Remove small values to increase sparsity
+    # Remove very small values to improve sparsity and numerical cleanliness.
     eliminate_small(sop_H, parameters.zero_hamiltonian)
 
-    status(f'Completed in {time.time() - time_start:.4f} seconds.\n')
+    # Report the completion of the Hamiltonian construction.
+    status(
+        f"Hamiltonian constructed in {time.time() - time_start:.4f} "
+        "seconds.\n"
+    )
 
     return sop_H

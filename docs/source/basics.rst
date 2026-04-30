@@ -3,18 +3,18 @@
 Basics
 ======
 
-Spinguin is meant to be easy to use, even for those who are not very familiar
-with Python nor spin dynamics simulations. The package is designed to for
-running spin dynamics simulations in liquid state. The main features of
+Spinguin is designed to be easy to use, even for those who are not 
+familiar with Python or spin dynamics simulations. The package is intended for
+spin dynamics simulations in the liquid state. The main features of
 Spinguin are:
 
-* Versatile numerical spin-dynamics simulations in liquid state.
+* Versatile numerical spin-dynamics simulations in the liquid state.
 * Support for restricted basis sets, enabling the use of large spin systems
   with more than 10 spins on consumer-level hardware.
 * Simulation of coherent dynamics, relaxation, and chemical exchange processes.
 
-Below, the main functionality of Spinguin is introduced by simulating a simple
-NMR spectrum of a pyridine molecule.
+Below, the main functionality of Spinguin is introduced through a simple
+simulation of the NMR spectrum of pyridine.
 
 Usage
 -----
@@ -28,29 +28,29 @@ available functionality, please refer to :ref:`spinguin`.
 
 Global parameters
 -----------------
-Spinguin makes use of global parameters that can be set to control the behavior
-of the simulations. These parameters can be set by calling
-``sg.parameters.PARAMETERNAME`` after importing the package. For example, to set
-the magnetic field and temperature, you can use the following commands::
+Spinguin uses global parameters that can be adjusted to control the behaviour
+of simulations. These parameters can be set through
+``sg.parameters.PARAMETERNAME`` after importing the package. For example, to
+set the magnetic field and temperature, use the following commands::
 
     sg.parameters.magnetic_field = 9.4
     sg.parameters.temperature = 295
 
-Essentially, the ``parameters`` is an instance of ``Parameters`` class, and the
-behaviour of the Spinguin package can be managed by changing the attributes of
-the object. For the available parameters, please refer to the ``Parameters``
-class in :ref:`internals`.
+The ``parameters`` object is an instance of the ``Parameters`` class, and the
+behaviour of Spinguin can be controlled by changing its attributes. For the
+available parameters, please refer to the ``Parameters`` class in
+:ref:`internals`.
 
 Creating a spin system
 ----------------------
 
 A ``SpinSystem`` is the core of any spin dynamics simulation in Spinguin. It
-represents a collection of spins, to which properties, such as chemical shifts,
+represents a collection of spins to which properties such as chemical shifts,
 *J*-coupling constants, and relaxation rates can be assigned.
 
-You can create a spin system by providing a list of spin types (e.g., '1H',
-'13C', etc.) to the ``SpinSystem`` class. The spin types are specified as
-strings, and you can include as many spins as needed::
+You can create a spin system by providing a list of spin types, for example
+``"1H"`` or ``"13C"``, to the ``SpinSystem`` class. The spin types are given
+as strings, and you may include as many spins as needed::
 
     spin_system = sg.SpinSystem(['1H', '1H', '1H', '1H', '1H', '14N'])
 
@@ -63,30 +63,31 @@ the use of a restricted basis set, which is essential for simulating large spin
 systems efficiently.
 
 To build the basis, you must first define the maximum spin order that is going
-to be used in the basis. This is specified as an attribute to the basis of the
-``SpinSystem`` instance. Next, you can call the ``build_basis()`` method to
-build the basis set::
+to be used in the basis. This is specified as an attribute of the basis of the
+``SpinSystem`` instance. Next, call the ``build()`` method to construct the
+basis set::
 
     spin_system.basis.max_spin_order = 3
     spin_system.basis.build()
 
-The ``basis`` is an instance of ``Basis`` class which is automatically assigned
-as an attribute to the ``SpinSystem`` object. Other functionality available in
-the ``Basis`` class is documented in :ref:`internals`.
+The ``basis`` is an instance of the ``Basis`` class, which is automatically
+assigned as an attribute of the ``SpinSystem`` object. Other functionality
+available in the ``Basis`` class is documented in :ref:`internals`.
 
 Defining spin system properties
 -------------------------------
 
-The properties of the spin system are assigned as attributes to the system.
+The properties of the spin system are assigned directly as attributes of the
+system.
 
-First, we are going to assign the chemical shifts to the spin system created
-above. The chemical shifts are specified as a list of floats in the units of ppm
-(parts per million)::
+First, we assign the chemical shifts to the spin system created above. These
+chemical shifts are specified as a list of floats in units of ppm (parts per
+million)::
 
     spin_system.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
 
 Next, we assign the *J*-coupling constants. These are given as a two-dimensional
-list in the units of Hz::
+list in units of Hz::
 
     spin_system.J_couplings = [
         [ 0,     0,      0,      0,      0,      0],
@@ -97,35 +98,35 @@ list in the units of Hz::
         [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
     ]
 
-Define the relaxation theory
-----------------------------
+Defining the relaxation theory
+------------------------------
 
 The goal is to simulate the NMR spectrum of pyridine. Therefore, relaxation must
-be defined. We use the `phenomenological` relaxation here, `i.e.`, we give the
-relaxation times to the software.
+be defined. Here, we use phenomenological relaxation, that is, we provide the
+relaxation times directly to the software.
 
 First, the relaxation theory must be defined::
-    
+
     spin_system.relaxation.theory = "phenomenological"
 
-Then, the relaxation times in seconds can be given as a list::
+Then, the relaxation times can be given in seconds as a list::
 
     spin_system.relaxation.T1 = [20.0, 17.5, 15.0, 17.5, 20.0, 0.001]
     spin_system.relaxation.T2 = [5.0, 4.2, 3.1, 4.2, 5.0, 0.0002]
 
-Here, the ``relaxation`` is an instance of ``RelaxationProperties`` class, which
-is used to store the relaxation-theory settigns. The other available settings
-are documented in the class description in :ref:`internals`.
+Here, ``relaxation`` is an instance of the ``RelaxationProperties`` class,
+which is used to store the relaxation-theory settings. The other available
+settings are documented in the class description in :ref:`internals`.
 
 Performing the pulse-and-acquire experiment
 -------------------------------------------
 
-Once the global parameters, spin system, basis set, spin system properties, and 
-relaxation theory have been defined, the simulations can be performed. We
+Once the global parameters, spin system, basis set, spin system properties, and
+relaxation theory have been defined, the simulation can be performed. Here, we
 simulate the NMR spectrum using the pulse-and-acquire experiment. The available
-pulse sequences are documented in :ref:`sequences` and are accessible by
+pulse sequences are documented in :ref:`sequences` and are accessible through
 ``sg.sequences.SEQUENCENAME``. The pulse-and-acquire experiment requires five
-additional parameters to be defined:
+additional parameters:
 
 * isotope
 * center frequency (ppm)
@@ -141,7 +142,7 @@ Next, we define these parameters::
     dwell_time = 1e-3
     angle = 90
 
-Finally, we perform the experiment, which outputs the free induction decay::
+Finally, we perform the experiment, which returns the free induction decay::
 
     fid = sg.sequences.pulse_and_acquire(
         spin_system = spin_system,
@@ -152,18 +153,18 @@ Finally, we perform the experiment, which outputs the free induction decay::
         angle = angle
     )
 
-Congratulations! You have now sucessfully performed a spin dynamics simulation
+Congratulations! You have now successfully performed a spin dynamics simulation
 using Spinguin.
 
 Visualising the FID
 -------------------
 
-We plot the results using ``matplotlib``. First, make sure that ``matplotlib``
-is installed and then import the package::
+We plot the results using ``matplotlib``. First, make sure that
+``matplotlib`` is installed, and then import the package::
 
     import matplotlib.pyplot as plt
 
-Next, calculate the time axis using the number of points and dwell time::
+Next, calculate the time axis from the number of points and the dwell time::
 
     time_axis = sg.time_axis(npoints, dwell_time)
 
@@ -179,12 +180,12 @@ Obtaining the spectrum
 ----------------------
 
 The ultimate goal is to plot the NMR spectrum of pyridine, which is obtained by
-performing the Fourier transform. The Fourier transform returns the frequencies
-and their corresponding intensities. The frequencies are converted to the ppm
-scale::
+performing a Fourier transform. The Fourier transform returns the frequencies
+and the corresponding intensities. The frequencies are then converted to the
+ppm scale::
 
     freqs, spec = sg.spectrum(fid, dwell_time)
-    shift_axis = freqs/sg.resonance_frequency(isotope) * 1e6 + center_frequency
+    shift_axis = freqs/sg.resonance_frequency(isotope)*1e6 + center_frequency
 
 Finally, we plot the spectrum of pyridine::
 

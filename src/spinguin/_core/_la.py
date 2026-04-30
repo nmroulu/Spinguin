@@ -1,214 +1,249 @@
 """
-This module provides various linear algebra tools required for spin dynamics
-simulations.
+Linear algebra utilities used throughout the Spinguin code base.
+
+The module contains helper routines for sparse-memory sharing, matrix
+exponentials, tensor manipulations, and small conversion utilities needed
+across multiple Spinguin modules. 
 """
 
 # Imports
 import math
+from functools import lru_cache
+from io import BytesIO
+from multiprocessing.shared_memory import SharedMemory
+
 import numpy as np
 from numpy.typing import ArrayLike
-from scipy.sparse import eye_array, csc_array, block_array, issparse
-from scipy.io import mmwrite, mmread
-from io import BytesIO
-from functools import lru_cache
-from sympy.physics.quantum.cg import CG
-from spinguin._core._sparse_dot import sparse_dot as _sparse_dot
-from spinguin._core._intersect_indices import intersect_indices
-from spinguin._core._hide_prints import HidePrints
-from spinguin._core._nmr_isotopes import ISOTOPES
-from multiprocessing.shared_memory import SharedMemory
-from spinguin._core._status import status
-
+from scipy.io import mmread, mmwrite
+from scipy.sparse import block_array, csc_array, eye_array, issparse
 from scipy.spatial.transform import Rotation
+from sympy.physics.quantum.cg import CG
 from sympy.physics.wigner import wigner_d
 
+from spinguin._core._hide_prints import HidePrints
+from spinguin._core._intersect_indices import intersect_indices
+from spinguin._core._sparse_dot import sparse_dot as _sparse_dot
+from spinguin._core._status import status
+
+
 def write_shared_sparse(A: csc_array) -> tuple[
-    dict[str, str | np.dtype | tuple[int]],
-    tuple[SharedMemory, SharedMemory, SharedMemory]]:
+    dict[str, str | np.dtype | tuple[int, ...]],
+    tuple[SharedMemory, SharedMemory, SharedMemory],
+]:
     """
-    Creates a shared memory representation of a sparse CSC array.
+    Create a shared-memory representation of a CSC sparse array.
 
     Parameters
     ----------
     A : csc_array
-        Sparse array to be shared.
+        Sparse array to be stored in shared memory.
 
     Returns
     -------
     A_shared : dict
-        Dictionary containing shared memory names and metadata for the sparse
-        array's data, indices, and indptr, along with their shapes and dtypes.
+        Metadata for reconstructing the sparse array from shared memory.
     A_shm : tuple
-        Tuple containing the shared memory objects for the sparse array's data,
-        indices, and indptr.
+        Shared-memory handles for the data, indices, and index-pointer arrays.
     """
-    # Create a shared memory of the sparse array
+
+    # Allocate shared memory for the three internal CSC buffers.
     A_data_shm = SharedMemory(create=True, size=A.data.nbytes)
     A_indices_shm = SharedMemory(create=True, size=A.indices.nbytes)
     A_indptr_shm = SharedMemory(create=True, size=A.indptr.nbytes)
-    A_data_shared = np.ndarray(A.data.shape, dtype=A.data.dtype,
-                               buffer=A_data_shm.buf)
-    A_indices_shared = np.ndarray(A.indices.shape, dtype=A.indices.dtype,
-                                  buffer=A_indices_shm.buf)
-    A_indptr_shared = np.ndarray(A.indptr.shape, dtype=A.indptr.dtype,
-                                 buffer=A_indptr_shm.buf)
+
+    # Expose the shared buffers as NumPy arrays and copy the CSC data into
+    # them.
+    A_data_shared = np.ndarray(
+        A.data.shape,
+        dtype=A.data.dtype,
+        buffer=A_data_shm.buf,
+    )
+    A_indices_shared = np.ndarray(
+        A.indices.shape,
+        dtype=A.indices.dtype,
+        buffer=A_indices_shm.buf,
+    )
+    A_indptr_shared = np.ndarray(
+        A.indptr.shape,
+        dtype=A.indptr.dtype,
+        buffer=A_indptr_shm.buf,
+    )
     A_data_shared[:] = A.data[:]
     A_indices_shared[:] = A.indices[:]
     A_indptr_shared[:] = A.indptr[:]
 
-    # Save the information of the memory to a dictionary
+    # Store the metadata required to rebuild the sparse array later.
     A_shared = {
-        'A_data_shm_name' : A_data_shm.name,
-        'A_indices_shm_name' : A_indices_shm.name,
-        'A_indptr_shm_name' : A_indptr_shm.name,
-        'A_data_shape' : A.data.shape,
-        'A_indices_shape' : A.indices.shape,
-        'A_indptr_shape' : A.indptr.shape,
-        'A_data_dtype' : A.data.dtype,
-        'A_indices_dtype' : A.indices.dtype,
-        'A_indptr_dtype' : A.indptr.dtype,
-        'A_shape' : A.shape
+        "A_data_shm_name": A_data_shm.name,
+        "A_indices_shm_name": A_indices_shm.name,
+        "A_indptr_shm_name": A_indptr_shm.name,
+        "A_data_shape": A.data.shape,
+        "A_indices_shape": A.indices.shape,
+        "A_indptr_shape": A.indptr.shape,
+        "A_data_dtype": A.data.dtype,
+        "A_indices_dtype": A.indices.dtype,
+        "A_indptr_dtype": A.indptr.dtype,
+        "A_shape": A.shape,
     }
 
-    # Combine the shared memories into one tuple
+    # Return both the serialisable metadata and the live handles.
     A_shm = (A_data_shm, A_indices_shm, A_indptr_shm)
-
     return A_shared, A_shm
 
-def read_shared_sparse(A_shared: dict[str, str | np.dtype | tuple[int]]) -> \
-    tuple[csc_array, tuple[SharedMemory, SharedMemory, SharedMemory]]:
+
+def read_shared_sparse(
+    A_shared: dict[str, str | np.dtype | tuple[int, ...]],
+) -> tuple[csc_array, tuple[SharedMemory, SharedMemory, SharedMemory]]:
     """
-    Reads a shared memory representation of a sparse CSC array and reconstructs
-    it.
+    Reconstruct a CSC sparse array from shared-memory metadata.
 
     Parameters
     ----------
     A_shared : dict
-        Dictionary containing shared memory names and metadata for the sparse
-        array's data, indices, and indptr, along with their shapes and dtypes.
+        Metadata describing the shared-memory layout of the sparse array.
 
     Returns
     -------
     A : csc_array
-        Sparse array reconstructed from the shared memory.
+        Sparse array reconstructed from the shared buffers.
     A_shm : tuple
-        Tuple containing the shared memory objects for the sparse array's data,
-        indices, and indptr.
+        Shared-memory handles for the data, indices, and index-pointer arrays.
     """
-    # Parse the dictionary
-    A_data_shm_name = A_shared['A_data_shm_name']
-    A_indices_shm_name = A_shared['A_indices_shm_name']
-    A_indptr_shm_name = A_shared['A_indptr_shm_name']
-    A_data_shape = A_shared['A_data_shape']
-    A_indices_shape = A_shared['A_indices_shape']
-    A_indptr_shape = A_shared['A_indptr_shape']
-    A_data_dtype = A_shared['A_data_dtype']
-    A_indices_dtype = A_shared['A_indices_dtype']
-    A_indptr_dtype = A_shared['A_indptr_dtype']
-    A_shape = A_shared['A_shape']
 
-    # Obtain the shared memories
+    # Unpack the shared-memory metadata.
+    A_data_shm_name = A_shared["A_data_shm_name"]
+    A_indices_shm_name = A_shared["A_indices_shm_name"]
+    A_indptr_shm_name = A_shared["A_indptr_shm_name"]
+    A_data_shape = A_shared["A_data_shape"]
+    A_indices_shape = A_shared["A_indices_shape"]
+    A_indptr_shape = A_shared["A_indptr_shape"]
+    A_data_dtype = A_shared["A_data_dtype"]
+    A_indices_dtype = A_shared["A_indices_dtype"]
+    A_indptr_dtype = A_shared["A_indptr_dtype"]
+    A_shape = A_shared["A_shape"]
+
+    # Attach to the existing shared-memory blocks.
     A_data_shm = SharedMemory(name=A_data_shm_name)
     A_indices_shm = SharedMemory(name=A_indices_shm_name)
     A_indptr_shm = SharedMemory(name=A_indptr_shm_name)
 
-    # Obtain the previously shared array
-    A_data = np.ndarray(shape=A_data_shape, dtype=A_data_dtype,
-                        buffer=A_data_shm.buf)
-    A_indices = np.ndarray(shape=A_indices_shape, dtype=A_indices_dtype,
-                           buffer=A_indices_shm.buf)
-    A_indptr = np.ndarray(shape=A_indptr_shape, dtype=A_indptr_dtype,
-                          buffer=A_indptr_shm.buf)
+    # View the shared buffers as the original NumPy arrays.
+    A_data = np.ndarray(
+        shape=A_data_shape,
+        dtype=A_data_dtype,
+        buffer=A_data_shm.buf,
+    )
+    A_indices = np.ndarray(
+        shape=A_indices_shape,
+        dtype=A_indices_dtype,
+        buffer=A_indices_shm.buf,
+    )
+    A_indptr = np.ndarray(
+        shape=A_indptr_shape,
+        dtype=A_indptr_dtype,
+        buffer=A_indptr_shm.buf,
+    )
 
-    # Create the sparse array
+    # Rebuild the sparse CSC array without copying the shared data.
     A = csc_array((A_data, A_indices, A_indptr), shape=A_shape, copy=False)
 
-    # Combine the shared memories into one tuple
+    # Return the reconstructed matrix together with the live handles.
     A_shm = (A_data_shm, A_indices_shm, A_indptr_shm)
-
     return A, A_shm
 
-def isvector(v: csc_array | np.ndarray, ord: str = "col") -> bool:
+
+def isvector(v: np.ndarray | csc_array, ord: str="col") -> bool:
     """
-    Checks if the given array is a vector.
+    Determine whether a two-dimensional array is a row or column vector.
 
     Parameters
     ----------
-    v : csc_array or ndarray
-        Array to be checked. Must be two-dimensional.
-    ord : str
-        Can be either "col" or "row".
+    v : ndarray or csc_array
+        Array to inspect. The input must be two-dimensional.
+    ord : str, default="col"
+        Vector orientation to test. Accepted values are "col" and "row".
 
     Returns
     -------
     bool
-        True if the array is a vector.
+        True if the requested vector condition is satisfied.
+
+    Raises
+    ------
+    ValueError
+        Raised if the input is not two-dimensional or if `ord` is invalid.
     """
 
-    # Check whether the array is two-dimensional
+    # Require a matrix-shaped input so that row and column vectors can be
+    # distinguished unambiguously.
     if len(v.shape) != 2:
         raise ValueError("Input array must be two-dimensional.")
 
-    # Determine whether to check for row or column vector
+    # Select the axis that must have unit length.
     if ord == "col":
-        i = 1
-    elif ord == "row":
-        i = 0
-    else:
-        raise ValueError(f"Invalid value for ord: {ord}")
-
-    # Check whether the array is a vector
-    return v.shape[i] == 1
-
-def norm_1(A: csc_array | np.ndarray, ord: str = 'row') -> float:
-    """
-    Calculates the 1-norm of a matrix.
-
-    Parameters
-    ----------
-    A : csc_array or ndarray
-        Array for which the norm is calculated.
-    ord : str, default='row'
-        Either 'row' or 'col', specifying the direction for the 1-norm
-        calculation.
-
-    Returns
-    -------
-    norm_1 : float
-        1-norm of the given array `A`.
-    """
-
-    # Process either row- or column-wise
-    if ord == 'row':
         axis = 1
-    elif ord == 'col':
+    elif ord == "row":
         axis = 0
     else:
         raise ValueError(f"Invalid value for ord: {ord}")
 
-    # Calculate sums along rows or columns and get the maximum of them
-    return abs(A).sum(axis).max()
+    # Test whether the requested dimension is unity.
+    return v.shape[axis] == 1
 
-def expm(A: np.ndarray | csc_array,
-         zero_value: float) -> np.ndarray | csc_array:
+
+def norm_1(A: np.ndarray | csc_array, ord: str="row") -> float:
     """
-    Calculates the matrix exponential of a SciPy sparse CSC array using the
-    scaling and squaring method with the Taylor series, shown to be the fastest
-    method in:
-
-    https://doi.org/10.1016/j.jmr.2010.12.004
-
-    This function uses a custom dot product implementation, which is more
-    memory-efficient and parallelized.
+    Calculate the row-wise or column-wise matrix 1-norm.
 
     Parameters
     ----------
     A : ndarray or csc_array
-        Array to be exponentiated.
+        Array for which the norm is evaluated.
+    ord : str, default="row"
+        Direction of the reduction. Accepted values are "row" and "col".
+
+    Returns
+    -------
+    norm_1 : float
+        Maximum absolute row sum or column sum of `A`.
+
+    Raises
+    ------
+    ValueError
+        Raised if `ord` is neither "row" nor "col".
+    """
+
+    # Select the reduction axis according to the requested orientation.
+    if ord == "row":
+        axis = 1
+    elif ord == "col":
+        axis = 0
+    else:
+        raise ValueError(f"Invalid value for ord: {ord}")
+
+    # Sum the absolute values along the requested axis and keep the largest
+    # entry.
+    return np.abs(A).sum(axis).max()
+
+
+def expm(
+    A: np.ndarray | csc_array,
+    zero_value: float,
+) -> np.ndarray | csc_array:
+    """
+    Evaluate the matrix exponential with scaling, squaring, and Taylor series.
+
+    The implementation follows the approach benchmarked in
+    https://doi.org/10.1016/j.jmr.2010.12.004 and uses the custom sparse
+    matrix product, which is parallelised.
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        Matrix to exponentiate.
     zero_value : float
-        Values below this threshold are considered zero. Used to increase the
-        sparsity of the result and estimate the convergence of the Taylor
-        series.
+        Values below this are dropped during each step in the Taylor series
+        expansion as well as in the squaring step.
 
     Returns
     -------
@@ -218,110 +253,113 @@ def expm(A: np.ndarray | csc_array,
 
     status("Calculating the matrix exponential...")
 
-    # Calculate the norm of A
-    norm_A = norm_1(A, ord='col')
+    # Estimate the matrix magnitude to decide whether scaling is required.
+    norm_A = norm_1(A, ord="col")
 
-    # If the norm of the matrix is too large, scale the matrix down
+    # Scale large matrices before the Taylor expansion and undo the scaling by
+    # repeated squaring afterwards.
     if norm_A > 1:
 
         # Calculate the scaling factor for the matrix
         scaling_count = int(math.ceil(math.log2(norm_A)))
-        scaling_factor = 2 ** scaling_count
+        scaling_factor = 2**scaling_count
 
-        status(f"Scaling the matrix down {scaling_count} times.")
-
-        # Scale the matrix down
+        # Divide the matrix by the scaling factor to improve Taylor convergence.
+        status(
+            f"Using scaling and squaring: "
+            f"scaling factor: {scaling_factor}, "
+            f"squarings: {scaling_count}..."
+        )
         A = A / scaling_factor
 
-        # Calculate the expm of the scaled matrix using the Taylor series
+        # Compute the matrix exponential of the scaled matrix using Taylor
+        # series.
         expm_A = expm_taylor(A, zero_value)
 
-        # Scale the matrix exponential back up by repeated squaring
-        for i in range(scaling_count):
-            status(f"Squaring the matrix. Step {i+1} of {scaling_count}.")
+        # Apply repeated squaring to undo the scaling:
+        # exp(A) = [exp(A/2^n)]^(2^n).
+        status(f"Matrix squaring...")
+        for step in range(scaling_count):
+            status(f"Step {step + 1} of {scaling_count}...")
             expm_A = custom_dot(expm_A, expm_A, zero_value)
-    
-    # If the norm of the matrix is small, proceed without scaling
     else:
+        # For small matrices, compute the exponential directly without scaling.
         expm_A = expm_taylor(A, zero_value)
 
-    status("Matrix exponential completed.")
-
+    status("Matrix exponential computed.")
     return expm_A
 
-def expm_taylor(A: np.ndarray | csc_array,
-                zero_value: float) -> np.ndarray | csc_array:
-    """
-    Computes the matrix exponential using the Taylor series. This function is 
-    adapted from an older SciPy version.
 
-    It uses a custom dot product implementation, which is more memory-efficient 
-    and parallelized.
+def expm_taylor(
+    A: np.ndarray | csc_array,
+    zero_value: float,
+) -> np.ndarray | csc_array:
+    """
+    Evaluate the matrix exponential by direct Taylor summation.
+
+    The routine is adapted from an older SciPy implementation and uses the
+    custom sparse dot product to reduce memory consumption for CSC matrices.
 
     Parameters
     ----------
     A : ndarray or csc_array
-        Matrix (N, N) to be exponentiated.
+        Square matrix to exponentiate.
     zero_value : float
-        Values below this threshold are considered zero. Used to increase
-        sparsity and check the convergence of the series.
+        Threshold used when pruning numerically negligible values.
 
     Returns
     -------
     eA : ndarray or csc_array
-        Matrix exponential of A.
+        Matrix exponential of `A`.
     """
 
-    status("Calculating the matrix exponential using Taylor series.")
+    status("Taylor series...")
 
-    # Increase sparsity of A
+    # Remove entries that are already below the effective numerical threshold.
     eliminate_small(A, zero_value)
-    
-    # Create a unit matrix for the first term
-    eA = eye_array(A.shape[0], A.shape[0], dtype=complex, format='csc')
 
-    # Make a copy for the terms
+    # Start from the identity term of the Taylor series.
+    eA = eye_array(A.shape[0], A.shape[0], dtype=complex, format="csc")
     trm = eA.copy()
 
-    # Calculate new terms until their significance becomes negligible
+    # Accumulate higher-order terms until the current contribution vanishes.
     k = 1
     cont = True
     while cont:
+        status(f"Term {k}...")
 
-        status(f"Taylor series term: {k}")
-
-        # Get the next term
+        # Form the next Taylor term and add it to the running sum.
         trm = custom_dot(trm, A / k, zero_value)
-
-        # Add the term to the result
         eA += trm
-
-        # Increment the counter
         k += 1
 
-        # Continue if the convergence criterion is not met
-        if issparse(A):
-            cont = (trm.nnz != 0)
+        # Continue until the newly generated term is exactly zero after the
+        # thresholding step.
+        if issparse(trm):
+            cont = trm.nnz != 0
         else:
-            cont = (np.count_nonzero(trm) != 0)
+            cont = np.count_nonzero(trm) != 0
 
     status("Taylor series converged.")
-
     return eA
 
-def eliminate_small(A: np.ndarray | csc_array, zero_value: float):
+
+def eliminate_small(
+    A: np.ndarray | csc_array,
+    zero_value: float,
+) -> None:
     """
-    Eliminates small values from the input matrix `A` by replacing values
-    smaller than `zero_value` with zeros. Modification happens inplace.
+    Set numerically small matrix elements to zero in place.
 
     Parameters
     ----------
     A : ndarray or csc_array
-        Array to be modified.
+        Array to modify in place.
     zero_value : float
-        Values smaller than this threshold are set to zero.
+        Absolute threshold below which values are replaced by zero.
     """
-    # Identify values smaller than the threshold and set them to zero
+
+    # Apply the threshold either to sparse data values or to a dense array.
     if issparse(A):
         nonzero_mask = np.abs(A.data) < zero_value
         A.data[nonzero_mask] = 0
@@ -330,84 +368,111 @@ def eliminate_small(A: np.ndarray | csc_array, zero_value: float):
         nonzero_mask = np.abs(A) < zero_value
         A[nonzero_mask] = 0
 
+
 def sparse_to_bytes(A: csc_array) -> bytes:
     """
-    Converts the given SciPy sparse array into a byte representation.
+    Serialise a sparse array into a byte string.
 
     Parameters
     ----------
     A : csc_array
-        Sparse matrix to be converted into bytes.
+        Sparse matrix to serialise.
 
     Returns
     -------
     A_bytes : bytes
         Byte representation of the input matrix.
     """
-    
-    # Initialize a BytesIO object
-    bytes_io = BytesIO()
 
-    # Write the matrix A to bytes
+    # Write the sparse matrix into an in-memory byte buffer.
+    bytes_io = BytesIO()
     mmwrite(bytes_io, A)
 
-    # Retrieve the bytes
+    # Extract the raw bytes from the buffer.
     A_bytes = bytes_io.getvalue()
-
     return A_bytes
+
 
 def bytes_to_sparse(A_bytes: bytes) -> csc_array:
     """
-    Converts a byte representation back to a SciPy sparse array.
+    Reconstruct a sparse array from a byte string.
 
     Parameters
     ----------
     A_bytes : bytes
-        Byte representation of a SciPy sparse array.
+        Byte representation of a sparse array.
 
     Returns
     -------
     A : csc_array
-        Sparse array reconstructed from the byte representation.
+        Sparse array reconstructed from `A_bytes`.
     """
 
-    # Initialize a BytesIO object
+    # Wrap the raw bytes in an in-memory stream for SciPy.
     bytes_io = BytesIO(A_bytes)
 
-    # Read the SciPy sparse array from bytes
-    A = mmread(bytes_io)
-
+    # Read the sparse matrix from the byte representation.
+    A = mmread(bytes_io).tocsc()
     return A
 
-def comm(A: csc_array | np.ndarray,
-         B: csc_array | np.ndarray) -> csc_array | np.ndarray:
+
+def comm(
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+) -> np.ndarray | csc_array:
     """
-    Calculates the commutator [A, B] of two operators.
+    Calculate the commutator [A, B] = AB - BA
+    of two operators.
 
     Parameters
     ----------
-    A : csc_array or ndarray
+    A : ndarray or csc_array
         First operator.
-    B : csc_array or ndarray
+    B : ndarray or csc_array
         Second operator.
 
     Returns
     -------
-    C : csc_array or ndarray
-        Commutator [A, B].
+    C : ndarray or csc_array
+        Commutator of the two operators.
     """
 
-    # Compute the commutator
-    C = A @ B - B @ A
+    # Evaluate the commutator directly from the matrix products.
+    return A @ B - B @ A
 
-    return C
-
-def find_common_rows(A: np.ndarray,
-                     B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def anti_comm(
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+) -> np.ndarray | csc_array:
     """
-    Identifies the indices of common rows between two arrays, `A` and `B`.
-    Each row must appear only once in the arrays and they must be sorted
-    in lexicographical order.
+    Calculate the anti-commutator {A, B} = AB + BA
+    of two operators.
+
+    Parameters
+    ----------
+    A : ndarray or csc_array
+        First operator.
+    B : ndarray or csc_array
+        Second operator.
+
+    Returns
+    -------
+    C : ndarray or csc_array
+        Anti-commutator of the two operators.
+    """
+
+    # Evaluate the anti-commutator directly from the matrix products.
+    return A @ B + B @ A
+
+
+def find_common_rows(
+    A: np.ndarray,
+    B: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Find matching lexicographically sorted rows in two arrays.
+
+    Each row must appear at most once in each input array.
 
     Parameters
     ----------
@@ -419,44 +484,43 @@ def find_common_rows(A: np.ndarray,
     Returns
     -------
     A_ind : ndarray
-        Indices of the common rows in array `A`.
+        Indices of common rows in `A`.
     B_ind : ndarray
-        Indices of the common rows in array `B`.
+        Indices of common rows in `B`.
     """
 
-    # Handle special case where both arrays are empty
+    # Handle the degenerate case of arrays with zero columns.
     if A.shape[1] == 0 and B.shape[1] == 0:
         A_ind = np.array([0])
         B_ind = np.array([0])
         return A_ind, B_ind
-    
-    # Get the row length ensuring the correct data type
+
+    # Record the row length and flatten the arrays for the low-level helper.
     row_length = np.longlong(A.shape[1])
-    
-    # Convert the arrays to 1D
     A = A.ravel()
     B = B.ravel()
 
-    # Ensure that the data types are correct
+    # Convert the data explicitly to the integer type expected by the helper.
     A = A.astype(np.longlong)
     B = B.astype(np.longlong)
 
-    # Find the common indices
+    # Recover the matching row indices in both arrays.
     A_ind, B_ind = intersect_indices(A, B, row_length)
-
     return A_ind, B_ind
 
-def auxiliary_matrix_expm(A: np.ndarray | csc_array,
-                          B: np.ndarray | csc_array,
-                          C: np.ndarray | csc_array,
-                          t: float,
-                          zero_value: float) -> csc_array:   
+
+def auxiliary_matrix_expm(
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+    C: np.ndarray | csc_array,
+    t: float,
+    zero_value: float,
+) -> np.ndarray | csc_array:
     """
-    Computes the matrix exponential of an auxiliary matrix. This is used to 
-    calculate the Redfield integral.
+    Exponentiate the auxiliary matrix used in the Redfield integral.
 
     Based on Goodwin and Kuprov (Eq. 3): https://doi.org/10.1063/1.4928978
-    
+
     Parameters
     ----------
     A : ndarray or csc_array
@@ -468,43 +532,42 @@ def auxiliary_matrix_expm(A: np.ndarray | csc_array,
     t : float
         Integration time.
     zero_value : float
-        Threshold below which values are considered zero when exponentiating the
-        auxiliary matrix using the Taylor series. This significantly impacts
-        performance. Use the largest value that still provides correct results.
-    
+        Threshold used when pruning negligible values during exponentiation.
+
     Returns
     -------
     expm_aux : ndarray or csc_array
-        Matrix exponential of the auxiliary matrix. The output is sparse or
-        dense matching the sparsity of the input.
+        Matrix exponential of the auxiliary matrix.
+
+    Raises
+    ------
+    ValueError
+        Raised if the three blocks are not all sparse or all dense.
     """
 
-    # Ensure that the input arrays are all either sparse or dense
+    # Require a consistent matrix representation for all blocks.
     if not (issparse(A) == issparse(B) == issparse(C)):
-        raise ValueError(f"All arrays A, B and C must be of same type.")
+        raise ValueError("All arrays A, B and C must be of same type.")
 
-    # Are we using sparse?
-    sparse = issparse(A)
-
-    # Construct the auxiliary matrix
-    if sparse:
+    # Construct the block auxiliary matrix
+    if issparse(A):
         empty_array = csc_array(A.shape)
-        aux = block_array([[A, B],
-                        [empty_array, C]], format='csc')
+        aux = block_array([[A, B], [empty_array, C]], format="csc")
     else:
         empty_array = np.zeros(A.shape)
-        aux = np.block([[A, B],
-                        [empty_array, C]])
+        aux = np.block([[A, B], [empty_array, C]])
 
-    # Compute the matrix exponential of the auxiliary matrix
+    # Suppress status messages while exponentiating the enlarged auxiliary
+    # matrix.
     with HidePrints():
         expm_aux = expm(aux * t, zero_value)
 
     return expm_aux
 
+
 def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
     """
-    Computes the angle between two vectors in radians.
+    Compute the angle between two vectors in radians.
 
     Parameters
     ----------
@@ -516,78 +579,85 @@ def angle_between_vectors(v1: np.ndarray, v2: np.ndarray) -> float:
     Returns
     -------
     theta : float
-        Angle between the vectors in radians.
+        Angle between `v1` and `v2` in radians.
     """
 
-    # Handle the case where the vectors are identical
+    # Return the exact zero angle for identical vectors.
     if np.array_equal(v1, v2):
         theta = 0
     else:
         theta = np.arccos(
-            np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
+            np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+        )
 
     return theta
 
-def rotation_matrix_to_align_axes(axes1: np.ndarray,
-                                  axes2: np.ndarray) -> np.ndarray:
+
+def rotation_matrix_to_align_axes(
+    axes1: np.ndarray,
+    axes2: np.ndarray,
+) -> np.ndarray:
     """
-    Computes the rotation matrix that aligns `axes1` to `axes2`.
+    Compute the rotation matrix that aligns one set of axes with another.
 
     Parameters
     ----------
     axes1 : ndarray
-        Initial coordinate system represented as a 3x3 matrix, where rows
-        are the basis vectors.
+        Initial coordinate system as a 3x3 matrix with basis vectors as rows.
     axes2 : ndarray
-        Target coordinate system represented as a 3x3 matrix, where rows
-        are the basis vectors.
+        Target coordinate system as a 3x3 matrix with basis vectors as rows.
 
     Returns
     -------
     R : ndarray
-        Rotation matrix that aligns `axes1` to `axes2`.
+        Rotation matrix that maps `axes1` onto `axes2`.
     """
-    # Compute the rotation matrix using scipy
-    rotation = Rotation.align_vectors(axes2, axes1)[0]
 
+    # Determine the best-fit rotation between the two ordered sets of axes.
+    rotation, _ = Rotation.align_vectors(axes2, axes1)
     return rotation.as_matrix()
 
-def Wigner_D_matrix(rotation_matrix: np.ndarray,
-                    j: int) -> np.ndarray:
+
+def Wigner_D_matrix(
+    rotation_matrix: np.ndarray,
+    j: int,
+) -> np.ndarray:
     """
-    Computes the Wigner D-matrix for a given rotation matrix and angular
-    momentum quantum number `j`.
+    Compute the Wigner D-matrix associated with a rotation.
 
     Parameters
     ----------
     rotation_matrix : ndarray
-        Rotation matrix (3x3).
+        3x3 rotation matrix.
     j : int
-        Angular momentum quantum number.
+        Angular-momentum quantum number.
 
     Returns
     -------
     D : ndarray
-        Wigner D-matrix of size (2j+1, 2j+1).
+        Complex Wigner D-matrix of shape (2j + 1, 2j + 1).
     """
-    # Convert the rotation matrix to a scipy Rotation object
-    rotation = Rotation.from_matrix(rotation_matrix)
-    
-    # Get the Euler angles from the rotation (SymPy uses ZYZ convention)
-    alpha, beta, gamma = rotation.as_euler('ZYZ', degrees=False)
 
-    # Get the Wigner D-matrix using the Euler angles and sympy
+    # Convert the Cartesian rotation matrix to Euler angles in the ZYZ
+    # convention expected by SymPy wigner_d. 
+    rotation = Rotation.from_matrix(rotation_matrix)
+    alpha, beta, gamma = rotation.as_euler("ZYZ", degrees=False)
+
+    # Evaluate the symbolic Wigner D-matrix and cast it to a NumPy array.
     D = wigner_d(j, alpha, beta, gamma)
     return np.array(D).astype(np.complex128)
 
-def decompose_matrix(matrix: np.ndarray) \
-    -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Decomposes a matrix into three components:
 
-    - Isotropic part.
-    - Antisymmetric part.
-    - Symmetric traceless part.
+def decompose_matrix(
+    matrix: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Decompose a matrix into isotropic, antisymmetric, and traceless parts:
+
+    - Isotropic: Tr(M) / dim(M) * I
+    - Antisymmetric: (M - M.T) / 2
+    - Symmetric traceless: (M + M.T) / 2 - Isotropic
+
 
     Parameters
     ----------
@@ -597,69 +667,67 @@ def decompose_matrix(matrix: np.ndarray) \
     Returns
     -------
     isotropic : ndarray
-        Isotropic part of the input matrix.
+        Isotropic contribution to `matrix`.
     antisymmetric : ndarray
-        Antisymmetric part of the input matrix.
+        Antisymmetric contribution to `matrix`.
     symmetric_traceless : ndarray
-        Symmetric traceless part of the input matrix.
+        Symmetric traceless contribution to `matrix`.
     """
 
-    # Compute the isotropic, antisymmetric, and symmetric traceless parts
+    # Separate the trace contribution from the symmetric and antisymmetric
+    # components.
     isotropic = np.trace(matrix) * np.eye(matrix.shape[0]) / matrix.shape[0]
     antisymmetric = (matrix - matrix.T) / 2
     symmetric_traceless = (matrix + matrix.T) / 2 - isotropic
-    
     return isotropic, antisymmetric, symmetric_traceless
 
-def principal_axis_system(tensor: np.ndarray) \
-    -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+
+def principal_axis_system(
+    tensor: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Determines the principal axis system (PAS) of a Cartesian tensor
-    and transforms the tensor into the PAS.
+    Transform a Cartesian tensor into its principal-axis system.
 
-    The PAS is defined as the coordinate system that diagonalizes
-    the symmetric traceless part of the tensor.
-
-    The eigenvalues are ordered as `(|largest|, |middle|, |smallest|)`.
+    The principal-axis system is defined by diagonalising the symmetric
+    traceless part of the tensor. The eigenvalues are ordered by decreasing
+    absolute value.
 
     Parameters
     ----------
-    tensor : np.ndarray
+    tensor : ndarray
         Cartesian tensor to transform.
 
     Returns
     -------
     eigenvalues : ndarray
-        Eigenvalues of the tensor in the PAS.
+        Eigenvalues in the principal-axis system.
     eigenvectors : ndarray
-        Two-dimensional array where rows contain the eigenvectors of the PAS.
+        Row-wise eigenvectors defining the principal axes.
     tensor_PAS : ndarray
-        Tensor transformed into the PAS.
+        Tensor transformed into the principal-axis system.
     """
 
-    # Extract the symmetric traceless part of the tensor
+    # Extract the symmetric traceless contribution that defines the PAS.
     _, _, symmetric_traceless = decompose_matrix(tensor)
 
-    # Diagonalize the symmetric traceless part
+    # Diagonalise the defining tensor and sort the eigenpairs consistently.
     eigenvalues, eigenvectors = np.linalg.eig(symmetric_traceless)
-
-    # Sort eigenvalues and eigenvectors by the absolute value of eigenvalues
     idx = np.argsort(np.abs(eigenvalues))[::-1]
     eigenvalues = eigenvalues[idx]
     eigenvectors = eigenvectors[:, idx].T
 
-    # Transform the tensor into the principal axis system
+    # Transform the full tensor into the principal-axis basis.
     tensor_PAS = eigenvectors @ tensor @ np.linalg.inv(eigenvectors)
-
     return eigenvalues, eigenvectors, tensor_PAS
+
 
 def cartesian_tensor_to_spherical_tensor(C: np.ndarray) -> dict:
     """
-    Converts a rank-2 Cartesian tensor to a spherical tensor.
+    Convert a rank-2 Cartesian tensor to irreducible
+    spherical-tensor components.
 
-    Uses the double outer product (DOP) convention from:
-    Eqs. 293-298 in Man: Cartesian and Spherical Tensors in NMR Hamiltonians
-    https://doi.org/10.1002/cmr.a.21289
+    The implementation follows the double outer-product convention from
+    Eqs. 293--298 of Man, https://doi.org/10.1002/cmr.a.21289.
 
     Parameters
     ----------
@@ -669,16 +737,16 @@ def cartesian_tensor_to_spherical_tensor(C: np.ndarray) -> dict:
     Returns
     -------
     spherical_tensor : dict
-        Keys specify the rank and the projection (l, q), and the values
-        are the components.
+        Dictionary whose keys are `(l, q)` and whose values are the 
+        irreducible spherical tensor components.
     """
 
-    # Extract the Cartesian components
+    # Read out the Cartesian tensor elements once for compact formulas.
     C_xx, C_xy, C_xz = C[0, :]
     C_yx, C_yy, C_yz = C[1, :]
     C_zx, C_zy, C_zz = C[2, :]
-    
-    # Build the spherical tensor components
+
+    # Assemble the irreducible spherical tensor components.
     spherical_tensor = {
         (0, 0): -1 / math.sqrt(3) * (C_xx + C_yy + C_zz),
         (1, 0): -1j / math.sqrt(2) * (C_xy - C_yx),
@@ -688,46 +756,52 @@ def cartesian_tensor_to_spherical_tensor(C: np.ndarray) -> dict:
         (2, 1): -1 / 2 * (C_xz + C_zx + 1j * (C_yz + C_zy)),
         (2, -1): 1 / 2 * (C_xz + C_zx - 1j * (C_yz + C_zy)),
         (2, 2): 1 / 2 * (C_xx - C_yy + 1j * (C_xy + C_yx)),
-        (2, -2): 1 / 2 * (C_xx - C_yy - 1j * (C_xy + C_yx))
+        (2, -2): 1 / 2 * (C_xx - C_yy - 1j * (C_xy + C_yx)),
     }
-    
     return spherical_tensor
+
 
 def vector_to_spherical_tensor(vector: np.ndarray) -> dict:
     """
-    Converts a Cartesian vector to a spherical tensor of rank 1.
+    Convert a Cartesian vector to a rank-1 irreducible spherical tensor
+    components.
 
-    Uses the covariant components.
-    Eq. 230 in Man: Cartesian and Spherical Tensors in NMR Hamiltonians
-    https://doi.org/10.1002/cmr.a.21289
+    The covariant-component convention follows Eq. 230 of Man,
+    https://doi.org/10.1002/cmr.a.21289.
 
     Parameters
     ----------
     vector : ndarray
-        Vector in the format [x, y, z].
+        Cartesian vector in the order [x, y, z].
 
     Returns
     -------
     spherical_tensor : dict
-        Keys specify the rank and the projection (l, q), and the values
-        are the components.   
+        Dictionary whose keys are `(l, q)` and whose values are the 
+        irreducible spherical tensor components.
     """
 
-    # Build the spherical tensor
+    # Assemble the irreducible spherical rank-1 components.
     spherical_tensor = {
         (1, 1): -1 / math.sqrt(2) * (vector[0] + 1j * vector[1]),
         (1, 0): vector[2],
-        (1, -1): 1 / math.sqrt(2) * (vector[0] - 1j * vector[1])
+        (1, -1): 1 / math.sqrt(2) * (vector[0] - 1j * vector[1]),
     }
-
     return spherical_tensor
 
+
 @lru_cache(maxsize=32784)
-def CG_coeff(j1: float, m1: float,
-             j2: float, m2: float,
-             j3: float, m3: float) -> float:
+def CG_coeff(
+    j1: float,
+    m1: float,
+    j2: float,
+    m2: float,
+    j3: float,
+    m3: float,
+) -> float:
     """
-    Computes the Clebsch-Gordan coefficients.
+    Compute a Clebsch-Gordan coefficient using SymPy's symbolic
+    implementation.
 
     Parameters
     ----------
@@ -751,211 +825,215 @@ def CG_coeff(j1: float, m1: float,
     """
 
     # Get the coefficient
-    coeff = float(CG(j1, m1, j2, m2, j3, m3).doit())
+    return float(CG(j1, m1, j2, m2, j3, m3).doit())
 
-    return coeff
 
 def custom_dot(
-        A: np.ndarray | csc_array,
-        B: np.ndarray | csc_array,
-        zero_value: float
-) -> csc_array:
+    A: np.ndarray | csc_array,
+    B: np.ndarray | csc_array,
+    zero_value: float,
+) -> np.ndarray | csc_array:
     """
-    User-friendly wrapper for the custom sparse matrix multiplication, which
-    saves memory usage by dropping values smaller than `zero_value` during the
-    calculation. The sparse multiplication is implemented with C++ / Cython and
-    is parallelized with OpenMP.
+    Multiply two arrays using the sparse-optimised backend when possible.
 
-    NOTE: If either of the input arrays is NumPy array, this function falls
-    back to the regular `@` multiplication.
+    Values smaller than `zero_value` are discarded from the result. If either
+    operand is dense, the function falls back to the regular matrix product.
 
     Parameters
     ----------
     A : ndarray or csc_array
-        First matrix in the multiplication.
+        Left matrix in the multiplication.
     B : ndarray or csc_array
-        Second matrix in the multiplication.
+        Right matrix in the multiplication.
     zero_value : float
-        Threshold under which the resulting matrix elements are considered as
-        zero.
+        Threshold below which matrix elements are treated as zero.
 
     Returns
     -------
     C : ndarray or csc_array
-        Result of matrix multiplication.
+        Matrix product `A @ B`.
     """
-    # Check input types
+
+    # Fall back to dense multiplication whenever a dense operand is present.
     if isinstance(A, np.ndarray) or isinstance(B, np.ndarray):
         C = A @ B
         eliminate_small(C, zero_value)
-    elif issparse(A) and issparse(B):
+
+    # Route sparse CSC products through the custom low-level implementation.
+    else:
         A = A.tocsc()
         B = B.tocsc()
         C = _sparse_dot(A, B, zero_value)
-    else:
-        raise ValueError("Invalid input type for custom dot.")
 
     return C
 
+
 def arraylike_to_tuple(A: ArrayLike) -> tuple:
     """
-    Converts a 1-dimensional `ArrayLike` object into a Python tuple.
+    Convert a zero- or one-dimensional array-like object to a Python tuple.
 
     Parameters
     ----------
     A : ArrayLike
-        An object that can be converted into NumPy array.
+        Object that can be converted to a NumPy array.
 
     Returns
     -------
     A : tuple
-        The original object represented as Python tuple.
+        Tuple representation of the input.
+
+    Raises
+    ------
+    ValueError
+        Raised if the input has more than one dimension.
     """
 
-    # Convert to tuple
+    # Convert the input to a NumPy array for dimensionality inspection.
     A = np.asarray(A)
+
+    # Return a length-one tuple for scalars and a direct tuple conversion for
+    # one-dimensional arrays.
     if A.ndim == 0:
-        A = tuple([A.item()])
+        A = (A.item(),)
     elif A.ndim == 1:
         A = tuple(A)
     else:
-        raise ValueError(f"Cannot convert {A.ndim}-dimensional array into "
-                         "tuple.")
-    
+        raise ValueError(
+            f"Cannot convert {A.ndim}-dimensional array into tuple."
+        )
+
     return A
+
 
 def arraylike_to_array(A: ArrayLike) -> np.ndarray:
     """
-    Converts an `ArrayLike` object into a NumPy array while ensuring
-    that at least one dimension is created.
+    Convert an array-like object to a NumPy array with at least one dimension.
 
     Parameters
     ----------
     A : ArrayLike
-        An object that can be converted into NumPy array.
+        Object that can be converted to a NumPy array.
 
     Returns
     -------
     A : ndarray
-        The original object converted into a NumPy array.
+        NumPy representation of the input with `ndim >= 1`.
     """
 
-    # Convert to NumPy array and ensure at least one dimension
+    # Convert the input and promote scalars to one-dimensional arrays.
     A = np.asarray(A)
     A = np.atleast_1d(A)
-
     return A
+
 
 def expm_vec_taylor(
     A: np.ndarray | csc_array,
     v: np.ndarray | csc_array,
-    zero_value: float
+    zero_value: float,
 ) -> np.ndarray | csc_array:
     """
-    Computes the action of the matrix exponential of `A` on the vector `v`,
-    i.e., `expm(A) @ v` using the Taylor series.
+    Apply the matrix exponential to a vector by Taylor summation.
+
+    NOTE: Status messages are suppressed in this routine since
+    it is called repeatedly by `expm_vec`.
 
     Parameters
     ----------
     A : ndarray or csc_array
-        Square matrix (N, N).
+        Square matrix of shape (N, N).
     v : ndarray or csc_array
-        Column vector (N, 1).
+        Column vector of shape (N, 1).
     zero_value : float
-        Used to estimate the convergence of the Taylor series.
+        Threshold used when testing convergence of the Taylor series.
 
     Returns
     -------
     eAv : ndarray or csc_array
-        Result of `expm(A) @ v`. Returns a sparse CSC array only when both input
-        arrays are sparse.
+        Result of `expm(A) @ v`.
     """
-    # First term (k = 0)
+
+    # Start from the zeroth-order Taylor contribution.
     trm = v
     eAv = trm
 
-    # Calculate higher order terms until they converge to zero
+    # Add higher-order terms until the thresholded term vanishes.
     k = 1
     cont = True
     while cont:
 
-        # Get the current term
+        # Form the next Taylor term and add it to the running sum.
+        # Eliminate small values on the fly.
         trm = A @ (trm / k)
-
-        # Set very small values to zero
         eliminate_small(trm, zero_value)
-
-        # Add the term to the result
         eAv = eAv + trm
-
-        # Increment the counter
         k += 1
 
-        # Continue if the convergence criterion is not met
+        # Continue until the newly generated term is exactly zero after the
+        # thresholding step.
         if issparse(trm):
-            cont = (trm.nnz != 0)
+            cont = trm.nnz != 0
         else:
-            cont = (np.count_nonzero(trm) != 0)
+            cont = np.count_nonzero(trm) != 0
 
     return eAv
+
 
 def expm_vec(
     A: np.ndarray | csc_array,
     v: np.ndarray | csc_array,
-    zero_value: float
+    zero_value: float,
 ) -> np.ndarray | csc_array:
     """
-    Computes the action of the matrix exponential of `A` on the vector `v`,
-    i.e., `expm(A) @ v` using the Taylor series combined with the scaling of the
-    input matrix `A`.
+    Apply the matrix exponential to a vector with matrix scaling.
 
     Parameters
     ----------
     A : ndarray or csc_array
-        Square matrix (N, N).
+        Square matrix of shape (N, N).
     v : ndarray or csc_array
-        Column vector (N, 1).
+        Column vector of shape (N, 1).
     zero_value : float
-        Used to estimate the convergence of the Taylor series.
+        Threshold used when testing convergence of the Taylor series.
 
     Returns
     -------
     eAv : ndarray or csc_array
-        Result of `expm(A) @ v`. Returns a sparse CSC array only when both input
-        arrays are sparse.
+        Result of `expm(A) @ v`.
     """
     status("Calculating the action of matrix exponential on a vector...")
 
-    # Calculate the norm of A
-    norm_A = norm_1(A, ord='col')
-
-    # Calculate the scaling factor for the matrix
+    # Determine the matrix scaling factor from the column-wise 1-norm.
+    norm_A = norm_1(A, ord="col")
     scaling_A = int(math.ceil(norm_A))
 
-    # Scale the matrix
-    status(f"Scaling the matrix by {scaling_A}.")
+    # Scale the matrix before repeated Taylor applications.
+    status(f"Scaling the matrix down by {scaling_A}...")
     A = A / scaling_A
 
-    # Calculate a scaling factor for the zero value
-    scaling_zv = abs(v).max()
-
-    # Scale the zero-value
-    status(f"Scaling the zero-value by {scaling_zv}.")
+    # Scale the convergence threshold relative to the largest vector element.
+    scaling_zv = np.abs(v).max()
     zero_value = zero_value / scaling_zv
 
-    # Initialise the result
+    # Repeatedly apply the Taylor propagator for the scaled matrix.
+    status("Taylor series...")
     eAv = v
-
-    # Calculate the expm*vec using the scaled matrix
-    for i in range(scaling_A):
-        status(f"Calculating expm(A)*vec. Step {i+1} of {scaling_A}.")
+    for step in range(scaling_A):
+        status(f"Step {step + 1} of {scaling_A}...")
         eAv = expm_vec_taylor(A, eAv, zero_value)
 
+    status("Taylor series converged. "
+           "Matrix exponential applied to a vector computed.")
     return eAv
 
-def clear_cache_CG_coeff():
+
+def clear_cache_CG_coeff() -> None:
     """
-    Clears the cache of the `CG_coeff` function.
+    Clear the memoisation cache used by `CG_coeff`.
+
+    Returns
+    -------
+    None
     """
-    # Clear the cache
+
+    # Reset the cached symbolic Clebsch-Gordan evaluations.
     CG_coeff.cache_clear()

@@ -1,14 +1,18 @@
 """
-Spinguin package is desined to be imported as `import spinguin as sg`, which
-reveals the main functionality of the package to the user in a user-friendly
-manner. For example, to create a SpinSystem object with one 1H nucleus, the user
-should::
+Public package namespace for Spinguin.
+
+Spinguin is intended to be imported as ``import spinguin as sg`` so that the
+main simulation functionality is available directly under the package
+namespace. For example, a one-spin system may be created as follows::
 
     import spinguin as sg
     spin_system = sg.SpinSystem(["1H"])
+
+The package also re-exports the ready-to-use pulse-sequence namespace as
+``sg.sequences``.
 """
 
-# Make the core functionality directly available under the spinguin namespace
+# Re-export the public core functionality under the package namespace.
 from spinguin._core import (
     # cache
     clear_cache,
@@ -25,7 +29,9 @@ from spinguin._core import (
     liouvillian,
 
     # nmr_isotopes
+    atomic_mass,
     gamma,
+    natural_abundance,
     quadrupole_moment,
     spin,
 
@@ -90,8 +96,11 @@ from spinguin._core import (
     idx_to_lq,
     lq_to_idx,
 )
-from spinguin import sequences
 
+# Re-export the ready-to-use pulse-sequence namespace.
+from . import sequences
+
+# Define the public package interface for star imports and documentation.
 __all__ = [
     # core: cache
     "clear_cache",
@@ -111,7 +120,9 @@ __all__ = [
     "Molecule",
 
     # core: nmr_isotopes
+    "atomic_mass",
     "gamma",
+    "natural_abundance",
     "quadrupole_moment",
     "spin",
 

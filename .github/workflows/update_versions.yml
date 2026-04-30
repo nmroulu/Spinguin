@@ -1,21 +1,25 @@
 name: update versions
 
 on:
-  # Run this workflow after the generation of documents completes successfully
+  # Run after the "documentation" workflow completes.
+  # The job itself is further restricted below to successful runs only.
   workflow_run:
     workflows: ["documentation"]
     types:
       - completed
 
-  # Allow the workflow to be run manually
+  # Allow manual execution from the Actions tab.
   workflow_dispatch:
 
 permissions:
+  # Required to commit and push updates to the gh-pages branch.
   contents: write
 
 jobs:
   update-versions:
     runs-on: ubuntu-latest
+    # Run automatically only when the triggering documentation workflow
+    # succeeds, or allow the job to run when started manually.
     if: >
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success') ||
@@ -26,6 +30,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Copy the update_versions.py script
+        # Preserve the script before switching branches in the next step.
         run: cp docs/source/update_versions.py /tmp/update_versions.py
 
       - name: Check out gh-pages branch
@@ -39,6 +44,7 @@ jobs:
           python-version: "3.11"
 
       - name: Generate version_switcher.json and index.html
+        # Create or update the version metadata and landing page content.
         run: python /tmp/update_versions.py
 
       - name: Deploy to GitHub pages

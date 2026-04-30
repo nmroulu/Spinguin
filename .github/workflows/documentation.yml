@@ -1,20 +1,28 @@
 name: documentation
 
 on:
+  # Allow the workflow to be started manually from the Actions tab.
   workflow_dispatch:
 
+# Grant permission to push generated documentation to the repository.
 permissions:
   contents: write
 
 jobs:
   docs:
+    # Run the documentation build on the latest Ubuntu runner.
     runs-on: ubuntu-latest
+
     steps:
+      # Check out the full repository history so tags are available.
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
+      # Choose the deployment folder:
+      # - use the tag name when running from a tag
+      # - otherwise publish to "latest"
       - name: Determine output folder
         id: vars
         run: |
@@ -25,21 +33,25 @@ jobs:
             echo "folder=latest" >> $GITHUB_OUTPUT
           fi
 
+      # Install Python for the documentation build.
       - name: Set-up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
+      # Install the package itself and the Sphinx dependencies.
       - name: Install dependencies
         run: |
           pip install -e .
           pip install sphinx sphinx_book_theme
 
+      # Build the HTML documentation with Sphinx.
       - name: Sphinx build
         run: |
           cd docs
           make html
 
+      # Deploy the generated HTML to GitHub Pages under the selected folder.
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:

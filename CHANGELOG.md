@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+- Re-write the documentation using AI.
+- Dynamic frequency shifts are included by default.
+- Antisymmetric part of CSA is included by default.
+- Thermalisation of the relaxation superoperator is applied by default.
+
 ## 0.1.1
 - Added quadrupolar moments to several isotopes.
 

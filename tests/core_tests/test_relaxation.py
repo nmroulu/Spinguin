@@ -201,6 +201,9 @@ class TestRelaxation(unittest.TestCase):
 
         # Define the relaxation theory
         ss.relaxation.theory = "redfield"
+        ss.relaxation.antisymmetric = False
+        ss.relaxation.dynamic_frequency_shift = False
+        ss.relaxation.thermalization = False
         ss.relaxation.tau_c = 50e-12
         
         # Get the Redfield relaxation superoperator
@@ -276,6 +279,9 @@ class TestRelaxation(unittest.TestCase):
         # Define the relaxation theory
         ss.relaxation.theory = "redfield"
         ss.relaxation.tau_c = 50e-12
+        ss.relaxation.thermalization = False
+        ss.relaxation.antisymmetric = False
+        ss.relaxation.dynamic_frequency_shift = False
 
         # Truncate the basis set to include only zero-quantum terms
         ss.basis.truncate_by_coherence([0])
@@ -342,6 +348,9 @@ class TestRelaxation(unittest.TestCase):
 
         # Define the relaxation theory
         ss.relaxation.theory = "redfield"
+        ss.relaxation.antisymmetric = False
+        ss.relaxation.dynamic_frequency_shift = False
+        ss.relaxation.thermalization = False
         
         # Obtain R using the isotropic rotational diffusion
         ss.relaxation.tau_c = 50e-12
@@ -378,6 +387,7 @@ class TestRelaxation(unittest.TestCase):
         
         # Define the relaxation theory
         ss.relaxation.theory = "phenomenological"
+        ss.relaxation.thermalization = False
         ss.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
         ss.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
 
@@ -432,6 +442,7 @@ class TestRelaxation(unittest.TestCase):
         # Define the relaxation theory
         ss.relaxation.theory = "phenomenological"
         ss.relaxation.sr2k = "true"
+        ss.relaxation.thermalization = False
         ss.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
         ss.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
         

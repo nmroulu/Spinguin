@@ -1,5 +1,8 @@
 """
-This is a subpackage of Spinguin that contains ready-to-use pulse sequences.
+Ready-to-use pulse-sequences in Spinguin.
+
+This package exposes the public sequence constructors that implement common
+NMR simulation workflows.
 """
 
 from ._inversion_recovery import inversion_recovery

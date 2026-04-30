@@ -3,33 +3,34 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# Add path to the package
+# Add the package source directory to the Python path.
 import os
 import sys
 import tomllib
+
 sys.path.insert(0, os.path.abspath('../../src'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Spinguin'
-copyright = '2025, Joni Eronen, Perttu Hilla'
+copyright = '2026, Joni Eronen, Perttu Hilla'
 author = 'Joni Eronen, Perttu Hilla'
 
-# Find out whether GitHub Actions is used
+# Determine whether the documentation is being built in GitHub Actions.
 gh_actions = os.environ.get("GITHUB_ACTIONS") == "true"
 
-# Find out whether the build is from a branch
+# Determine whether the current build originates from a branch.
 if gh_actions and os.environ.get("GITHUB_REF", "").startswith("refs/heads/"):
     branch_build = True
 else:
     branch_build = False
 
-# If branch build, use the "latest" release
+# Use the "latest" label for branch builds.
 if branch_build:
     release = "latest"
 
-# Otherwise determine the release from pyproject.toml
+# Otherwise, read the release version from pyproject.toml.
 else:
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     toml_dir = os.path.join(root_dir, "pyproject.toml")
@@ -47,6 +48,7 @@ extensions = [
 ]
 exclude_patterns = []
 add_module_names = False
+autodoc_member_order = "groupwise"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
