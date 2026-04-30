@@ -18,11 +18,6 @@ def status(msg: str) -> None:
     ----------
     msg : str
         Message to print.
-
-    Returns
-    -------
-    None
-        The message is printed only when verbose output is enabled.
     """
 
     # Import the global parameters lazily to avoid a circular dependency.
@@ -49,11 +44,6 @@ def status_section(title: str) -> None:
     ----------
     title : str
         Title to print for the new section in the status output.
-
-    Returns
-    -------
-    None
-        The section header is printed only when verbose output is enabled.
     """
 
     # Import the global parameters lazily to avoid a circular dependency.

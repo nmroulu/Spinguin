@@ -549,11 +549,6 @@ def clear_cache_op_T() -> None:
     Clear the internal cache used by ``_op_T``.
 
     Usage: ``clear_cache_op_T()``.
-
-    Returns
-    -------
-    None
-        This function clears cached spherical tensor operators in place.
     """
 
     # Remove all cached tensor operators.

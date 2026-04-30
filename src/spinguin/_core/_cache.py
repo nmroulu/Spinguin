@@ -27,10 +27,6 @@ def clear_cache() -> None:
     This function resets cached results from the chemistry, linear algebra,
     operator, and superoperator helper functions that expose explicit
     cache-clearing entry points.
-
-    Returns
-    -------
-    None
     """
 
     # Clear cache entries related to chemical index mappings.

@@ -1029,10 +1029,6 @@ def expm_vec(
 def clear_cache_CG_coeff() -> None:
     """
     Clear the memoisation cache used by `CG_coeff`.
-
-    Returns
-    -------
-    None
     """
 
     # Reset the cached symbolic Clebsch-Gordan evaluations.

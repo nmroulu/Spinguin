@@ -58,10 +58,6 @@ def _validate_interactions(
     ----------
     interactions : list
         Requested interaction labels.
-
-    Returns
-    -------
-    None
     """
 
     # Check that each requested interaction appears only once.

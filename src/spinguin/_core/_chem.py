@@ -51,10 +51,6 @@ def _validate_bipartite_spin_maps(
         Indices of subsystem A within the composite system.
     spin_map_B : list or tuple or ndarray
         Indices of subsystem B within the composite system.
-
-    Returns
-    -------
-    None
     """
 
     # Check that subsystem A has the expected number of mapped spins.
@@ -92,10 +88,6 @@ def _validate_permutation_spin_map(
         Spin system to be permuted.
     spin_map : list or tuple or ndarray
         Permuted spin indices.
-
-    Returns
-    -------
-    None
     """
 
     # Check that the map is a valid permutation of all spin indices.
@@ -649,10 +641,6 @@ def permute_spins(
 def clear_cache_associate_index_map() -> None:
     """
     Clear the cache used by `_associate_index_map()`.
-
-    Returns
-    -------
-    None
     """
 
     # Reset the cached association index maps.
@@ -662,10 +650,6 @@ def clear_cache_associate_index_map() -> None:
 def clear_cache_dissociate_index_map() -> None:
     """
     Clear the cache used by `_dissociate_index_map()`.
-
-    Returns
-    -------
-    None
     """
 
     # Reset the cached dissociation index maps.
@@ -675,10 +659,6 @@ def clear_cache_dissociate_index_map() -> None:
 def clear_cache_permutation_matrix() -> None:
     """
     Clear the cache used by `_permutation_matrix()`.
-
-    Returns
-    -------
-    None
     """
 
     # Reset the cached permutation matrices.

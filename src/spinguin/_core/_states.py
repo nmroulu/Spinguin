@@ -38,11 +38,6 @@ def _require_basis(
     action : str
         Description of the attempted operation for error reporting.
 
-    Returns
-    -------
-    None
-        Validation is performed for its side effect only.
-
     Raises
     ------
     ValueError

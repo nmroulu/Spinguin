@@ -15,11 +15,6 @@ def inversion_recovery_fid() -> None:
 
     This function is currently a stub and does not yet implement the sequence.
     It exists only to reserve the public API for a future implementation.
-
-    Returns
-    -------
-    None
-        No value is returned because the implementation is not yet available.
     """
 
     # Leave the stub unchanged until the full sequence is implemented.

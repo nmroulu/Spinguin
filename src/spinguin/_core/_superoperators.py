@@ -40,11 +40,6 @@ def _require_basis(
         Spin system whose basis is required.
     action : str
         Description of the attempted operation for error reporting.
-
-    Returns
-    -------
-    None
-        Validation is performed for its side effect only.
     """
 
     # Reject operations that require a built basis when none is present.

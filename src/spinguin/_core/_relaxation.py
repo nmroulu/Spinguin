@@ -1007,13 +1007,6 @@ def _get_sop_T(
 def sop_R_random_field() -> None:
     """
     Placeholder for a random-field relaxation superoperator.
-
-    The implementation has not yet been added.
-
-    Returns
-    -------
-    None
-        Placeholder return value until the functionality is implemented.
     """
 
     # This functionality has not yet been implemented.
@@ -1263,11 +1256,6 @@ def _validate_relaxation_inputs(spin_system: SpinSystem) -> None:
     ----------
     spin_system : SpinSystem
         Spin system for which the relaxation superoperator is requested.
-
-    Returns
-    -------
-    None
-        The input data are validated in place.
     """
 
     # Require that the relaxation theory has been specified explicitly.
