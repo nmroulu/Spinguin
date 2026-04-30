@@ -182,6 +182,43 @@ ISOTOPES = {
     '247Cm': [4.5, 0.6098074583288254, 0, 246.066452, 0.0]
 }
 
+def add_isotope(
+    isotope: str,
+    spin: float | None=None,
+    gyromagnetic_ratio: float | None=None,
+    quadrupole_moment: float | None=None,
+    atomic_mass: float | None=None,
+    natural_abundance: float | None=None,
+) -> None:
+    """
+    Add a new isotope to Spinguin temporarily.
+
+    Parameters
+    ----------
+    isotope : str
+        Nucleus symbol (e.g. '1H') for the isotope.
+    spin : float
+        Spin quantum number.
+    gyromagnetic_ratio : float
+        Gyromagnetic ratio in MHz/T.
+    quadrupole_moment : float
+        Quadrupole moment in barns.
+    atomic_mass : float
+        Atomic mass in atomic mass units.
+    natural_abundance : float
+        Natural abundance in percent.
+    """
+    # Do not allow an existing isotope to be replaced.
+    if isotope in ISOTOPES:
+        raise ValueError(f"Isotope {isotope} already exists.")
+    
+    ISOTOPES[isotope] = [
+        spin,
+        gyromagnetic_ratio,
+        quadrupole_moment,
+        atomic_mass,
+        natural_abundance
+    ]
 
 def spin(isotope: str) -> float:
     """

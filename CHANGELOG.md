@@ -5,6 +5,7 @@
 - Dynamic frequency shifts are included by default.
 - Antisymmetric part of CSA is included by default.
 - Thermalisation of the relaxation superoperator is applied by default.
+- Added a possibility of adding own isotopes.
 
 ## 0.1.1
 - Added quadrupolar moments to several isotopes.

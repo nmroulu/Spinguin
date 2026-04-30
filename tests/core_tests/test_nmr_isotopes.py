@@ -2,6 +2,8 @@ import unittest
 import numpy as np
 from spinguin._core._nmr_isotopes import spin, gamma, quadrupole_moment
 
+import spinguin as sg
+
 class TestNMRIsotopes(unittest.TestCase):
 
     def test_spin(self):
@@ -45,4 +47,34 @@ class TestNMRIsotopes(unittest.TestCase):
         self.assertTrue(np.allclose(quadrupole_moment("14N"), 20.44e-3*1e-28))
         self.assertTrue(np.allclose(quadrupole_moment("19F"), 0))
         self.assertTrue(np.allclose(quadrupole_moment("23Na"), 0))
-        
+
+    def test_add_isotope(self):
+        """
+        Test adding an isotope.
+        """
+        # Define a new isotope.
+        isotope = "MY_OWN"
+        spin = 1/2
+        gyromagnetic_ratio = 1.57
+        quadrupole_moment = 0
+        atomic_mass = 125.442
+        natural_abundance = 99.2
+        sg.add_isotope(
+            isotope,
+            spin,
+            gyromagnetic_ratio,
+            quadrupole_moment,
+            atomic_mass,
+            natural_abundance,
+        )
+
+        # Test that the defined properties can be requested.
+        self.assertEqual(sg.spin(isotope), spin)
+        self.assertEqual(sg.gamma(isotope, "Hz"), gyromagnetic_ratio*1e6)
+        self.assertEqual(sg.quadrupole_moment(isotope), quadrupole_moment)
+        self.assertEqual(sg.atomic_mass(isotope), atomic_mass)
+        self.assertEqual(sg.natural_abundance(isotope), natural_abundance)
+
+        # Defining an existing isotope must result in an error
+        with self.assertRaises(ValueError):
+            sg.add_isotope("1H")

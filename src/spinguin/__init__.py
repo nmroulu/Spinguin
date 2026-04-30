@@ -29,6 +29,7 @@ from spinguin._core import (
     liouvillian,
 
     # nmr_isotopes
+    add_isotope,
     atomic_mass,
     gamma,
     natural_abundance,
@@ -120,6 +121,7 @@ __all__ = [
     "Molecule",
 
     # core: nmr_isotopes
+    "add_isotope",
     "atomic_mass",
     "gamma",
     "natural_abundance",
