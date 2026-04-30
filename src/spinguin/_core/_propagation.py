@@ -34,8 +34,6 @@ def propagator(
     """
     Construct the time propagator ``exp(L*t)``.
 
-    Usage: ``propagator(L, t)``.
-
     Parameters
     ----------
     L : ndarray or csc_array
@@ -92,8 +90,6 @@ def pulse(
 ) -> np.ndarray | sp.csc_array:
     """
     Construct a pulse superoperator that acts from the left on a state.
-
-    Usage: ``pulse(spin_system, operator, angle)``.
 
     Parameters
     ----------
@@ -185,8 +181,6 @@ def propagator_to_rotframe(
     Transform a time propagator to the rotating frame defined by the
     center frequencies (Zeeman + chemical shift interactions) 
     of each spin.
-
-    Usage: ``propagator_to_rotframe(spin_system, P, t, center_frequencies)``.
 
     Parameters
     ----------

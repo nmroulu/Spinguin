@@ -17,8 +17,6 @@ def _get_openmp_flags() -> tuple[list[str], list[str]]:
     """
     Return the platform-dependent compiler and linker flags.
 
-    Usage: ``_get_openmp_flags()``.
-
     Returns
     -------
     tuple of list of str

@@ -40,8 +40,6 @@ def dd_constant(y1: float, y2: float) -> float:
     """
     Calculate the dipole-dipole coupling constant excluding the distance term.
 
-    Usage: ``dd_constant(y1, y2)``.
-
     Parameters
     ----------
     y1 : float
@@ -63,8 +61,6 @@ def dd_constant(y1: float, y2: float) -> float:
 def Q_constant(S: float, Q_moment: float) -> float:
     """
     Calculate the nuclear quadrupolar coupling constant.
-
-    Usage: ``Q_constant(S, Q_moment)``.
 
     Parameters
     ----------
@@ -96,8 +92,6 @@ def tau_c_l(tau_c: float | np.ndarray, l: int) -> float | np.ndarray:
     This function is used to convert the input molecular correlation
     time to the rank-dependent correlation times required for the relaxation
     superoperator construction. 
-
-    Usage: ``tau_c_l(tau_c, l)``.
 
     The expression applies to anisotropic rotationally modulated interactions
     with ``l > 0``.
@@ -137,8 +131,6 @@ def tau_c_l(tau_c: float | np.ndarray, l: int) -> float | np.ndarray:
 def dd_coupling_tensors(xyz: np.ndarray, gammas: np.ndarray) -> np.ndarray:
     """
     Calculate dipole-dipole coupling tensors between all spins.
-
-    Usage: ``dd_coupling_tensors(xyz, gammas)``.
 
     Parameters
     ----------
@@ -194,8 +186,6 @@ def shielding_intr_tensors(
     """
     Calculate shielding interaction tensors for relaxation calculations.
 
-    Usage: ``shielding_intr_tensors(shielding, gammas, B)``.
-
     Parameters
     ----------
     shielding : ndarray
@@ -235,8 +225,6 @@ def Q_intr_tensors(
     """
     Calculate quadrupolar interaction tensors for a spin system.
 
-    Usage: ``Q_intr_tensors(efg, spins, quad)``.
-
     Parameters
     ----------
     efg : ndarray
@@ -275,8 +263,6 @@ def rotational_diffusion_constant_SED(
     """
     Calculate the rotational diffusion constant from the SED relation.
 
-    Usage: ``rotational_diffusion_constant_SED(T, eta, r)``.
-
     Parameters
     ----------
     T : float
@@ -306,8 +292,6 @@ def rotational_correlation_time(
     """
     Calculate the rotational correlation time for a given rank.
 
-    Usage: ``rotational_correlation_time(l, D_r)``.
-
     Parameters
     ----------
     l : int
@@ -333,8 +317,6 @@ def rotational_correlation_time_SED(
 ) -> float | np.ndarray:
     """
     Calculate the rotational correlation time from the SED relation.
-
-    Usage: ``rotational_correlation_time_SED(T, eta, r, l)``.
 
     Parameters
     ----------
@@ -367,8 +349,6 @@ def center_of_mass(
     """
     Calculate the centre of mass of a molecule.
 
-    Usage: ``center_of_mass(masses, coords)``.
-
     Parameters
     ----------
     masses : ndarray
@@ -397,8 +377,6 @@ def moment_of_inertia_tensor(
 ) -> np.ndarray:
     """
     Calculate the moment of inertia tensor of a molecule.
-
-    Usage: ``moment_of_inertia_tensor(masses, coords)``.
 
     Parameters
     ----------
@@ -455,8 +433,6 @@ def moment_of_inertia_equivalent_ellipsoid(
 ) -> np.ndarray:
     """
     Calculate the semi-axes of the mass-equivalent ellipsoid.
-
-    Usage: ``moment_of_inertia_equivalent_ellipsoid(masses, coords)``.
 
     The semi-axes are determined from the equations
 
@@ -523,8 +499,6 @@ def Perrin_integrals(
     """
     Calculate the Perrin integrals for an ellipsoid.
 
-    Usage: ``Perrin_integrals(a_x, a_y, a_z, num_points=int(1e6))``.
-
     A variable substitution is used to map the infinite integration domain to
     the interval ``[0, 1)``.
 
@@ -576,8 +550,6 @@ def Perrin_factors(
     """
     Calculate the Perrin factors for an ellipsoid.
 
-    Usage: ``Perrin_factors(a_x, a_y, a_z)``.
-
     Parameters
     ----------
     a_x : float
@@ -611,8 +583,6 @@ def rotational_diffusion_constants_Perrin(
 ) -> np.ndarray:
     """
     Calculate Perrin rotational diffusion constants along the principal axes.
-
-    Usage: ``rotational_diffusion_constants_Perrin(T, eta, a_x, a_y, a_z)``.
 
     Parameters
     ----------
@@ -652,8 +622,6 @@ def rotational_correlation_times_Perrin(
 ) -> np.ndarray:
     """
     Calculate Perrin rotational correlation times for a given tensor rank.
-
-    Usage: ``rotational_correlation_times_Perrin(masses, coords, T, eta, l)``.
 
     Parameters
     ----------
@@ -702,8 +670,6 @@ def rotational_correlation_times_Perrin(
 def _rot_diff_gen(spin_system: SpinSystem) -> dict:
     """
     Generate the rotational diffusion generator for a spin system.
-
-    Usage: ``_rot_diff_gen(spin_system)``.
 
     Parameters
     ----------
@@ -776,8 +742,6 @@ def _process_interaction_tensor(
     """
     Decompose an interaction tensor into rotational-diffusion components.
 
-    Usage: ``_process_interaction_tensor(V, R, dge, anti)``.
-
     The first key of the returned dictionary is the interaction rank ``l`` and
     the second key is the component ``p`` associated with the eigenvectors of
     the rotational diffusion generator. Ranks with negligible norm are omitted.
@@ -838,8 +802,6 @@ def _process_interaction_tensor(
 def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     """
     Collect and rank-sort all relevant interaction tensors.
-
-    Usage: ``_process_interactions(spin_system, dge)``.
 
     Interaction tensors whose norm falls below the global threshold are
     disregarded.
@@ -955,8 +917,6 @@ def _get_sop_T(
     """
     Calculate the coupled spherical tensor superoperator for one interaction.
 
-    Usage: ``_get_sop_T(spin_system, l, q, interaction_type, spin_1, spin_2)``.
-
     Parameters
     ----------
     spin_system : SpinSystem
@@ -1019,8 +979,6 @@ def _sop_R_phenomenological(
 ) -> np.ndarray | sp.csc_array:
     """
     Construct the phenomenological relaxation superoperator.
-
-    Usage: ``_sop_R_phenomenological(basis, R1, R2)``.
 
     Parameters
     ----------
@@ -1095,8 +1053,6 @@ def _sop_R_sr2k(
 ) -> np.ndarray | sp.csc_array:
     """
     Calculate scalar relaxation of the second kind from Abragam's formula.
-
-    Usage: ``_sop_R_sr2k(spin_system, R)``.
 
     Parameters
     ----------
@@ -1210,8 +1166,6 @@ def _ldb_thermalization(
     """
     Apply Levitt-di Bari thermalization to a relaxation superoperator.
 
-    Usage: ``_ldb_thermalization(R, H_left, T)``.
-
     Parameters
     ----------
     R : ndarray or csc_array
@@ -1249,8 +1203,6 @@ def _ldb_thermalization(
 def _validate_relaxation_inputs(spin_system: SpinSystem) -> None:
     """
     Validate the input data required for relaxation calculations.
-
-    Usage: ``_validate_relaxation_inputs(spin_system)``.
 
     Parameters
     ----------
@@ -1320,8 +1272,6 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     """
     Create the relaxation superoperator using the requested level
     of theory.
-
-    Usage: ``relaxation(spin_system)``.
 
     Requires that the following spin system properties are set:
 
@@ -1399,8 +1349,6 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
     """
     Build all coupled spherical tensor superoperators needed for relaxation.
 
-    Usage: ``_get_all_sop_T(spin_system, interactions)``.
-
     Parameters
     ----------
     spin_system : SpinSystem
@@ -1450,8 +1398,6 @@ def _get_all_sop_T(spin_system: SpinSystem, interactions: dict) -> dict:
 def _sop_R_redfield(spin_system: SpinSystem) -> sp.csc_array:
     """
     Calculate the relaxation superoperator using Redfield theory.
-
-    Usage: ``_sop_R_redfield(spin_system)``.
 
     Parameters
     ----------

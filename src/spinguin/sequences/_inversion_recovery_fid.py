@@ -11,8 +11,6 @@ def inversion_recovery_fid() -> None:
     """
     Placeholder for a traditional inversion-recovery FID experiment.
 
-    Usage: ``inversion_recovery_fid()``.
-
     This function is currently a stub and does not yet implement the sequence.
     It exists only to reserve the public API for a future implementation.
     """

@@ -25,8 +25,6 @@ def op_E(S: float) -> np.ndarray | sp.csc_array:
     """
     Generate the unit operator for a single spin.
 
-    Usage: ``op_E(S)``.
-
     Parameters
     ----------
     S : float
@@ -55,8 +53,6 @@ def op_Sx(S: float) -> np.ndarray | sp.csc_array:
     """
     Generate the Cartesian spin operator ``Sx``.
 
-    Usage: ``op_Sx(S)``.
-
     Parameters
     ----------
     S : float
@@ -78,8 +74,6 @@ def op_Sy(S: float) -> np.ndarray | sp.csc_array:
     """
     Generate the Cartesian spin operator ``Sy``.
 
-    Usage: ``op_Sy(S)``.
-
     Parameters
     ----------
     S : float
@@ -100,8 +94,6 @@ def op_Sy(S: float) -> np.ndarray | sp.csc_array:
 def op_Sz(S: float) -> np.ndarray | sp.csc_array:
     """
     Generate the Cartesian spin operator ``Sz``.
-
-    Usage: ``op_Sz(S)``.
 
     Parameters
     ----------
@@ -135,8 +127,6 @@ def op_Sp(S: float) -> np.ndarray | sp.csc_array:
     """
     Generate the spin-raising operator.
 
-    Usage: ``op_Sp(S)``.
-
     Parameters
     ----------
     S : float
@@ -168,8 +158,6 @@ def op_Sp(S: float) -> np.ndarray | sp.csc_array:
 def op_Sm(S: float) -> np.ndarray | sp.csc_array:
     """
     Generate the spin-lowering operator.
-
-    Usage: ``op_Sm(S)``.
 
     Parameters
     ----------
@@ -209,8 +197,6 @@ def _op_T(
     """
     Construct a cached single-spin irreducible spherical tensor operator.
 
-    Usage: ``_op_T(S, l, q, sparse)``.
-
     Parameters
     ----------
     S : float
@@ -248,8 +234,6 @@ def op_T(S: float, l: int, q: int) -> np.ndarray | sp.csc_array:
     """
     Generate a single-spin irreducible spherical tensor operator.
 
-    Usage: ``op_T(S, l, q)``.
-
     The operator is constructed by sequentially lowering the maximum-projection
     tensor. The implementation follows Kuprov, *Spin: From Basic Symmetries to
     Quantum Optimal Control* (2023), p. 94.
@@ -285,8 +269,6 @@ def op_T_coupled(
 ) -> np.ndarray | sp.csc_array:
     """
     Construct a coupled irreducible spherical tensor for two spins.
-
-    Usage: ``op_T_coupled(l, q, l1, s1, l2, s2)``.
 
     Parameters
     ----------
@@ -345,8 +327,6 @@ def op_prod(
     """
     Generate a many-spin product operator in the Zeeman eigenbasis.
 
-    Usage: ``op_prod(op_def, spins, include_unit=True)``.
-
     Parameters
     ----------
     op_def : ndarray
@@ -392,8 +372,6 @@ def op_from_string(
 ) -> np.ndarray | sp.csc_array:
     """
     Generate a Hilbert-space operator from a user-defined operator string.
-
-    Usage: ``op_from_string(spins, operator)``.
 
     Parameters
     ----------
@@ -458,8 +436,6 @@ def operator(
 ) -> np.ndarray | sp.csc_array:
     """
     Generate a Hilbert-space operator for a spin system.
-
-    Usage: ``operator(spin_system, operator)``.
 
     The operator may be specified using either of the two approaches below:
 
@@ -547,8 +523,6 @@ def operator(
 def clear_cache_op_T() -> None:
     """
     Clear the internal cache used by ``_op_T``.
-
-    Usage: ``clear_cache_op_T()``.
     """
 
     # Remove all cached tensor operators.

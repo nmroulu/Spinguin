@@ -71,8 +71,6 @@ class RelaxationProperties:
         """
         Convert file or array-like relaxation data to a NumPy array.
 
-        Usage: ``self._convert_relaxation_array(values, name)``.
-
         Parameters
         ----------
         values : list or tuple or ndarray or str
@@ -109,8 +107,6 @@ class RelaxationProperties:
     ) -> None:
         """
         Validate the shape and positivity of the input data.
-
-        Usage: ``self._validate_relaxation_array(values, name)``.
 
         Parameters
         ----------
@@ -276,8 +272,6 @@ class RelaxationProperties:
     ) -> None:
         """
         Automatically assign rotational correlation time or times.
-
-        Usage: ``auto_tau_c(eta, model="iso", r=None, scaling_factor=1.0)``.
 
         The correlation time is evaluated either from the
         Stokes-Einstein-Debye relation for isotropic rotational diffusion or

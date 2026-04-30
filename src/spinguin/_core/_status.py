@@ -10,10 +10,6 @@ def status(msg: str) -> None:
     """
     Print a status message when verbose output is enabled.
 
-    Usage
-    -----
-    ``status(msg)``
-
     Parameters
     ----------
     msg : str
@@ -31,10 +27,6 @@ def status(msg: str) -> None:
 def status_section(title: str) -> None:
     """
     Print a titled separator for a new section in the status output.
-
-    Usage
-    -----
-    ``status_section(title)``
 
     This function is intended for visually separating different stages of the
     computation when verbose output is enabled. It prints a separator line,
