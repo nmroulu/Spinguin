@@ -23,30 +23,9 @@ from spinguin._core._la import expm
 from spinguin._core._operators import op_prod
 from spinguin._core._parameters import parameters
 from spinguin._core._utils import parse_operator_string
+from spinguin._core._validation import require
 
-def _require_basis(
-    spin_system: SpinSystem,
-    action: str,
-) -> None:
-    """
-    Ensure that the basis has been built before state manipulation.
 
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system whose basis is required.
-    action : str
-        Description of the attempted operation for error reporting.
-
-    Raises
-    ------
-    ValueError
-        Raised if the basis has not yet been built.
-    """
-
-    # Reject operations that require a built basis when none is present.
-    if spin_system.basis.basis is None:
-        raise ValueError(f"Please build the basis before {action}.")
 
 def empty_state(spin_system: SpinSystem) -> np.ndarray | sp.lil_array:
     """
@@ -65,7 +44,7 @@ def empty_state(spin_system: SpinSystem) -> np.ndarray | sp.lil_array:
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing an empty state")
+    require(spin_system, "basis.basis", "constructing an empty state")
 
     # Allocate the output state vector.
     if parameters.sparse_state:
@@ -100,7 +79,7 @@ def unit_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the unit state")
+    require(spin_system, "basis.basis", "constructing the unit state")
 
     # Allocate the output state vector.
     rho = empty_state(spin_system)
@@ -174,7 +153,7 @@ def state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing a state")
+    require(spin_system, "basis.basis", "constructing a state")
 
     # Allocate the output state vector.
     rho = empty_state(spin_system)
@@ -248,8 +227,9 @@ def state_to_zeeman(
     """
 
     # Ensure that the basis is available.
-    _require_basis(
+    require(
         spin_system,
+        "basis.basis",
         "converting the state vector into a density matrix",
     )
 
@@ -307,7 +287,7 @@ def alpha_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the alpha state")
+    require(spin_system, "basis.basis", "constructing the alpha state")
 
     # Determine the full Hilbert-space dimension.
     dim = int(np.prod(spin_system.mults))
@@ -345,7 +325,7 @@ def beta_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the beta state")
+    require(spin_system, "basis.basis", "constructing the beta state")
 
     # Determine the full Hilbert-space dimension.
     dim = int(np.prod(spin_system.mults))
@@ -378,15 +358,14 @@ def equilibrium_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the equilibrium state")
+    require(spin_system, "basis.basis", "constructing the equilibrium state")
 
     # Ensure that the thermodynamic parameters have been configured.
-    if parameters.magnetic_field is None:
-        raise ValueError("Magnetic field must be set before "
-                         "constructing the equilibrium state.")
-    if parameters.temperature is None:
-        raise ValueError("Temperature must be set before "
-                         "constructing the equilibrium state.")
+    require(
+        parameters,
+        ["magnetic_field", "temperature"],
+        "constructing the equilibrium state",
+    )
 
     # Build the Boltzmann propagator and apply it to the unit state.
     with HidePrints():
@@ -437,7 +416,7 @@ def singlet_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the singlet state")
+    require(spin_system, "basis.basis", "constructing the singlet state")
 
     # Determine the full Hilbert-space dimension.
     dim = int(np.prod(spin_system.mults))
@@ -480,7 +459,7 @@ def triplet_zero_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the triplet zero state")
+    require(spin_system, "basis.basis", "constructing the triplet zero state")
 
     # Determine the full Hilbert-space dimension.
     dim = int(np.prod(spin_system.mults))
@@ -523,7 +502,7 @@ def triplet_plus_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the triplet plus state")
+    require(spin_system, "basis.basis", "constructing the triplet plus state")
 
     # Determine the full Hilbert-space dimension.
     dim = int(np.prod(spin_system.mults))
@@ -566,7 +545,7 @@ def triplet_minus_state(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing the triplet minus state")
+    require(spin_system, "basis.basis", "constructing the triplet minus state")
 
     # Determine the full Hilbert-space dimension.
     dim = int(np.prod(spin_system.mults))
@@ -641,7 +620,11 @@ def measure(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "measuring an expectation value of an operator")
+    require(
+        spin_system,
+        "basis.basis",
+        "measuring an expectation value of an operator",
+    )
 
     # Construct the operator state vector in the system basis.
     oper = state(spin_system, operator)

@@ -32,6 +32,7 @@ from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 from spinguin._core._superoperators import sop_T_coupled, superoperator
 from spinguin._core._utils import idx_to_lq, parse_operator_string
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -1200,73 +1201,6 @@ def _ldb_thermalization(
     return R
 
 
-def _validate_relaxation_inputs(spin_system: SpinSystem) -> None:
-    """
-    Validate the input data required for relaxation calculations.
-
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system for which the relaxation superoperator is requested.
-    """
-
-    # Require that the relaxation theory has been specified explicitly.
-    if spin_system.relaxation.theory is None:
-        raise ValueError(
-            "Please specify relaxation theory before constructing the "
-            "relaxation superoperator."
-        )
-
-    # Require that the basis has already been built.
-    if spin_system.basis.basis is None:
-        raise ValueError(
-            "Please build basis before constructing the relaxation "
-            "superoperator."
-        )
-
-    # Validate the phenomenological relaxation inputs.
-    if spin_system.relaxation.theory == "phenomenological":
-        if spin_system.relaxation.T1 is None:
-            raise ValueError(
-                "Please set T1 times before constructing the relaxation "
-                "superoperator."
-            )
-        if spin_system.relaxation.T2 is None:
-            raise ValueError(
-                "Please set T2 times before constructing the relaxation "
-                "superoperator."
-            )
-
-    # Validate the Redfield relaxation inputs.
-    elif spin_system.relaxation.theory == "redfield":
-        if spin_system.relaxation.tau_c is None:
-            raise ValueError(
-                "Please set the correlation time before constructing the "
-                "Redfield relaxation superoperator."
-            )
-        if parameters.magnetic_field is None:
-            raise ValueError(
-                "Please set the magnetic field before constructing the "
-                "Redfield relaxation superoperator."
-            )
-
-    # Validate the inputs required for scalar relaxation of the second kind.
-    if spin_system.relaxation.sr2k and parameters.magnetic_field is None:
-        raise ValueError(
-            "Please set the magnetic field before applying scalar "
-            "relaxation of the second kind."
-        )
-
-    # Validate the inputs required for thermalization.
-    if spin_system.relaxation.thermalization:
-        if parameters.magnetic_field is None:
-            raise ValueError(
-                "Please set the magnetic field when applying thermalization."
-            )
-        if parameters.temperature is None:
-            raise ValueError(
-                "Please define temperature when applying thermalization."
-            )
 
 def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
     """
@@ -1310,11 +1244,20 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
         Relaxation superoperator.
     """
 
-    # Validate that all required inputs have been provided.
-    _validate_relaxation_inputs(spin_system)
+    # Require that the relaxation theory has been specified and basis built.
+    require(
+        spin_system,
+        ["relaxation.theory", "basis.basis"],
+        "constructing the relaxation superoperator",
+    )
 
     # Construct the phenomenological relaxation superoperator if requested.
     if spin_system.relaxation.theory == "phenomenological":
+        require(
+            spin_system,
+            ["relaxation.T1", "relaxation.T2"],
+            "constructing the phenomenological relaxation superoperator",
+        )
         R = _sop_R_phenomenological(
             basis=spin_system.basis.basis,
             R1=spin_system.relaxation.R1,
@@ -1323,14 +1266,34 @@ def relaxation(spin_system: SpinSystem) -> np.ndarray | sp.csc_array:
 
     # Construct the Redfield relaxation superoperator if requested.
     elif spin_system.relaxation.theory == "redfield":
+        require(
+            spin_system,
+            "relaxation.tau_c",
+            "constructing the Redfield relaxation superoperator",
+        )
+        require(
+            parameters,
+            "magnetic_field",
+            "constructing the Redfield relaxation superoperator",
+        )
         R = _sop_R_redfield(spin_system)
     
     # Add scalar relaxation of the second kind if requested.
     if spin_system.relaxation.sr2k:
+        require(
+            parameters,
+            "magnetic_field",
+            "applying scalar relaxation of the second kind",
+        )
         R += _sop_R_sr2k(spin_system, R)
         
     # Apply Levitt-di Bari thermalization if requested.
     if spin_system.relaxation.thermalization:
+        require(
+            parameters,
+            ["magnetic_field", "temperature"],
+            "applying thermalization",
+        )
         
         # Build the left Hamiltonian superoperator.
         with HidePrints():

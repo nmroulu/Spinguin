@@ -12,6 +12,7 @@ import numpy as np
 
 from spinguin._core._nmr_isotopes import gamma
 from spinguin._core._parameters import parameters
+from spinguin._core._validation import require
 
 def _resolve_magnetic_field(B: float | None) -> float:
     """
@@ -40,8 +41,7 @@ def _resolve_magnetic_field(B: float | None) -> float:
         return B
 
     # Ensure that a default magnetic field has been configured.
-    if parameters.magnetic_field is None:
-        raise ValueError("'magnetic_field' has not been set in parameters.")
+    require(parameters, "magnetic_field", "performing a spectral calculation")
 
     # Return the shared magnetic-field setting.
     return parameters.magnetic_field

@@ -9,6 +9,7 @@ from copy import deepcopy
 
 import numpy as np
 import spinguin._core as sg
+from spinguin._core._validation import require
 from tqdm import tqdm
 
 
@@ -73,20 +74,19 @@ def inversion_recovery(
     spin_system = deepcopy(spin_system)
 
     # Check that the sequence prerequisites have been defined.
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before using "
-                         "inversion recovery.")
-    if spin_system.relaxation.theory is None:
-        raise ValueError("Please set the relaxation theory before using "
-                         "inversion recovery.")
+    require(
+        spin_system,
+        ["basis.basis", "relaxation.theory"],
+        "using inversion recovery"
+    )
+    require(
+        sg.parameters,
+        ["magnetic_field", "temperature"],
+        "using inversion recovery"
+    )
+
     if spin_system.relaxation.thermalization is False:
         raise ValueError("Please set thermalization to True before using "
-                         "inversion recovery.")
-    if sg.parameters.magnetic_field is None:
-        raise ValueError("Please set the magnetic field before using "
-                         "inversion recovery.")
-    if sg.parameters.temperature is None:
-        raise ValueError("Please set the temperature before using "
                          "inversion recovery.")
 
     # Construct the Liouvillian governing the spin dynamics.

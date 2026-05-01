@@ -25,26 +25,10 @@ from spinguin._core import _la
 from spinguin._core._operators import op_T
 from spinguin._core._parameters import parameters
 from spinguin._core._utils import idx_to_lq, parse_operator_string
+from spinguin._core._validation import require
 
 
-def _require_basis(
-    spin_system: SpinSystem,
-    action: str,
-) -> None:
-    """
-    Ensure that the basis has been built before superoperator construction.
 
-    Parameters
-    ----------
-    spin_system : SpinSystem
-        Spin system whose basis is required.
-    action : str
-        Description of the attempted operation for error reporting.
-    """
-
-    # Reject operations that require a built basis when none is present.
-    if spin_system.basis.basis is None:
-        raise ValueError(f"Please build the basis before {action}.")
 
 
 @lru_cache(maxsize=16)
@@ -523,7 +507,7 @@ def sop_T_coupled(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing coupled superoperators")
+    require(spin_system, "basis.basis", "constructing coupled superoperators")
 
     # Convert the basis and spin arrays to bytes for caching.
     basis_bytes = spin_system.basis.basis.tobytes()
@@ -614,7 +598,7 @@ def superoperator(
     """
 
     # Ensure that the basis is available.
-    _require_basis(spin_system, "constructing superoperators")
+    require(spin_system, "basis.basis", "constructing superoperators")
 
     # Construct the superoperator from a string specification.
     if isinstance(operator, str):

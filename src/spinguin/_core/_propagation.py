@@ -22,6 +22,7 @@ from spinguin._core._la import expm
 from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -142,9 +143,7 @@ def pulse(
         not straightforwardly correspond to a rotation operator.
     """
     # Ensure that the working basis has been constructed.
-    if spin_system.basis.basis is None:
-        raise ValueError("Please build the basis before constructing pulse "
-                         "superoperators. Use `spin_system.basis.build()`.")
+    require(spin_system, "basis.basis", "constructing pulse superoperators")
 
     # Report the start of the pulse-superoperator construction.
     time_start = time.time()

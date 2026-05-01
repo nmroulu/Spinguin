@@ -20,6 +20,7 @@ from spinguin._core._parameters import parameters
 from spinguin._core._specutils import resonance_frequency
 from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -121,10 +122,7 @@ def rotating_frame(
     time_start = time.time()
 
     # Ensure that the working basis has been built.
-    if spin_system.basis.basis is None:
-        raise ValueError(
-            "Basis must be built before transforming to the rotating frame."
-        )
+    require(spin_system, "basis.basis", "transforming to the rotating frame")
 
     # Validate the basic input list lengths.
     if len(isotopes) == 0:

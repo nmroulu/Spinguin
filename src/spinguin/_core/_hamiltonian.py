@@ -18,6 +18,7 @@ from spinguin._core._la import eliminate_small
 from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -117,12 +118,11 @@ def _sop_H_Z_CS(
     """
 
     # Ensure that the magnetic field has been defined.
-    if parameters.magnetic_field is None:
-        raise ValueError(
-            "Magnetic field must be defined to construct the Zeeman and/or "
-            "chemical shift Hamiltonian. Use parameters.magnetic_field to "
-            "set the magnetic field strength."
-        )
+    require(
+        parameters, 
+        "magnetic_field", 
+        "constructing the Zeeman and/or chemical shift Hamiltonian"
+    )
 
     # Initialise the requested Hamiltonian contribution.
     sop_H = _empty_hamiltonian(spin_system)
@@ -238,11 +238,7 @@ def hamiltonian(
     status("Constructing the Hamiltonian...")
 
     # Ensure that the basis has been built before constructing the Hamiltonian.
-    if spin_system.basis.basis is None:
-        raise ValueError(
-            "Basis must be built before constructing the Hamiltonian. Use "
-            "`spin_system.build_basis()` to build the basis."
-        )
+    require(spin_system, "basis.basis", "constructing the Hamiltonian")
 
     # Validate the list of requested interactions.
     _validate_interactions(interactions)
