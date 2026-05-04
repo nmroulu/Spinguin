@@ -1,34 +1,42 @@
-import unittest
-import numpy as np
+"""
+Tests for basis-set construction and truncation in the Spinguin core.
+"""
+
 import math
-import spinguin as sg
+import unittest
 from copy import deepcopy
 
+import numpy as np
+
+import spinguin as sg
+
 class TestBasis(unittest.TestCase):
+    """
+    Test basis-set generation and basis-set truncation utilities.
+    """
 
     def test_make_basis_1(self):
         """
-        Test the creation of the basis set for a spin system
-        against a hard-coded result.
+        Test basis-set construction against a hard-coded reference.
         """
 
-        # Hard-coded result for comparison
-        basis_ref = np.array([[0, 0],
-                              [0, 1],
-                              [0, 2],
-                              [0, 3],
-                              [1, 0],
-                              [2, 0],
-                              [3, 0]])
+        # Define the reference basis set explicitly.
+        basis_ref = np.array([
+            [0, 0],
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [1, 0],
+            [2, 0],
+            [3, 0]
+        ])
         
-        # Test system
+        # Build the basis set for the test system.
         spin_system = sg.SpinSystem(['1H', '1H'])
-        
-        # Create the basis
         spin_system.basis.max_spin_order = 1
         spin_system.basis.build()
 
-        # Compare the generated basis with the hard-coded result
+        # Compare the generated basis set with the reference result.
         self.assertTrue(np.array_equal(spin_system.basis.basis, basis_ref))
 
     def test_make_basis_2(self):
