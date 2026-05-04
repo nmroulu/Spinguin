@@ -303,34 +303,26 @@ class TestBasis(unittest.TestCase):
 
     def test_truncate_basis_by_indices(self):
         """
-        Test the basis set truncation by indices.
+        Test basis-set truncation by explicitly retained basis indices.
         """
-        # Example system
+        # Build the full basis set for the example system.
         spin_system = sg.SpinSystem(['1H', '1H', '1H'])
-
-        # Create a basis set
         spin_system.basis.max_spin_order = 3
         spin_system.basis.build()
 
-        # Make a copy of the spin system
+        # Keep a copy of the original basis set for comparison.
         spin_system_org = deepcopy(spin_system)
 
-        # Truncate the basis set by retaining only a set of states
+        # Retain only a selected subset of basis states.
         retained_indices = [0, 7, spin_system.basis.dim-1]
         spin_system.basis.truncate_by_indices(retained_indices)
 
-        # Test each state in the original basis
+        # Check that only the requested states remain in the basis set.
         for op_def in spin_system_org.basis.basis:
-
-            # Determine whether a state should exist in the basis
             idx = spin_system_org.basis.indexof(op_def)
-            deleted = idx not in retained_indices
-
-            # Check if the state is deleted as it should be
-            if deleted:
+            
+            if idx not in retained_indices:
                 with self.assertRaises(ValueError):
                     spin_system.basis.indexof(op_def)
-
-            # Otherwise the state should be in the basis set (no Error)
             else:
                 spin_system.basis.indexof(op_def)
