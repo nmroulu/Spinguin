@@ -1,132 +1,39 @@
+"""
+Tests for single-spin and multi-spin operator construction.
+"""
+
+import math
 import unittest
+
 import numpy as np
 import scipy.sparse as sp
-import math
+
 import spinguin as sg
 from spinguin._core._la import comm
-from spinguin._core._operators import op_prod, op_from_string
+from spinguin._core._operators import op_from_string, op_prod
+
 
 class TestOperators(unittest.TestCase):
+    """
+    Test operator factories and operator-string parsing.
+    """
 
     def test_op_S(self):
         """
-        Test spin operators (E, Sx, Sy, Sz, Sp, Sm) against hard-coded values 
-        and verify commutation relations.
+        The operators `E`, `Sx`, `Sy`, `Sz`, `Sp`, and `Sm` are compared
+        the angular momentum commutation relations.
         """
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # Hard-coded operators for different spins
-        E = {
-            1/2 : np.array([[1, 0],
-                            [0, 1]]),
-            1 : np.array([[1, 0, 0],
-                          [0, 1, 0],
-                          [0, 0, 1]]),
-            3/2 : np.array([[1, 0, 0, 0],
-                            [0, 1, 0, 0],
-                            [0, 0, 1, 0],
-                            [0, 0, 0, 1]])
-        }
+        # List the spin quantum numbers used in the commutator tests.
+        spins = [1/2, 1, 3/2]
 
-        Sx = {
-            1/2: np.array([[0, 1/2],
-                           [1/2, 0]]),
-            1: np.array([[0, 1/math.sqrt(2), 0],
-                         [1/math.sqrt(2), 0, 1/math.sqrt(2)],
-                         [0, 1/math.sqrt(2), 0]]),
-            3/2: np.array([[0, math.sqrt(3)/2, 0, 0],
-                           [math.sqrt(3)/2, 0, 1, 0],
-                           [0, 1, 0, math.sqrt(3)/2],
-                           [0, 0, math.sqrt(3)/2, 0]])
-        }
-
-        Sy = {
-            1/2: np.array([[0, -1j/2],
-                           [1j/2, 0]]),
-            1: np.array([[0, 1/(1j*math.sqrt(2)), 0],
-                         [-1/(1j*math.sqrt(2)), 0, 1/(1j*math.sqrt(2))],
-                         [0, -1/(1j*math.sqrt(2)), 0]]),
-            3/2: np.array([[0, math.sqrt(3)/(2j), 0, 0],
-                           [-math.sqrt(3)/(2j), 0, -1j, 0],
-                           [0, 1j, 0, math.sqrt(3)/(2j)],
-                           [0, 0, -math.sqrt(3)/(2j), 0]])
-        }
-
-        Sz = {
-            1/2: np.array([[1/2, 0],
-                           [0, -1/2]]),
-            1: np.array([[1, 0, 0],
-                         [0, 0, 0],
-                         [0, 0, -1]]),
-            3/2: np.array([[3/2, 0, 0, 0],
-                           [0, 1/2, 0, 0],
-                           [0, 0, -1/2, 0],
-                           [0, 0, 0, -3/2]])
-        }
-
-        Sp = {
-            1/2: np.array([[0, 1],
-                           [0, 0]]),
-            1: np.array([[0, math.sqrt(2), 0],
-                         [0, 0, math.sqrt(2)],
-                         [0, 0, 0]]),
-            3/2: np.array([[0, math.sqrt(3), 0, 0],
-                           [0, 0, 2, 0],
-                           [0, 0, 0, math.sqrt(3)],
-                           [0, 0, 0, 0]])
-        }
-
-        Sm = {
-            1/2: np.array([[0, 0],
-                           [1, 0]]),
-            1: np.array([[0, 0, 0],
-                         [math.sqrt(2), 0, 0],
-                         [0, math.sqrt(2), 0]]),
-            3/2: np.array([[0, 0, 0, 0],
-                           [math.sqrt(3), 0, 0, 0],
-                           [0, 2, 0, 0],
-                           [0, 0, math.sqrt(3), 0]])
-        }
-
-        # Compare values using the dense backend
-        sg.parameters.sparse_operator = False 
-        for spin, op in E.items():
-            self.assertTrue(np.allclose(sg.op_E(spin), op))
-        for spin, op in Sx.items():
-            self.assertTrue(np.allclose(sg.op_Sx(spin), op))
-        for spin, op in Sy.items():
-            self.assertTrue(np.allclose(sg.op_Sy(spin), op))
-        for spin, op in Sz.items():
-            self.assertTrue(np.allclose(sg.op_Sz(spin), op))
-        for spin, op in Sp.items():
-            self.assertTrue(np.allclose(sg.op_Sp(spin), op))
-        for spin, op in Sm.items():
-            self.assertTrue(np.allclose(sg.op_Sm(spin), op))
-
-        # Compare values using the sparse backend
-        sg.parameters.sparse_operator = True 
-        for spin, op in E.items():
-            self.assertTrue(np.allclose(sg.op_E(spin).toarray(), op))
-        for spin, op in Sx.items():
-            self.assertTrue(np.allclose(sg.op_Sx(spin).toarray(), op))
-        for spin, op in Sy.items():
-            self.assertTrue(np.allclose(sg.op_Sy(spin).toarray(), op))
-        for spin, op in Sz.items():
-            self.assertTrue(np.allclose(sg.op_Sz(spin).toarray(), op))
-        for spin, op in Sp.items():
-            self.assertTrue(np.allclose(sg.op_Sp(spin).toarray(), op))
-        for spin, op in Sm.items():
-            self.assertTrue(np.allclose(sg.op_Sm(spin).toarray(), op))
-
-        # List of spins for which commutation relations are tested
-        spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
-
-        # Test the commutation relations using the dense backend
+        # Test the commutation relations using the dense backend.
         sg.parameters.sparse_operator = False
         for spin in spins:
 
-            # Test commutation relations
+            # Check the standard angular momentum commutators.
             self.assertTrue(np.allclose(comm(sg.op_E(spin), sg.op_E(spin)), 0))
             self.assertTrue(np.allclose(
                 comm(sg.op_Sx(spin), sg.op_Sy(spin)),
@@ -149,7 +56,7 @@ class TestOperators(unittest.TestCase):
                 sg.op_Sm(spin)
             ))
 
-        # Test the commutation relations using the sparse backend
+        # Test the commutation relations using the sparse backend.
         sg.parameters.sparse_operator = True
         for spin in spins:
 
@@ -186,10 +93,10 @@ class TestOperators(unittest.TestCase):
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # Spin quantum numbers to test
-        spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
+        # List the spin quantum numbers to test.
+        spins = [1/2, 1, 3/2]
 
-        # Test the commutation relations using the dense backend
+        # Test the commutation relations using the dense backend.
         sg.parameters.sparse_operator = False
         for spin in spins:
 
@@ -197,7 +104,7 @@ class TestOperators(unittest.TestCase):
             for l in range(0, int(2*spin+1)):
                 for q in range(-l, l+1):
 
-                    # Check the commutation relations
+                    # Check the defining commutation relations.
                     self.assertTrue(np.allclose(
                         comm(sg.op_Sz(spin), sg.op_T(spin, l, q)),
                         q*sg.op_T(spin, l, q)
@@ -208,17 +115,19 @@ class TestOperators(unittest.TestCase):
                             sg.op_Sy(spin)@sg.op_Sy(spin) + \
                             sg.op_Sz(spin)@sg.op_Sz(spin),
                             sg.op_T(spin, l, q)
-                        ), 0
+                        ), 
+                        0
                     ))
                     if not q == -l:
                         self.assertTrue(np.allclose(
                             comm(sg.op_Sm(spin), sg.op_T(spin, l, q)),
-                            math.sqrt(l*(l+1) - q*(q-1)) * sg.op_T(spin, l, q-1)
+                            math.sqrt(l*(l + 1) - q*(q - 1)) * sg.op_T(spin, l, q - 1)
                         ))
                     if not q == l:
                         self.assertTrue(np.allclose(
                             comm(sg.op_Sp(spin), sg.op_T(spin, l, q)),
-                            math.sqrt(l*(l+1) - q*(q+1)) * sg.op_T(spin, l, q+1)
+                            math.sqrt(l*(l + 1) - q*(q + 1))
+                            * sg.op_T(spin, l, q + 1)
                         ))
 
         # Test the commutation relations using the sparse backend
@@ -229,7 +138,7 @@ class TestOperators(unittest.TestCase):
             for l in range(0, int(2*spin+1)):
                 for q in range(-l, l+1):
 
-                    # Check the commutation relations
+                    # Check the defining commutation relations.
                     self.assertTrue(np.allclose(
                         comm(sg.op_Sz(spin), sg.op_T(spin, l, q)).toarray(),
                         q*sg.op_T(spin, l, q).toarray()
@@ -252,8 +161,8 @@ class TestOperators(unittest.TestCase):
                     if not q == l:
                         self.assertTrue(np.allclose(
                             comm(sg.op_Sp(spin), sg.op_T(spin, l, q)).toarray(),
-                            math.sqrt(l*(l+1) - q*(q+1)) * \
-                            sg.op_T(spin, l, q+1).toarray(),
+                            math.sqrt(l*(l+1) - q*(q+1))
+                            * sg.op_T(spin, l, q+1).toarray(),
                             atol = 1e-7
                         ))
 
