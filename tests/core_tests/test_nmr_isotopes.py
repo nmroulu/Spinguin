@@ -78,3 +78,34 @@ class TestNMRIsotopes(unittest.TestCase):
         # Defining an existing isotope must result in an error
         with self.assertRaises(ValueError):
             sg.add_isotope("1H")
+
+    def test_atomic_mass(self):
+        """
+        Test retrieving atomic masses.
+        """
+
+        # Compare against tabulated reference values.
+        self.assertEqual(sg.atomic_mass("1H"), 1.007825)
+        self.assertEqual(sg.atomic_mass("28Si"), 27.976927)
+        self.assertEqual(sg.atomic_mass("40Ar"), 39.962383)
+
+    def test_natural_abundance(self):
+        """
+        Test retrieving natural abundances.
+        """
+
+        # Compare against tabulated reference values.
+        self.assertEqual(sg.natural_abundance("1H"), 99.9885)
+        self.assertEqual(sg.natural_abundance("13C"), 1.07)
+        self.assertEqual(sg.natural_abundance("28Si"), 92.223)
+        self.assertEqual(sg.natural_abundance("239Pu"), 0.0)
+
+    def test_common_non_nmr_active_isotopes(self):
+        """
+        Test common non-NMR-active isotopes present in the table.
+        """
+
+        # Check that common non-NMR-active isotopes have zero-valued properties.
+        self.assertEqual(sg.spin("4He"), 0.0)
+        self.assertEqual(sg.gamma("40Ar", "Hz"), 0.0)
+        self.assertEqual(sg.quadrupole_moment("56Fe"), 0.0)
