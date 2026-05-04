@@ -157,86 +157,72 @@ class TestBasis(unittest.TestCase):
 
     def test_truncate_basis_by_coupling_2(self):
         """
-        Test truncating the basis set by coupling.
+        Test basis truncation from distance-based coupling connectivity.
         """
-        # Example system
+        # Build the full basis set for the example system.
         spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
 
-        # Assign XYZ
+        # Assign Cartesian coordinates used to infer couplings.
         spin_system.xyz = [
             [0, 0, 0],
             [1, 1, 1],
             [99, 99, 99]
         ]
 
-        # Create a basis set with all coherence orders 
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
-
-        # Save the original basis set for further testing
+        # Save the original basis set for later comparison.
         basis_org = spin_system.basis.basis.copy()
 
-        # Truncate the basis set
+        # Truncate the basis set according to the inferred coupling graph.
         spin_system.basis.truncate_by_coupling()
 
-        # Test each state in the original basis
+        # Check that only the expected disconnected states are removed.
         for op_def in basis_org:
-
-            # Determine whether a state should exist in the basis
             deleted = (op_def[0] != 0 or op_def[1] != 0) and op_def[2] != 0 
 
-            # Check if the state is deleted as it should be
             if deleted:
                 with self.assertRaises(ValueError):
                     spin_system.basis.indexof(op_def)
-
-            # Otherwise the state should be in the basis set (no Error)
             else:
                 spin_system.basis.indexof(op_def)
 
     def test_truncate_basis_by_coupling_3(self):
         """
-        Test truncating the basis set by coupling.
+        Test basis truncation with combined coupling definitions.
         """
-        # Example system
+        # Build the full basis set for the example system.
         spin_system = sg.SpinSystem(['1H', '1H', '1H'])
+        spin_system.basis.max_spin_order = 3
+        spin_system.basis.build()
 
-        # Assign J-couplings (spins 1 and 3 are coupled)
+        # Assign scalar couplings where spins 1 and 3 are coupled.
         spin_system.J_couplings = [
             [0, 0, 0],
             [0, 0, 0],
             [1, 0, 0]
         ]
 
-        # Assign XYZ (spins 1 and 2 are coupled)
+        # Assign coordinates where spins 1 and 2 are coupled.
         spin_system.xyz = [
             [0, 0, 0],
             [1, 1, 1],
             [99, 99, 99]
         ]
 
-        # Create a basis set with all coherence orders 
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
-
-        # Save the original basis set for further testing
+        # Save the original basis set for later comparison.
         basis_org = spin_system.basis.basis.copy()
 
-        # Truncate the basis set
+        # Truncate the basis set using the combined connectivity data.
         spin_system.basis.truncate_by_coupling()
 
-        # Test each state in the original basis
+        # Check that only the expected disconnected states are removed.
         for op_def in basis_org:
-
-            # Determine whether a state should exist in the basis
             deleted = op_def[0] == 0 and op_def[1] != 0 and op_def[2] != 0 
 
-            # Check if the state is deleted as it should be
             if deleted:
                 with self.assertRaises(ValueError):
                     spin_system.basis.indexof(op_def)
-
-            # Otherwise the state should be in the basis set (no Error)
             else:
                 spin_system.basis.indexof(op_def)
 
