@@ -474,9 +474,11 @@ class Basis:
 
         # Copy the initial state vector for the ZTE propagation loop
         rho_zte = rho.copy()
+        if sp.issparse(rho_zte):
+            rho_zte = rho_zte.toarray()
 
         # Track the largest absolute value reached by each basis state
-        rho_max = abs(np.array(rho_zte))
+        rho_max = abs(rho_zte)
 
         # Rescale the ZTE threshold for the current state-vector amplitude
         zero_zte = parameters.zero_zte / max(rho_max[1:, 0])
