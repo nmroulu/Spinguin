@@ -18,6 +18,9 @@ class TestOperators(unittest.TestCase):
     Test operator factories and operator-string parsing.
     """
 
+    # List the spin quantum numbers used in the commutator tests.
+    SPINS = [1/2, 1, 3/2]
+
     def test_op_S(self):
         """
         The operators `E`, `Sx`, `Sy`, `Sz`, `Sp`, and `Sm` are compared
@@ -26,12 +29,9 @@ class TestOperators(unittest.TestCase):
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # List the spin quantum numbers used in the commutator tests.
-        spins = [1/2, 1, 3/2]
-
         # Test the commutation relations using the dense backend.
         sg.parameters.sparse_operator = False
-        for spin in spins:
+        for spin in self.SPINS:
 
             # Check the standard angular momentum commutators.
             self.assertTrue(np.allclose(comm(sg.op_E(spin), sg.op_E(spin)), 0))
@@ -58,7 +58,7 @@ class TestOperators(unittest.TestCase):
 
         # Test the commutation relations using the sparse backend.
         sg.parameters.sparse_operator = True
-        for spin in spins:
+        for spin in self.SPINS:
 
             # Test commutation relations
             self.assertTrue(np.allclose(
@@ -93,12 +93,9 @@ class TestOperators(unittest.TestCase):
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # List the spin quantum numbers to test.
-        spins = [1/2, 1, 3/2]
-
         # Test the commutation relations using the dense backend.
         sg.parameters.sparse_operator = False
-        for spin in spins:
+        for spin in self.SPINS:
 
             # Go through all the possible ranks and projections
             for l in range(0, int(2*spin+1)):
@@ -132,7 +129,7 @@ class TestOperators(unittest.TestCase):
 
         # Test the commutation relations using the sparse backend
         sg.parameters.sparse_operator = True
-        for spin in spins:
+        for spin in self.SPINS:
 
             # Go through all the possible ranks and projections
             for l in range(0, int(2*spin+1)):
