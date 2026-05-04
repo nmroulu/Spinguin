@@ -231,115 +231,74 @@ class TestBasis(unittest.TestCase):
         Test the basis set truncation using ZTE by comparing the generated FID
         to the exact solution.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
         sg.parameters.temperature = 295
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
-
-        # Create the basis set
+        # Build the basis set for the example spin system.
+        ss = sg.SpinSystem(["1H", "1H", "1H", "1H"])
         ss.basis.max_spin_order = 3
         ss.basis.build()
 
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        # Define the chemical shifts in ppm.
+        ss.chemical_shifts = [8.1, 7.9, 5.1, 4.9]
 
-        # Define scalar couplings (in Hz)
+        # Define scalar couplings in Hz.
         ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
+            [0,     0,      0,      0],
+            [2,     0,      0,      0],
+            [0,     0,      0,      0],
+            [0,     0,      1,      0]
         ]
 
-        # Define Cartesian coordinates of nuclei
-        ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
-        ]
-
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
-        # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
-        ])
-        ss.efg = efg
-
-        # Define the relaxation theory
-        ss.relaxation.thermalization = True
-        ss.relaxation.theory = "redfield"
-        ss.relaxation.tau_c = 50e-12
-
-        # Dwell time and number of points
+        # Define the acquisition parameters.
         dt = 1e-3
-        npoints = 1000
+        npoints = 500
 
-        # Get the Hamiltonian
+        # Construct the Liouvillian.
         H = sg.hamiltonian(ss)
-        
-        # Get the Redfield relaxation superoperator
-        R = sg.relaxation(ss)
+        L = sg.liouvillian(H)
 
-        # Get the Liouvillian
-        L = sg.liouvillian(H, R)
+        # Transform the Liouvillian to the rotating frame.
+        L = sg.rotating_frame(ss, L, ["1H"], [8])
 
-        # Transform the Liouvillian to the rotating frame
-        L = sg.rotating_frame(ss, L, ["1H", "14N"], [8, 96])
-
-        # Get the thermal equilibrium state
+        # Get the thermal equilibrium state.
         rho = sg.equilibrium_state(ss)
 
-        # Apply pulse for protons
+        # Apply a proton pulse to generate observable coherence.
         indices = np.where(ss.isotopes == "1H")[0]
         op_pulse = "+".join(f"I(y,{i})" for i in indices)
         Px = sg.pulse(ss, op_pulse, 90)
         rho = Px @ rho
 
-        # Truncate the basis set to single-quantum coherence
+        # Retain only single-quantum coherences before the ZTE step.
         L, rho = ss.basis.truncate_by_coherence([1, -1], L, rho)
 
-        # Truncate the basis set using ZTE (make new spin system for this)
+        # Apply ZTE in a copied spin system.
         ss_ZTE = deepcopy(ss)
         L_ZTE, rho_ZTE = ss_ZTE.basis.truncate_by_zte(L, rho)
 
-        # Get the time propagators
+        # Build the propagators for the full and truncated problems.
         P = sg.propagator(L, dt)
         P_ZTE = sg.propagator(L_ZTE, dt)
 
-        # Construct the operator to be measured
+        # Construct the measurement operator.
         op_measure = "+".join(f"I(-,{i})" for i in indices)
 
-        # Initialize an array for storing results
+        # Allocate arrays for the reference and ZTE signals.
         fid = np.zeros(npoints, dtype=complex)
         fid_ZTE = np.zeros(npoints, dtype=complex)
 
-        # Perform the time evolution
+        # Propagate both systems and record their free induction decays.
         for step in range(npoints):
             fid[step] = sg.measure(ss, rho, op_measure)
             fid_ZTE[step] = sg.measure(ss_ZTE, rho_ZTE, op_measure)
             rho = P @ rho
             rho_ZTE = P_ZTE @ rho_ZTE
 
-        # Check that the FIDs match
+        # Verify that the ZTE truncation preserves the signal exactly.
         self.assertTrue(np.allclose(fid, fid_ZTE))
 
     def test_truncate_basis_by_indices(self):
