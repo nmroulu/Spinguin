@@ -2,7 +2,6 @@
 Tests for reading spin-system input data from text files.
 """
 
-import os
 import unittest
 
 import numpy as np
