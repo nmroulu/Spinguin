@@ -61,28 +61,26 @@ class TestBasis(unittest.TestCase):
         """
         Test the mapping of states to their corresponding indices.
         """
-        # Create a spin system
-        spin_system = sg.SpinSystem(["14N", "1H", "1H"])
 
-        # Create a basis set
+        # Build the basis set for the test system.
+        spin_system = sg.SpinSystem(["14N", "1H", "1H"])
         spin_system.basis.max_spin_order = 2
         spin_system.basis.build()
 
-        # Test searching the index against hard-coded values with different
-        # input types
+        # Check state indexing for multiple supported input types.
         self.assertEqual(spin_system.basis.indexof([0, 1, 0]), 4)
         self.assertEqual(spin_system.basis.indexof((1, 0, 3)), 19)
         self.assertEqual(spin_system.basis.indexof(np.array([8, 0, 3])), 68)
 
-        # Test searching for a non-existent state
+        # Check that a non-existent state raises an error.
         with self.assertRaises(ValueError):
             spin_system.basis.indexof([9, 9, 9])
 
-        # Test searching state with too small dimension
+        # Check that an undersized state vector raises an error.
         with self.assertRaises(ValueError):
             spin_system.basis.indexof([0])
 
-        # Test searching state with too large dimension
+        # Check that an oversized state vector raises an error.
         with self.assertRaises(ValueError):
             spin_system.basis.indexof([0, 1, 2, 0])
 
