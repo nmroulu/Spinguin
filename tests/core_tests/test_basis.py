@@ -9,6 +9,7 @@ from copy import deepcopy
 import numpy as np
 
 import spinguin as sg
+from ._helpers import build_spin_system
 
 class TestBasis(unittest.TestCase):
     """
@@ -32,9 +33,7 @@ class TestBasis(unittest.TestCase):
         ])
         
         # Build the basis set for the test system.
-        spin_system = sg.SpinSystem(['1H', '1H'])
-        spin_system.basis.max_spin_order = 1
-        spin_system.basis.build()
+        spin_system = build_spin_system(["1H", "1H"], 1)
 
         # Compare the generated basis set with the reference result.
         self.assertTrue(np.array_equal(spin_system.basis.basis, basis_ref))
@@ -63,9 +62,7 @@ class TestBasis(unittest.TestCase):
         """
 
         # Build the basis set for the test system.
-        spin_system = sg.SpinSystem(["14N", "1H", "1H"])
-        spin_system.basis.max_spin_order = 2
-        spin_system.basis.build()
+        spin_system = build_spin_system(["14N", "1H", "1H"], 2)
 
         # Check state indexing for multiple supported input types.
         self.assertEqual(spin_system.basis.indexof([0, 1, 0]), 4)
@@ -90,9 +87,7 @@ class TestBasis(unittest.TestCase):
         selection criterion.
         """
         # Build the basis set for the test system.
-        spin_system = sg.SpinSystem(['1H', '1H', '14N'])
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
+        spin_system = build_spin_system(["1H", "1H", "14N"], 3)
 
         # Save the original basis set for later comparison.
         basis_org = spin_system.basis.basis.copy()
@@ -128,9 +123,7 @@ class TestBasis(unittest.TestCase):
         Test basis truncation from scalar-coupling connectivity.
         """
         # Build the full basis set for the example system.
-        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
+        spin_system = build_spin_system(["1H", "1H", "1H"], 3)
 
         # Assign the J-couplings.
         spin_system.J_couplings = [
@@ -160,9 +153,7 @@ class TestBasis(unittest.TestCase):
         Test basis truncation from distance-based coupling connectivity.
         """
         # Build the full basis set for the example system.
-        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
+        spin_system = build_spin_system(["1H", "1H", "1H"], 3)
 
         # Assign Cartesian coordinates used to infer couplings.
         spin_system.xyz = [
@@ -192,9 +183,7 @@ class TestBasis(unittest.TestCase):
         Test basis truncation with combined coupling definitions.
         """
         # Build the full basis set for the example system.
-        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
+        spin_system = build_spin_system(["1H", "1H", "1H"], 3)
 
         # Assign scalar couplings where spins 1 and 3 are coupled.
         spin_system.J_couplings = [
@@ -238,9 +227,7 @@ class TestBasis(unittest.TestCase):
         sg.parameters.temperature = 295
 
         # Build the basis set for the example spin system.
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H"])
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        ss = build_spin_system(["1H", "1H", "1H", "1H"], 3)
 
         # Define the chemical shifts in ppm.
         ss.chemical_shifts = [8.1, 7.9, 5.1, 4.9]
@@ -306,9 +293,7 @@ class TestBasis(unittest.TestCase):
         Test basis-set truncation by explicitly retained basis indices.
         """
         # Build the full basis set for the example system.
-        spin_system = sg.SpinSystem(['1H', '1H', '1H'])
-        spin_system.basis.max_spin_order = 3
-        spin_system.basis.build()
+        spin_system = build_spin_system(["1H", "1H", "1H"], 3)
 
         # Keep a copy of the original basis set for comparison.
         spin_system_org = deepcopy(spin_system)
