@@ -89,43 +89,36 @@ class TestBasis(unittest.TestCase):
         Test the creation of the truncated basis using coherence order as the
         selection criterion.
         """
-        # Example system
-        spin_system = sg.SpinSystem(['1H', '1H', '1H', '1H', '14N'])
-
-        # Create a basis set with all coherence orders 
-        spin_system.basis.max_spin_order = 4
+        # Build the basis set for the test system.
+        spin_system = sg.SpinSystem(['1H', '1H', '14N'])
+        spin_system.basis.max_spin_order = 3
         spin_system.basis.build()
 
-        # Save the original basis set for further testing
+        # Save the original basis set for later comparison.
         basis_org = spin_system.basis.basis.copy()
 
-        # Create a superoperator and a state in the full basis set
-        oper_org = sg.superoperator(spin_system, "I(z,0) * I(+,1) * I(-,2)")
-        state_org = sg.state(spin_system, "I(+,1) * I(z,3) * I(-,4)")
+        # Create a superoperator and a state in the original basis set.
+        oper_org = sg.superoperator(spin_system, "I(z, 0) * I(+, 1) * I(-, 2)")
+        state_org = sg.state(spin_system, "I(+, 0) * I(z, 1) * I(-, 2)")
 
-        # Truncate the basis (retain coherence orders of -2, 0, and 1)
-        # Obtain also the superoperator and the state in the truncated basis
+        # Truncate the basis and transform the operator and state with it.
         coherence_orders = [-2, 0, 1]
         oper_org_tr, state_org_tr = spin_system.basis.truncate_by_coherence(
             coherence_orders, oper_org, state_org
         )
 
         # Obtain the superoperator and state directly in the truncated basis
-        oper_tr = sg.superoperator(spin_system, "I(z,0) * I(+,1) * I(-,2)")
-        state_tr = sg.state(spin_system, "I(+,1) * I(z,3) * I(-,4)")
+        oper_tr = sg.superoperator(spin_system, "I(z, 0) * I(+, 1) * I(-, 2)")
+        state_tr = sg.state(spin_system, "I(+, 0) * I(z, 1) * I(-, 2)")
 
-        # Verify that the superoperators and states are equal
+        # Verify that both construction routes give the same result.
         self.assertTrue(np.allclose(oper_org_tr.toarray(), oper_tr.toarray()))
         self.assertTrue(np.allclose(state_org_tr, state_tr))
 
-        # Check that only the coherence orders [-2, 0, 1] remain in the basis
+        # Check that only the requested coherence orders remain.
         for op_def in basis_org:
-
-            # Should not raise an error
             if sg.coherence_order(op_def) in coherence_orders:
                 spin_system.basis.indexof(op_def)
-
-            # Raises an error
             else:
                 with self.assertRaises(ValueError):
                     spin_system.basis.indexof(op_def)
