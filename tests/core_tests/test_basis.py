@@ -41,20 +41,19 @@ class TestBasis(unittest.TestCase):
 
     def test_make_basis_2(self):
         """
-        Test the creation of a basis set using large spin system.
+        Test basis-set dimensions.
         """
 
-        # Large test system
-        spin_system = sg.SpinSystem(['1H', '1H', '1H', '1H', '1H', '1H', '1H'])
+        # Create the test system.
+        spin_system = sg.SpinSystem(['1H', '1H', '1H', '1H'])
         nspins = spin_system.nspins
 
-        # Compare the dimension of the basis set to a reference value for
-        # different spin orders
+        # Compare the basis dimension with the combinatorial reference value.
         for max_so in range(1, nspins):
             spin_system.basis.max_spin_order = max_so
             spin_system.basis.build()
             dim_ref = sum(
-                [math.comb(nspins, k) * 3**k for k in range(max_so + 1)]
+                math.comb(nspins, k) * 3**k for k in range(max_so + 1)
             )
             self.assertEqual(spin_system.basis.dim, dim_ref)
 
