@@ -73,75 +73,58 @@ class TestOperators(unittest.TestCase):
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # Test the commutation relations using the dense backend.
-        sg.parameters.sparse_operator = False
-        for spin in self.SPINS:
+        def _test_op_T(zeros: Callable, sparse: bool) -> None:
+            sg.parameters.sparse_operator = sparse
 
-            # Go through all the possible ranks and projections
-            for l in range(0, int(2*spin+1)):
-                for q in range(-l, l+1):
+            # Test with each spin quantum number
+            for spin in self.SPINS:
 
-                    # Check the defining commutation relations.
-                    self.assertTrue(np.allclose(
-                        comm(sg.op_Sz(spin), sg.op_T(spin, l, q)),
-                        q*sg.op_T(spin, l, q)
-                    ))
-                    self.assertTrue(np.allclose(
-                        comm(
-                            sg.op_Sx(spin)@sg.op_Sx(spin) + \
-                            sg.op_Sy(spin)@sg.op_Sy(spin) + \
-                            sg.op_Sz(spin)@sg.op_Sz(spin),
-                            sg.op_T(spin, l, q)
-                        ), 
-                        0
-                    ))
-                    if not q == -l:
-                        self.assertTrue(np.allclose(
-                            comm(sg.op_Sm(spin), sg.op_T(spin, l, q)),
-                            math.sqrt(l*(l + 1) - q*(q - 1)) * sg.op_T(spin, l, q - 1)
-                        ))
-                    if not q == l:
-                        self.assertTrue(np.allclose(
-                            comm(sg.op_Sp(spin), sg.op_T(spin, l, q)),
-                            math.sqrt(l*(l + 1) - q*(q + 1))
-                            * sg.op_T(spin, l, q + 1)
-                        ))
+                # Calculate single-spin operators for the current spin
+                Sx = sg.op_Sx(spin)
+                Sy = sg.op_Sy(spin)
+                Sz = sg.op_Sz(spin)
+                Sp = sg.op_Sp(spin)
+                Sm = sg.op_Sm(spin)
+                S2 = Sx @ Sx + Sy @ Sy + Sz @ Sz
 
-        # Test the commutation relations using the sparse backend
-        sg.parameters.sparse_operator = True
-        for spin in self.SPINS:
+                # Test all ranks and projections
+                for l in range(0, int(2*spin + 1)):
+                    for q in range(-l, l + 1):
 
-            # Go through all the possible ranks and projections
-            for l in range(0, int(2*spin+1)):
-                for q in range(-l, l+1):
+                        T_lq = sg.op_T(spin, l, q)
 
-                    # Check the defining commutation relations.
-                    self.assertTrue(np.allclose(
-                        comm(sg.op_Sz(spin), sg.op_T(spin, l, q)).toarray(),
-                        q*sg.op_T(spin, l, q).toarray()
-                    ))
-                    self.assertTrue(np.allclose(
-                        comm(
-                            sg.op_Sx(spin)@sg.op_Sx(spin) + \
-                            sg.op_Sy(spin)@sg.op_Sy(spin) + \
-                            sg.op_Sz(spin)@sg.op_Sz(spin),
-                            sg.op_T(spin, l, q)
-                        ).toarray(), 0
-                    ))
-                    if not q == -l:
-                        self.assertTrue(np.allclose(
-                            comm(sg.op_Sm(spin), sg.op_T(spin, l, q)).toarray(),
-                            math.sqrt(l*(l+1) - q*(q-1)) * \
-                            sg.op_T(spin, l, q-1).toarray()
-                        ))
-                    # NOTE: Tolerance of allclose has to be increased a bit
-                    if not q == l:
-                        self.assertTrue(np.allclose(
-                            comm(sg.op_Sp(spin), sg.op_T(spin, l, q)).toarray(),
-                            math.sqrt(l*(l+1) - q*(q+1))
-                            * sg.op_T(spin, l, q+1).toarray(),
-                            atol = 1e-7
-                        ))
+                        # Define the commutation relations.
+                        relations = [
+                            (comm(Sz, T_lq), q * T_lq),
+                            (comm(S2, T_lq), zeros(T_lq.shape)),
+                        ]
+                        if q != -l:
+                            T_lqm1 = sg.op_T(spin, l, q - 1)
+                            relations.append((
+                                comm(sg.op_Sm(spin), T_lq),
+                                math.sqrt(l*(l + 1) - q*(q - 1)) * T_lqm1
+                            ))
+                        if not q == l:
+                            T_lqp1 = sg.op_T(spin, l, q + 1)
+                            relations.append((
+                                comm(sg.op_Sp(spin), T_lq),
+                                math.sqrt(l*(l + 1) - q*(q + 1)) * T_lqp1 
+                            ))
+
+                        # Test the relations
+                        for actual, expected in relations:
+                            if sparse:
+                                actual = actual.toarray()
+                                expected = expected.toarray()
+                            # NOTE: Tolerance of allclose increased slightly
+                            self.assertTrue(
+                                np.allclose(actual, expected, atol=1e-7)
+                            )
+
+        # Test with dense and sparse backends
+        _test_op_T(zeros=np.zeros, sparse=False)
+        _test_op_T(zeros=sp.csc_array, sparse=True)
+
 
     def test_operator_1(self):
         """
