@@ -241,92 +241,80 @@ class TestStates(unittest.TestCase):
     def _test_state(
         self,
         ss: sg.SpinSystem,
-        opers: dict,
-        test_states: list,
+        test_opers: list[dict[str, np.ndarray]],
         sparse_operator: bool,
         sparse_state: bool
-    ):
+    ) -> None:
         """
         Helper method for test_state().
         """
-        # Set the sparsity
+        # Set the state and operator sparsity.
         sg.parameters.sparse_operator = sparse_operator
         sg.parameters.sparse_state = sparse_state
 
         # Test the creation of states with all possible combinations
-        for i in test_states:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
+        for op1_k, op1_v in test_opers[0].items():
+            for op2_k, op2_v in test_opers[1].items():
 
-            for j in test_states:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
+                # Create the state vector using inbuilt function
+                op_string = f"{op1_k} * {op2_k}"
+                state = sg.state(ss, op_string)
 
-                for k in test_states:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
+                # Create the reference density matrix
+                state_ref = np.kron(op1_v, op2_v)
 
-                    # Create the state vector in the spherical tensor basis
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-                    state = sg.state(ss, op_string)
+                # Convert the state to density matrix
+                state = sg.state_to_zeeman(ss, state)
 
-                    # Create the reference density matrix
-                    state_ref = np.kron(
-                        opers[(i, 1/2)], np.kron(opers[(j, 1)], opers[(k, 3/2)])
-                    )
+                # Convert the state to dense if necessary
+                if sparse_operator:
+                    state = state.toarray()
 
-                    # Convert the state to density matrix
-                    state = sg.state_to_zeeman(ss, state)
-
-                    # Convert the state to dense if necessary
-                    if sparse_operator:
-                        state = state.toarray()
-
-                    # Compare to the reference
-                    self.assertTrue(np.allclose(state, state_ref))
+                # Compare to the reference
+                self.assertTrue(np.allclose(state, state_ref))
 
 
     def test_state(self):
         """
-        A test that creates various states for a spin system using the
-        operator string. These states are converted to Zeeman eigenbasis
-        and compared with reference.
+        Test state construction from operator strings against Zeeman references.
         """
+
         # Reset to defaults
         sg.parameters.default()
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
+        # Build the example spin system.
+        ss = build_spin_system(["1H", "14N"], 2)
 
-        # Build the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-
-        # States to test
-        test_states = ['E', 'x', 'y', 'z', '+', '-']
-
-        # Get the Zeeman eigenbasis operators (as dense matrices)
+        # Create a set of operators to test
         sg.parameters.sparse_operator = False
-        opers = {}
-        for spin in ss.spins:
-            opers[('E', spin)] = sg.op_E(spin)
-            opers[('x', spin)] = sg.op_Sx(spin)
-            opers[('y', spin)] = sg.op_Sy(spin)
-            opers[('z', spin)] = sg.op_Sz(spin)
-            opers[('+', spin)] = sg.op_Sp(spin)
-            opers[('-', spin)] = sg.op_Sm(spin)
+        test_opers = []
+        for i in range(ss.nspins):
+            ops = {}
+
+            # Unit operator
+            ops["E"] = sg.op_E(ss.spins[i])
+
+            # Cartesian operators
+            ops[f"I(x, {i})"] = sg.op_Sx(ss.spins[i])
+            ops[f"I(y, {i})"] = sg.op_Sy(ss.spins[i])
+            ops[f"I(z, {i})"] = sg.op_Sz(ss.spins[i])
+
+            # Ladder operators
+            ops[f"I(+, {i})"] = sg.op_Sp(ss.spins[i])
+            ops[f"I(-, {i})"] = sg.op_Sm(ss.spins[i])
+
+            # Spherical tensor operators
+            for l in range(int(2*ss.spins[i] + 1)):
+                for q in range(-l, l + 1):
+                    ops[f"T({l}, {q}, {i})"] = sg.op_T(ss.spins[i], l, q)
+                    
+            test_opers.append(ops)
 
         # Use the helper method to test all possible state combinations
-        self._test_state(ss, opers, test_states, True, True)
-        self._test_state(ss, opers, test_states, True, False)
-        self._test_state(ss, opers, test_states, False, True)
-        self._test_state(ss, opers, test_states, False, False)
+        self._test_state(ss, test_opers, True, True)
+        self._test_state(ss, test_opers, True, False)
+        self._test_state(ss, test_opers, False, True)
+        self._test_state(ss, test_opers, False, False)
 
     def test_unit_state(self):
         """
