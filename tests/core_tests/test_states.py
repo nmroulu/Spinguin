@@ -443,55 +443,48 @@ class TestStates(unittest.TestCase):
         sg.parameters.magnetic_field = magnetic_field
         sg.parameters.temperature = temperature
         
-        # Construct the equilibrium state
-        sg.parameters.sparse_state = False
-        rho_eq_dense = sg.equilibrium_state(ss)
-        sg.parameters.sparse_state = True
-        rho_eq_sparse = sg.equilibrium_state(ss)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Test the thermal equilibrium for each spin
-        for i in range(ss.nspins):
+            # Construct the equilibrium state
+            rho_eq = sg.equilibrium_state(ss)
 
-            # Measure the z-magnetization
-            Mz_measured_dense = sg.measure(ss, rho_eq_dense, f"I(z, {i})")
-            Mz_measured_sparse = sg.measure(ss, rho_eq_sparse, f"I(z, {i})")
+            # Compare the equilibrium magnetisation for every spin.
+            for i in range(ss.nspins):
 
-            # Calculate a reference value for the magnetisation in equilibrium
-            Mz_ref = _thermal_magnetization(
-                gamma = ss.gammas[i],
-                S = ss.spins[i],
-                B = sg.parameters.magnetic_field,
-                T = sg.parameters.temperature
-            )
+                # Measure the longitudinal magnetisation
+                Mz_measured = sg.measure(ss, rho_eq, f"I(z, {i})")
 
-            # Compare
-            self.assertAlmostEqual(Mz_measured_sparse, Mz_ref)
-            self.assertAlmostEqual(Mz_measured_dense, Mz_ref)
+                # Calculate the reference equilibrium magnetisation.
+                Mz_ref = _thermal_magnetization(
+                    gamma = ss.gammas[i],
+                    S = ss.spins[i],
+                    B = sg.parameters.magnetic_field,
+                    T = sg.parameters.temperature
+                )
+
+                # Compare the measured and reference magnetisations.
+                self.assertAlmostEqual(Mz_measured, Mz_ref)
 
     def test_equilibrium_state(self):
         """
-        Compare the expectation value of Iz operator for the equilibrium
-        state against the reference value calculated from Boltzmann
-        distribution.
+        Test equilibrium magnetisation against Boltzmann-distribution values.
         """
-        # Reset parameters
+
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "14N", "23Na", "17O"])
+        # Build the example spin system.
+        ss = build_spin_system(["1H", "14N", "23Na"], 3)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 4
-        ss.basis.build()
-
-        # Test the equilibrium state using helper method
+        # Test the equilibrium state under two conditions.
         self._test_equilibrium_state(ss, magnetic_field=9.4, temperature=293)
         self._test_equilibrium_state(ss, magnetic_field=100, temperature=1)
 
 def _thermal_magnetization(gamma: float, S: float, B: float, T: float) -> float:
     """
-    Calculates the magnetization at thermal equilibrium. Helper function for
-    testing.
+    Calculate the thermal-equilibrium magnetisation for one spin.
     
     Parameters
     ----------
@@ -509,19 +502,22 @@ def _thermal_magnetization(gamma: float, S: float, B: float, T: float) -> float:
     magnetization : float
         Magnetization at thermal equilibrium.
     """
-    # Get the possible spin magnetic quantum numbers (from largest to smallest)
+    # Get the available spin magnetic quantum numbers.
     m = np.arange(-S, S + 1)
 
-    # Get the populations of the states
+    # Calculate the Boltzmann populations of the Zeeman levels.
     populations = {}
     for m_i in m:
-        # Population according to the Boltzmann distribution
+
+        # Calculate population according to the Boltzmann distribution
         numerator = np.exp(m_i * const.hbar * gamma * B / (const.k * T))
         denominator = sum(
-            np.exp(m_j * const.hbar * gamma * B / (const.k * T)) for m_j in m)
+            np.exp(m_j * const.hbar * gamma * B / (const.k * T))
+            for m_j in m
+        )
         populations[m_i] = numerator / denominator
 
-    # Calculate the polarization
+    # Calculate the equilibrium magnetisation.
     magnetization = sum(m_i * populations[m_i] for m_i in m)
     
     return magnetization
