@@ -318,56 +318,39 @@ class TestStates(unittest.TestCase):
 
     def test_unit_state(self):
         """
-        A test that creates the unit state in the spherical tensor basis
-        with the two normalization conventions and compares them to the
-        expected reference values.
+        Test unit-state construction with and without trace normalisation.
         """
+
         # Reset to default parameters
         sg.parameters.default()
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
+        # Build the example spin system.
+        ss = build_spin_system(["1H", "14N", "23Na"], 3)
 
-        # Build a basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-
-        # Create the unit state in the Zeeman eigenbasis
+        # Build the unit operator in the Zeeman basis.
         sg.parameters.sparse_operator = False
-        unit_zeeman = np.array([[1]])
+        unit_ref = np.array([[1]])
         for spin in ss.spins:
-            unit_zeeman = np.kron(unit_zeeman, sg.op_E(spin))
-
-        # Create the non-normalized unit state in the spherical tensor basis
-        sg.parameters.sparse_state = False
-        unit_dense = sg.unit_state(ss, normalized=False)
-        sg.parameters.sparse_state = True
-        unit_sparse = sg.unit_state(ss, normalized=False)
-
-        # Convert to density matrices
-        unit_dense = sg.state_to_zeeman(ss, unit_dense)
-        unit_sparse = sg.state_to_zeeman(ss, unit_sparse)
+            unit_ref = np.kron(unit_ref, sg.op_E(spin))
+        unit_ref_norm = unit_ref / unit_ref.trace()
         
-        # Compare
-        self.assertTrue(np.allclose(unit_dense, unit_zeeman))
-        self.assertTrue(np.allclose(unit_sparse, unit_zeeman))
 
-        # Create the trace-normalized unit state in the spherical tensor basis
-        sg.parameters.sparse_state = False
-        unit_dense = sg.unit_state(ss, normalized=True)
-        sg.parameters.sparse_state = True
-        unit_sparse = sg.unit_state(ss, normalized=True)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Convert to density matrices
-        unit_dense = sg.state_to_zeeman(ss, unit_dense)
-        unit_sparse = sg.state_to_zeeman(ss, unit_sparse)
+            # Create the unit state using inbuilt function.
+            unit = sg.unit_state(ss, normalized=False)
+            unit_norm = sg.unit_state(ss, normalized=True)
 
-        # Apply trace normalization to the unit state in the Zeeman eigenbasis
-        unit_zeeman = unit_zeeman / unit_zeeman.trace()
+            # Convert to density matrix
+            unit = sg.state_to_zeeman(ss, unit)
+            unit_norm = sg.state_to_zeeman(ss, unit_norm)
+        
+            # Compare the unit states with the reference.
+            self.assertTrue(np.allclose(unit, unit_ref))
+            self.assertTrue(np.allclose(unit_norm, unit_ref_norm))
 
-        # Compare
-        self.assertTrue(np.allclose(unit_dense, unit_zeeman))
-        self.assertTrue(np.allclose(unit_sparse, unit_zeeman))
 
     def _test_measure(
         self,
