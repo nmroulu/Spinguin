@@ -272,55 +272,30 @@ class TestRelaxation(unittest.TestCase):
 
     def test_relaxation_sr2k(self):
         """
-        Test that adds the contribution from SR2K to a phenomenological
-        relaxation superoperator and compares the result to a pre-computed
-        value.
+        Test the SR2K contribution against pre-computed reference data.
         """
-        # Set the global parameters
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 3e-6
+        sg.parameters.temperature = 293
 
-        # Load the previously calculated R for comparison
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        R_previous = sp.csc_array(sp.load_npz(
-            os.path.join(test_dir, 'test_data', 'relaxation_sr2k.npz')
-        ))
+        # Load the previously calculated SR2K superoperator.
+        R_ref = sp.csc_array(sp.load_npz(test_data_path('relaxation_sr2k.npz')))
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the spin system for the SR2K test.
+        ss = self._phenomenological_spin_system()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
-
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ]
-
-        # Define the relaxation theory
-        ss.relaxation.theory = "phenomenological"
+        # Enable SR2K
         ss.relaxation.sr2k = "true"
-        ss.relaxation.thermalization = False
-        ss.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
-        ss.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
         
-        # Get the relaxation superoperator
+        # Build the relaxation superoperator.
         R = sg.relaxation(ss)
 
-        # Compare
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the calculated superoperator with the reference.
+        self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
         
-        # Get the relaxation superoperator again (check for cache errors etc.)
+        # Recalculate the same superoperator to exercise caching paths.
         R = sg.relaxation(ss)
         
-        # Compare
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the repeated calculation with the reference.
+        self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
