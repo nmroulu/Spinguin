@@ -1,27 +1,35 @@
-import unittest
-import numpy as np
-import spinguin as sg
+"""
+Tests for superoperator construction, representation, and basis truncation.
+"""
+
 from typing import Literal
+
+import unittest
+
+import numpy as np
+
+import spinguin as sg
 from spinguin._core._la import cartesian_tensor_to_spherical_tensor
 from spinguin._core._superoperators import structure_coefficients
+from ._helpers import build_spin_system
 
 class TestSuperoperators(unittest.TestCase):
+    """
+    Test superoperator generation against reference constructions.
+    """
 
     def test_superoperator_1(self):
         """
         Test that the operator sparsity does not influence the output.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the example spin system.
+        ss = build_spin_system(["1H", "14N"], 2)
 
-        # Build all superoperators from the basis set using the dense operators
+        # Build all superoperators from the basis set using dense operators
         sg.parameters.sparse_operator = False
         sops_dense = []
         for op_def in ss.basis.basis:
@@ -30,18 +38,17 @@ class TestSuperoperators(unittest.TestCase):
         # Clear the cache
         sg.clear_cache()
 
-        # Build all superoperators from the basis set using the sparse operators
+        # Build all superoperators from the basis set using sparse operators
         sg.parameters.sparse_operator = True
         sops_sparse = []
         for op_def in ss.basis.basis:
             sops_sparse.append(sg.superoperator(ss, op_def))
 
-        # Compare
+        # Compare the dense and sparse results.
         for sop_dense, sop_sparse in zip(sops_dense, sops_sparse):
-            self.assertTrue(np.allclose(
-                sop_dense.toarray(),
-                sop_sparse.toarray()
-            ))
+            self.assertTrue(
+                np.allclose(sop_dense.toarray(), sop_sparse.toarray())
+            )
 
     def test_superoperator_2(self):
         """
