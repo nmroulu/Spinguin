@@ -16,15 +16,15 @@ class TestRelaxation(unittest.TestCase):
     Test relaxation superoperator construction.
     """
 
-    def test_ldb_thermalization(self):
+    def _redfield_spin_system(self) -> sg.SpinSystem:
         """
-        Test that relaxation drives the system back to thermal equilibrium.
-        """
+        Create the spin system used in Redfield relaxation tests.
 
-        # Set the global simulation parameters.
-        sg.parameters.default()
-        sg.parameters.magnetic_field = 1
-        sg.parameters.temperature = 273
+        Returns
+        -------
+        SpinSystem
+            Spin system with a built basis set and assigned interactions.
+        """
 
         # Make the spin system
         ss = build_spin_system(["1H", "1H", "14N"], 3)
@@ -54,6 +54,21 @@ class TestRelaxation(unittest.TestCase):
             [0.0000, 0.0000, -1.1000]
         ])
         ss.efg = efg
+
+        return ss
+
+    def test_ldb_thermalization(self):
+        """
+        Test that relaxation drives the system back to thermal equilibrium.
+        """
+
+        # Set the global simulation parameters.
+        sg.parameters.default()
+        sg.parameters.magnetic_field = 1
+        sg.parameters.temperature = 273
+
+        # Build the Redfield test system.
+        ss = self._redfield_spin_system()
 
         # Define the relaxation theory
         ss.relaxation.theory = "redfield"
