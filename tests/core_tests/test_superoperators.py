@@ -130,7 +130,7 @@ class TestSuperoperators(unittest.TestCase):
             self.assertTrue(np.allclose(sop_L.toarray(), sop_L_ref))
             self.assertTrue(np.allclose(sop_R.toarray(), sop_R_ref))
 
-    def test_superoperator_5(self):
+    def test_superoperator_4(self):
         """
         Test caching behavior of the superoperator function when the basis
         changes.
@@ -161,7 +161,7 @@ class TestSuperoperators(unittest.TestCase):
         # Resulting shapes should be different
         self.assertNotEqual(Iz.shape, Iz_tr.shape)
 
-    def test_superoperator_6(self):
+    def test_superoperator_5(self):
         """
         Test creating the superoperator from a string against creating the same
         superoperator from an array.
