@@ -82,26 +82,23 @@ class TestSuperoperators(unittest.TestCase):
     def test_superoperator_3(self):
         """
         Test that the superoperator created using the structure coefficients
-        matches with the trivial approach.
+        matches the explicit matrix-algebra construction.
         """
-        # Reset the parameters to defaults
+
+        # Reset the parameters to defaults.
         sg.parameters.default()
 
-        # Create a test spin system
-        ss = sg.SpinSystem(["1H", "14N"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the test spin system.
+        ss = build_spin_system(["1H", "14N"], 1)
 
         # Test all product operators from the basis set
         for op_def_i in ss.basis.basis:
 
-            # Initialise left and right superoperators (for manual construction)
+            # Start constructing left and right superoperators manually
             sop_L_ref = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
             sop_R_ref = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
 
-            # Construct the operator
+            # Construct the operator in Hilbert space
             op_i = sg.operator(ss, op_def_i)
 
             # Loop over the operator bras
@@ -129,11 +126,10 @@ class TestSuperoperators(unittest.TestCase):
                     sop_R_ref[j, k] = sop_R_ref[j, k] / norm
 
             # Build left and right superoperators using inbuilt function
-            # that uses the structure coefficients
             sop_L = sg.superoperator(ss, op_def_i, "left")
             sop_R = sg.superoperator(ss, op_def_i, "right")
 
-            # Compare
+            # Compare the reference and inbuilt constructions.
             self.assertTrue(np.allclose(sop_L.toarray(), sop_L_ref))
             self.assertTrue(np.allclose(sop_R.toarray(), sop_R_ref))
 
