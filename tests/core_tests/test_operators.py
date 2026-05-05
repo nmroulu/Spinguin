@@ -149,7 +149,9 @@ class TestOperators(unittest.TestCase):
         with self.assertRaises(ValueError):
             sg.operator(ss, [[1, 2, 3]])
 
-        def _test_product_operators() -> None:
+        def _test_product_operators(kron: Callable, sparse: bool) -> None:
+            sg.parameters.sparse_operator = sparse
+
             for i in range(ss.mults[0]):
                 l_i, q_i = sg.idx_to_lq(i)
                 op_i = sg.op_T(ss.spins[0], l_i, q_i)
@@ -167,12 +169,9 @@ class TestOperators(unittest.TestCase):
                         oper = sg.operator(ss, op_def)
 
                         # Create the reference operator manually
-                        if sg.parameters.sparse_operator:
-                            oper_ref = sp.kron(op_i, sp.kron(op_j, op_k))
-                        else:
-                            oper_ref = np.kron(op_i, np.kron(op_j, op_k))
+                        oper_ref = kron(op_i, kron(op_j, op_k))
 
-                        if sg.parameters.sparse_operator:
+                        if sparse:
                             oper = oper.toarray()
                             oper_ref = oper_ref.toarray()
 
@@ -180,9 +179,8 @@ class TestOperators(unittest.TestCase):
                         self.assertTrue(np.allclose(oper, oper_ref))
 
         # Test all product operator combinations with dense and sparse backends
-        for sparse in [False, True]:
-            sg.parameters.sparse_operator = sparse
-            _test_product_operators()
+        _test_product_operators(kron=np.kron, sparse=False)
+        _test_product_operators(kron=sp.kron, sparse=True)
 
 
     def test_operator_2(self):
