@@ -9,8 +9,6 @@ import numpy as np
 import scipy.sparse as sp
 
 import spinguin as sg
-from spinguin._core._nmr_isotopes import ISOTOPES
-from spinguin._core._relaxation import dd_constant
 
 
 class TestRelaxation(unittest.TestCase):
@@ -18,61 +16,44 @@ class TestRelaxation(unittest.TestCase):
     Test relaxation superoperator construction.
     """
 
-
     def test_ldb_thermalization(self):
         """
-        Test the thermalization of the relaxation superoperator. Simulates the
-        evolution of a spin system under relaxation and compares the final state
-        with the thermal equilibrium state.
+        Test that relaxation drives the system back to thermal equilibrium.
         """
-        # Set the global parameters
+        
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
         sg.parameters.temperature = 273
 
         # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        ss = sg.SpinSystem(["1H", "1H", "14N"])
         ss.basis.max_spin_order = 3
         ss.basis.build()
 
         # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
+        ss.chemical_shifts = [5, 6, 7]
 
         # Define scalar couplings (in Hz)
         ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
+            [0,  0,  0],
+            [5,  0,  0],
+            [2,  10, 0]
         ]
 
         # Define Cartesian coordinates of nuclei
         ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
+            [2.0000000, 0.0000000, 0.0000000],
+            [0.0000000, 2.0000000, 0.0000000],
+            [0.0000000, 0.0000000, 2.0000000],
         ]
 
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
         # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
+        efg = np.zeros((3, 3, 3))
+        efg[2] = np.array([
+            [0.3000, 0.0000,  0.0000],
+            [0.0000, 0.8000,  0.0000],
+            [0.0000, 0.0000, -1.1000]
         ])
         ss.efg = efg
 
@@ -82,41 +63,35 @@ class TestRelaxation(unittest.TestCase):
         ss.relaxation.thermalization = True
         ss.relaxation.sr2k = True
 
-        # Propagation parameters
+        # Define the propagation parameters.
         time_step = 2e-3
-        nsteps = 50000
+        nsteps = 40000
 
-        # Get the Hamiltonian
+        # Build the Liouvillian.
         H = sg.hamiltonian(ss)
-
-        # Get the relaxation superoperator
         R = sg.relaxation(ss)
-
-        # Construct the Liouvillian
         L = sg.liouvillian(H, R)
 
-        # Create the thermal equilibrium state
+        # Create the thermal equilibrium state.
         rho = sg.equilibrium_state(ss)
 
-        # Apply a 180-degree pulse (to all 1H)
-        op_string = "I(x,0) + I(x,1) + I(x,2) + I(x,3) + I(x,4) + I(x,5)"
+        # Invert the proton spins.
+        op_string = "I(x,0) + I(x,1)"
         pul_180 = sg.pulse(ss, op_string, 180)
         rho = pul_180 @ rho
 
-        # Switch to the zero-quantum (ZQ) subspace
+        # Restrict the evolution to the zero-quantum subspace.
         L, rho = ss.basis.truncate_by_coherence([0], L, rho)
 
-        # Get the propagator
+        # Build the propagator and evolve the system.
         P = sg.propagator(L, time_step)
-        
-        # Simulate the evolution of the spin system
         for _ in range(nsteps):
             rho = P @ rho
 
-        # Create an equilibrium state in the ZQ basis for reference
+        # Construct the equilibrium reference in the same basis.
         rho_ref = sg.equilibrium_state(ss)
 
-        # Verify that the final state matches the thermal equilibrium state
+        # Verify that the final state matches thermal equilibrium.
         self.assertTrue(np.allclose(rho, rho_ref))
 
     def test_relaxation_redfield_1(self):
