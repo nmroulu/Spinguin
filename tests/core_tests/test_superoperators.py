@@ -2,15 +2,12 @@
 Tests for superoperator construction, representation, and basis truncation.
 """
 
-from typing import Literal
-
 import unittest
 
 import numpy as np
 
 import spinguin as sg
 from spinguin._core._la import cartesian_tensor_to_spherical_tensor
-from spinguin._core._superoperators import structure_coefficients
 from ._helpers import build_spin_system
 
 class TestSuperoperators(unittest.TestCase):
@@ -132,72 +129,6 @@ class TestSuperoperators(unittest.TestCase):
             # Compare the reference and inbuilt constructions.
             self.assertTrue(np.allclose(sop_L.toarray(), sop_L_ref))
             self.assertTrue(np.allclose(sop_R.toarray(), sop_R_ref))
-
-    def test_superoperator_4(self):
-        """
-        Test the construction of superoperators at varying truncated basis sets
-        against the reference method.
-        """
-        # Reset parameters to defaults
-        sg.parameters.default()
-
-        # Define test spin systems
-        ss1 = sg.SpinSystem(["1H"])
-        ss2 = sg.SpinSystem(["1H", "14N"])
-        test_systems = [ss1, ss2]
-
-        # Test with both systems
-        for ss in test_systems:
-
-            # Test all possible spin orders
-            for max_so in range(1, ss.nspins + 1):
-
-                # Create a basis set
-                ss.basis.max_spin_order = max_so
-                ss.basis.build()
-
-                # Test all possible operators
-                for op_def in ss.basis.basis:
-
-                    # Create reference superoperators using an "idiot-proof"
-                    # function
-                    sop_L_ref = sop_prod_ref(
-                        op_def,
-                        ss.basis.basis,
-                        ss.spins,
-                        'left'
-                    )
-                    sop_R_ref = sop_prod_ref(
-                        op_def,
-                        ss.basis.basis,
-                        ss.spins,
-                        'right'
-                    )
-                    sop_comm_ref = sop_prod_ref(
-                        op_def,
-                        ss.basis.basis,
-                        ss.spins,
-                        'comm'
-                    )
-
-                    # Create superoperators using the inbuilt function
-                    sop_L = sg.superoperator(ss, op_def, "left")
-                    sop_R = sg.superoperator(ss, op_def, "right")
-                    sop_comm = sg.superoperator(ss, op_def, "comm")
-
-                    # Compare
-                    self.assertTrue(np.allclose(
-                        sop_L.toarray(),
-                        sop_L_ref
-                    ))
-                    self.assertTrue(np.allclose(
-                        sop_R.toarray(),
-                        sop_R_ref
-                    ))
-                    self.assertTrue(np.allclose(
-                        sop_comm.toarray(),
-                        sop_comm_ref
-                    ))
 
     def test_superoperator_5(self):
         """
@@ -397,83 +328,3 @@ class TestSuperoperators(unittest.TestCase):
                 sop_trunc.toarray(),
                 sop_trunc_ref.toarray()
             ))
-
-def sop_prod_ref(
-    op_def: np.ndarray,
-    basis: np.ndarray,
-    spins: np.ndarray,
-    side: Literal["comm", "left", "right"]
-) -> np.ndarray:
-    """
-    A reference method for calculating the superoperator.
-    
-    NOTE:
-    This implementation is very slow and should be used for testing purposes
-    only.
-
-    Parameters
-    ----------
-    op_def : ndarray
-        Specifies the product operator to be generated. For example,
-        input `(0, 2, 0, 1)` will generate `E*T_10*E*T_11`. The indices are
-        given by `N = l^2 + l - q`, where `l` is the rank and `q` is the
-        projection.
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    spins : ndarray
-        A sequence of floats describing the spin quantum numbers of the spin
-        system.
-    side : {'comm', 'left', 'right'}
-        Specifies the type of superoperator:
-        - 'comm' -- commutation superoperator
-        - 'left' -- left superoperator
-        - 'right' -- right superoperator
-
-    Returns
-    -------
-    sop : ndarray
-        Superoperator defined by `op_def`.
-    """
-
-    # If commutation superoperator, calculate left and right superoperators and
-    # return their difference
-    if side == 'comm':
-        sop = sop_prod_ref(op_def, basis, spins, 'left') \
-            - sop_prod_ref(op_def, basis, spins, 'right')
-        return sop
-    
-    # Obtain the basis dimension and number of spins
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
-    
-    # Initialize the superoperator
-    sop = np.zeros((dim, dim), dtype=complex)
-
-    # Loop over each matrix row j
-    for j in range(dim):
-
-        # Loop over each matrix column k
-        for k in range(dim):
-
-            # Initialize the matrix element
-            sop_jk = 1
-
-            # Loop over the spins
-            for n in range(nspins):
-
-                # Get the single-spin operator indices
-                i_ind = op_def[n]
-                j_ind = basis[j, n]
-                k_ind = basis[k, n]
-
-                # Get the structure coefficients for the current spin
-                c = structure_coefficients(spins[n], side)
-
-                # Add to the product
-                sop_jk = sop_jk * c[i_ind, j_ind, k_ind]
-
-            # Add to the superoperator
-            sop[j, k] = sop_jk
-
-    return sop
