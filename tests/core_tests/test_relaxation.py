@@ -65,6 +65,36 @@ class TestRelaxation(unittest.TestCase):
         ss.efg = efg
 
         return ss
+    
+    def _phenomenological_spin_system(self) -> sg.SpinSystem:
+        """
+        Create the spin system used in testing the phenomenological relaxation
+        superoperator.
+
+        Returns
+        -------
+        SpinSystem
+            Spin system with a built basis set and assigned interactions.
+        """
+        # Make the spin system
+        ss = build_spin_system(["1H", "1H", "14N"], 3)
+
+        # Define the chemical shifts (in ppm)
+        ss.chemical_shifts = [5, 6, 7]
+
+        # Define scalar couplings (in Hz)
+        ss.J_couplings = [
+            [0,  0,  0],
+            [5,  0,  0],
+            [2,  10, 0]
+        ]
+        
+        # Define the relaxation theory
+        ss.relaxation.theory = "phenomenological"
+        ss.relaxation.T1 = np.array([5, 5, 0.001])
+        ss.relaxation.T2 = np.array([5, 5, 0.001])
+
+        return ss
 
     def test_ldb_thermalization(self):
         """
@@ -211,42 +241,34 @@ class TestRelaxation(unittest.TestCase):
 
     def test_relaxation_phenomenological(self):
         """
-        Test that creates the phenomenological relaxation superoperator and
-        makes a comparison to a previously computed result.
+        Test the phenomenological relaxation superoperator against reference
+        data.
         """
+
         # Set the global parameters
         sg.parameters.default()
+        sg.parameters.magnetic_field = 9.4
+        sg.parameters.temperature = 293
 
         # Load the previously calculated R for comparison
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        R_previous = sp.csc_array(sp.load_npz(os.path.join(
-            test_dir, 'test_data', 'relaxation_phenomenological.npz')
-        ))
+        R_ref = sp.csc_array(
+            sp.load_npz(test_data_path('relaxation_phenomenological.npz'))
+        )
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the spin system for the phenomenological relaxation test.
+        ss = self._phenomenological_spin_system()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-        
-        # Define the relaxation theory
-        ss.relaxation.theory = "phenomenological"
-        ss.relaxation.thermalization = False
-        ss.relaxation.T1 = np.array([5, 5, 5, 5, 5, 0.001])
-        ss.relaxation.T2 = np.array([5, 5, 5, 5, 5, 0.001])
-
-        # Obtain the relaxation superoperator
+        # Build the relaxation superoperator.
         R = sg.relaxation(ss)
 
-        # Compare to the previous result
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the calculated superoperator with the reference.
+        self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
 
-        # Obtain R again (check for cache errors etc.)
+        # Recalculate the same superoperator to exercise caching paths.
         R = sg.relaxation(ss)
 
-        # Compare to the previous result
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the repeated calculation with the reference.
+        self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
 
     def test_relaxation_sr2k(self):
         """
