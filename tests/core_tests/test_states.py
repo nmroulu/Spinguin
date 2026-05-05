@@ -355,110 +355,80 @@ class TestStates(unittest.TestCase):
     def _test_measure(
         self,
         ss: sg.SpinSystem,
-        test_states: list,
-        opers: dict,
+        test_opers: list[dict[str, np.ndarray]],
         sparse_state: bool
-    ):
+    ) -> None:
         """
         Helper method for test_measure().
         """
         # Change the state sparsity
         sg.parameters.sparse_state = sparse_state
 
-        # Try all possible state combinations
-        for i in test_states:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
+        # Collect all state combinations
+        cases = []
+        for op1_k, op1_v in test_opers[0].items():
+            for op2_k, op2_v in test_opers[1].items():
 
-            for j in test_states:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
+                # Create the operator string and the reference operator
+                op_string = f"{op1_k} * {op2_k}"
+                op_ref = np.kron(op1_v, op2_v)
 
-                for k in test_states:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
+                cases.append((op_string, op_ref))
 
-                    # Create the state vector in the spherical tensor basis
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-                    state = sg.state(ss, op_string)
+        # Create and measure each state
+        for (state_string, state_oper) in cases:
+            state = sg.state(ss, state_string)
 
-                    # Create the density matrices in the Zeeman eigenbasis
-                    op1, op2, op3 = \
-                        opers[(i, 1/2)], opers[(j, 1)], opers[(k, 3/2)]
-                    state_zeeman = np.kron(op1, np.kron(op2, op3))
+            for (meas_string, meas_oper) in cases:
 
-                    # Measure each state combination
-                    for l in test_states:
-                        if l == 'E':
-                            op_l = 'E'
-                        else:
-                            op_l = f"I({l}, 0)"
+                # Obtain the reference measurement
+                result_ref = (state_oper @ meas_oper.conj().T).trace()
 
-                        for m in test_states:
-                            if m == 'E':
-                                op_m = 'E'
-                            else:
-                                op_m = f"I({m}, 1)"
+                # Measure using the inbuilt function
+                result = sg.measure(ss, state, meas_string)
 
-                            for n in test_states:
-                                if n == 'E':
-                                    op_n = 'E'
-                                else:
-                                    op_n = f"I({n}, 2)"
-
-                                # Measure using the Zeeman eigenbasis
-                                op1, op2, op3 = opers[(l, 1/2)], \
-                                                opers[(m, 1)], \
-                                                opers[(n, 3/2)]
-                                oper_zeeman = np.kron(op1, np.kron(op2, op3))
-                                result_zeeman = (
-                                    state_zeeman @ oper_zeeman.conj().T
-                                ).trace()
-
-                                # Measure using the inbuilt function
-                                op_string = f"{op_l} * {op_m} * {op_n}"
-                                result = sg.measure(ss, state, op_string)
-
-                                # Compare
-                                self.assertAlmostEqual(result_zeeman, result)
+                # Compare with the reference
+                self.assertAlmostEqual(result_ref, result)
 
     def test_measure(self):
         """
-        Different states are created for a spin system using both
-        the Zeeman eigenbasis and spherical tensor basis, and the
-        expectation values for varying operators are compared.
+        Test measurements against direct Zeeman-basis expectation values.
         """
+
         # Reset to defaults
         sg.parameters.default()
 
-        # Create an example spin system with different spin quantum numbers
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        # Build the example spin system with mixed spin quantum numbers.
+        ss = build_spin_system(["1H", "14N"], 2)
 
-        # States to test
-        test_states = ['E', 'x', 'y', 'z', '+', '-']
-
-        # Get the Zeeman eigenbasis operators in dense format
+        # Create a set of operators to test
         sg.parameters.sparse_operator = False
-        opers = {}
-        for spin in ss.spins:
-            opers[('E', spin)] = sg.op_E(spin)
-            opers[('x', spin)] = sg.op_Sx(spin)
-            opers[('y', spin)] = sg.op_Sy(spin)
-            opers[('z', spin)] = sg.op_Sz(spin)
-            opers[('+', spin)] = sg.op_Sp(spin)
-            opers[('-', spin)] = sg.op_Sm(spin)
+        test_opers = []
+        for i in range(ss.nspins):
+            ops = {}
+
+            # Unit operator
+            ops["E"] = sg.op_E(ss.spins[i])
+
+            # Cartesian operators
+            ops[f"I(x, {i})"] = sg.op_Sx(ss.spins[i])
+            ops[f"I(y, {i})"] = sg.op_Sy(ss.spins[i])
+            ops[f"I(z, {i})"] = sg.op_Sz(ss.spins[i])
+
+            # Ladder operators
+            ops[f"I(+, {i})"] = sg.op_Sp(ss.spins[i])
+            ops[f"I(-, {i})"] = sg.op_Sm(ss.spins[i])
+
+            # Spherical tensor operators
+            for l in range(int(2*ss.spins[i] + 1)):
+                for q in range(-l, l + 1):
+                    ops[f"T({l}, {q}, {i})"] = sg.op_T(ss.spins[i], l, q)
+                    
+            test_opers.append(ops)
         
         # Test with the helper method using dense and sparse states
-        self._test_measure(ss, test_states, opers, False)
-        self._test_measure(ss, test_states, opers, True)
+        self._test_measure(ss, test_opers, False)
+        self._test_measure(ss, test_opers, True)
 
     def _test_equilibrium_state(
         self,
