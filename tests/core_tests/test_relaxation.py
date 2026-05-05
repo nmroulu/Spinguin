@@ -9,7 +9,7 @@ import numpy as np
 import scipy.sparse as sp
 
 import spinguin as sg
-
+from ._helpers import build_spin_system
 
 class TestRelaxation(unittest.TestCase):
     """
@@ -20,16 +20,14 @@ class TestRelaxation(unittest.TestCase):
         """
         Test that relaxation drives the system back to thermal equilibrium.
         """
-        
+
         # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
         sg.parameters.temperature = 273
 
         # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "14N"])
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
+        ss = build_spin_system(["1H", "1H", "14N"], 3)
 
         # Define the chemical shifts (in ppm)
         ss.chemical_shifts = [5, 6, 7]
