@@ -9,7 +9,7 @@ import numpy as np
 import scipy.sparse as sp
 
 import spinguin as sg
-from ._helpers import build_spin_system
+from ._helpers import build_spin_system, test_data_path
 
 class TestRelaxation(unittest.TestCase):
     """
@@ -46,7 +46,16 @@ class TestRelaxation(unittest.TestCase):
             [0.0000000, 0.0000000, 2.0000000],
         ]
 
-        # Define electric field gradient tensors
+        # Define the shielding tensors.
+        shielding = np.zeros((3, 3, 3))
+        shielding[2] = np.array([
+            [-130.0, -150.0, -70.00],
+            [-120.0,  90.00,  230.0],
+            [-60.00,  230.0, -30.00]
+        ])
+        ss.shielding = shielding
+
+        # Define the electric-field-gradient tensors.
         efg = np.zeros((3, 3, 3))
         efg[2] = np.array([
             [0.3000, 0.0000,  0.0000],
@@ -109,85 +118,38 @@ class TestRelaxation(unittest.TestCase):
 
     def test_relaxation_redfield_1(self):
         """
-        Test that creates a relaxation superoperator using Redfield theory and
-        compares that to a previously calculated value.
+        Test the Redfield relaxation superoperator against reference data.
         """
-        # Set the global parameters
+
+        # Set the global simulation parameters.
         sg.parameters.default()
         sg.parameters.magnetic_field = 1
+        sg.parameters.temperature = 293
 
-        # Load the previously calculated R for comparison
-        test_dir = os.path.dirname(os.path.dirname(__file__))
-        R_previous = sp.csc_array(sp.load_npz(os.path.join(
-            test_dir, 'test_data', 'relaxation.npz')
-        ))
+        # Load the previously calculated Redfield superoperator.
+        R_ref = sp.csc_array(sp.load_npz(test_data_path("relaxation.npz")))
 
-        # Make the spin system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H", "14N"])
+        # Build the Redfield test system.
+        ss = self._redfield_spin_system()
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-
-        # Define the chemical shifts (in ppm)
-        ss.chemical_shifts = [8.56, 8.56, 7.47, 7.47, 7.88, 95.94]
-
-        # Define scalar couplings (in Hz)
-        ss.J_couplings = [
-            [ 0,     0,      0,      0,      0,      0],
-            [-1.04,  0,      0,      0,      0,      0],
-            [ 4.85,  1.05,   0,      0,      0,      0],
-            [ 1.05,  4.85,   0.71,   0,      0,      0],
-            [ 1.24,  1.24,   7.55,   7.55,   0,      0],
-            [ 8.16,  8.16,   0.87,   0.87,  -0.19,   0]
-        ]
-
-        # Define Cartesian coordinates of nuclei
-        ss.xyz = [
-            [ 2.0495335, 0.0000000, -1.4916842],
-            [-2.0495335, 0.0000000, -1.4916842],
-            [ 2.1458878, 0.0000000,  0.9846086],
-            [-2.1458878, 0.0000000,  0.9846086],
-            [ 0.0000000, 0.0000000,  2.2681296],
-            [ 0.0000000, 0.0000000, -1.5987077]
-        ]
-
-        # Define shielding tensors
-        shielding = np.zeros((6, 3, 3))
-        shielding[5] = np.array([
-            [-406.20, 0.00,   0.00],
-            [ 0.00,   299.44, 0.00],
-            [ 0.00,   0.00,  -181.07]
-        ])
-        ss.shielding = shielding
-
-        # Define electric field gradient tensors
-        efg = np.zeros((6, 3, 3))
-        efg[5] = np.array([
-            [0.3069, 0.0000,  0.0000],
-            [0.0000, 0.7969,  0.0000],
-            [0.0000, 0.0000, -1.1037]
-        ])
-        ss.efg = efg
-
-        # Define the relaxation theory
+        # Define the relaxation model.
         ss.relaxation.theory = "redfield"
-        ss.relaxation.antisymmetric = False
-        ss.relaxation.dynamic_frequency_shift = False
-        ss.relaxation.thermalization = False
+        ss.relaxation.antisymmetric = True
+        ss.relaxation.dynamic_frequency_shift = True
+        ss.relaxation.thermalization = True
         ss.relaxation.tau_c = 50e-12
         
-        # Get the Redfield relaxation superoperator
+        # Build the Redfield relaxation superoperator.
         R = sg.relaxation(ss)
 
-        # Compare with the reference
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the calculated superoperator with the reference.
+        self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
 
-        # Obtain R again (to check possible errors from caches etc.)
+        # Recalculate the same superoperator to exercise caching paths.
         R = sg.relaxation(ss)
 
-        # Compare with the reference
-        self.assertTrue(np.allclose(R.toarray(), R_previous.toarray()))
+        # Compare the repeated calculation with the reference.
+        self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
 
     def test_relaxation_redfield_2(self):
         """
