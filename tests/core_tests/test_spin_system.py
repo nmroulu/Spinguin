@@ -1,84 +1,73 @@
-import unittest
-import numpy as np
+"""
+Tests for `SpinSystem` property assignment, relaxation settings, and
+subsystem construction.
+"""
+
 import os
+import unittest
+
+import numpy as np
+
 import spinguin as sg
+from ._helpers import build_spin_system, test_data_path
 
 class TestSpinSystem(unittest.TestCase):
+    """
+    Test `SpinSystem` input handling, configuration, and subsystem copying.
+    """
 
     def test_assign_isotopes(self):
         """
-        A test for creating a SpinSystem instance and assigning isotopes using
-        different input types.
+        Test `SpinSystem` construction from isotope arrays and files.
         """
-        # Isotopes
+
+        # Define the reference isotope labels.
         isotopes = np.array(['1H', '19F', '14N'])
 
-        # Initialising spin system should work with any array like object
-        spin_system = sg.SpinSystem(isotopes)
-        self.assertTrue((spin_system.isotopes == isotopes).all())
-        spin_system = sg.SpinSystem(list(isotopes))
-        self.assertTrue((spin_system.isotopes == isotopes).all())
-        spin_system = sg.SpinSystem(tuple(isotopes))
-        self.assertTrue((spin_system.isotopes == isotopes).all())
+        # Construct the spin system from several array-like inputs.
+        for value in (isotopes, list(isotopes), tuple(isotopes)):
+            spin_system = sg.SpinSystem(value)
+            self.assertTrue(np.array_equal(spin_system.isotopes, isotopes))
 
-        # Initialising spin system should work from text file
-        isotopes_txt = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'isotopes.txt')
-        spin_system = sg.SpinSystem(isotopes_txt)
-        self.assertTrue((spin_system.isotopes == isotopes).all())
+        # Construct the spin system from a text file.
+        spin_system = sg.SpinSystem(test_data_path("isotopes.txt"))
+        self.assertTrue(np.array_equal(spin_system.isotopes, isotopes))
 
-        # Initialising spin system with incorrect file path results in error
-        isotopes_txt = "not_a_real_file.txt"
+        # Verify that an incorrect file path raises an error.
         with self.assertRaises(FileNotFoundError):
-            spin_system = sg.SpinSystem(isotopes_txt)
+            spin_system = sg.SpinSystem("not_a_real_file.txt")
 
-        # Assigning an array with incorrect dimensions should result in error
-        isotopes = np.array([['1H', '19F', '14N']])
+        # Verify that incorrectly shaped isotope data raise an error.
         with self.assertRaises(ValueError):
-            spin_system = sg.SpinSystem(isotopes)
+            spin_system = sg.SpinSystem([['1H', '19F', '14N']])
 
-        # Assigning an isotope that is not defined should result in error
-        isotopes = np.array(['4H'])
+        # Verify that unknown isotopes raise an error.
         with self.assertRaises(ValueError):
-            spin_system = sg.SpinSystem(isotopes)
+            spin_system = sg.SpinSystem(["4H"])
 
     def test_assign_chemical_shifts(self):
         """
-        A test for creating a SpinSystem instance and assigning chemical shifts
-        using different input types.
+        Test chemical-shift assignment from array-like objects and files.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(["1H", "19F", "14N"])
 
-        # Trying to configure chemical shifts for a spin system of incorrect
-        # size results in an error
-        chemical_shifts = np.array([8.00, -127.5])
+        # Verify that an incorrect number of chemical shifts raises an error.
         with self.assertRaises(ValueError):
-            spin_system.chemical_shifts = chemical_shifts
+            spin_system.chemical_shifts = [8.00, -127.5]
 
-        # Assigning chemical shifts should work with any array like object
-        chemical_shifts = np.array([8.00, -127.5, 40.50])
-        spin_system.chemical_shifts = chemical_shifts
-        self.assertTrue((spin_system.chemical_shifts == chemical_shifts).all())
+        # Verify assignment from several array-like input types.
+        delta = np.array([8.00, -127.5, 40.50])
+        for value in (delta, list(delta), tuple(delta)):
+            spin_system.chemical_shifts = value
+            self.assertTrue(np.array_equal(spin_system.chemical_shifts, delta))
 
-        spin_system.chemical_shifts = list(chemical_shifts)
-        self.assertTrue((spin_system.chemical_shifts == chemical_shifts).all())
+        # Verify assignment from a text file.
+        spin_system.chemical_shifts = test_data_path("chemical_shifts.txt")
+        self.assertTrue(np.array_equal(spin_system.chemical_shifts, delta))
 
-        spin_system.chemical_shifts = tuple(chemical_shifts)
-        self.assertTrue((spin_system.chemical_shifts == chemical_shifts).all())
-
-        # Assigning chemical_shifts should work from text file
-        spin_system.chemical_shifts = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'chemical_shifts.txt')
-        self.assertTrue((spin_system.chemical_shifts == chemical_shifts).all())
-
-        # Assigning chemical_shifts with incorrect file path should result in
-        # error
+        # Verify that an incorrect file path raises an error.
         with self.assertRaises(FileNotFoundError):
             spin_system.chemical_shifts = "not_a_real_file.txt"
 
@@ -88,11 +77,10 @@ class TestSpinSystem(unittest.TestCase):
         using different input types.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(["1H", "19F", "14N"])
 
-        # Trying to configure J-couplings for a spin system of incorrect size
-        # should result in an error
+        # Verify that an incorrectly sized coupling matrix raises an error.
         J_couplings = np.array([
             [0,    0],
             [1.05, 0]
@@ -100,44 +88,35 @@ class TestSpinSystem(unittest.TestCase):
         with self.assertRaises(ValueError):
             spin_system.J_couplings = J_couplings
 
-
-        # Assigning J-couplings should work with any array like object
+        # Verify assignment from several array-like input types.
         J_couplings = np.array([
             [0,    0,    0],
             [1.05, 0,    0],
             [0.50, 9.17, 0]
         ])
-        spin_system.J_couplings = J_couplings
-        self.assertTrue((spin_system.J_couplings == J_couplings).all())
+        for value in (J_couplings, list(J_couplings), tuple(J_couplings)):
+            spin_system.J_couplings = value
+            self.assertTrue(
+                np.array_equal(spin_system.J_couplings, J_couplings)
+            )
 
-        spin_system.J_couplings = list(J_couplings)
-        self.assertTrue((spin_system.J_couplings == J_couplings).all())
+        # Verify assignment from a text file.
+        spin_system.J_couplings = test_data_path("J_couplings.txt")
+        self.assertTrue(np.array_equal(spin_system.J_couplings, J_couplings))
 
-        spin_system.J_couplings = tuple(J_couplings)
-        self.assertTrue((spin_system.J_couplings == J_couplings).all())
-
-        # Assigning J-couplings should work from text file
-        spin_system.J_couplings = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'J_couplings.txt')
-        self.assertTrue((spin_system.J_couplings == J_couplings).all())
-
-        # Assigning J-couplings with incorrect file path should result in error
+        # Verify that an incorrect file path raises an error.
         with self.assertRaises(FileNotFoundError):
             spin_system.J_couplings = "not_a_real_file.txt"
 
     def test_assign_xyz(self):
         """
-        A test for creating a SpinSystem instance and assigning XYZ coordinates
-        using different input types.
+        Test Cartesian-coordinate assignment from array-like objects and files.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(["1H", "19F", "14N"])
 
-        # Trying to configure XYZ for a spin system of incorrect size should
-        # result in an error
+        # Verify that an incorrect coordinate array size raises an error.
         xyz = np.array([
             [1.0527, 2.2566, 0.9925],
             [0.0014, 1.5578, 2.1146]
@@ -145,33 +124,25 @@ class TestSpinSystem(unittest.TestCase):
         with self.assertRaises(ValueError):
             spin_system.xyz = xyz
 
-        # Assigning XYZ should work with any array like object
+        # Verify assignment from several array-like input types.
         xyz = np.array([
             [1.0527, 2.2566, 0.9925],
             [0.0014, 1.5578, 2.1146],
             [1.3456, 0.3678, 1.4251]
         ])
-        spin_system.xyz = xyz
-        self.assertTrue((spin_system.xyz == xyz).all())
+        for value in (xyz, list(xyz), tuple(xyz)):
+            spin_system.xyz = value
+            self.assertTrue(np.array_equal(spin_system.xyz, xyz))
 
-        spin_system.xyz = list(xyz)
-        self.assertTrue((spin_system.xyz == xyz).all())
+        # Verify assignment from a text file.
+        spin_system.xyz = test_data_path("xyz.txt")
+        self.assertTrue(np.array_equal(spin_system.xyz, xyz))
 
-        spin_system.xyz = tuple(xyz)
-        self.assertTrue((spin_system.xyz == xyz).all())
-
-        # Assigning XYZ should work from text file
-        spin_system.xyz = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'xyz.txt')
-        self.assertTrue((spin_system.xyz == xyz).all())
-
-        # Assigning XYZ with incorrect file path should result in error
+        # Verify that an incorrect file path raises an error.
         with self.assertRaises(FileNotFoundError):
             spin_system.xyz = "not_a_real_file.txt"
 
-        # Assigning an array with incorrect dimensions should result in error
+        # Verify that incorrectly shaped coordinate data raise an error.
         xyz = np.array([[
             [1.0527, 2.2566, 0.9925],
             [0.0014, 1.5578, 2.1146],
@@ -182,15 +153,13 @@ class TestSpinSystem(unittest.TestCase):
 
     def test_assign_shielding(self):
         """
-        A test for creating a SpinSystem instance and assigning shielding
-        tensors using different input types.
+        Test shielding-tensor assignment from array-like objects and files.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(["1H", "19F", "14N"])
 
-        # Trying to configure shielding tensors for a spin system of incorrect
-        # size should result in an error
+        # Verify that an incorrect number of shielding tensors raises an error.
         shielding = np.array([
             [[0, 0, 0],
              [0, 0, 0],
@@ -202,7 +171,7 @@ class TestSpinSystem(unittest.TestCase):
         with self.assertRaises(ValueError):
             spin_system.shielding = shielding
 
-        # Assigning shielding tensors should work with any array like object
+        # Verify assignment from several array-like input types.
         shielding = np.array([
             [[0, 0, 0],
              [0, 0, 0],
@@ -214,28 +183,19 @@ class TestSpinSystem(unittest.TestCase):
              [37.5,   10.7, 86.9],
              [109.7, -91.1, 81.8]]
         ])
-        spin_system.shielding = shielding
-        self.assertTrue((spin_system.shielding == shielding).all())
+        for value in (shielding, list(shielding), tuple(shielding)):
+            spin_system.shielding = value
+            self.assertTrue(np.array_equal(spin_system.shielding, shielding))
 
-        spin_system.shielding = list(shielding)
-        self.assertTrue((spin_system.shielding == shielding).all())
+        # Verify assignment from a text file.
+        spin_system.shielding = test_data_path("shielding.txt")
+        self.assertTrue(np.array_equal(spin_system.shielding, shielding))
 
-        spin_system.shielding = tuple(shielding)
-        self.assertTrue((spin_system.shielding == shielding).all())
-
-        # Assigning shielding tensors should work from text file
-        spin_system.shielding = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'shielding.txt')
-        self.assertTrue((spin_system.shielding == shielding).all())
-
-        # Assigning shielding tensors with incorrect file path should result in
-        # error
+        # Verify that an incorrect file path raises an error.
         with self.assertRaises(FileNotFoundError):
             spin_system.shielding = "not_a_real_file.txt"
 
-        # Assigning an array with incorrect dimensions should result in error
+        # Verify that incorrectly shaped shielding data raise an error.
         shielding = np.array([[
             [[0, 0, 0],
              [0, 0, 0],
@@ -252,15 +212,13 @@ class TestSpinSystem(unittest.TestCase):
 
     def test_assign_efg(self):
         """
-        A test for creating a SpinSystem instance and assigning efg tensors
-        using different input types.
+        Test EFG-tensor assignment from array-like objects and files.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(["1H", "19F", "14N"])
 
-        # Trying to configure efg tensors for a spin system of incorrect size
-        # should result in an error
+        # Verify that an incorrect number of EFG tensors raises an error.
         efg = np.array([
             [[0, 0, 0],
              [0, 0, 0],
@@ -272,7 +230,7 @@ class TestSpinSystem(unittest.TestCase):
         with self.assertRaises(ValueError):
             spin_system.efg = efg
 
-        # Assigning efg tensors should work with any array like object
+        # Verify assignment from several array-like input types.
         efg = np.array([
             [[0, 0, 0],
              [0, 0, 0],
@@ -284,27 +242,19 @@ class TestSpinSystem(unittest.TestCase):
              [0.38, 0.65, 0.26],
              [0.29, 0.82, 0.06]]
         ])
-        spin_system.efg = efg
-        self.assertTrue((spin_system.efg == efg).all())
+        for value in (efg, list(efg), tuple(efg)):
+            spin_system.efg = value
+            self.assertTrue(np.array_equal(spin_system.efg, efg))
 
-        spin_system.efg = list(efg)
-        self.assertTrue((spin_system.efg == efg).all())
+        # Verify assignment from a text file.
+        spin_system.efg = test_data_path("efg.txt")
+        self.assertTrue(np.array_equal(spin_system.efg, efg))
 
-        spin_system.efg = tuple(efg)
-        self.assertTrue((spin_system.efg == efg).all())
-
-        # Assigning efg tensors should work from text file
-        spin_system.efg = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'efg.txt')
-        self.assertTrue((spin_system.efg == efg).all())
-
-        # Assigning efg tensors with incorrect file path should result in error
+        # Verify that an incorrect file path raises an error.
         with self.assertRaises(FileNotFoundError):
             spin_system.efg = "not_a_real_file.txt"
 
-        # Assigning an array with incorrect dimensions should result in error
+        # Verify that incorrectly shaped EFG data raise an error.
         efg = np.array([[
             [[0, 0, 0],
              [0, 0, 0],
@@ -321,269 +271,258 @@ class TestSpinSystem(unittest.TestCase):
 
     def test_set_maximum_spin_order(self):
         """
-        A test for creating a SpinSystem instance and setting the maximum spin
-        order for the basis.
+        Test setting the maximum spin order for the basis.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Maximum spin orders within 1 and the number of spins should be fine
-        for max_spin_order in range(1, spin_system.nspins+1):
+        # Verify that valid spin orders can be assigned.
+        for max_spin_order in range(1, spin_system.nspins + 1):
             spin_system.basis.max_spin_order = max_spin_order
+            self.assertEqual(spin_system.basis.max_spin_order, max_spin_order)
 
-        # Setting the maximum spin order to less than 1 causes an error
+        # Verify that spin orders below one raise an error.
         with self.assertRaises(ValueError):
             spin_system.basis.max_spin_order = 0
 
-        # Setting the maximum spin order above number of spins causes an error
+        # Verify that spin orders above the system size raise an error.
         with self.assertRaises(ValueError):
             spin_system.basis.max_spin_order = spin_system.nspins + 1
 
     def test_build_basis(self):
         """
-        A test for creating a SpinSystem instance and building a basis set.
+        Test basis construction for a new spin system.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Building a basis without specifying the maximum spin order gives a
-        # warning and sets the maximum spin order to the number of spins
+        # Verify that the default basis build emits a warning.
         with self.assertWarns(Warning):
             spin_system.basis.build()
+
+        # Verify that the basis settings were updated correctly.
         self.assertEqual(spin_system.basis.max_spin_order, spin_system.nspins)
         self.assertTrue(isinstance(spin_system.basis.basis, np.ndarray))
 
     def test_set_relaxation_theory(self):
         """
-        A test for creating a SpinSystem instance and setting the relaxation
-        theory.
+        Test assigning the relaxation-theory name.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the relaxation theory
-        relaxation_theory = "redfield"
-        spin_system.relaxation.theory = relaxation_theory
-        self.assertEqual(spin_system.relaxation.theory, relaxation_theory)
+        # Verify that known theory labels are accepted.
+        for theory in ("redfield", "phenomenological"):
+            spin_system.relaxation.theory = theory
+            self.assertEqual(spin_system.relaxation.theory, theory)
 
-        relaxation_theory = "phenomenological"
-        spin_system.relaxation.theory = relaxation_theory
-        self.assertEqual(spin_system.relaxation.theory, relaxation_theory)
-
-        # Setting an unknown theory should result in an error
+        # Verify that an unknown theory label raises an error.
         with self.assertRaises(ValueError):
             spin_system.relaxation.theory = "unknown_theory"
 
     def test_set_thermalization(self):
         """
-        A test for adjusting the thermalization setting.
+        Test assigning the thermalization setting.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the thermalization setting
-        thermalization = True
-        spin_system.relaxation.thermalization = thermalization
-        self.assertEqual(spin_system.relaxation.thermalization, thermalization)
+        # Assign and verify the thermalization flag.
+        for value in (False, True):
+            spin_system.relaxation.thermalization = value
+            self.assertEqual(spin_system.relaxation.thermalization, value)
 
     def test_set_tau_c(self):
         """
-        A test for creating a SpinSystem instance and setting the correlation
-        time.
+        Test assigning the rotational correlation time.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the correlation time
+        # Set and verify correlation time for isotropic rotational diffusion.
         tau_c = 50e-12
         spin_system.relaxation.tau_c = tau_c
         self.assertEqual(spin_system.relaxation.tau_c, tau_c)
 
+        # Set and verify correlation time for anisotropic rotational diffusion.
+        tau_c = np.array([10e-12, 20e-12, 30e-12])
+        for value in (tau_c, list(tau_c), tuple(tau_c)):
+            spin_system.relaxation.tau_c = value
+            self.assertTrue(
+                np.array_equal(spin_system.relaxation.tau_c, tau_c)
+            )
+
+        # Verify that unsupported input raises an error
+        with self.assertRaises(ValueError):
+            spin_system.relaxation.tau_c = [10e-12, 20e-12]
+
     def test_set_sr2k(self):
         """
-        A test for creating a SpinSystem instance and setting the scalar
-        relaxation of the second kind.
+        Test assigning the SR2K setting.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the sr2k
-        sr2k = True
-        spin_system.relaxation.sr2k = sr2k
-        self.assertEqual(spin_system.relaxation.sr2k, sr2k)
+        # Assign and verify the SR2K flag.
+        for sr2k in (False, True):
+            spin_system.relaxation.sr2k = sr2k
+            self.assertEqual(spin_system.relaxation.sr2k, sr2k)
 
     def test_set_dynamic_frequency_shift(self):
         """
-        A test for creating a SpinSystem instance and setting the dynamic
-        frequency shift.
+        Test assigning the dynamic-frequency-shift setting.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the dynamic frequency shift
-        dynamic_frequency_shift = True
-        spin_system.relaxation.dynamic_frequency_shift = dynamic_frequency_shift
-        self.assertEqual(spin_system.relaxation.dynamic_frequency_shift,
-                         dynamic_frequency_shift)
+        # Assign and verify the dynamic frequency shift flag.
+        for dfs in (False, True):
+            spin_system.relaxation.dynamic_frequency_shift = dfs
+            self.assertEqual(
+                spin_system.relaxation.dynamic_frequency_shift,
+                dfs
+            )
 
     def test_set_antisymmetric_relaxation(self):
         """
-        A test for creating a SpinSystem instance and setting the antisymmetric
-        relaxation.
+        Test assigning the antisymmetric-relaxation setting.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the antisymmetric relaxation
-        antisymmetric_relaxation = True
-        spin_system.relaxation.antisymmetric = antisymmetric_relaxation
-        self.assertEqual(spin_system.relaxation.antisymmetric,
-                         antisymmetric_relaxation)
+        # Assign and verify the antisymmetric relaxation flag.
+        for anti in (False, True):
+            spin_system.relaxation.antisymmetric = anti
+            self.assertEqual(spin_system.relaxation.antisymmetric, anti)
 
     def test_set_relative_error(self):
         """
-        A test for creating a SpinSystem instance and setting the relative error.
+        Test assigning the relaxation relative-error threshold.
         """
 
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Set the relative error
+        # Assign and verify the relative error.
         relative_error = 1e-12
         spin_system.relaxation.relative_error = relative_error
         self.assertEqual(spin_system.relaxation.relative_error, relative_error)
 
     def test_set_R1(self):
         """
-        A test for setting the longitudinal relaxation rates.
+        Test assigning longitudinal relaxation rates.
         """
-        # Initialize SpinSystem
+
+        # Create the reference spin system.
         ss = sg.SpinSystem(['1H', '14N'])
 
-        # Wrong array size returns an error
-        R1 = [1, 0.5, 2]
+        # Verify that an incorrect number of rates raises an error.
         with self.assertRaises(ValueError):
-            ss.relaxation.R1 = R1
+            ss.relaxation.R1 = [1, 0.5, 2]
 
-        # Test setting R1 properly
+        # Assign and verify the relaxation rates and derived T1 values.
         R1 = [1, 0.5]
         ss.relaxation.R1 = R1
-        self.assertTrue((ss.relaxation.R1 == R1).all())
-        self.assertTrue((ss.relaxation.T1 == 1/np.array(R1)).all())
+        self.assertTrue(np.array_equal(ss.relaxation.R1, R1))
+        self.assertTrue(np.array_equal(ss.relaxation.T1, 1/np.array(R1)))
 
-        # Setting R1 from text file should be possible
-        ss.relaxation.R1 = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'R1.txt')
-        self.assertTrue((ss.relaxation.R1 == R1).all())
+        # Verify assignment from a text file.
+        ss.relaxation.R1 = test_data_path("R1.txt")
+        self.assertTrue(np.array_equal(ss.relaxation.R1, R1))
 
     def test_set_R2(self):
         """
-        A test for setting the transverse relaxation rates.
+        Test assigning transverse relaxation rates.
         """
-        # Initialize SpinSystem
+
+        # Create the reference spin system.
         ss = sg.SpinSystem(['1H', '14N'])
 
-        # Wrong array size returns an error
-        R2 = [1, 0.5, 2]
+        # Verify that an incorrect number of rates raises an error.
         with self.assertRaises(ValueError):
-            ss.relaxation.R2 = R2
+            ss.relaxation.R2 = [1, 0.5, 2]
 
-        # Test setting R2 properly
+        # Assign and verify the relaxation rates and derived T2 values.
         R2 = [1, 0.5]
         ss.relaxation.R2 = R2
-        self.assertTrue((ss.relaxation.R2 == R2).all())
-        self.assertTrue((ss.relaxation.T2 == 1/np.array(R2)).all())
+        self.assertTrue(np.array_equal(ss.relaxation.R2, R2))
+        self.assertTrue(np.array_equal(ss.relaxation.T2, 1/np.array(R2)))
 
-        # Setting R2 from text file should be possible
-        ss.relaxation.R2 = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'R2.txt')
+        # Verify assignment from a text file.
+        ss.relaxation.R2 = test_data_path("R2.txt")
         self.assertTrue((ss.relaxation.R2 == R2).all())
 
     def test_set_T1(self):
         """
-        A test for setting the longitudinal relaxation time constants.
+        Test assigning longitudinal relaxation time constants.
         """
         
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Trying to configure T1 times for a spin system of different size
-        # results in an error
-        T1 = [1, 2]
+        # Verify that an incorrect number of T1 values raises an error.
         with self.assertRaises(ValueError):
-            spin_system.relaxation.T1 = T1
+            spin_system.relaxation.T1 = [1, 2]
 
-        # Test configuring T1
+        # Assign and verify the T1 values.
         T1 = [1, 2, 3]
         spin_system.relaxation.T1 = T1
-        self.assertTrue((spin_system.relaxation.T1 == T1).all())
+        self.assertTrue(np.array_equal(spin_system.relaxation.T1, T1))
 
-        # Assigning T1 should work from text file
-        spin_system.relaxation.T1 = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'T1.txt')
-        self.assertTrue((spin_system.relaxation.T1 == T1).all())
+        # Verify assignment from a text file.
+        spin_system.relaxation.T1 = test_data_path("T1.txt")
+        self.assertTrue(np.array_equal(spin_system.relaxation.T1, T1))
 
     def test_set_T2(self):
         """
-        A test for setting the transverse relaxation time constants.
+        Test assigning transverse relaxation time constants.
         """
         
-        # Initialize our SpinSystem object
+        # Create the reference spin system.
         spin_system = sg.SpinSystem(['1H', '19F', '14N'])
 
-        # Trying to configure T2 times for a spin system of different size
-        # results in an error
-        T2 = [1, 2]
+        # Verify that an incorrect number of T2 values raises an error.
         with self.assertRaises(ValueError):
-            spin_system.relaxation.T2 = T2
+            spin_system.relaxation.T2 = [1, 2]
 
-        # Test configuring T2
+        # Assign and verify the T2 values.
         T2 = [1, 2, 3]
         spin_system.relaxation.T2 = T2
-        self.assertTrue((spin_system.relaxation.T2 == T2).all())
+        self.assertTrue(np.array_equal(spin_system.relaxation.T2, T2))
 
-        # Assigning T2 should work from text file
-        spin_system.relaxation.T2 = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            'test_data',
-            'T2.txt')
-        self.assertTrue((spin_system.relaxation.T2 == T2).all())
+        # Verify assignment from a text file.
+        spin_system.relaxation.T2 = test_data_path("T2.txt")
+        self.assertTrue(np.array_equal(spin_system.relaxation.T2, T2))
 
     def test_subsystem(self):
         """
-        Test creating the subsystem from a spin system.
+        Test creating subsystems with copied properties.
         """
-        # Reset parameters to defaults
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Create an example spin system
+        # Create the example spin system
         ss = sg.SpinSystem(["1H", "14N", "19F"])
         
-        # Try that the subsystem works with nothing else assigned to the system
+        # Verify that isotopes are copied even without other assigned data.
         sub = ss.subsystem([0, 1])
         self.assertTrue(np.array_equal(np.array(["1H", "14N"]), sub.isotopes))
 
-        # Test that incorrect input leads to error
+        # Verify that invalid subsystem indices raise errors.
         with self.assertRaises(ValueError):
             ss.subsystem([0, 1, 1])
         with self.assertRaises(ValueError):
             ss.subsystem([1, 3])
 
-        # Assign the spin system properties
+        # Create the fully populated reference spin system.
         ss.chemical_shifts = [0, 1, 2]
         ss.J_couplings = [
             [0, 0, 0],
@@ -630,10 +569,8 @@ class TestSpinSystem(unittest.TestCase):
             ]
         ]
 
-        # Create a subsystem with all spins
+        # Verify that a full subsystem reproduces all properties.
         sub = ss.subsystem([0, 1, 2])
-
-        # Everything should remain the same
         self.assertTrue(np.array_equal(ss.isotopes, sub.isotopes))
         self.assertTrue(np.array_equal(ss.chemical_shifts, sub.chemical_shifts))
         self.assertTrue(np.array_equal(ss.J_couplings, sub.J_couplings))
@@ -641,10 +578,8 @@ class TestSpinSystem(unittest.TestCase):
         self.assertTrue(np.array_equal(ss.shielding, sub.shielding))
         self.assertTrue(np.array_equal(ss.efg, sub.efg))
 
-        # Create a subsystem with one spin
+        # Verify that a one-spin subsystem copies all properties correctly.
         sub = ss.subsystem([1])
-
-        # Check that the properties were copied correctly
         self.assertTrue(np.array_equal(np.array(["14N"]), sub.isotopes))
         self.assertTrue(np.array_equal(np.array([1]), sub.chemical_shifts))
         self.assertTrue(np.array_equal(np.array([[0]]), sub.J_couplings))
@@ -666,10 +601,8 @@ class TestSpinSystem(unittest.TestCase):
             sub.efg
         ))
 
-        # Create a subsystem with two spins
+        # Verify that a two-spin subsystem copies all properties correctly.
         sub = ss.subsystem([0, 2])
-
-        # Check that the properties were copied correctly
         self.assertTrue(np.array_equal(np.array(["1H", "19F"]), sub.isotopes))
         self.assertTrue(np.array_equal(np.array([0, 2]), sub.chemical_shifts))
         self.assertTrue(np.array_equal(
