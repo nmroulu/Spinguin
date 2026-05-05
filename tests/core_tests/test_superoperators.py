@@ -54,34 +54,30 @@ class TestSuperoperators(unittest.TestCase):
         """
         Test that the superoperator sparsity setting works as intended.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the example spin system.
+        ss = build_spin_system(["1H", "14N"], 2)
 
-        # Test building dense superoperators
+        # Build dense superoperators
         sg.parameters.sparse_superoperator = False
         sops_dense = []
         for op_def in ss.basis.basis:
             sops_dense.append(sg.superoperator(ss, op_def))
 
-        # Test building sparse superoperators
+        # Build sparse superoperators
         sg.parameters.sparse_superoperator = True
         sops_sparse = []
         for op_def in ss.basis.basis:
             sops_sparse.append(sg.superoperator(ss, op_def))
 
-        # Compare
+        # Compare the dense and sparse representations.
         for sop_dense, sop_sparse in zip(sops_dense, sops_sparse):
-            self.assertTrue(np.allclose(
-                sop_dense,
-                sop_sparse.toarray()
-            ))
+            self.assertTrue(
+                np.allclose(sop_dense, sop_sparse.toarray())
+            )
 
     def test_superoperator_3(self):
         """
