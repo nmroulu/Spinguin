@@ -175,6 +175,18 @@ class TestOperators(unittest.TestCase):
         # Create a test spin system.
         ss = build_spin_system(["1H", "14N", "23Na"], 3)
 
+        # Wrong input type should raise an error
+        with self.assertRaises(ValueError):
+            sg.operator(ss, 1)
+
+        # Incorrect array length raises an error
+        with self.assertRaises(ValueError):
+            sg.operator(ss, [1, 2])
+
+        # Incorrect array dimension raises an error
+        with self.assertRaises(ValueError):
+            sg.operator(ss, [[1, 2, 3]])
+
         def _test_product_operators() -> None:
             for i in range(ss.mults[0]):
                 l_i, q_i = sg.idx_to_lq(i)
@@ -438,69 +450,3 @@ class TestOperators(unittest.TestCase):
             _test_single_spin_operators()
             _test_product_operators()
             _test_sum_operators()
-
-    def test_operator(self):
-        """
-        Test the user-friendly operator function.
-        """
-        # Reset parameters to defaults
-        sg.parameters.default()
-
-        # Create a spin system
-        ss = sg.SpinSystem(["1H", "14N", "23Na"])
-
-        # Test using the operator string with the dense backend
-        sg.parameters.sparse_operator = False
-        op = sg.operator(ss, f"I(x, 0) * I(y, 1) * I(z, 2)")
-        op_ref = np.kron(
-            sg.op_Sx(ss.spins[0]), np.kron(
-                sg.op_Sy(ss.spins[1]), sg.op_Sz(ss.spins[2])
-            ))
-        self.assertTrue(np.allclose(op, op_ref))
-
-        # Test using the operator string with the sparse backend
-        sg.parameters.sparse_operator = True
-        op = sg.operator(ss, f"I(x, 0) * I(y, 1) * I(z, 2)")
-        op_ref = sp.kron(
-            sg.op_Sx(ss.spins[0]), sp.kron(
-                sg.op_Sy(ss.spins[1]), sg.op_Sz(ss.spins[2])
-            ))
-        self.assertTrue(np.allclose(op.toarray(), op_ref.toarray()))
-
-        # Test using the operator array with the dense backend
-        sg.parameters.sparse_operator = False
-        op1 = sg.operator(ss, [1, 2, 3])
-        op2 = sg.operator(ss, (1, 2, 3))
-        op3 = sg.operator(ss, np.array([1, 2, 3]))
-        op_ref = np.kron(
-            sg.op_T(ss.spins[0], 1, 1), np.kron(
-                sg.op_T(ss.spins[1], 1, 0), sg.op_T(ss.spins[2], 1, -1)
-            ))
-        self.assertTrue(np.allclose(op1, op_ref))
-        self.assertTrue(np.allclose(op2, op_ref))
-        self.assertTrue(np.allclose(op3, op_ref))
-
-        # Test using the operator array with the sparse backend
-        sg.parameters.sparse_operator = True
-        op1 = sg.operator(ss, [1, 2, 3])
-        op2 = sg.operator(ss, (1, 2, 3))
-        op3 = sg.operator(ss, np.array([1, 2, 3]))
-        op_ref = sp.kron(
-            sg.op_T(ss.spins[0], 1, 1), sp.kron(
-                sg.op_T(ss.spins[1], 1, 0), sg.op_T(ss.spins[2], 1, -1)
-            ))
-        self.assertTrue(np.allclose(op1.toarray(), op_ref.toarray()))
-        self.assertTrue(np.allclose(op2.toarray(), op_ref.toarray()))
-        self.assertTrue(np.allclose(op3.toarray(), op_ref.toarray()))
-
-        # Wrong input type should raise an error
-        with self.assertRaises(ValueError):
-            sg.operator(ss, 1)
-
-        # Incorrect array length raises an error
-        with self.assertRaises(ValueError):
-            sg.operator(ss, [1, 2])
-
-        # Incorrect array dimension raises an error
-        with self.assertRaises(ValueError):
-            sg.operator(ss, [[1, 2, 3]])
