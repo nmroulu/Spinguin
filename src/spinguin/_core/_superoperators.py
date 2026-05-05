@@ -239,14 +239,19 @@ def _sop_prod(
             sop_j.append(j_op[ind_j])
             sop_k.append(k_op[ind_k])
 
-    # Concatenate the collected sparse matrix data.
-    # 32-bit integer indices are sufficient here.
-    sop_j = np.concatenate(sop_j, dtype=np.int32)
-    sop_k = np.concatenate(sop_k, dtype=np.int32)
-    sop_vals = np.concatenate(sop_vals, dtype=complex)
+    # Special case: superoperator does not contain any non-zero elements
+    if len(sop_vals) == 0:
+        sop = sp.csc_array((dim, dim))
 
-    # Construct the sparse superoperator matrix.
-    sop = sp.csc_array((sop_vals, (sop_j, sop_k)), shape=(dim, dim))
+    else:    
+        # Concatenate the collected sparse matrix data.
+        # 32-bit integer indices are sufficient here.
+        sop_j = np.concatenate(sop_j, dtype=np.int32)
+        sop_k = np.concatenate(sop_k, dtype=np.int32)
+        sop_vals = np.concatenate(sop_vals, dtype=complex)
+
+        # Construct the sparse superoperator matrix.
+        sop = sp.csc_array((sop_vals, (sop_j, sop_k)), shape=(dim, dim))
 
     if not sparse:
         return sop.toarray()

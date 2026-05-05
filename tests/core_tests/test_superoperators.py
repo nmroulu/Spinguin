@@ -200,6 +200,26 @@ class TestSuperoperators(unittest.TestCase):
                 + 1 / np.sqrt(2) * sg.superoperator(ss, [0, 3], "comm")
             ).toarray()
         ))
+
+    def test_superoperator_6(self):
+        """
+        Test a special case in which creating a superoperator results in an
+        empty matrix.
+        """
+
+        # Set default parameters
+        sg.parameters.default()
+
+        # Create a spin system and truncate the basis set
+        ss = build_spin_system(["1H", "14N"], 2)
+        ss.basis.truncate_by_coherence([0, 2])
+
+        # Commutation superoperators not in the basis set should be empty
+        sop = sg.superoperator(ss, [1, 2])
+        self.assertTrue(np.allclose(
+            sop.toarray(),
+            np.zeros((ss.basis.dim, ss.basis.dim))
+        ))
         
     def test_sop_T_coupled(self):
         """
@@ -264,7 +284,7 @@ class TestSuperoperators(unittest.TestCase):
         # Truncate the basis set and the original superoperators.
         sops_trunc = ss.basis.truncate_by_coherence([-2, 0, 2], *sops_original)
 
-        # # Compare the transformed and directly rebuilt superoperators
+        # Compare the transformed and directly rebuilt superoperators
         for sop_trunc, sop_trunc_ref in zip(sops_trunc, sops_trunc_ref):
             self.assertTrue(
                 np.allclose(sop_trunc.toarray(), sop_trunc_ref.toarray())
