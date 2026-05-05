@@ -2,7 +2,6 @@
 Tests for relaxation models and relaxation superoperators.
 """
 
-import os
 import unittest
 
 import numpy as np
