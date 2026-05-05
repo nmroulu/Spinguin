@@ -24,68 +24,47 @@ class TestOperators(unittest.TestCase):
 
     def test_op_S(self):
         """
-        The operators `E`, `Sx`, `Sy`, `Sz`, `Sp`, and `Sm` are compared
+        The operators `E`, `Sx`, `Sy`, `Sz`, `Sp`, and `Sm` are compared with
         the angular momentum commutation relations.
         """
+        def _test_op_S(zeros: Callable, sparse: bool) -> None:
+            sg.parameters.sparse_operator = sparse
+
+            # Test with each spin quantum number
+            for spin in self.SPINS:
+
+                # Build single-spin operators for the current spin
+                E  = sg.op_E(spin)
+                Sx = sg.op_Sx(spin)
+                Sy = sg.op_Sy(spin)
+                Sz = sg.op_Sz(spin)
+                Sp = sg.op_Sp(spin)
+                Sm = sg.op_Sm(spin)
+
+                # Map the commutators to their expected results
+                relations = [
+                    (comm(E,  E),  zeros(E.shape)),
+                    (comm(Sx, Sy), 1j * Sz),
+                    (comm(Sy, Sz), 1j * Sx),
+                    (comm(Sz, Sx), 1j * Sy),
+                    (comm(Sp, Sz), -Sp),
+                    (comm(Sm, Sz), Sm),
+                ]
+
+                # Test all relations
+                for actual, expected in relations:
+                    if sparse:
+                        actual = actual.toarray()
+                        expected = expected.toarray()
+                    self.assertTrue(np.allclose(actual, expected))
+
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # Test the commutation relations using the dense backend.
-        sg.parameters.sparse_operator = False
-        for spin in self.SPINS:
+        # Test with dense and sparse backends
+        _test_op_S(zeros=np.zeros, sparse=False)
+        _test_op_S(zeros=sp.csc_array, sparse=True)
 
-            # Check the standard angular momentum commutators.
-            self.assertTrue(np.allclose(comm(sg.op_E(spin), sg.op_E(spin)), 0))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sx(spin), sg.op_Sy(spin)),
-                1j*sg.op_Sz(spin)
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sy(spin), sg.op_Sz(spin)),
-                1j*sg.op_Sx(spin)
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sz(spin), sg.op_Sx(spin)),
-                1j*sg.op_Sy(spin)
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sp(spin), sg.op_Sz(spin)),
-                -sg.op_Sp(spin)
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sm(spin), sg.op_Sz(spin)),
-                sg.op_Sm(spin)
-            ))
-
-        # Test the commutation relations using the sparse backend.
-        sg.parameters.sparse_operator = True
-        for spin in self.SPINS:
-
-            # Test commutation relations
-            self.assertTrue(np.allclose(
-                comm(sg.op_E(spin), sg.op_E(spin)).toarray(),
-                0
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sx(spin), sg.op_Sy(spin)).toarray(),
-                1j*sg.op_Sz(spin).toarray()
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sy(spin), sg.op_Sz(spin)).toarray(),
-                1j*sg.op_Sx(spin).toarray()
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sz(spin), sg.op_Sx(spin)).toarray(),
-                1j*sg.op_Sy(spin).toarray()
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sp(spin), sg.op_Sz(spin)).toarray(),
-                -sg.op_Sp(spin).toarray()
-            ))
-            self.assertTrue(np.allclose(
-                comm(sg.op_Sm(spin), sg.op_Sz(spin)).toarray(),
-                sg.op_Sm(spin).toarray()
-            ))
 
     def test_op_T(self):
         """
