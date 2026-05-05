@@ -196,19 +196,27 @@ class TestOperators(unittest.TestCase):
         # Create a set of operators to test
         sg.parameters.sparse_operator = False
         test_opers = []
-        for spin in range(ss.nspins):
-            opers = {}
-            opers["E"] = sg.op_E(ss.spins[spin])
-            opers[f"I(x, {spin})"] = sg.op_Sx(ss.spins[spin])
-            opers[f"I(y, {spin})"] = sg.op_Sy(ss.spins[spin])
-            opers[f"I(z, {spin})"] = sg.op_Sz(ss.spins[spin])
-            opers[f"I(+, {spin})"] = sg.op_Sp(ss.spins[spin])
-            opers[f"I(-, {spin})"] = sg.op_Sm(ss.spins[spin])
-            for l in range(2*spin + 1):
+        for i in range(ss.nspins):
+            ops = {}
+
+            # Unit operator
+            ops["E"] = sg.op_E(ss.spins[i])
+
+            # Cartesian operators
+            ops[f"I(x, {i})"] = sg.op_Sx(ss.spins[i])
+            ops[f"I(y, {i})"] = sg.op_Sy(ss.spins[i])
+            ops[f"I(z, {i})"] = sg.op_Sz(ss.spins[i])
+
+            # Ladder operators
+            ops[f"I(+, {i})"] = sg.op_Sp(ss.spins[i])
+            ops[f"I(-, {i})"] = sg.op_Sm(ss.spins[i])
+
+            # Spherical tensor operators
+            for l in range(int(2*ss.spins[i] + 1)):
                 for q in range(-l, l + 1):
-                    opers[f"T({l}, {q}, {spin})"] = \
-                        sg.op_T(ss.spins[spin], l, q)
-            test_opers.append(opers)
+                    ops[f"T({l}, {q}, {i})"] = sg.op_T(ss.spins[i], l, q)
+            
+            test_opers.append(ops)
 
         def _test_single_spin_operators() -> None:
             for spin in range(ss.nspins):
