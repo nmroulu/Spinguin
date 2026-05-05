@@ -4,13 +4,13 @@ Tests for single-spin and multi-spin operator construction.
 
 import math
 import unittest
+from typing import Callable
 
 import numpy as np
 import scipy.sparse as sp
 
 import spinguin as sg
 from spinguin._core._la import comm
-from spinguin._core._operators import op_from_string, op_prod
 from ._helpers import build_spin_system
 
 
@@ -334,120 +334,60 @@ class TestOperators(unittest.TestCase):
 
     def test_op_T_coupled(self):
         """
-        Test the coupled spherical tensor operators for two spins.
+        Test the coupled spherical tensor operators for two spins using the
+        relations given in:
+        
+        Eq. 254-262, Man: Cartesian and Spherical Tensors in NMR Hamiltonian.
         """
+        def _test_op_T_coupled(kron: Callable, sparse: bool) -> None:
+            sg.parameters.sparse_operator = sparse
+
+            # Test all spin quantum number combinations
+            for s1 in self.SPINS:
+                for s2 in self.SPINS:
+
+                    # Get the two-spin operators
+                    SxIx = kron(sg.op_Sx(s1), sg.op_Sx(s2))
+                    SxIy = kron(sg.op_Sx(s1), sg.op_Sy(s2))
+                    SxIz = kron(sg.op_Sx(s1), sg.op_Sz(s2))
+                    SyIx = kron(sg.op_Sy(s1), sg.op_Sx(s2))
+                    SyIy = kron(sg.op_Sy(s1), sg.op_Sy(s2))
+                    SyIz = kron(sg.op_Sy(s1), sg.op_Sz(s2))
+                    SzIx = kron(sg.op_Sz(s1), sg.op_Sx(s2))
+                    SzIy = kron(sg.op_Sz(s1), sg.op_Sy(s2))
+                    SzIz = kron(sg.op_Sz(s1), sg.op_Sz(s2))
+
+                    # Write the relations for each (l, q)
+                    relations = [
+                        ((0,  0), -1 / np.sqrt(3) * (SxIx + SyIy + SzIz)),
+                        ((1,  1),  1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz))),
+                        ((1,  0),  1j / np.sqrt(2) * (SxIy - SyIx)),
+                        ((1, -1),  1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz))),
+                        ((2,  2),  1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx))),
+                        ((2,  1), -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy))),
+                        ((2,  0),  1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy)),
+                        ((2, -1),  1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy))),
+                        ((2, -2),  1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))),
+                    ]
+
+                    # Test all relations
+                    for (l, q), op_T_coupled_ref in relations:
+
+                        # Create the operator using inbuilt function
+                        op_T_coupled = sg.op_T_coupled(l, q, 1, s1, 1, s2)
+
+                        if sparse:
+                            op_T_coupled = op_T_coupled.toarray()
+                            op_T_coupled_ref = op_T_coupled_ref.toarray()
+
+                        # Compare the parsed operator with the reference.
+                        self.assertTrue(
+                            np.allclose(op_T_coupled, op_T_coupled_ref)
+                        )
+
         # Reset the parameters to defaults
         sg.parameters.default()
 
-        # Spin quantum numbers to test
-        spins = [1/2, 1, 3/2, 2, 5/2, 3, 7/2, 4, 9/2, 5, 11/2]
-
-        # Test relations given in:
-        # Eq. 254-262, Man: Cartesian and Spherical Tensors in NMR Hamiltonian.
-        # Using dense arrays
-        sg.parameters.sparse_operator = False
-        for s1 in spins:
-            for s2 in spins:
-
-                # Get the two-spin operators
-                SxIx = np.kron(sg.op_Sx(s1), sg.op_Sx(s2))
-                SxIy = np.kron(sg.op_Sx(s1), sg.op_Sy(s2))
-                SxIz = np.kron(sg.op_Sx(s1), sg.op_Sz(s2))
-                SyIx = np.kron(sg.op_Sy(s1), sg.op_Sx(s2))
-                SyIy = np.kron(sg.op_Sy(s1), sg.op_Sy(s2))
-                SyIz = np.kron(sg.op_Sy(s1), sg.op_Sz(s2))
-                SzIx = np.kron(sg.op_Sz(s1), sg.op_Sx(s2))
-                SzIy = np.kron(sg.op_Sz(s1), sg.op_Sy(s2))
-                SzIz = np.kron(sg.op_Sz(s1), sg.op_Sz(s2))
-
-                # Test the relations
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(0, 0, 1, s1, 1, s2),
-                    -1 / np.sqrt(3) * (SxIx + SyIy + SzIz)
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(1, 1, 1, s1, 1, s2),
-                    1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz))
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(1, 0, 1, s1, 1, s2),
-                    1j / np.sqrt(2) * (SxIy - SyIx)
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(1, -1, 1, s1, 1, s2),
-                    1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz))
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, 2, 1, s1, 1, s2),
-                    1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx))
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, 1, 1, s1, 1, s2),
-                    -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy))
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, 0, 1, s1, 1, s2),
-                    1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy)
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, -1, 1, s1, 1, s2),
-                    1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy))
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, -2, 1, s1, 1, s2),
-                    1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx))
-                ))
-
-        # Repeat the test for sparse arrays
-        sg.parameters.sparse_operator = True
-        for s1 in spins:
-            for s2 in spins:
-
-                # Get the two-spin operators
-                SxIx = sp.kron(sg.op_Sx(s1), sg.op_Sx(s2))
-                SxIy = sp.kron(sg.op_Sx(s1), sg.op_Sy(s2))
-                SxIz = sp.kron(sg.op_Sx(s1), sg.op_Sz(s2))
-                SyIx = sp.kron(sg.op_Sy(s1), sg.op_Sx(s2))
-                SyIy = sp.kron(sg.op_Sy(s1), sg.op_Sy(s2))
-                SyIz = sp.kron(sg.op_Sy(s1), sg.op_Sz(s2))
-                SzIx = sp.kron(sg.op_Sz(s1), sg.op_Sx(s2))
-                SzIy = sp.kron(sg.op_Sz(s1), sg.op_Sy(s2))
-                SzIz = sp.kron(sg.op_Sz(s1), sg.op_Sz(s2))
-
-                # Test the relations
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(0, 0, 1, s1, 1, s2).toarray(),
-                    -1 / np.sqrt(3) * (SxIx + SyIy + SzIz).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(1, 1, 1, s1, 1, s2).toarray(),
-                    1 / 2 * (SzIx - SxIz + 1j * (SzIy - SyIz)).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(1, 0, 1, s1, 1, s2).toarray(),
-                    1j / np.sqrt(2) * (SxIy - SyIx).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(1, -1, 1, s1, 1, s2).toarray(),
-                    1 / 2 * (SzIx - SxIz - 1j * (SzIy - SyIz)).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, 2, 1, s1, 1, s2).toarray(),
-                    1 / 2 * (SxIx - SyIy + 1j * (SxIy + SyIx)).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, 1, 1, s1, 1, s2).toarray(),
-                    -1 / 2 * (SxIz + SzIx + 1j * (SyIz + SzIy)).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, 0, 1, s1, 1, s2).toarray(),
-                    1 / np.sqrt(6) * (-SxIx + 2 * SzIz - SyIy).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, -1, 1, s1, 1, s2).toarray(),
-                    1 / 2 * (SxIz + SzIx - 1j * (SyIz + SzIy)).toarray()
-                ))
-                self.assertTrue(np.allclose(
-                    sg.op_T_coupled(2, -2, 1, s1, 1, s2).toarray(),
-                    1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx)).toarray()
-                ))
+        # Test with dense and sparse backends
+        _test_op_T_coupled(kron=np.kron, sparse=False)
+        _test_op_T_coupled(kron=sp.kron, sparse=True)
