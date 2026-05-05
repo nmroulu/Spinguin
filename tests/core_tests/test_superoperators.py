@@ -3,6 +3,7 @@ Tests for superoperator construction, representation, and basis truncation.
 """
 
 import unittest
+from copy import deepcopy
 
 import numpy as np
 
@@ -132,26 +133,23 @@ class TestSuperoperators(unittest.TestCase):
 
     def test_superoperator_4(self):
         """
-        Test caching behavior of the superoperator function when the basis
+        Test caching behaviour of the superoperator function when the basis
         changes.
         """
-        # Reset parameters to defaults
+
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H", "1H"])
+        # Create the example spin system.
+        ss = build_spin_system(["1H", "1H", "1H"], 3)
 
         # Define an operator to be created
         op_def = np.array([2, 0, 0])
-
-        # Construct the full basis
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
         
         # Create the superoperator in the full basis
         Iz = sg.superoperator(ss, op_def, "comm")
 
-        # Construct a truncated basis
+        # Truncate the basis
         ss.basis.max_spin_order = 2
         ss.basis.build()
 
@@ -163,20 +161,15 @@ class TestSuperoperators(unittest.TestCase):
 
     def test_superoperator_5(self):
         """
-        Test creating the superoperator from a string against creating the same
-        superoperator from an array.
+        Test creating the same superoperator from string and array inputs.
         """
         # Reset to default parameters
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Create and build the example spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Build a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create the same superoperator using the string and array inputs
+        # Compare string and array inputs for several superoperators.
         self.assertTrue(np.allclose(
             sg.superoperator(ss, "I(z,0)", "left").toarray(),
             sg.superoperator(ss, [2, 0], "left").toarray()
@@ -210,121 +203,69 @@ class TestSuperoperators(unittest.TestCase):
         
     def test_sop_T_coupled(self):
         """
-        Test creating the Hamiltonian term using "Cartesian" superoperators and
-        the coupled spherical tensor superoperator.
+        Test Cartesian and coupled-spherical constructions of a two-spin term.
         """
+
         # Set parameters
         sg.parameters.default()
         sg.parameters.sparse_superoperator = False
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H"])
-        
-        # Build the basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
+        # Create and build the example spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Make a random Cartesian interaction tensor
-        A = np.random.rand(3, 3)
+        # Make a Cartesian interaction tensor
+        A = np.array([
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        ])
 
-        # Cartesian spin operators
+        # Define the Cartesian operator labels.
         I = np.array(['x', 'y', 'z'])
         
-        # Perform the dot product manually
+        # Perform the Cartesian contraction explicitly.
         left = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
         for i in range(A.shape[0]):
             for s in range(A.shape[1]):
                 left += A[i, s]*sg.superoperator(ss, f"I({I[i]},0)*I({I[s]},1)")
 
-        # Convert A to spherical tensors
+        # Convert the interaction tensor to spherical components.
         A = cartesian_tensor_to_spherical_tensor(A)
 
-        # Use spherical tensors
+        # Perform the same contraction using coupled spherical tensors.
         right = np.zeros((ss.basis.dim, ss.basis.dim), dtype=complex)
         for l in range(0, 3):
             for q in range(-l, l + 1):
                 right += (-1)**(q)*A[(l, q)] * sg.sop_T_coupled(ss, l, -q, 0, 1)
 
-        # Both conventions should give the same result
+        # Both constructions should give the same result.
         self.assertTrue(np.allclose(left, right))
 
     def test_sop_to_truncated_basis(self):
         """
-        Test the transformation of superoperators to truncated basis.
+        Test the transformation of superoperators to a truncated basis.
         """
+
         # Reset to defaults
         sg.parameters.default()
 
-        # Example system
-        ss = sg.SpinSystem(["1H", "1H", "1H", "1H", "14N"])
+        # Create a spin system with full and truncated basis sets
+        ss = build_spin_system(["1H", "14N"], 2)
+        ss_tr = deepcopy(ss)
+        ss_tr.basis.truncate_by_coherence([-2, 0, 2])
 
-        # Create the basis set
-        ss.basis.max_spin_order = 3
-        ss.basis.build()
-
-        # Operators to test
-        operators = ['E', 'x', 'y', 'z', '+', '-']
-
-        # Create the superoperators in the original basis set
+        # Create superoperators using both basis sets
         sops_original = []
-        for i in operators:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
+        sops_trunc_ref = []
+        for op_def in ss_tr.basis.basis:
+            sops_original.append(sg.superoperator(ss, op_def))
+            sops_trunc_ref.append(sg.superoperator(ss_tr, op_def))
 
-            for j in operators:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
-
-                for k in operators:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
-
-                    # Create the operator string
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-
-                    # Create the superoperator
-                    sop = sg.superoperator(ss, op_string)
-                    sops_original.append(sop)
-
-        # Truncate the basis set and superoperators
+        # Truncate the basis set and the original superoperators.
         sops_trunc = ss.basis.truncate_by_coherence([-2, 0, 2], *sops_original)
 
-        # Create the superoperators in the truncated basis directly
-        sops_trunc_ref = []
-        for i in operators:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
-
-            for j in operators:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
-
-                for k in operators:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
-
-                    # Create the operator string
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-
-                    # Create the superoperator
-                    sop = sg.superoperator(ss, op_string)
-                    sops_trunc_ref.append(sop)
-
-        # Compare
+        # # Compare the transformed and directly rebuilt superoperators
         for sop_trunc, sop_trunc_ref in zip(sops_trunc, sops_trunc_ref):
-            self.assertTrue(np.allclose(
-                sop_trunc.toarray(),
-                sop_trunc_ref.toarray()
-            ))
+            self.assertTrue(
+                np.allclose(sop_trunc.toarray(), sop_trunc_ref.toarray())
+            )
