@@ -11,6 +11,7 @@ import scipy.sparse as sp
 import spinguin as sg
 from spinguin._core._la import comm
 from spinguin._core._operators import op_from_string, op_prod
+from ._helpers import build_spin_system
 
 
 class TestOperators(unittest.TestCase):
@@ -163,104 +164,52 @@ class TestOperators(unittest.TestCase):
                             atol = 1e-7
                         ))
 
-    def test_op_prod(self):
+    def test_operator_1(self):
         """
-        Test the construction of product operators for different spin quantum
-        numbers.
+        Test the construction of product operators using the integer array
+        input.
         """
-        # Reset parameters to defaults
+        # Reset parameters to defaults.
         sg.parameters.default()
 
-        # Create a test spin system
-        spins = np.array([1/2, 1, 3/2])
+        # Create a test spin system.
+        ss = build_spin_system(["1H", "14N", "23Na"], 3)
 
-        # Try all possible product operator combinations with the dense backend
-        sg.parameters.sparse_operator = False
-        for i in range(int(2*spins[0]+1)):
-            l_i, q_i = sg.idx_to_lq(i)
-            op_i = sg.op_T(spins[0], l_i, q_i)
+        def _test_product_operators() -> None:
+            for i in range(ss.mults[0]):
+                l_i, q_i = sg.idx_to_lq(i)
+                op_i = sg.op_T(ss.spins[0], l_i, q_i)
 
-            for j in range(int(2*spins[1]+1)):
-                l_j, q_j = sg.idx_to_lq(j)
-                op_j = sg.op_T(spins[1], l_j, q_j)
+                for j in range(ss.mults[1]):
+                    l_j, q_j = sg.idx_to_lq(j)
+                    op_j = sg.op_T(ss.spins[1], l_j, q_j)
 
-                for k in range(int(2*spins[2]+1)):
-                    l_k, q_k = sg.idx_to_lq(k)
-                    op_k = sg.op_T(spins[2], l_k, q_k)
+                    for k in range(ss.mults[2]):
+                        l_k, q_k = sg.idx_to_lq(k)
+                        op_k = sg.op_T(ss.spins[2], l_k, q_k)
 
-                    # Create the operator using inbuilt function with the unit
-                    # operator included
-                    op_def = np.array([i, j, k])
-                    oper = op_prod(op_def, spins, include_unit=True)
+                        # Create the operator using inbuilt function
+                        op_def = [i, j, k]
+                        oper = sg.operator(ss, op_def)
 
-                    # Create the reference operator manually
-                    oper_ref = np.kron(op_i, np.kron(op_j, op_k))
+                        # Create the reference operator manually
+                        if sg.parameters.sparse_operator:
+                            oper_ref = sp.kron(op_i, sp.kron(op_j, op_k))
+                        else:
+                            oper_ref = np.kron(op_i, np.kron(op_j, op_k))
 
-                    # Compare
-                    self.assertTrue(np.allclose(oper, oper_ref))
+                        if sg.parameters.sparse_operator:
+                            oper = oper.toarray()
+                            oper_ref = oper_ref.toarray()
 
-                    # Create the operator using inbuilt function without
-                    # including the unit operator
-                    oper = op_prod(op_def, spins, include_unit=False)
-                
-                    # Create the reference operator manually
-                    oper_ref = np.array([[1]])
-                    if i != 0:
-                        oper_ref = np.kron(oper_ref, op_i)
-                    if j != 0:
-                        oper_ref = np.kron(oper_ref, op_j)
-                    if k != 0:
-                        oper_ref = np.kron(oper_ref, op_k)
+                        # Compare the constructed and manual operators.
+                        self.assertTrue(np.allclose(oper, oper_ref))
 
-                    # Compare
-                    self.assertTrue(np.allclose(oper, oper_ref))
+        # Test all product operator combinations with dense and sparse backends
+        for sparse in [False, True]:
+            sg.parameters.sparse_operator = sparse
+            _test_product_operators()
 
-        # Try all possible product operator combinations with the sparse backend
-        sg.parameters.sparse_operator = True
-        for i in range(int(2*spins[0]+1)):
-            l_i, q_i = sg.idx_to_lq(i)
-            op_i = sg.op_T(spins[0], l_i, q_i)
-
-            for j in range(int(2*spins[1]+1)):
-                l_j, q_j = sg.idx_to_lq(j)
-                op_j = sg.op_T(spins[1], l_j, q_j)
-
-                for k in range(int(2*spins[2]+1)):
-                    l_k, q_k = sg.idx_to_lq(k)
-                    op_k = sg.op_T(spins[2], l_k, q_k)
-
-                    # Create the operator using inbuilt function with the unit
-                    # operator included
-                    op_def = np.array([i, j, k])
-                    oper = op_prod(op_def, spins, include_unit=True)
-
-                    # Create the reference operator manually
-                    oper_ref = sp.kron(op_i, sp.kron(op_j, op_k))
-
-                    # Compare
-                    self.assertTrue(np.allclose(
-                        oper.toarray(),
-                        oper_ref.toarray()
-                    ))
-
-                    # Create the operator using inbuilt function without
-                    # including the unit operator
-                    oper = op_prod(op_def, spins, include_unit=False)
-                
-                    # Create the reference operator manually
-                    oper_ref = sp.csc_array([[1]])
-                    if i != 0:
-                        oper_ref = sp.kron(oper_ref, op_i)
-                    if j != 0:
-                        oper_ref = sp.kron(oper_ref, op_j)
-                    if k != 0:
-                        oper_ref = sp.kron(oper_ref, op_k)
-
-                    # Compare
-                    self.assertTrue(np.allclose(
-                        oper.toarray(),
-                        oper_ref.toarray()
-                    ))
 
     def test_op_T_coupled(self):
         """
@@ -382,156 +331,113 @@ class TestOperators(unittest.TestCase):
                     1 / 2 * (SxIx - SyIy - 1j * (SxIy + SyIx)).toarray()
                 ))
 
-    def test_op_from_string(self):
+    def test_operator_2(self):
         """
-        A test for creating the Hilbert-space operators using the operators
-        string.
+        Test the construction of product operators using the string input.
         """
         # Reset parameters to defaults
         sg.parameters.default()
 
-        # Create a test spin system
-        spins = np.array([1/2, 1, 3/2])
+        # Create a test spin system.
+        ss = build_spin_system(["1H", "14N"], 2)
 
-        # Operators to test
-        test_opers = ['E', 'x', 'y', 'z', '+', '-']
-
-        # Get the Zeeman eigenbasis operators in dense format
+        # Create a set of operators to test
         sg.parameters.sparse_operator = False
-        opers = {}
-        for spin in spins:
-            opers[('E', spin)] = sg.op_E(spin)
-            opers[('x', spin)] = sg.op_Sx(spin)
-            opers[('y', spin)] = sg.op_Sy(spin)
-            opers[('z', spin)] = sg.op_Sz(spin)
-            opers[('+', spin)] = sg.op_Sp(spin)
-            opers[('-', spin)] = sg.op_Sm(spin)
+        test_opers = []
+        for spin in range(ss.nspins):
+            opers = {}
+            opers["E"] = sg.op_E(ss.spins[spin])
+            opers[f"I(x, {spin})"] = sg.op_Sx(ss.spins[spin])
+            opers[f"I(y, {spin})"] = sg.op_Sy(ss.spins[spin])
+            opers[f"I(z, {spin})"] = sg.op_Sz(ss.spins[spin])
+            opers[f"I(+, {spin})"] = sg.op_Sp(ss.spins[spin])
+            opers[f"I(-, {spin})"] = sg.op_Sm(ss.spins[spin])
+            for l in range(2*spin + 1):
+                for q in range(-l, l + 1):
+                    opers[f"T({l}, {q}, {spin})"] = \
+                        sg.op_T(ss.spins[spin], l, q)
+            test_opers.append(opers)
 
-        # Try all possible product operator combinations using the dense format
-        for i in test_opers:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
-
-            for j in test_opers:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
-
-                for k in test_opers:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
+        def _test_single_spin_operators() -> None:
+            for spin in range(ss.nspins):
+                for op_k, op_v in test_opers[spin].items():
 
                     # Create the operator using inbuilt function
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-                    oper = op_from_string(spins, op_string)
+                    oper = sg.operator(ss, op_k)
 
                     # Create the reference operator
-                    oper_ref = np.kron(
-                        opers[(i, spins[0])], np.kron(
-                            opers[(j, spins[1])], opers[(k, spins[2])]
-                        ))
+                    if spin == 0:
+                        oper_ref = np.kron(op_v, test_opers[1]["E"])
+                    else:
+                        oper_ref = np.kron(test_opers[0]["E"], op_v)
 
-                    # Compare
+                    # Compare the parsed operator with the reference operator.
+                    if sg.parameters.sparse_operator:
+                        oper = oper.toarray()
                     self.assertTrue(np.allclose(oper, oper_ref))
 
-        # Test creating a sum operator for all spins using input type I(x)
-        for oper in test_opers:
-            if oper != "E":      
-
-                op_string = f"I({oper})"
-                op_string_ref = f"I({oper},0) + I({oper},1) + I({oper},2)"
-
-                oper = op_from_string(spins, op_string)
-                oper_ref = op_from_string(spins, op_string_ref)
-
-                # Compare
-                self.assertTrue(np.allclose(oper, oper_ref))
-
-        # Test creating a sum operator for all spins using input type T(l,q)
-        for l in range(0, 2):
-            for q in range(-l, l+1):
-
-                op_string = f"T({l},{q})"
-                op_string_ref = f"T({l},{q},0) + T({l},{q},1) + T({l},{q},2)"
-
-                oper = op_from_string(spins, op_string)
-                oper_ref = op_from_string(spins, op_string_ref)
-
-                # Compare
-                self.assertTrue(np.allclose(oper, oper_ref))
-
-        # Perform the same tests using the sparse format
-        sg.parameters.sparse_operator = True
-        for i in test_opers:
-            if i == "E":
-                op_i = "E"
-            else:
-                op_i = f"I({i}, 0)"
-
-            for j in test_opers:
-                if j == "E":
-                    op_j = "E"
-                else:
-                    op_j = f"I({j}, 1)"
-
-                for k in test_opers:
-                    if k == "E":
-                        op_k = "E"
-                    else:
-                        op_k = f"I({k}, 2)"
+        def _test_product_operators() -> None:
+            for op1_k, op1_v in test_opers[0].items():
+                for op2_k, op2_v in test_opers[1].items():
 
                     # Create the operator using inbuilt function
-                    op_string = f"{op_i} * {op_j} * {op_k}"
-                    oper = op_from_string(spins, op_string)
+                    op_string = f"{op1_k} * {op2_k}"
+                    oper = sg.operator(ss, op_string)
 
                     # Create the reference operator
-                    oper_ref = sp.kron(
-                        opers[(i, spins[0])], sp.kron(
-                            opers[(j, spins[1])], opers[(k, spins[2])]
-                        ))
+                    oper_ref = np.kron(op1_v, op2_v)
 
-                    # Compare
-                    self.assertTrue(np.allclose(
-                        oper.toarray(),
-                        oper_ref.toarray()
-                    ))
+                    # Compare the parsed operator with the reference operator.
+                    if sg.parameters.sparse_operator:
+                        oper = oper.toarray()
+                    self.assertTrue(np.allclose(oper, oper_ref))
 
-        # Test creating a sum operator for all spins using input type I(x)
-        for oper in test_opers:
-            if oper != "E":      
+        def _test_sum_operators() -> None:
+            # Collect operators to be tested
+            cases = []
 
-                op_string = f"I({oper})"
-                op_string_ref = f"I({oper},0) + I({oper},1) + I({oper},2)"
+            # Cartesian + ladder
+            for oper in ["x", "y", "z", "+", "-"]:
+                case = {}
+                case["inp1"] = f"I({oper})"
+                case["inp2"] = f"I({oper}, {0}) + I({oper}, {1})"
+                case["ref"] = [f"I({oper}, {0})", f"I({oper}, {1})"]
+                cases.append(case)
 
-                oper = op_from_string(spins, op_string)
-                oper_ref = op_from_string(spins, op_string_ref)
+            # Spherical tensor
+            for l in range(2):
+                for q in range(-l, l+1):
+                    case = {}
+                    case["inp1"] = f"T({l}, {q})"
+                    case["inp2"] = f"T({l}, {q}, 0) + T({l}, {q}, 1)"
+                    case["ref"] =  [f"T({l}, {q}, 0)", f"T({l}, {q}, 1)"]
+                    cases.append(case)
 
-                # Compare
-                self.assertTrue(np.allclose(
-                    oper.toarray(),
-                    oper_ref.toarray()
-                ))
+            for case in cases:
+                # Create the operator using inbuilt function
+                oper1 = sg.operator(ss, case["inp1"])
+                oper2 = sg.operator(ss, case["inp2"])
 
-        # Test creating a sum operator for all spins using input type T(l,q)
-        for l in range(0, 2):
-            for q in range(-l, l+1):
+                # Create the reference operator
+                oper_ref = sum(
+                    sg.operator(ss, case["ref"][i]) for i in range(ss.nspins)
+                )
 
-                op_string = f"T({l},{q})"
-                op_string_ref = f"T({l},{q},0) + T({l},{q},1) + T({l},{q},2)"
+                if sg.parameters.sparse_operator:
+                    oper1 = oper1.toarray()
+                    oper2 = oper2.toarray()
+                    oper_ref = oper_ref.toarray()
 
-                oper = op_from_string(spins, op_string)
-                oper_ref = op_from_string(spins, op_string_ref)
+                # Compare the parsed operator with the reference operator.
+                self.assertTrue(np.allclose(oper1, oper_ref), msg=case["inp1"])
+                self.assertTrue(np.allclose(oper2, oper_ref), msg=case["inp2"])
 
-                # Compare
-                self.assertTrue(np.allclose(
-                    oper.toarray(),
-                    oper_ref.toarray()
-                ))
+        # Try all operator inputs with dense and sparse backends.
+        for sparse in [False, True]:
+            sg.parameters.sparse_operator = sparse
+            _test_single_spin_operators()
+            _test_product_operators()
+            _test_sum_operators()
 
     def test_operator(self):
         """
