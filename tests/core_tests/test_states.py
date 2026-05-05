@@ -1,283 +1,242 @@
+"""
+Tests for state construction, state measurement, and equilibrium populations.
+"""
+
 import unittest
+
 import numpy as np
 import scipy.constants as const
+
 import spinguin as sg
+from ._helpers import build_spin_system
 
 class TestStates(unittest.TestCase):
+    """
+    Test state-generation utilities and state-based observables.
+    """
 
     def test_alpha(self):
         """
-        Test creating the alpha state vector in the spherical tensor
-        basis, converting that to Zeeman basis and compare with reference
-        result.
+        Test alpha-state construction against Zeeman-basis references.
         """
-        # Reset to defaults
+
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Use dense format for operators
+        # Use dense operators for the reference matrices.
         sg.parameters.sparse_operator = False
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Build the example two-spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create Hilbert-space spin operators
+        # Build the single-spin reference operators.
         E = sg.op_E(1/2)
         Iz = sg.op_Sz(1/2)
 
-        # Create density matrices for alpha states for reference
+        # Construct the Zeeman-basis reference density matrices.
         alpha1_ref = 1/4 * np.kron(E, E) + 1/2 * np.kron(Iz, E)
         alpha2_ref = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz)
 
-        # Create alpha states using the inbuilt function (dense format)
-        sg.parameters.sparse_state = False
-        alpha1_dense = sg.alpha_state(ss, 0)
-        alpha2_dense = sg.alpha_state(ss, 1)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Create alpha states using the inbuilt function (sparse format)
-        sg.parameters.sparse_state = True
-        alpha1_sparse = sg.alpha_state(ss, 0)
-        alpha2_sparse = sg.alpha_state(ss, 1)
+            # Create alpha states using the inbuilt function
+            alpha1 = sg.alpha_state(ss, 0)
+            alpha2 = sg.alpha_state(ss, 1)
 
-        # Convert the states to density matrices (to dense format)
-        alpha1_dense = sg.state_to_zeeman(ss, alpha1_dense)
-        alpha2_dense = sg.state_to_zeeman(ss, alpha2_dense)
-        alpha1_sparse = sg.state_to_zeeman(ss, alpha1_sparse)
-        alpha2_sparse = sg.state_to_zeeman(ss, alpha2_sparse)
+            # Convert the states to density matrices
+            alpha1 = sg.state_to_zeeman(ss, alpha1)
+            alpha2 = sg.state_to_zeeman(ss, alpha2)
 
-        # Compare
-        self.assertTrue(np.allclose(alpha1_dense, alpha1_ref))
-        self.assertTrue(np.allclose(alpha2_dense, alpha2_ref))
-        self.assertTrue(np.allclose(alpha1_sparse, alpha1_ref))
-        self.assertTrue(np.allclose(alpha2_sparse, alpha2_ref))
+            # Compare the constructed states with the references.
+            self.assertTrue(np.allclose(alpha1, alpha1_ref))
+            self.assertTrue(np.allclose(alpha2, alpha2_ref))
 
     def test_beta(self):
         """
-        Test creating the beta state vector in the spherical tensor
-        basis, converting that to Zeeman basis and compare with reference
-        result.
+        Test beta-state construction against Zeeman-basis references.
         """
-        # Reset to defaults
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Use dense format for operators
+        # Use dense operators for the reference matrices.
         sg.parameters.sparse_operator = False
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Build the example two-spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create Hilbert-space spin operators
+        # Build the single-spin reference operators.
         E = sg.op_E(1/2)
         Iz = sg.op_Sz(1/2)
 
-        # Create Zeeman beta states
+        # Construct the Zeeman-basis reference density matrices.
         beta1_ref = 1/4 * np.kron(E, E) - 1/2 * np.kron(Iz, E)
         beta2_ref = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz)
 
-        # Create beta states using the inbuilt funtion (dense format)
-        sg.parameters.sparse_state = False
-        beta1_dense = sg.beta_state(ss, 0)
-        beta2_dense = sg.beta_state(ss, 1)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Create beta states using the inbuilt funtion (sparse format)
-        sg.parameters.sparse_state = True
-        beta1_sparse = sg.beta_state(ss, 0)
-        beta2_sparse = sg.beta_state(ss, 1)
+            # Create beta states using the inbuilt function
+            beta1 = sg.beta_state(ss, 0)
+            beta2 = sg.beta_state(ss, 1)
 
-        # Convert the states to density matrices (to dense format)
-        beta1_dense = sg.state_to_zeeman(ss, beta1_dense)
-        beta2_dense = sg.state_to_zeeman(ss, beta2_dense)
-        beta1_sparse = sg.state_to_zeeman(ss, beta1_sparse)
-        beta2_sparse = sg.state_to_zeeman(ss, beta2_sparse)
+            # Convert the states to density matrices
+            beta1 = sg.state_to_zeeman(ss, beta1)
+            beta2 = sg.state_to_zeeman(ss, beta2)
 
-        # Compare
-        self.assertTrue(np.allclose(beta1_dense, beta1_ref))
-        self.assertTrue(np.allclose(beta2_dense, beta2_ref))
-        self.assertTrue(np.allclose(beta1_sparse, beta1_ref))
-        self.assertTrue(np.allclose(beta2_sparse, beta2_ref))
+            # Compare the constructed states with the references.
+            self.assertTrue(np.allclose(beta1, beta1_ref))
+            self.assertTrue(np.allclose(beta2, beta2_ref))
 
     def test_singlet(self):
         """
-        Test creating the singlet state vector in the spherical tensor
-        basis, converting that to Zeeman basis and compare with reference
-        result.
+        Test singlet-state construction against a Zeeman-basis reference.
         """
-        # Reset to defaults
+
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Use dense format for operators
+        # Use dense operators for the reference matrices.
         sg.parameters.sparse_operator = False
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Build the example two-spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create Hilbert-space spin operators
+        # Build the single-spin reference operators.
         E = sg.op_E(1/2)
         Iz = sg.op_Sz(1/2)
         Ip = sg.op_Sp(1/2)
         Im = sg.op_Sm(1/2)
 
-        # Create the singlet state density matrix for reference
-        singlet_ref = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) - \
-                      1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
+        # Construct the Zeeman-basis reference density matrix.
+        singlet_ref = \
+            1/4 * np.kron(E, E) - np.kron(Iz, Iz) - \
+            1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
         
-        # Create the singlet state using the inbuilt function (dense format)
-        sg.parameters.sparse_state = False
-        singlet_dense = sg.singlet_state(ss, 0, 1)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Create the singlet state using the inbuilt function (sparse format)
-        sg.parameters.sparse_state = True
-        singlet_sparse = sg.singlet_state(ss, 0, 1)
+            # Create the singlet state using the inbuilt function
+            singlet = sg.singlet_state(ss, 0, 1)
 
-        # Convert the states to density matrices
-        singlet_dense = sg.state_to_zeeman(ss, singlet_dense)
-        singlet_sparse = sg.state_to_zeeman(ss, singlet_sparse)
+            # Convert the state to a density matrix
+            singlet = sg.state_to_zeeman(ss, singlet)
 
-        # Compare
-        self.assertTrue(np.allclose(singlet_ref, singlet_dense))
-        self.assertTrue(np.allclose(singlet_ref, singlet_sparse))
+            # Compare the constructed state with the reference.
+            self.assertTrue(np.allclose(singlet, singlet_ref))
 
     def test_triplet_zero(self):
         """
-        Test creating the triplet zero state vector in the spherical tensor
-        basis, converting that to Zeeman basis and compare with reference
-        result.
+        Test triplet-zero-state construction against a Zeeman reference.
         """
-        # Reset to defaults
+
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Use dense format for operators
+        # Use dense operators for the reference matrices.
         sg.parameters.sparse_operator = False
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Build the example two-spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create Hilbert-space spin operators
+        # Build the single-spin reference operators.
         E = sg.op_E(1/2)
         Iz = sg.op_Sz(1/2)
         Ip = sg.op_Sp(1/2)
         Im = sg.op_Sm(1/2)
 
-        # Create the triplet-zero density matrix for reference
-        triplet_zero_ref = 1/4 * np.kron(E, E) - np.kron(Iz, Iz) + \
-                           1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
+        # Construct the Zeeman-basis reference density matrix.
+        triplet_zero_ref = \
+            1/4 * np.kron(E, E) - np.kron(Iz, Iz) + \
+            1/2 * (np.kron(Ip, Im) + np.kron(Im, Ip))
         
-        # Create the triplet-zero state using the inbuilt function (dense)
-        sg.parameters.sparse_state = False
-        triplet_zero_dense = sg.triplet_zero_state(ss, 0, 1)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Create the triplet-zero state using the inbuilt function (sparse)
-        sg.parameters.sparse_state = True
-        triplet_zero_sparse = sg.triplet_zero_state(ss, 0, 1)
+            # Create the triplet-zero state using the inbuilt function
+            triplet_zero = sg.triplet_zero_state(ss, 0, 1)
 
-        # Convert the states to density matrices
-        triplet_zero_dense = sg.state_to_zeeman(ss, triplet_zero_dense)
-        triplet_zero_sparse = sg.state_to_zeeman(ss, triplet_zero_sparse)
+            # Convert the state to a density matrix
+            triplet_zero = sg.state_to_zeeman(ss, triplet_zero)
 
-        # Compare
-        self.assertTrue(np.allclose(triplet_zero_ref, triplet_zero_dense))
-        self.assertTrue(np.allclose(triplet_zero_ref, triplet_zero_sparse))
+            # Compare the constructed state with the reference.
+            self.assertTrue(np.allclose(triplet_zero, triplet_zero_ref))
 
     def test_triplet_plus(self):
         """
-        Test creating the triplet plus state vector in the spherical tensor
-        basis, converting that to Zeeman basis and compare with reference
-        result.
+        Test triplet-plus-state construction against a Zeeman reference.
         """
-        # Reset to defaults
+
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Use dense format for operators
+        # Use dense operators for the reference matrices.
         sg.parameters.sparse_operator = False
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Build the example two-spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create Hilbert-space spin operators
+        # Build the single-spin reference operators.
         E = sg.op_E(1/2)
         Iz = sg.op_Sz(1/2)
 
         # Create density matrix for the triplet-plus state for reference
-        triplet_plus_ref = 1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + \
-                           1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
+        triplet_plus_ref = \
+            1/4 * np.kron(E, E) + 1/2 * np.kron(E, Iz) + \
+            1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
         
-        # Create the triplet-plus state using the inbuilt function (dense)
-        sg.parameters.sparse_state = False
-        triplet_plus_dense = sg.triplet_plus_state(ss, 0, 1)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Create the triplet-plus state using the inbuilt function (sparse)
-        sg.parameters.sparse_state = True
-        triplet_plus_sparse = sg.triplet_plus_state(ss, 0, 1)
+            # Create the triplet-plus state using the inbuilt function
+            triplet_plus = sg.triplet_plus_state(ss, 0, 1)
 
-        # Convert the states to density matrices
-        triplet_plus_dense = sg.state_to_zeeman(ss, triplet_plus_dense)
-        triplet_plus_sparse = sg.state_to_zeeman(ss, triplet_plus_sparse)
+            # Convert the state to a density matrix
+            triplet_plus = sg.state_to_zeeman(ss, triplet_plus)
 
-        # Compare
-        self.assertTrue(np.allclose(triplet_plus_ref, triplet_plus_dense))
-        self.assertTrue(np.allclose(triplet_plus_ref, triplet_plus_sparse))
+            # Compare the constructed state with the reference.
+            self.assertTrue(np.allclose(triplet_plus, triplet_plus_ref))
 
     def test_triplet_minus(self):
         """
-        Test creating the triplet minus state vector in the spherical tensor
-        basis, converting that to Zeeman basis and compare with reference
-        result.
+        Test triplet-minus-state construction against a Zeeman reference.
         """
-        # Reset to defaults
+
+        # Reset the global settings.
         sg.parameters.default()
 
-        # Use dense format for operators
+        # Use dense operators for the reference matrices.
         sg.parameters.sparse_operator = False
 
-        # Create an example spin system
-        ss = sg.SpinSystem(["1H", "1H"])
+        # Build the example two-spin system.
+        ss = build_spin_system(["1H", "1H"], 2)
 
-        # Create a basis set
-        ss.basis.max_spin_order = 2
-        ss.basis.build()
-
-        # Create Hilbert-space spin operators
+        # Build the single-spin reference operators.
         E = sg.op_E(1/2)
         Iz = sg.op_Sz(1/2)
 
         # Create the triplet-minus density matrix for reference
-        triplet_minus_ref = 1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - \
-                            1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
+        triplet_minus_ref = \
+            1/4 * np.kron(E, E) - 1/2 * np.kron(E, Iz) - \
+            1/2 * np.kron(Iz, E) + np.kron(Iz, Iz)
         
-        # Create the triplet-minus state using the inbuilt function (dense)
-        sg.parameters.sparse_state = False
-        triplet_minus_dense = sg.triplet_minus_state(ss, 0, 1)
+        # Test with dense and sparse backends
+        for sparse in (False, True):
+            sg.parameters.sparse_state = sparse
 
-        # Create the triplet-minus state using the inbuilt function (sparse)
-        sg.parameters.sparse_state = True
-        triplet_minus_sparse = sg.triplet_minus_state(ss, 0, 1)
+            # Create the triplet-minus state using the inbuilt function
+            triplet_minus = sg.triplet_minus_state(ss, 0, 1)
 
-        # Convert to density matrices
-        triplet_minus_dense = sg.state_to_zeeman(ss, triplet_minus_dense)
-        triplet_minus_sparse = sg.state_to_zeeman(ss, triplet_minus_sparse)
+            # Convert the state to a density matrix
+            triplet_minus = sg.state_to_zeeman(ss, triplet_minus)
 
-        # Compare
-        self.assertTrue(np.allclose(triplet_minus_ref, triplet_minus_dense))
-        self.assertTrue(np.allclose(triplet_minus_ref, triplet_minus_sparse))
+            # Compare the constructed state with the reference.
+            self.assertTrue(np.allclose(triplet_minus, triplet_minus_ref))
 
     def _test_state(
         self,
