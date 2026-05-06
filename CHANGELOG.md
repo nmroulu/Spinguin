@@ -11,6 +11,7 @@ system.
 - Quadrupole coupling tensors can now be requested for a spin system.
 - Shielding interaction tensors (in rad/s) can now be requested for a spin
 system.
+- Added a function for returning resonance frequencies of a spin system.
 
 ## 0.1.1
 - Added quadrupolar moments to several isotopes.

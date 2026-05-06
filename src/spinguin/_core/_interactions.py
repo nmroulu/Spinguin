@@ -168,11 +168,56 @@ def shielding_intr_tensors(spin_system: SpinSystem) -> np.ndarray:
     # Convert the shielding tensors from ppm to dimensionless units.
     shielding_tensors = spin_system.shielding * 1e-6
 
-    # Construct the Larmor frequencies that scale the shielding tensors.
-    w0s = -spin_system.gammas * parameters.magnetic_field
+    # Construct the bare Larmor frequencies that scale the shielding tensors.
+    w0s = resonance_frequencies(spin_system, cs=False)
 
     # Scale each shielding tensor by the corresponding Larmor frequency.
     for i, val in enumerate(w0s):
         shielding_tensors[i] *= val
 
     return shielding_tensors
+
+def resonance_frequencies(
+    spin_system: SpinSystem,
+    zeeman: bool=True,
+    cs: bool=True
+) -> np.ndarray:
+    """
+    Calculate the resonance frequencies of all spins in a spin system.
+
+    Parameters
+    ----------
+    spin_system: SpinSystem
+        Spin system for which the resonance frequencies are to be calculated.
+
+    Returns
+    -------
+    np.ndarray
+        Resonance frequencies of all spins in the spin system in rad/s.
+    """
+    # Ensure that either the Zeeman or chemical-shift interactions are included.
+    if not zeeman and not cs:
+        raise ValueError(
+            "Either the Zeeman or chemical-shift interaction must be included."
+        )
+
+    # Require that the magnetic field is set
+    require(parameters, "magnetic_field", "calculating resonance frequencies")
+    B = parameters.magnetic_field
+
+    # Calculate the requested resonance frequencies
+    omegas = np.zeros(spin_system.nspins)
+    if zeeman:
+        # Add contribution from Zeeman interaction
+        omegas -= spin_system.gammas * B
+    if cs:
+        # Require that the chemical shifts are set
+        require(
+            spin_system,
+            "chemical_shifts",
+            "calculating resonance frequencies with chemical shifts"
+        )
+        # Add contribution from chemical shift
+        omegas -= spin_system.gammas * B * spin_system.chemical_shifts * 1e-6
+
+    return omegas

@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 from scipy.sparse import csc_array
 
+from spinguin._core._interactions import resonance_frequencies
 from spinguin._core._la import eliminate_small
 from spinguin._core._parameters import parameters
 from spinguin._core._status import status
@@ -127,28 +128,17 @@ def _sop_H_Z_CS(
     # Initialise the requested Hamiltonian contribution.
     sop_H = _empty_hamiltonian(spin_system)
 
+    # Calculate the requested frequencies
+    omegas = resonance_frequencies(spin_system, zeeman, cs)
+
     # Accumulate the single-spin Zeeman and chemical-shift terms.
     for n in range(spin_system.nspins):
-
-        # Compute the bare Larmor frequency of the current nucleus.
-        # NOTE: The negative sign definition is used
-        omega_0 = -spin_system.gammas[n] * parameters.magnetic_field
-
-        # Select the requested frequency contribution.
-        if zeeman and cs:
-            omega = omega_0 * (1 + spin_system.chemical_shifts[n] * 1e-6)
-        elif zeeman:
-            omega = omega_0
-        elif cs:
-            omega = omega_0 * spin_system.chemical_shifts[n] * 1e-6
-        else:
-            raise ValueError("arguments zeeman and/or cs must be True.")
 
         # Build the z-superoperator for the current spin.
         sop_Iz = superoperator(spin_system, f"I(z, {n})", side)
 
         # Add the single-spin contribution to the Hamiltonian.
-        sop_H += omega * sop_Iz
+        sop_H += omegas[n] * sop_Iz
 
     return sop_H
 

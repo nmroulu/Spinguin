@@ -22,6 +22,7 @@ from ._interactions import (
     dd_coupling_tensors,
     dd_constants,
     Q_intr_tensors,
+    resonance_frequencies,
     shielding_intr_tensors,
 )
 from ._liouvillian import liouvillian
@@ -101,6 +102,7 @@ __all__ = [
     "dd_coupling_tensors",
     "dd_constants",
     "Q_intr_tensors",
+    "resonance_frequencies",
     "shielding_intr_tensors",
 
     # liouvillian

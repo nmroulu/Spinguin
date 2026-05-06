@@ -29,6 +29,7 @@ from spinguin._core import (
     dd_coupling_tensors,
     dd_constants,
     Q_intr_tensors,
+    resonance_frequencies,
     shielding_intr_tensors,
 
     # liouvillian
@@ -124,6 +125,7 @@ __all__ = [
     "dd_coupling_tensors",
     "dd_constants",
     "Q_intr_tensors",
+    "resonance_frequencies",
     "shielding_intr_tensors",
 
     # core: liouvillian
