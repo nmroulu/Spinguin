@@ -84,9 +84,9 @@ def dd_coupling_tensors(spin_system: SpinSystem) -> np.ndarray:
 
     return dd_tensors
 
-def Q_constant(S: float, Q_moment: float) -> float:
+def _Q_prefactor(S: float, Q_moment: float) -> float:
     """
-    Calculate the nuclear quadrupolar coupling constant.
+    Calculate the prefactor in nuclear quadrupolar coupling tensors.
 
     Parameters
     ----------
@@ -97,17 +97,18 @@ def Q_constant(S: float, Q_moment: float) -> float:
 
     Returns
     -------
-    Q_const : float
-        Quadrupolar coupling constant in ``(rad/s) / (V/m^2)``.
+    float
+        Prefactor in nuclear quadrupolar coupling
+        tensors in ``(rad/s) / (V/m^2)``.
     """
 
     # Evaluate the quadrupolar prefactor for spins with ``S >= 1``.
     if (S >= 1) and (Q_moment > 0):
-        Q_const = -e * Q_moment / hbar / (2 * S * (2 * S - 1))
+        Q_prefactor = -e * Q_moment / hbar / (2 * S * (2 * S - 1))
     else:
-        Q_const = 0
+        Q_prefactor = 0
     
-    return Q_const
+    return Q_prefactor
 
 # TODO: Confirm the sign convention of the quadrupolar interaction.
 def Q_intr_tensors(
@@ -139,11 +140,11 @@ def Q_intr_tensors(
     # Convert the electric field gradients from atomic units to ``V/m^2``.
     Q_tensors = -9.7173624292e21 * efg
 
-    # Evaluate the quadrupolar coupling constants for all spins.
-    Q_constants = [Q_constant(S, Q) for S, Q in zip(spins, quad)]
+    # Evaluate the quadrupolar coupling prefactors for all spins.
+    Q_prefactors = [_Q_prefactor(S, Q) for S, Q in zip(spins, quad)]
 
-    # Scale each tensor by the corresponding quadrupolar coupling constant.
-    for i, val in enumerate(Q_constants):
+    # Scale each tensor by the corresponding quadrupolar prefactor.
+    for i, val in enumerate(Q_prefactors):
         Q_tensors[i] *= val
 
     return Q_tensors
