@@ -370,9 +370,9 @@ def Perrin_integrals(
         1 / np.sqrt((a_z**2 + s) ** 3 * (a_x**2 + s) * (a_y**2 + s)) * jacobian
 
     # Integrate the three transformed functions over the finite interval.
-    P = np.trapz(integrand_P, t)
-    Q = np.trapz(integrand_Q, t)
-    R = np.trapz(integrand_R, t)
+    P = np.trapezoid(integrand_P, t)
+    Q = np.trapezoid(integrand_Q, t)
+    R = np.trapezoid(integrand_R, t)
 
     return P, Q, R
 
