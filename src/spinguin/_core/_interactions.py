@@ -3,13 +3,14 @@ This module provides functionality for calculating the NMR interactions.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 from scipy.constants import mu_0, hbar, e
 
-from spinguin._core._validation import require
+from spinguin._core._nmr_isotopes import gamma
 from spinguin._core._parameters import parameters
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -221,3 +222,44 @@ def resonance_frequencies(
         omegas -= spin_system.gammas * B * spin_system.chemical_shifts * 1e-6
 
     return omegas
+
+def resonance_frequency(
+    isotope: str,
+    B: float | None=None,
+    delta: float=0,
+    unit: Literal["Hz", "rad/s"]="Hz",
+) -> float:
+    """
+    Compute the resonance frequency at a given magnetic field and chemical
+    shift.
+
+    Parameters
+    ----------
+    isotope : str
+        Nucleus symbol, for example ``'1H'``.
+    B : float, default=None
+        Magnetic field strength in T. If not supplied, the value stored in
+        ``parameters.magnetic_field`` is used.
+    delta : float, default=0
+        Chemical shift in ppm.
+    unit : {'Hz', 'rad/s'}
+        Unit in which the resonance frequency is returned.
+
+    Returns
+    -------
+    omega : float
+        Resonance frequency of the selected nucleus.
+
+    Raises
+    ------
+    ValueError
+        Raised if no magnetic field is supplied and no default value has been
+        configured.
+    """
+    # Use the global magnetic field setting if no value is supplied.
+    if B is None:
+        require(parameters, "magnetic_field", "calculating resonance frequency")
+        B = parameters.magnetic_field
+
+    # Evaluate the resonance frequency including the chemical-shift offset.
+    return -gamma(isotope, unit) * B * (1 + delta * 1e-6)

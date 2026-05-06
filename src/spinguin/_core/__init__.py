@@ -23,6 +23,7 @@ from ._interactions import (
     dd_constants,
     Q_intr_tensors,
     resonance_frequencies,
+    resonance_frequency,
     shielding_intr_tensors,
 )
 from ._liouvillian import liouvillian
@@ -57,7 +58,6 @@ from ._rotframe import rotating_frame
 from ._specutils import (
     fourier_transform,
     frequency_to_chemical_shift,
-    resonance_frequency,
     spectral_width_to_dwell_time,
     spectrum,
     time_axis,
@@ -103,6 +103,7 @@ __all__ = [
     "dd_constants",
     "Q_intr_tensors",
     "resonance_frequencies",
+    "resonance_frequency",
     "shielding_intr_tensors",
 
     # liouvillian
@@ -147,7 +148,6 @@ __all__ = [
     # specutils
     "fourier_transform",
     "frequency_to_chemical_shift",
-    "resonance_frequency",
     "spectral_width_to_dwell_time",
     "spectrum",
     "time_axis",

@@ -15,9 +15,9 @@ import numpy as np
 import scipy.sparse as sp
 
 from spinguin._core._hide_prints import HidePrints
+from spinguin._core._interactions import resonance_frequency
 from spinguin._core._la import expm, norm_1
 from spinguin._core._parameters import parameters
-from spinguin._core._specutils import resonance_frequency
 from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
 from spinguin._core._validation import require

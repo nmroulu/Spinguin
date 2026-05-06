@@ -14,78 +14,6 @@ from spinguin._core._nmr_isotopes import gamma
 from spinguin._core._parameters import parameters
 from spinguin._core._validation import require
 
-def _resolve_magnetic_field(B: float | None) -> float:
-    """
-    Return the magnetic field to be used in a spectral calculation.
-
-    Parameters
-    ----------
-    B : float or None
-        Magnetic field in T. If ``None``, the value is taken from
-        ``parameters.magnetic_field``.
-
-    Returns
-    -------
-    float
-        Magnetic field in T.
-
-    Raises
-    ------
-    ValueError
-        Raised if ``B`` is ``None`` and the global magnetic field has not been
-        configured.
-    """
-
-    # Use the explicitly supplied magnetic field whenever available.
-    if B is not None:
-        return B
-
-    # Ensure that a default magnetic field has been configured.
-    require(parameters, "magnetic_field", "performing a spectral calculation")
-
-    # Return the shared magnetic-field setting.
-    return parameters.magnetic_field
-
-
-def resonance_frequency(
-    isotope: str,
-    B: float | None=None,
-    delta: float=0,
-    unit: Literal["Hz", "rad/s"]="Hz",
-) -> float:
-    """
-    Compute the resonance frequency at a given magnetic field and shift.
-
-    Parameters
-    ----------
-    isotope : str
-        Nucleus symbol, for example ``'1H'``.
-    B : float, default=None
-        Magnetic field strength in T. If not supplied, the value stored in
-        ``parameters.magnetic_field`` is used.
-    delta : float, default=0
-        Chemical shift in ppm.
-    unit : {'Hz', 'rad/s'}
-        Unit in which the resonance frequency is returned.
-
-    Returns
-    -------
-    omega : float
-        Resonance frequency of the selected nucleus.
-
-    Raises
-    ------
-    ValueError
-        Raised if no magnetic field is supplied and no default value has been
-        configured.
-    """
-
-    # Resolve the magnetic field used for the frequency calculation.
-    magnetic_field = _resolve_magnetic_field(B)
-
-    # Evaluate the resonance frequency including the chemical-shift offset.
-    return -gamma(isotope, unit) * magnetic_field * (1 + delta * 1e-6)
-
 
 def fourier_transform(
     signal: np.ndarray,
@@ -230,16 +158,13 @@ def spectral_width_to_dwell_time(
         configured.
     """
 
-    # Resolve the magnetic field used for the conversion.
-    magnetic_field = _resolve_magnetic_field(B)
+    # Use the global magnetic field setting if no value is supplied.
+    if B is None:
+        require(parameters, "magnetic_field", "calculating dwell time")
+        B = parameters.magnetic_field
 
     # Convert the spectral width from ppm to Hz.
-    spectral_width_hz = (
-        spectral_width
-        * 1e-6
-        * gamma(isotope, "Hz")
-        * magnetic_field
-    )
+    spectral_width_hz = spectral_width * 1e-6 * gamma(isotope, "Hz") * B
 
     # Invert the spectral width to obtain the dwell time.
     dwell_time = 1 / spectral_width_hz

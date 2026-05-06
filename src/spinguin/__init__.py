@@ -30,6 +30,7 @@ from spinguin._core import (
     dd_constants,
     Q_intr_tensors,
     resonance_frequencies,
+    resonance_frequency,
     shielding_intr_tensors,
 
     # liouvillian
@@ -74,7 +75,6 @@ from spinguin._core import (
     # specutils
     fourier_transform,
     frequency_to_chemical_shift,
-    resonance_frequency,
     spectral_width_to_dwell_time,
     spectrum,
     time_axis,
@@ -126,6 +126,7 @@ __all__ = [
     "dd_constants",
     "Q_intr_tensors",
     "resonance_frequencies",
+    "resonance_frequency",
     "shielding_intr_tensors",
 
     # core: liouvillian
@@ -170,7 +171,6 @@ __all__ = [
     # core: specutils
     "fourier_transform",
     "frequency_to_chemical_shift",
-    "resonance_frequency",
     "spectral_width_to_dwell_time",
     "spectrum",
     "time_axis",
