@@ -46,7 +46,7 @@ class Molecule:
             Supported inputs are:
 
             - `ArrayLike`: two-dimensional array of shape `(N, 3)` containing
-            the coordinates in Å.
+              the coordinates in Å.
             - `str`: path to an XYZ file containing the coordinates.
 
         Examples
