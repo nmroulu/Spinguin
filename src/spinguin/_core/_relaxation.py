@@ -695,11 +695,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     if spin_system.shielding is not None:
 
         # Get the shielding interaction tensors.
-        sh_tensors = shielding_intr_tensors(
-            spin_system.shielding,
-            spin_system.gammas,
-            parameters.magnetic_field
-        )
+        sh_tensors = shielding_intr_tensors(spin_system)
 
         # Choose whether the antisymmetric CSA contribution is retained.
         anti = spin_system.relaxation.antisymmetric

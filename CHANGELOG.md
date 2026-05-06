@@ -9,6 +9,8 @@
 - Dipole-dipole coupling constants and tensors can now be requested for a spin
 system.
 - Quadrupole coupling tensors can now be requested for a spin system.
+- Shielding interaction tensors (in rad/s) can now be requested for a spin
+system.
 
 ## 0.1.1
 - Added quadrupolar moments to several isotopes.

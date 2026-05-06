@@ -9,6 +9,7 @@ import numpy as np
 from scipy.constants import mu_0, hbar, e
 
 from spinguin._core._validation import require
+from spinguin._core._parameters import parameters
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -142,37 +143,33 @@ def Q_intr_tensors(spin_system: SpinSystem) -> np.ndarray:
 
     return Q_tensors
 
-def shielding_intr_tensors(
-    shielding: np.ndarray,
-    gammas: np.ndarray,
-    B: float,
-) -> np.ndarray:
+def shielding_intr_tensors(spin_system: SpinSystem) -> np.ndarray:
     """
-    Calculate shielding interaction tensors for relaxation calculations.
+    Calculate shielding interaction tensors for a spin system.
 
     Parameters
     ----------
-    shielding : ndarray
-        A 3-dimensional array specifying the nuclear shielding tensors for each
-        nucleus. The tensors must be given in the units of ppm.
-    gammas : ndarray
-        A 1-dimensional array specifying the gyromagnetic ratios for
-        each nucleus in the spin system. Must be given in the units
-        of rad/s/T.
-    B : float
-        External magnetic field in units of T.
+    spin_system: SpinSystem
+        Spin system for which the shielding interaction tensors are to be
+        calculated.
 
     Returns
     -------
-    shielding_tensors : ndarray
-        Array of shielding tensors.
+    ndarray
+        Array of shielding tensors in rad/s.
     """
+    # Ensure that the magnetic field is set
+    require(
+        parameters,
+        "magnetic_field",
+        "calculating shielding interaction tensors"
+    )
 
     # Convert the shielding tensors from ppm to dimensionless units.
-    shielding_tensors = shielding * 1e-6
+    shielding_tensors = spin_system.shielding * 1e-6
 
     # Construct the Larmor frequencies that scale the shielding tensors.
-    w0s = -gammas * B
+    w0s = -spin_system.gammas * parameters.magnetic_field
 
     # Scale each shielding tensor by the corresponding Larmor frequency.
     for i, val in enumerate(w0s):
