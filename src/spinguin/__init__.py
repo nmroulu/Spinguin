@@ -25,6 +25,10 @@ from spinguin._core import (
     # hamiltonian
     hamiltonian,
 
+    # interactions
+    dd_coupling_tensors,
+    dd_constants,
+
     # liouvillian
     liouvillian,
 
@@ -113,6 +117,10 @@ __all__ = [
 
     # core: hamiltonian
     "hamiltonian",
+
+    # core: interactions
+    "dd_coupling_tensors",
+    "dd_constants",
 
     # core: liouvillian
     "liouvillian",

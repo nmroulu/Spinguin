@@ -1,79 +1,86 @@
 """
 This module provides functionality for calculating the NMR interactions.
 """
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
-import scipy.constants as const
+from scipy.constants import mu_0, hbar, e
 
-def dd_constant(y1: float, y2: float) -> float:
+from spinguin._core._validation import require
+
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
+
+def dd_constants(spin_system: SpinSystem) -> np.ndarray:
     """
-    Calculate the dipole-dipole coupling constant excluding the distance term.
+    Calculate the dipole-dipole coupling constants in rad/s.
 
     Parameters
     ----------
-    y1 : float
-        Gyromagnetic ratio of the first spin in units of rad/s/T.
-    y2 : float
-        Gyromagnetic ratio of the second spin in units of rad/s/T.
+    spin_system : SpinSystem
+        Spin system for which the dipole-dipole coupling constants are to be
+        calculated.
 
     Returns
     -------
-    dd_const : float
-        Dipole-dipole coupling constant in units of rad/s * m^3.
+    np.ndarray
+        Dipole-dipole coupling constants in rad/s.
     """
+    # Ensure that the Cartesian coordinates are set
+    require(spin_system, "xyz", "calculating dipole-dipole coupling constants")
 
-    # Evaluate the gyromagnetic prefactor of the dipole-dipole coupling.
-    dd_const = -const.mu_0 / (4 * np.pi) * y1 * y2 * const.hbar
+    # Convert the molecular coordinates from Å to metres
+    xyz = spin_system.xyz * 1e-10
 
-    return dd_const
+    # Build the inter-spin vectors and distances
+    connectors = xyz[:, np.newaxis] - xyz
+    r = np.linalg.norm(connectors, axis=2)
 
-def dd_coupling_tensors(xyz: np.ndarray, gammas: np.ndarray) -> np.ndarray:
+    # Evaluate the pairwise dipole-dipole coupling constants in rad/s
+    dd_couplings = np.zeros(shape=(spin_system.nspins, spin_system.nspins))
+    y = spin_system.gammas
+    for i in range(spin_system.nspins):
+        for j in range(i):
+            dd_couplings[i, j] = -mu_0*y[i]*y[j]*hbar / (4*np.pi*r[i, j]**3)
+
+    return dd_couplings
+
+def dd_coupling_tensors(spin_system: SpinSystem) -> np.ndarray:
     """
-    Calculate dipole-dipole coupling tensors between all spins.
+    Calculate dipole-dipole coupling tensors between all spins in rad/s.
 
     Parameters
     ----------
-    xyz : ndarray
-        A 2-dimensional array specifying the cartesian coordinates in
-        the XYZ format for each nucleus in the spin system. Must be
-        given in the units of Å.
-    gammas : ndarray
-        A 1-dimensional array specifying the gyromagnetic ratios for
-        each nucleus in the spin system. Must be given in the units
-        of rad/s/T.
+    spin_system : SpinSystem
+        Spin system for which the dipole-dipole coupling tensors are to be
+        calculated.
 
     Returns
     -------
-    dd_tensors : ndarray
+    ndarray
         Array of dimensions (N, N, 3, 3) containing the 3x3 tensors
-        between all nuclei.
+        between all nuclei. Only the lower-triangular part is populated.
     """
-
-    # Determine the number of spins in the system.
-    nspins = gammas.shape[0]
+    # Fetch the dipole-dipole coupling constants
+    b = dd_constants(spin_system)
 
     # Convert the Cartesian coordinates from ångströms to metres.
-    xyz = xyz * 1e-10
+    xyz = spin_system.xyz * 1e-10
 
     # Build the connector and distance arrays for all spin pairs.
     connectors = xyz[:, np.newaxis] - xyz
-    distances = np.linalg.norm(connectors, axis=2)
+    r = np.linalg.norm(connectors, axis=2)
 
     # Allocate the full array of dipole-dipole interaction tensors.
-    dd_tensors = np.zeros((nspins, nspins, 3, 3))
+    dd_tensors = np.zeros((spin_system.nspins, spin_system.nspins, 3, 3))
 
     # Fill the lower-triangular spin-pair tensors.
-    for i in range(nspins):
-        for j in range(nspins):
-
-            # Evaluate only the lower-triangular part to avoid duplication.
-            if i > j:
-                rr = np.outer(connectors[i, j], connectors[i, j])
-                dd_tensors[i, j] = (
-                    dd_constant(gammas[i], gammas[j])
-                    * (3 * rr - distances[i, j] ** 2 * np.eye(3))
-                    / distances[i, j] ** 5
-                )
+    for i in range(spin_system.nspins):
+        for j in range(i):
+            rr = np.outer(connectors[i, j], connectors[i, j])
+            dd_tensors[i, j] = b[i, j]*(3*rr/r[i, j]**2 - np.eye(3))
 
     return dd_tensors
 
@@ -96,7 +103,7 @@ def Q_constant(S: float, Q_moment: float) -> float:
 
     # Evaluate the quadrupolar prefactor for spins with ``S >= 1``.
     if (S >= 1) and (Q_moment > 0):
-        Q_const = -const.e * Q_moment / const.hbar / (2 * S * (2 * S - 1))
+        Q_const = -e * Q_moment / hbar / (2 * S * (2 * S - 1))
     else:
         Q_const = 0
     

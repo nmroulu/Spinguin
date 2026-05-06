@@ -6,16 +6,14 @@ import unittest
 
 import numpy as np
 
-from spinguin._core._interactions import dd_constant
-from spinguin._core._nmr_isotopes import ISOTOPES
-
+import spinguin as sg
 
 class TestInteractions(unittest.TestCase):
     """
     Tests for various NMR interactions.
     """
 
-    def test_dd_constant(self):
+    def test_dd_constants(self):
         """
         Test the dipole-dipole (DD) relaxation constant calculation.
         Compares calculated values against tabulated values from the reference:
@@ -23,20 +21,29 @@ class TestInteractions(unittest.TestCase):
         practice.
         """
 
-        # Get gyromagnetic ratios (gamma) in Hz/T
-        y_13C = 2 * np.pi * ISOTOPES['13C'][1] * 1e6
-        y_1H = 2 * np.pi * ISOTOPES['1H'][1] * 1e6
-        y_15N = 2 * np.pi * ISOTOPES['15N'][1] * 1e6
+        # Create test spin systems
+        ss1 = sg.SpinSystem(["13C", "13C"])
+        ss2 = sg.SpinSystem(["13C", "1H"])
+        ss3 = sg.SpinSystem(["13C", "15N"])
 
-        # Interatomic distances in meters
-        r_13C_13C = 0.153e-9
-        r_13C_1H = 0.106e-9
-        r_13C_15N = 0.147e-9
+        # Assign Cartesian coordinates
+        ss1.xyz = [
+            [0.00, 0.00, 0.00],
+            [1.53, 0.00, 0.00]
+        ]
+        ss2.xyz = [
+            [0.00, 0.00, 0.00],
+            [0.00, 1.06, 0.00]
+        ]
+        ss3.xyz = [
+            [0.00, 0.00, 0.00],
+            [0.00, 0.00, 1.47]
+        ]
 
         # Calculate DD constants and convert to Hz
-        dd_13C_13C = -dd_constant(y_13C, y_13C) / r_13C_13C**3 / (2 * np.pi)
-        dd_13C_1H = -dd_constant(y_13C, y_1H) / r_13C_1H**3 / (2 * np.pi)
-        dd_13C_15N = dd_constant(y_13C, y_15N) / r_13C_15N**3 / (2 * np.pi)
+        dd_13C_13C = abs(sg.dd_constants(ss1)[1, 0] / (2*np.pi))
+        dd_13C_1H = abs(sg.dd_constants(ss2)[1, 0] / (2*np.pi))
+        dd_13C_15N = abs(sg.dd_constants(ss3)[1, 0] / (2*np.pi))
 
         # Compare with tabulated values (in Hz)
         self.assertTrue(np.allclose(2.12e3, dd_13C_13C, rtol=0.01))

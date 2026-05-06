@@ -18,6 +18,10 @@ from ._chem import (
     permute_spins,
 )
 from ._hamiltonian import hamiltonian
+from ._interactions import (
+    dd_coupling_tensors,
+    dd_constants,
+)
 from ._liouvillian import liouvillian
 from ._molecule import Molecule
 from ._nmr_isotopes import (
@@ -90,6 +94,10 @@ __all__ = [
 
     # hamiltonian
     "hamiltonian",
+
+    # interactions
+    "dd_coupling_tensors",
+    "dd_constants",
 
     # liouvillian
     "liouvillian",

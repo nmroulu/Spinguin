@@ -28,7 +28,7 @@ import scipy.sparse as sp
 from scipy.sparse.csgraph import connected_components
 
 from spinguin._core._hide_prints import HidePrints
-from spinguin._core._interactions import dd_constant
+from spinguin._core._interactions import dd_constants
 from spinguin._core._la import (
     arraylike_to_tuple,
     eliminate_small,
@@ -348,28 +348,12 @@ class Basis:
         truncated_basis = []
         index_map = []
 
-        # Initialise the dipole-dipole coupling matrix in Hz
-        nspins = self._spin_system.nspins
-        dd_couplings = np.zeros(shape=(nspins, nspins))
-
-        # Estimate dipole-dipole couplings if Cartesian coordinates are known
+        # Calculate DD couplings in Hz if Cartesian coordinates are known
         if self._spin_system.xyz is not None:
-
-            # Convert the molecular coordinates from Å to metres
-            xyz = self._spin_system.xyz * 1e-10
-
-            # Build the inter-spin vectors and distances
-            connectors = xyz[:, np.newaxis] - xyz
-            r = np.linalg.norm(connectors, axis=2)
-
-            # Evaluate the pairwise dipole-dipole couplings
-            y = self._spin_system.gammas
-            for i in range(nspins):
-                for j in range(i):
-                    dd_couplings[i, j] = (
-                        dd_constant(y[i], y[j]) / r[i, j]**3 
-                        / (2 * np.pi) # In Hz
-                    )
+            dd_couplings = dd_constants(self._spin_system) / (2*np.pi)
+        else:
+            nspins = self._spin_system.nspins
+            dd_couplings = np.zeros(shape=(nspins, nspins))
 
         # Build the binary connectivity matrix from scalar couplings
         j_connectivity = self._spin_system._J_couplings.copy()

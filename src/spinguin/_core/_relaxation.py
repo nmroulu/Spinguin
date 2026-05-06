@@ -681,7 +681,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     if spin_system.xyz is not None:
 
         # Get the dipole-dipole coupling tensors.
-        dd_tensors = dd_coupling_tensors(spin_system.xyz, spin_system.gammas)
+        dd_tensors = dd_coupling_tensors(spin_system)
 
         # Add all non-negligible dipole-dipole interaction components.
         for spin_1 in range(spin_system.nspins):

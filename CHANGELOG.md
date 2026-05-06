@@ -6,6 +6,8 @@
 - Antisymmetric part of CSA is included by default.
 - Thermalisation of the relaxation superoperator is applied by default.
 - Added a possibility of adding own isotopes.
+- Dipole-dipole coupling constants and tensors can now be requested for a spin
+system.
 
 ## 0.1.1
 - Added quadrupolar moments to several isotopes.
