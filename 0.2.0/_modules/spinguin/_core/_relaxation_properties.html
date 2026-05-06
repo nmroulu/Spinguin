@@ -1,0 +1,908 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._relaxation_properties &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_relaxation_properties';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._relaxation_properties</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Relaxation-property definitions associated with a spin system.</span>
+
+<span class="sd">The module provides the `RelaxationProperties` class, which stores the</span>
+<span class="sd">relaxation-theory settings associated with a `SpinSystem` instance. The</span>
+<span class="sd">properties may be accessed as follows::</span>
+
+<span class="sd">    import spinguin as sg</span>
+<span class="sd">    spin_system = sg.SpinSystem([&quot;1H&quot;])</span>
+<span class="sd">    spin_system.relaxation.theory = &quot;redfield&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._data_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">arraylike_to_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._molecule</span><span class="w"> </span><span class="kn">import</span> <span class="n">Molecule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._relaxation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">rotational_correlation_time_SED</span><span class="p">,</span>
+    <span class="n">rotational_correlation_times_Perrin</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._status</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
+
+
+<div class="viewcode-block" id="RelaxationProperties">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._relaxation_properties.RelaxationProperties">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RelaxationProperties</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Store the relaxation settings associated with a spin system.</span>
+
+<span class="sd">    The class stores the theory selection and auxiliary parameters required</span>
+<span class="sd">    for Redfield and phenomenological relaxation superoperator construction. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Store the default relaxation settings at class level.</span>
+    <span class="n">_antisymmetric</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_dynamic_frequency_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_relative_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span>
+    <span class="n">_sr2k</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_tau_c</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_theory</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;redfield&quot;</span><span class="p">,</span> <span class="s2">&quot;phenomenological&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_thermalization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_T1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_T2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_molecule</span><span class="p">:</span> <span class="n">Molecule</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the relaxation settings for a spin system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        spin_system : SpinSystem</span>
+<span class="sd">            Spin system to which the relaxation settings belong.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Store a reference to the parent spin system.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span> <span class="o">=</span> <span class="n">spin_system</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_relaxation_array</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert file or array-like relaxation data to a NumPy array.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : list or tuple or ndarray or str</span>
+<span class="sd">            Input relaxation data or a path to a text file.</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the relaxation quantity for error reporting.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        values : ndarray</span>
+<span class="sd">            One-dimensional NumPy array of floating-point values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Read relaxation data from a text file when a path is provided.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">read_array</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># Convert array-like relaxation data to a NumPy array.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="c1"># Reject unsupported input types explicitly.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> should be a one-dimensional array or a string.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_relaxation_array</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the shape and positivity of the input data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : ndarray</span>
+<span class="sd">            Array to validate.</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the relaxation quantity for error reporting.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The input is validated in place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check that the array length matches the number of spins.</span>
+        <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">isotopes</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Mismatch between the given </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> values and the &quot;</span>
+                <span class="s2">&quot;number of spins in the system.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check that all relaxation values are strictly positive.</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot be zero or negative.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">antisymmetric</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether antisymmetric interaction tensors are included.</span>
+
+<span class="sd">        This option applies to Redfield relaxation theory. The default value is</span>
+<span class="sd">        ``False``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_antisymmetric</span>
+
+    <span class="nd">@antisymmetric</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">antisymmetric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">antisymmetric</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the antisymmetric-interaction setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_antisymmetric</span> <span class="o">=</span> <span class="n">antisymmetric</span>
+
+        <span class="c1"># Report the updated antisymmetric-interaction setting.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Antisymmetric part of the interaction tensors set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">antisymmetric</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dynamic_frequency_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether the dynamic frequency shift is included.</span>
+
+<span class="sd">        This option applies to Redfield relaxation theory and corresponds to the</span>
+<span class="sd">        imaginary part of the relaxation superoperator. The default value is</span>
+<span class="sd">        ``True``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dynamic_frequency_shift</span>
+
+    <span class="nd">@dynamic_frequency_shift</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dynamic_frequency_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dynamic_frequency_shift</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the dynamic-frequency-shift setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dynamic_frequency_shift</span> <span class="o">=</span> <span class="n">dynamic_frequency_shift</span>
+
+        <span class="c1"># Report the updated dynamic-frequency-shift setting.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Dynamic frequency shift set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dynamic_frequency_shift</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">relative_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the relative error used in Redfield calculations.</span>
+
+<span class="sd">        This value acts as the convergence criterion for the Redfield integral.</span>
+<span class="sd">        The default value is ``1e-6``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relative_error</span>
+
+    <span class="nd">@relative_error</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">relative_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_error</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the Redfield relative-error threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_error</span> <span class="o">=</span> <span class="n">relative_error</span>
+
+        <span class="c1"># Report the updated Redfield relative-error threshold.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Relative error set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relative_error</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sr2k</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether scalar relaxation of the second kind is included.</span>
+
+<span class="sd">        The default value is ``False``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sr2k</span>
+
+    <span class="nd">@sr2k</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sr2k</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sr2k</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the SR2K setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sr2k</span> <span class="o">=</span> <span class="n">sr2k</span>
+
+        <span class="c1"># Report the updated SR2K setting.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SR2K set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sr2k</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_c</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the rotational correlation time or times.</span>
+
+<span class="sd">        The value is ``None`` until it is assigned explicitly or through</span>
+<span class="sd">        :meth:`auto_tau_c`.</span>
+
+<span class="sd">        For isotropic rotational diffusion, a single value is used. Example::</span>
+
+<span class="sd">            spin_system.relaxation.tau_c = 50e-12</span>
+
+<span class="sd">        For anisotropic rotational diffusion, an array of three values is used,</span>
+<span class="sd">        corresponding to the principal components of the diffusion tensor.</span>
+<span class="sd">        Example::</span>
+
+<span class="sd">            spin_system.relaxation.tau_c = [50e-12, 100e-12, 150e-12]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau_c</span>
+
+    <span class="nd">@tau_c</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_c</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tau_c</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store a single isotropic correlation time.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau_c</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tau_c</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tau_c</span><span class="p">)</span>
+
+        <span class="c1"># Store three anisotropic principal-axis correlation times.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau_c</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tau_c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tau_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">tau_c</span><span class="p">])</span>
+
+        <span class="c1"># Store an anisotropic correlation-time array directly.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau_c</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tau_c</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tau_c</span> <span class="o">=</span> <span class="n">tau_c</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># Reject unsupported correlation-time input formats.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;tau_c must be either a single float for isotropic rotational &quot;</span>
+                <span class="s2">&quot;diffusion or three values for anisotropic rotational &quot;</span>
+                <span class="s2">&quot;diffusion.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Report the updated rotational correlation time or times.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rotational correlation time(s) set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_c</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RelaxationProperties.auto_tau_c">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._relaxation_properties.RelaxationProperties.auto_tau_c">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auto_tau_c</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">eta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;iso&quot;</span><span class="p">,</span> <span class="s2">&quot;aniso&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;iso&quot;</span><span class="p">,</span>
+        <span class="n">r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scaling_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Automatically assign rotational correlation time or times.</span>
+
+<span class="sd">        The correlation time is evaluated either from the</span>
+<span class="sd">        Stokes-Einstein-Debye relation for isotropic rotational diffusion or</span>
+<span class="sd">        from Perrin theory for anisotropic rotational diffusion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        eta : float</span>
+<span class="sd">            Viscosity of the solvent in pascal-seconds.</span>
+<span class="sd">        model : {&quot;iso&quot;, &quot;aniso&quot;}, default=&quot;iso&quot;</span>
+<span class="sd">            Rotational-diffusion model used in the calculation.</span>
+<span class="sd">        r : float, default=None</span>
+<span class="sd">            Effective hydrodynamic radius in metres. Required for the isotropic</span>
+<span class="sd">            model.</span>
+<span class="sd">        scaling_factor : float, default=1.0</span>
+<span class="sd">            Scaling factor applied to the calculated correlation times.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            The calculated value is stored in ``tau_c``.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Raised if the required model-specific inputs are missing or if</span>
+<span class="sd">            ``model`` is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Use the isotropic Stokes-Einstein-Debye relation when requested.</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;iso&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Hydrodynamic radius &#39;r&#39; must be provided for the &quot;</span>
+                    <span class="s2">&quot;isotropic model.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_c</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">rotational_correlation_time_SED</span><span class="p">(</span>
+                    <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="mi">2</span>
+                <span class="p">)</span> <span class="o">*</span> <span class="n">scaling_factor</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Use Perrin theory for anisotropic rotational diffusion.</span>
+        <span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;aniso&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Molecule must be assigned to the &#39;molecule&#39; attribute &quot;</span>
+                    <span class="s2">&quot;before calling auto_tau_c with the anisotropic model.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau_c</span> <span class="o">=</span> <span class="n">rotational_correlation_times_Perrin</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+                <span class="n">eta</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="n">scaling_factor</span>
+
+        <span class="c1"># Reject unsupported rotational-diffusion models.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model must be either &#39;iso&#39; or &#39;aniso&#39;.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">theory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;redfield&quot;</span><span class="p">,</span> <span class="s2">&quot;phenomenological&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the selected relaxation theory.</span>
+
+<span class="sd">        Supported values are ``&quot;redfield&quot;`` and ``&quot;phenomenological&quot;``.</span>
+<span class="sd">        The value is ``None`` until a theory is selected explicitly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theory</span>
+
+    <span class="nd">@theory</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">theory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theory</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;redfield&quot;</span><span class="p">,</span> <span class="s2">&quot;phenomenological&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Validate the requested relaxation-theory label.</span>
+        <span class="k">if</span> <span class="n">theory</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;redfield&quot;</span><span class="p">,</span> <span class="s2">&quot;phenomenological&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Relaxation theory must be &#39;redfield&#39; or &#39;phenomenological&#39;.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Store the selected relaxation theory.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theory</span> <span class="o">=</span> <span class="n">theory</span>
+
+        <span class="c1"># Report the updated relaxation-theory selection.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Relaxation theory set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">theory</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether Levitt-di Bari thermalization is applied.</span>
+
+<span class="sd">        The default value is ``False``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thermalization</span>
+
+    <span class="nd">@thermalization</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thermalization</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the thermalization setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thermalization</span> <span class="o">=</span> <span class="n">thermalization</span>
+
+        <span class="c1"># Report the updated thermalization setting.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Thermalization set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">thermalization</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">T1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the longitudinal relaxation time constants for each spin.</span>
+
+<span class="sd">        These values are used to construct the phenomenological relaxation</span>
+<span class="sd">        superoperator. Two input types are supported:</span>
+
+<span class="sd">        - If `ArrayLike`: a one-dimensional array containing</span>
+<span class="sd">          ``T1`` values for each spin.</span>
+<span class="sd">        - If `str`: path to the file containing the ``T1`` values.</span>
+
+<span class="sd">        The input is converted and stored as a NumPy array. The value is</span>
+<span class="sd">        ``None`` until it is assigned.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Using array input</span>
+<span class="sd">            spin_system.relaxation.T1 = np.array([5.5, 6.0, 2.7])</span>
+
+<span class="sd">            # Using string input</span>
+<span class="sd">            spin_system.relaxation.T1 = &quot;/path/to/the/file/T1.txt&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_T1</span>
+
+    <span class="nd">@T1</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">T1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T1</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Convert the T1 input to a validated NumPy array.</span>
+        <span class="n">T1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_relaxation_array</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span> <span class="s2">&quot;T1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_relaxation_array</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span> <span class="s2">&quot;T1&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store the longitudinal relaxation times.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T1</span> <span class="o">=</span> <span class="n">T1</span>
+
+        <span class="c1"># Report the updated longitudinal relaxation times.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;T1 set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">T1</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">T2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the transverse relaxation time constants for each spin.</span>
+
+<span class="sd">        These values are used to construct the phenomenological relaxation</span>
+<span class="sd">        superoperator. Two input types are supported:</span>
+
+<span class="sd">        - If `ArrayLike`: a one-dimensional array containing</span>
+<span class="sd">          ``T2`` values for each spin.</span>
+<span class="sd">        - If `str`: path to the file containing the ``T2`` values.</span>
+
+<span class="sd">        The input is converted and stored as a NumPy array. The value is</span>
+<span class="sd">        ``None`` until it is assigned.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Using array input</span>
+<span class="sd">            spin_system.relaxation.T2 = np.array([5.5, 6.0, 2.7])</span>
+
+<span class="sd">            # Using string input</span>
+<span class="sd">            spin_system.relaxation.T2 = &quot;/path/to/the/file/T2.txt&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_T2</span>
+
+    <span class="nd">@T2</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">T2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T2</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Convert the T2 input to a validated NumPy array.</span>
+        <span class="n">T2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_relaxation_array</span><span class="p">(</span><span class="n">T2</span><span class="p">,</span> <span class="s2">&quot;T2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_relaxation_array</span><span class="p">(</span><span class="n">T2</span><span class="p">,</span> <span class="s2">&quot;T2&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store the transverse relaxation times.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T2</span> <span class="o">=</span> <span class="n">T2</span>
+
+        <span class="c1"># Report the updated transverse relaxation times.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;T2 set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">T2</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">R1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the longitudinal relaxation rates for each spin.</span>
+
+<span class="sd">        These values are used to construct the phenomenological relaxation</span>
+<span class="sd">        superoperator. Two input types are supported:</span>
+
+<span class="sd">        - If `ArrayLike`: a one-dimensional array containing</span>
+<span class="sd">          ``R1`` values for each spin.</span>
+<span class="sd">        - If `str`: path to the file containing the ``R1`` values.</span>
+
+<span class="sd">        The input is stored indirectly through the relation ``R1 = 1 / T1``.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Using array input</span>
+<span class="sd">            spin_system.relaxation.R1 = np.array([5.5, 6.0, 2.7])</span>
+
+<span class="sd">            # Using string input</span>
+<span class="sd">            spin_system.relaxation.R1 = &quot;/path/to/the/file/R1.txt&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">T1</span>
+
+    <span class="nd">@R1</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">R1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R1</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Convert the R1 input to a validated NumPy array.</span>
+        <span class="n">R1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_relaxation_array</span><span class="p">(</span><span class="n">R1</span><span class="p">,</span> <span class="s2">&quot;R1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_relaxation_array</span><span class="p">(</span><span class="n">R1</span><span class="p">,</span> <span class="s2">&quot;R1&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store the corresponding longitudinal relaxation times.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">R1</span>
+
+        <span class="c1"># Report the updated longitudinal relaxation rates.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R1 set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R1</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">R2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the transverse relaxation rates for each spin.</span>
+
+<span class="sd">        These values are used to construct the phenomenological relaxation</span>
+<span class="sd">        superoperator. Two input types are supported:</span>
+
+<span class="sd">        - If `ArrayLike`: a one-dimensional array containing</span>
+<span class="sd">          ``R2`` values for each spin.</span>
+<span class="sd">        - If `str`: path to the file containing the ``R2`` values.</span>
+
+<span class="sd">        The input is stored indirectly through the relation ``R2 = 1 / T2``.</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            # Using array input</span>
+<span class="sd">            spin_system.relaxation.R2 = np.array([5.5, 6.0, 2.7])</span>
+
+<span class="sd">            # Using string input</span>
+<span class="sd">            spin_system.relaxation.R2 = &quot;/path/to/the/file/R2.txt&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">T2</span>
+
+    <span class="nd">@R2</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">R2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R2</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Convert the R2 input to a validated NumPy array.</span>
+        <span class="n">R2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_relaxation_array</span><span class="p">(</span><span class="n">R2</span><span class="p">,</span> <span class="s2">&quot;R2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_relaxation_array</span><span class="p">(</span><span class="n">R2</span><span class="p">,</span> <span class="s2">&quot;R2&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store the corresponding transverse relaxation times.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_T2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">R2</span>
+
+        <span class="c1"># Report the updated transverse relaxation rates.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R2 set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R2</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Molecule</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the molecule associated with the spin system.</span>
+
+<span class="sd">        The molecule is used to define the rotational principal axes. The</span>
+<span class="sd">        value is ``None`` until a molecule is assigned explicitly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molecule</span>
+
+    <span class="nd">@molecule</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">molecule</span><span class="p">:</span> <span class="n">Molecule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Validate the assigned molecule object.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">Molecule</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid input type for molecule. &quot;</span>
+                             <span class="s2">&quot;Must be a Molecule instance.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store the molecular structure used in relaxation calculations.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_molecule</span> <span class="o">=</span> <span class="n">molecule</span>
+
+        <span class="c1"># Report that a molecule has been assigned.</span>
+        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Molecule has been assigned.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

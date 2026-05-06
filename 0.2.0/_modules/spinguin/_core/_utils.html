@@ -1,0 +1,789 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._utils &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_utils';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Shared utility helpers for tensor indices, operator parsing, basis analysis,</span>
+<span class="sd">and other small tasks.</span>
+
+<span class="sd">This module provides small helper functions for irreducible-tensor index</span>
+<span class="sd">conversions, operator-string parsing, and simple basis-set analysis.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_arguments</span><span class="p">(</span><span class="n">operator_term</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the comma-separated arguments of an operator term.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator_term : str</span>
+<span class="sd">        Operator term such as ``I(z,0)`` or ``T(1,-1,2)``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of str</span>
+<span class="sd">        Arguments extracted from inside the parentheses.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        Raised if the operator term does not contain a valid argument list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract the comma-separated arguments enclosed in parentheses.</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\(([^)]*)\)&#39;</span><span class="p">,</span> <span class="n">operator_term</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Cannot parse the following invalid operator: </span><span class="si">{</span><span class="n">operator_term</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_split_sum_terms</span><span class="p">(</span><span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split an operator string into top-level additive terms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        Operator string without whitespace.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of str</span>
+<span class="sd">        Additive terms of the operator string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Track the additive terms and the current parenthesis depth.</span>
+    <span class="n">prod_ops</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">parenthesis_depth</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Split only at plus signs that are outside parentheses.</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">operator</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+            <span class="n">parenthesis_depth</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+            <span class="n">parenthesis_depth</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">and</span> <span class="n">parenthesis_depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">prod_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operator</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Append the final term after the last split point.</span>
+    <span class="n">prod_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operator</span><span class="p">[</span><span class="n">start</span><span class="p">:])</span>
+
+    <span class="k">return</span> <span class="n">prod_ops</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_expand_global_operator</span><span class="p">(</span><span class="n">prod_op</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">nspins</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expand single-term shorthand operators that apply to all spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prod_op : str</span>
+<span class="sd">        One additive operator term.</span>
+<span class="sd">    nspins : int</span>
+<span class="sd">        Number of spins in the system.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of str</span>
+<span class="sd">        Expanded operator terms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Keep product operators unchanged because they are already explicit.</span>
+    <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">prod_op</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">prod_op</span><span class="p">]</span>
+
+    <span class="c1"># Leave the unit operator unchanged.</span>
+    <span class="k">if</span> <span class="n">prod_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">prod_op</span><span class="p">]</span>
+
+    <span class="c1"># Expand Cartesian and ladder operators that omit the spin index.</span>
+    <span class="k">if</span> <span class="n">prod_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="n">_extract_arguments</span><span class="p">(</span><span class="n">prod_op</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;I(</span><span class="si">{</span><span class="n">component</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">prod_op</span><span class="p">]</span>
+
+    <span class="c1"># Expand spherical tensor operators that omit the spin index.</span>
+    <span class="k">if</span> <span class="n">prod_op</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="n">_extract_arguments</span><span class="p">(</span><span class="n">prod_op</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">component</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">component</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;T(</span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">prod_op</span><span class="p">]</span>
+
+    <span class="c1"># Reject unsupported operator expressions explicitly.</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Cannot parse the following invalid operator: </span><span class="si">{</span><span class="n">prod_op</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_operator_component_to_terms</span><span class="p">(</span>
+    <span class="n">operator_component</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a single-spin operator label to basis indices and coefficients.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator_component : str</span>
+<span class="sd">        Single-spin operator label such as ``E``, ``I_x``, or ``T_1_0``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    op_ints : list of int</span>
+<span class="sd">        Basis indices corresponding to the operator component.</span>
+<span class="sd">    op_coeffs : list of complex</span>
+<span class="sd">        Coefficients associated with the basis expansion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Map the operator component to basis indices and coefficients.</span>
+    <span class="k">match</span> <span class="n">operator_component</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">case</span><span class="w"> </span><span class="s1">&#39;I</span><span class="k">_</span><span class="o">+</span><span class="s1">&#39;:</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">case</span> <span class="s1">&#39;I_z&#39;</span><span class="p">:</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">case</span><span class="w"> </span><span class="s1">&#39;I</span><span class="k">_</span><span class="o">-</span><span class="s1">&#39;:</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">case</span> <span class="s1">&#39;I_x&#39;</span><span class="p">:</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="k">case</span> <span class="s1">&#39;I_y&#39;</span><span class="p">:</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="n">j</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="n">j</span><span class="p">)]</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="n">l_str</span><span class="p">,</span> <span class="n">q_str</span> <span class="o">=</span> <span class="n">operator_component</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">lq_to_idx</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l_str</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">q_str</span><span class="p">))</span>
+            <span class="n">op_ints</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">op_coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">op_ints</span><span class="p">,</span> <span class="n">op_coeffs</span>
+
+
+<div class="viewcode-block" id="coherence_order">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.coherence_order">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coherence_order</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine the coherence order of a product operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    op_def : ndarray</span>
+<span class="sd">        Contains the indices that describe the product operator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    order : int</span>
+<span class="sd">        Coherence order of the operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise the total coherence order.</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Sum the tensor projections of all single-spin factors.</span>
+    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">op_def</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">idx_to_lq</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="n">order</span> <span class="o">+=</span> <span class="n">q</span>
+
+    <span class="k">return</span> <span class="n">order</span></div>
+
+
+
+<div class="viewcode-block" id="idx_to_lq">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.idx_to_lq">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">idx_to_lq</span><span class="p">(</span><span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a tensor index to rank ``l`` and projection ``q``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idx : int</span>
+<span class="sd">        Index that describes the irreducible spherical tensor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Operator rank.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Operator projection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the tensor rank from the quadratic index relation.</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">idx</span><span class="p">))</span>
+
+    <span class="c1"># Determine the tensor projection from the index definition.</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">l</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">l</span> <span class="o">-</span> <span class="n">idx</span>
+
+    <span class="k">return</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span></div>
+
+
+
+<div class="viewcode-block" id="lq_to_idx">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.lq_to_idx">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lq_to_idx</span><span class="p">(</span><span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the index of a single-spin irreducible spherical tensor operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Operator rank.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Operator projection.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    idx : int</span>
+<span class="sd">        Index of the operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the tensor rank and projection to the linear index.</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">l</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">l</span> <span class="o">-</span> <span class="n">q</span>
+
+    <span class="k">return</span> <span class="n">idx</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_operator_string</span><span class="p">(</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">nspins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse an operator string into basis definitions and coefficients.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        The operator string must follow the rules below:</span>
+
+<span class="sd">        - Cartesian or ladder operator at specific index or for all spins::</span>
+
+<span class="sd">            operator = &quot;I(component, index)&quot;</span>
+<span class="sd">            operator = &quot;I(component)&quot;</span>
+
+<span class="sd">        - Spherical tensor operator at specific index or for all spins::</span>
+
+<span class="sd">            operator = &quot;T(l, q, index)&quot;</span>
+<span class="sd">            operator = &quot;T(l, q)&quot;</span>
+
+<span class="sd">        - Product operators::</span>
+
+<span class="sd">            operator = &quot;I(component1, index1) * I(component2, index2)&quot;</span>
+
+<span class="sd">        - Sum of operators::</span>
+
+<span class="sd">            operator = &quot;I(component1, index1) + I(component2, index2)&quot;</span>
+
+<span class="sd">        - Unit operators are ignored in the input. These are identical::</span>
+
+<span class="sd">            operator = &quot;E * I(component, index)&quot;</span>
+<span class="sd">            operator = &quot;I(component, index)&quot;</span>
+
+<span class="sd">        Special case: An empty ``operator`` string is considered as the unit</span>
+<span class="sd">        operator.</span>
+
+<span class="sd">        Whitespace is ignored in the input.</span>
+
+<span class="sd">        Note that indexing starts from 0.</span>
+<span class="sd">    nspins : int</span>
+<span class="sd">        Number of spins in the system.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    op_defs : list of ndarray</span>
+<span class="sd">        Arrays that describe the requested operator with integers. Example:</span>
+<span class="sd">        ``[[2, 0, 1]]`` corresponds to ``T_1_0 * E * T_1_1``.</span>
+<span class="sd">    coeffs : list of complex</span>
+<span class="sd">        Coefficients that account for the different norms of operator</span>
+<span class="sd">        relations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise the lists of operator definitions and coefficients.</span>
+    <span class="n">op_defs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Remove all whitespace from the input string.</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+    <span class="c1"># Return the unit operator when the input string is empty.</span>
+    <span class="k">if</span> <span class="n">operator</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">)])</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">op_defs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span>
+        <span class="n">coeffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span>
+
+    <span class="c1"># Split the additive (+) terms.</span>
+    <span class="n">prod_ops</span> <span class="o">=</span> <span class="n">_split_sum_terms</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+
+    <span class="c1"># Expand shorthand single-spin notation.</span>
+    <span class="n">prod_ops</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">expanded_op</span>
+        <span class="k">for</span> <span class="n">prod_op</span> <span class="ow">in</span> <span class="n">prod_ops</span>
+        <span class="k">for</span> <span class="n">expanded_op</span> <span class="ow">in</span> <span class="n">_expand_global_operator</span><span class="p">(</span><span class="n">prod_op</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Process each product operator separately.</span>
+    <span class="k">for</span> <span class="n">prod_op</span> <span class="ow">in</span> <span class="n">prod_ops</span><span class="p">:</span>
+
+        <span class="c1"># Start from the all-unit product operator.</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;E&quot;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;U10&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Split the product into single-spin operator terms.</span>
+        <span class="n">op_terms</span> <span class="o">=</span> <span class="n">prod_op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Parse and place each single-spin operator term.</span>
+        <span class="k">for</span> <span class="n">op_term</span> <span class="ow">in</span> <span class="n">op_terms</span><span class="p">:</span>
+
+            <span class="c1"># Keep explicit unit operators unchanged.</span>
+            <span class="k">if</span> <span class="n">op_term</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="c1"># Parse Cartesian and ladder operators.</span>
+            <span class="k">elif</span> <span class="n">op_term</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span>
+                <span class="n">component_and_index</span> <span class="o">=</span> <span class="n">_extract_arguments</span><span class="p">(</span><span class="n">op_term</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">component_and_index</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Cannot parse the following invalid operator: &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op_term</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">component</span> <span class="o">=</span> <span class="n">component_and_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">component_and_index</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">op</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;I_</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Parse spherical tensor operators.</span>
+            <span class="k">elif</span> <span class="n">op_term</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                <span class="n">component_and_index</span> <span class="o">=</span> <span class="n">_extract_arguments</span><span class="p">(</span><span class="n">op_term</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">component_and_index</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Cannot parse the following invalid operator: &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op_term</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">component_and_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">component_and_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">component_and_index</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">op</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;T_</span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Reject unsupported operator terms explicitly.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Cannot parse the following invalid operator: </span><span class="si">{</span><span class="n">op_term</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Initialise the current basis-expansion lists.</span>
+        <span class="n">op_defs_curr</span> <span class="o">=</span> <span class="p">[[]]</span>
+        <span class="n">coeffs_curr</span> <span class="o">=</span> <span class="p">[[]]</span>
+
+        <span class="c1"># Expand each single-spin factor into basis indices and coefficients.</span>
+        <span class="k">for</span> <span class="n">operator_component</span> <span class="ow">in</span> <span class="n">op</span><span class="p">:</span>
+            <span class="n">op_ints</span><span class="p">,</span> <span class="n">op_coeffs</span> <span class="o">=</span> <span class="n">_operator_component_to_terms</span><span class="p">(</span>
+                <span class="n">operator_component</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Append all allowed basis choices for the current spin factor.</span>
+            <span class="n">op_defs_curr</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">op_def</span> <span class="o">+</span> <span class="p">[</span><span class="n">op_int</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="n">op_defs_curr</span>
+                <span class="k">for</span> <span class="n">op_int</span> <span class="ow">in</span> <span class="n">op_ints</span>
+            <span class="p">]</span>
+            <span class="n">coeffs_curr</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">coeff</span> <span class="o">+</span> <span class="p">[</span><span class="n">op_coeff</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="n">coeffs_curr</span>
+                <span class="k">for</span> <span class="n">op_coeff</span> <span class="ow">in</span> <span class="n">op_coeffs</span>
+            <span class="p">]</span>
+
+        <span class="c1"># Convert the operator definitions to NumPy arrays.</span>
+        <span class="n">op_defs_curr</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="k">for</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="n">op_defs_curr</span><span class="p">]</span>
+
+        <span class="c1"># Multiply the single-spin coefficients into total coefficients.</span>
+        <span class="n">coeffs_curr</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="k">for</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="n">coeffs_curr</span><span class="p">]</span>
+
+        <span class="c1"># Append the current contributions to the total expansion.</span>
+        <span class="n">op_defs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">op_defs_curr</span><span class="p">)</span>
+        <span class="n">coeffs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">coeffs_curr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">spin_order</span><span class="p">(</span><span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine the spin order (number of non-unit single-spin operators)</span>
+<span class="sd">    of a product operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    op_def : ndarray</span>
+<span class="sd">        Contains the indices that describe the product operator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    order : int</span>
+<span class="sd">        Spin order of the operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Count the number of non-unit single-spin factors.</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._specutils &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_specutils';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._specutils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Spectral utilities for common NMR post-processing tasks.</span>
+
+<span class="sd">This module provides helper functions for resonance-frequency evaluation,</span>
+<span class="sd">Fourier transformation, chemical-shift conversion, and construction of</span>
+<span class="sd">uniformly sampled time axes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._nmr_isotopes</span><span class="w"> </span><span class="kn">import</span> <span class="n">gamma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">require</span>
+
+
+<div class="viewcode-block" id="fourier_transform">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.fourier_transform">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fourier_transform</span><span class="p">(</span>
+    <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the discrete Fourier transform of a time-domain signal.</span>
+
+<span class="sd">    The returned frequency axis and transformed signal are both shifted so that</span>
+<span class="sd">    zero frequency is centred in the output arrays.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal : ndarray</span>
+<span class="sd">        Input signal in the time domain.</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        Time step between consecutive samples in the signal.</span>
+<span class="sd">    normalize : bool, default=True</span>
+<span class="sd">        Whether to normalise the Fourier transform.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    freqs : ndarray</span>
+<span class="sd">        Frequency axis corresponding to the Fourier-transformed signal.</span>
+<span class="sd">    fft_signal : ndarray</span>
+<span class="sd">        Fourier-transformed signal in the frequency domain. If ``normalize``</span>
+<span class="sd">        is ``True``, the result is scaled by the sampling interval.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Construct the unshifted frequency axis.</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">),</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="c1"># Evaluate the discrete Fourier transform of the signal.</span>
+    <span class="n">fft_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+
+    <span class="c1"># Apply the sampling-interval normalisation when requested.</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">fft_signal</span> <span class="o">=</span> <span class="n">fft_signal</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="c1"># Shift zero frequency to the centre of the arrays.</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+    <span class="n">fft_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">fft_signal</span></div>
+
+
+
+<div class="viewcode-block" id="spectrum">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.spectrum">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectrum</span><span class="p">(</span>
+    <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">part</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;real&quot;</span><span class="p">,</span> <span class="s2">&quot;imag&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;real&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return one component of the Fourier-domain spectrum.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal : ndarray</span>
+<span class="sd">        Input signal in the time domain.</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        Time step between consecutive samples in the signal.</span>
+<span class="sd">    normalize : bool, default=True</span>
+<span class="sd">        Whether to normalise the Fourier transform.</span>
+<span class="sd">    part : {&#39;real&#39;, &#39;imag&#39;}</span>
+<span class="sd">        Selects which component of the Fourier transform to return.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    freqs : ndarray</span>
+<span class="sd">        Frequency axis corresponding to the Fourier-transformed signal.</span>
+<span class="sd">    spectrum_part : ndarray</span>
+<span class="sd">        Selected real or imaginary component of the Fourier-domain signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute the shifted Fourier transform of the input signal.</span>
+    <span class="n">freqs</span><span class="p">,</span> <span class="n">fft_signal</span> <span class="o">=</span> <span class="n">fourier_transform</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">)</span>
+
+    <span class="c1"># Extract the requested component of the transformed signal.</span>
+    <span class="k">if</span> <span class="n">part</span> <span class="o">==</span> <span class="s2">&quot;real&quot;</span><span class="p">:</span>
+        <span class="n">spectrum_part</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">part</span> <span class="o">==</span> <span class="s2">&quot;imag&quot;</span><span class="p">:</span>
+        <span class="n">spectrum_part</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fft_signal</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid value for &#39;part&#39;. Must be &#39;real&#39; or &#39;imag&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">spectrum_part</span></div>
+
+
+
+<div class="viewcode-block" id="frequency_to_chemical_shift">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.frequency_to_chemical_shift">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">frequency_to_chemical_shift</span><span class="p">(</span>
+    <span class="n">frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">reference_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">spectrometer_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert frequencies in Hz to chemical shifts in ppm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frequency : float or ndarray</span>
+<span class="sd">        Frequency, or an array of frequencies, in Hz.</span>
+<span class="sd">    reference_frequency : float</span>
+<span class="sd">        Reference frequency in Hz.</span>
+<span class="sd">    spectrometer_frequency : float</span>
+<span class="sd">        Spectrometer frequency in Hz.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    chemical_shift : float or ndarray</span>
+<span class="sd">        Chemical shift, or an array of chemical shifts, in ppm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert the frequency offset to the chemical-shift scale.</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">frequency</span> <span class="o">-</span> <span class="n">reference_frequency</span><span class="p">)</span> <span class="o">/</span> <span class="n">spectrometer_frequency</span> <span class="o">*</span> <span class="mf">1e6</span></div>
+
+
+<div class="viewcode-block" id="spectral_width_to_dwell_time">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.spectral_width_to_dwell_time">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectral_width_to_dwell_time</span><span class="p">(</span>
+    <span class="n">spectral_width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">isotope</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a spectral width in ppm to a dwell time in seconds.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spectral_width : float</span>
+<span class="sd">        Spectral width in ppm.</span>
+<span class="sd">    isotope : str</span>
+<span class="sd">        Nucleus symbol, for example ``&#39;1H&#39;``.</span>
+<span class="sd">    B : float, default=None</span>
+<span class="sd">        Magnetic field of the spectrometer in T. If not supplied, the magnetic</span>
+<span class="sd">        field is obtained from ``parameters.magnetic_field``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dwell_time : float</span>
+<span class="sd">        Dwell time in seconds.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        Raised if no magnetic field is supplied and no default value has been</span>
+<span class="sd">        configured.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Use the global magnetic field setting if no value is supplied.</span>
+    <span class="k">if</span> <span class="n">B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">require</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="s2">&quot;magnetic_field&quot;</span><span class="p">,</span> <span class="s2">&quot;calculating dwell time&quot;</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span>
+
+    <span class="c1"># Convert the spectral width from ppm to Hz.</span>
+    <span class="n">spectral_width_hz</span> <span class="o">=</span> <span class="n">spectral_width</span> <span class="o">*</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">(</span><span class="n">isotope</span><span class="p">,</span> <span class="s2">&quot;Hz&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span>
+
+    <span class="c1"># Invert the spectral width to obtain the dwell time.</span>
+    <span class="n">dwell_time</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">spectral_width_hz</span>
+
+    <span class="k">return</span> <span class="n">dwell_time</span></div>
+
+
+
+<div class="viewcode-block" id="time_axis">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.time_axis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">time_axis</span><span class="p">(</span><span class="n">npoints</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a uniformly spaced time axis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    npoints : int</span>
+<span class="sd">        Number of points.</span>
+<span class="sd">    time_step : float</span>
+<span class="sd">        Time step in seconds.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        One-dimensional time axis with ``npoints`` samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Construct the uniformly sampled time axis.</span>
+    <span class="n">t_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">npoints</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">npoints</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">t_axis</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

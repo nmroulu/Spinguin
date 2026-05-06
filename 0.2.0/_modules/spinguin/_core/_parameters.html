@@ -1,0 +1,810 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._parameters &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_parameters';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._parameters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Global parameter definitions for the Spinguin package.</span>
+
+<span class="sd">The module provides the `Parameters` class that stores the package-wide</span>
+<span class="sd">settings used throughout spin-dynamics simulations. A single instance is</span>
+<span class="sd">created when Spinguin is imported and may be modified as follows::</span>
+
+<span class="sd">    import spinguin as sg</span>
+<span class="sd">    sg.parameters.PARAMETERNAME = VALUE</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._status</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+
+
+<div class="viewcode-block" id="Parameters">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._parameters.Parameters">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Store the global settings used throughout the Spinguin package.</span>
+
+<span class="sd">    A single module-level instance is created when Spinguin is imported and is</span>
+<span class="sd">    exposed as `spinguin.parameters`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the parameter container with the default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Populate the object with the default parameter values.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Parameters.default">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._parameters.Parameters.default">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset all parameters to their default values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set the default experimental conditions.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_field</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Set the default parallelisation threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+
+        <span class="c1"># Set the default rotating-frame expansion order.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rotating_frame_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+
+        <span class="c1"># Set the default sparsity controls.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Enable status messages by default.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Set the default numerical zero-value thresholds.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_aux</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-15</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_equilibrium</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_hamiltonian</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_interaction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_propagator</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pulse</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_relaxation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_thermalization</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_zte</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-33</span>
+
+        <span class="c1"># Set the default zero-track elimination controls.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nsteps_zte</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the external magnetic field in tesla.</span>
+
+<span class="sd">        A value of `None` indicates that no magnetic field has been assigned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_field</span>
+
+    <span class="nd">@magnetic_field</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">magnetic_field</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new magnetic-field value.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_magnetic_field</span> <span class="o">=</span> <span class="n">magnetic_field</span>
+
+        <span class="c1"># Report the updated magnetic-field value.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Magnetic field set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">magnetic_field</span><span class="si">}</span><span class="s2"> T</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the sample temperature in kelvin.</span>
+
+<span class="sd">        A value of `None` indicates that no temperature has been assigned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span>
+
+    <span class="nd">@temperature</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new temperature value.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+
+        <span class="c1"># Report the updated temperature value.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Temperature set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2"> K</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parallel_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the basis-size threshold for parallel Redfield calculations.</span>
+
+<span class="sd">        If the number of basis elements exceeds this value, parallel execution is</span>
+<span class="sd">        used when constructing the Redfield relaxation superoperator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_dim</span>
+
+    <span class="nd">@parallel_dim</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parallel_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallel_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new parallelisation threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_dim</span> <span class="o">=</span> <span class="n">parallel_dim</span>
+
+        <span class="c1"># Report the updated parallelisation threshold.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Threshold for parallel Redfield set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_dim</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rotating_frame_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the Taylor-expansion order used in the rotating frame.</span>
+
+<span class="sd">        Higher orders give more accurate rotating-frame transformations but</span>
+<span class="sd">        require more computation time. The default value is 5.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotating_frame_order</span>
+
+    <span class="nd">@rotating_frame_order</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rotating_frame_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rotating_frame_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new rotating-frame expansion order.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rotating_frame_order</span> <span class="o">=</span> <span class="n">rotating_frame_order</span>
+
+        <span class="c1"># Report the updated rotating-frame expansion order.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rotating frame order set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rotating_frame_order</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether Hilbert-space operators are stored sparsely.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span>
+
+    <span class="nd">@sparse_operator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_operator</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new Hilbert-space operator sparsity setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_operator</span> <span class="o">=</span> <span class="n">sparse_operator</span>
+
+        <span class="c1"># Report the updated Hilbert-space operator sparsity setting.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparsity setting of operator set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_operator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether superoperators are stored sparsely.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span>
+
+    <span class="nd">@sparse_superoperator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_superoperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_superoperator</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new superoperator sparsity setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_superoperator</span> <span class="o">=</span> <span class="n">sparse_superoperator</span>
+
+        <span class="c1"># Report the updated superoperator sparsity setting.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Sparsity setting of superoperator set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether state vectors are stored sparsely.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span>
+
+    <span class="nd">@sparse_state</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sparse_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sparse_state</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new state-vector sparsity setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sparse_state</span> <span class="o">=</span> <span class="n">sparse_state</span>
+
+        <span class="c1"># Report the updated state-vector sparsity setting.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparsity setting of state set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_state</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">propagator_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the density threshold used for propagator storage selection.</span>
+
+<span class="sd">        If the density of the propagator exceeds this value, a dense array is</span>
+<span class="sd">        returned; otherwise, a sparse array is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span>
+
+    <span class="nd">@propagator_density</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">propagator_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">propagator_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new propagator-density threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_propagator_density</span> <span class="o">=</span> <span class="n">propagator_density</span>
+
+        <span class="c1"># Report the updated propagator-density threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Propagator density threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">propagator_density</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verbose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether status and other informational messages are</span>
+<span class="sd">        printed to the console.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+
+    <span class="nd">@verbose</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verbose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new verbosity setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+        <span class="c1"># Report the updated verbosity setting unconditionally.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Verbose set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used for Hamiltonians.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_hamiltonian</span>
+
+    <span class="nd">@zero_hamiltonian</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_hamiltonian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_hamiltonian</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new Hamiltonian zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_hamiltonian</span> <span class="o">=</span> <span class="n">zero_hamiltonian</span>
+
+        <span class="c1"># Report the updated Hamiltonian zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Hamiltonian zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_hamiltonian</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used in the auxiliary-matrix method.</span>
+
+<span class="sd">        This threshold is used in the Redfield integral evaluation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_aux</span>
+
+    <span class="nd">@zero_aux</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_aux</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new auxiliary-method zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_aux</span> <span class="o">=</span> <span class="n">zero_aux</span>
+
+        <span class="c1"># Report the updated auxiliary-method zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Auxiliary zero-value threshold set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_aux</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used for relaxation superoperators.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_relaxation</span>
+
+    <span class="nd">@zero_relaxation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_relaxation</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new relaxation zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_relaxation</span> <span class="o">=</span> <span class="n">zero_relaxation</span>
+
+        <span class="c1"># Report the updated relaxation zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Relaxation zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_relaxation</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the threshold below which interaction tensors are ignored.</span>
+
+<span class="sd">        If the matrix 1-norm of an interaction tensor, which is an upper bound</span>
+<span class="sd">        for its eigenvalues, is smaller than this threshold, the interaction is</span>
+<span class="sd">        neglected when constructing the Redfield relaxation superoperator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_interaction</span>
+
+    <span class="nd">@zero_interaction</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_interaction</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new interaction zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_interaction</span> <span class="o">=</span> <span class="n">zero_interaction</span>
+
+        <span class="c1"># Report the updated interaction zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Interaction zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_interaction</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_propagator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used in propagator calculations.</span>
+
+<span class="sd">        This threshold is used as the convergence criterion for the Taylor</span>
+<span class="sd">        series employed to evaluate the matrix exponential.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_propagator</span>
+
+    <span class="nd">@zero_propagator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_propagator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_propagator</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new propagator zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_propagator</span> <span class="o">=</span> <span class="n">zero_propagator</span>
+
+        <span class="c1"># Report the updated propagator zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Propagator zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_propagator</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used in pulse calculations.</span>
+
+<span class="sd">        This threshold is used as the convergence criterion for the Taylor</span>
+<span class="sd">        series employed to evaluate the matrix exponential.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pulse</span>
+
+    <span class="nd">@zero_pulse</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_pulse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_pulse</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new pulse zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_pulse</span> <span class="o">=</span> <span class="n">zero_pulse</span>
+
+        <span class="c1"># Report the updated pulse zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pulse zero-value threshold set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_pulse</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used in thermalization calculations.</span>
+
+<span class="sd">        This threshold is used as the convergence criterion for the Taylor</span>
+<span class="sd">        series employed during Levitt-di Bari thermalization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_thermalization</span>
+
+    <span class="nd">@zero_thermalization</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_thermalization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_thermalization</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new thermalization zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_thermalization</span> <span class="o">=</span> <span class="n">zero_thermalization</span>
+
+        <span class="c1"># Report the updated thermalization zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Thermalization zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_thermalization</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used for equilibrium-state construction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_equilibrium</span>
+
+    <span class="nd">@zero_equilibrium</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_equilibrium</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new equilibrium zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_equilibrium</span> <span class="o">=</span> <span class="n">zero_equilibrium</span>
+
+        <span class="c1"># Report the updated equilibrium zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Equilibrium zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_equilibrium</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used in single-step propagation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_time_step</span>
+
+    <span class="nd">@zero_time_step</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new time-step zero-value threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_time_step</span> <span class="o">=</span> <span class="n">zero_time_step</span>
+
+        <span class="c1"># Report the updated time-step zero-value threshold.</span>
+        <span class="n">status</span><span class="p">(</span>
+            <span class="s2">&quot;Time step zero-value threshold set to: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_time_step</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the zero-value threshold used in zero-track elimination.</span>
+
+<span class="sd">        The default value, ``1e-33``, is intended to eliminate only basis states</span>
+<span class="sd">        that remain exactly zero during ZTE basis truncation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zero_zte</span>
+
+    <span class="nd">@zero_zte</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_zte</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new zero-track-elimination threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_zte</span> <span class="o">=</span> <span class="n">zero_zte</span>
+
+        <span class="c1"># Report the updated zero-track-elimination threshold.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ZTE zero-value threshold set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_zte</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nsteps_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the maximum number of steps used in ZTE basis truncation.</span>
+
+<span class="sd">        The default value is 10.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nsteps_zte</span>
+
+    <span class="nd">@nsteps_zte</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nsteps_zte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsteps_zte</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the new limit for ZTE propagation steps.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nsteps_zte</span> <span class="o">=</span> <span class="n">nsteps_zte</span>
+
+        <span class="c1"># Report the updated ZTE propagation-step limit.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum number of steps in ZTE set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nsteps_zte</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Instantiate the global parameter container.</span>
+<span class="n">parameters</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">()</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

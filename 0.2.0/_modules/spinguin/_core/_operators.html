@@ -1,0 +1,907 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._operators &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_operators';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._operators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Spin-operator construction utilities for Hilbert-space calculations.</span>
+
+<span class="sd">The module provides single-spin Cartesian, ladder, and spherical tensor</span>
+<span class="sd">operators together with helpers for assembling many-spin product operators.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">CG_coeff</span><span class="p">,</span> <span class="n">comm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">parse_operator_string</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
+
+
+<div class="viewcode-block" id="op_E">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_E">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_E</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the unit operator for a single spin.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    E : ndarray or csc_array</span>
+<span class="sd">        Unit operator of dimension ``2*S + 1`` in the configured storage</span>
+<span class="sd">        format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the Hilbert-space dimension of the spin.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Allocate the identity matrix in the requested storage format.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye_array</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E</span></div>
+
+
+
+<div class="viewcode-block" id="op_Sx">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_Sx">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sx</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the Cartesian spin operator ``Sx``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sx : ndarray or csc_array</span>
+<span class="sd">        Cartesian x-component spin operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Combine the ladder operators into the x component.</span>
+    <span class="n">Sx</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">+</span> <span class="n">op_Sm</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">Sx</span></div>
+
+
+
+<div class="viewcode-block" id="op_Sy">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_Sy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sy</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the Cartesian spin operator ``Sy``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sy : ndarray or csc_array</span>
+<span class="sd">        Cartesian y-component spin operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Combine the ladder operators into the y component.</span>
+    <span class="n">Sy</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">-</span> <span class="n">op_Sm</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">Sy</span></div>
+
+
+
+<div class="viewcode-block" id="op_Sz">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_Sz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sz</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the Cartesian spin operator ``Sz``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sz : ndarray or csc_array</span>
+<span class="sd">        Cartesian z-component spin operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Enumerate the magnetic quantum numbers from ``S`` down to ``-S``.</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Allocate mutable storage for the diagonal operator.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">Sz</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Insert the magnetic quantum numbers onto the diagonal.</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="n">Sz</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_i</span>
+
+    <span class="c1"># Return the operator in the configured output format.</span>
+    <span class="k">return</span> <span class="n">Sz</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span> <span class="k">else</span> <span class="n">Sz</span></div>
+
+
+
+<div class="viewcode-block" id="op_Sp">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_Sp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the spin-raising operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sp : ndarray or csc_array</span>
+<span class="sd">        Spin-raising operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Enumerate the magnetic quantum numbers in ascending order.</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Allocate mutable storage for the off-diagonal operator.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">Sp</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Sp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Populate the non-zero elements generated by one raising step.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">Sp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">S</span> <span class="o">*</span> <span class="p">(</span><span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Return the operator in the configured output format.</span>
+    <span class="k">return</span> <span class="n">Sp</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span> <span class="k">else</span> <span class="n">Sp</span></div>
+
+
+
+<div class="viewcode-block" id="op_Sm">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_Sm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_Sm</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the spin-lowering operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Sm : ndarray or csc_array</span>
+<span class="sd">        Spin-lowering operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Enumerate the magnetic quantum numbers in ascending order.</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">S</span><span class="p">,</span> <span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Allocate mutable storage for the off-diagonal operator.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">Sm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Sm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Populate the non-zero elements generated by one lowering step.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)):</span>
+        <span class="n">Sm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">S</span> <span class="o">*</span> <span class="p">(</span><span class="n">S</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Return the operator in the configured output format.</span>
+    <span class="k">return</span> <span class="n">Sm</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span> <span class="k">else</span> <span class="n">Sm</span></div>
+
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_op_T</span><span class="p">(</span>
+    <span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a cached single-spin irreducible spherical tensor operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Tensor rank.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Tensor projection.</span>
+<span class="sd">    sparse : bool</span>
+<span class="sd">        Whether sparse operators should be returned.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : ndarray or csc_array</span>
+<span class="sd">        Cached spherical tensor operator in the requested storage format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Start from the maximum-projection tensor component ``T_l^l``.</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">l</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">l</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">l</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">l</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">l</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">op_Sp</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">l</span><span class="p">)</span>
+
+    <span class="c1"># Lower the projection stepwise until the requested value is reached.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span> <span class="o">-</span> <span class="n">q</span><span class="p">):</span>
+        <span class="n">current_q</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="n">i</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">comm</span><span class="p">(</span><span class="n">op_Sm</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">l</span> <span class="o">*</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">current_q</span> <span class="o">*</span> <span class="p">(</span><span class="n">current_q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">T</span>
+
+
+<div class="viewcode-block" id="op_T">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_T">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_T</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a single-spin irreducible spherical tensor operator.</span>
+
+<span class="sd">    The operator is constructed by sequentially lowering the maximum-projection</span>
+<span class="sd">    tensor. The implementation follows Kuprov, *Spin: From Basic Symmetries to</span>
+<span class="sd">    Quantum Optimal Control* (2023), p. 94.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : float</span>
+<span class="sd">        Spin quantum number.</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Tensor rank.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Tensor projection.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : ndarray or csc_array</span>
+<span class="sd">        Spherical tensor operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Copy the cached tensor so that callers may modify their local result.</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">_op_T</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">T</span></div>
+
+
+
+<div class="viewcode-block" id="op_T_coupled">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.op_T_coupled">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">op_T_coupled</span><span class="p">(</span>
+    <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">l1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">s1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">l2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">s2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a coupled irreducible spherical tensor for two spins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Rank of the coupled tensor.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Projection of the coupled tensor.</span>
+<span class="sd">    l1 : int</span>
+<span class="sd">        Rank of the first single-spin tensor.</span>
+<span class="sd">    s1 : float</span>
+<span class="sd">        Spin quantum number of the first spin.</span>
+<span class="sd">    l2 : int</span>
+<span class="sd">        Rank of the second single-spin tensor.</span>
+<span class="sd">    s2 : float</span>
+<span class="sd">        Spin quantum number of the second spin.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : ndarray or csc_array</span>
+<span class="sd">        Coupled spherical tensor operator of rank ``l`` and projection ``q``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the composite Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">s1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">s2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Allocate the accumulator for the coupled tensor.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Sum all Clebsch-Gordan-weighted tensor products.</span>
+    <span class="k">for</span> <span class="n">q1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l1</span><span class="p">,</span> <span class="n">l1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">q2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l2</span><span class="p">,</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">coefficient</span> <span class="o">=</span> <span class="n">CG_coeff</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="n">T</span> <span class="o">+</span> <span class="n">coefficient</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span>
+                    <span class="n">op_T</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">q1</span><span class="p">),</span>
+                    <span class="n">op_T</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">q2</span><span class="p">),</span>
+                    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="n">T</span> <span class="o">+</span> <span class="n">coefficient</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span>
+                    <span class="n">op_T</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">q1</span><span class="p">),</span>
+                    <span class="n">op_T</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">q2</span><span class="p">),</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">T</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">op_prod</span><span class="p">(</span>
+    <span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">include_unit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a many-spin product operator in the Zeeman eigenbasis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    op_def : ndarray</span>
+<span class="sd">        Integer definition of the product operator. For example,</span>
+<span class="sd">        ``np.array([0, 2, 0, 1])`` corresponds to ``E*T_10*E*T_11``. The</span>
+<span class="sd">        indices satisfy ``N = l**2 + l - q``.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        Spin quantum numbers. The array length must match ``op_def``.</span>
+<span class="sd">    include_unit : bool, default=True</span>
+<span class="sd">        If ``False``, unit operators are omitted from the Kronecker product.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    op : ndarray or csc_array</span>
+<span class="sd">        Product operator in the Zeeman eigenbasis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Normalise the inputs to NumPy arrays.</span>
+    <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">spins</span><span class="p">)</span>
+
+    <span class="c1"># Start from the scalar identity for iterative Kronecker products.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Append each requested single-spin tensor to the product operator.</span>
+    <span class="k">for</span> <span class="n">spin</span><span class="p">,</span> <span class="n">oper</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">spins</span><span class="p">,</span> <span class="n">op_def</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">include_unit</span> <span class="ow">or</span> <span class="n">oper</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">l</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">idx_to_lq</span><span class="p">(</span><span class="n">oper</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">op_T</span><span class="p">(</span><span class="n">spin</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">op_T</span><span class="p">(</span><span class="n">spin</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">op</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">op_from_string</span><span class="p">(</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a Hilbert-space operator from a user-defined operator string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        One-dimensional array of spin quantum numbers.</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        Operator definition string. The supported syntax is summarised below:</span>
+
+<span class="sd">        - Cartesian and ladder operators: ``I(component,index)`` or</span>
+<span class="sd">          ``I(component)``. Examples:</span>
+
+<span class="sd">          - ``I(x,4)`` creates the x-operator for the spin at index 4.</span>
+<span class="sd">          - ``I(x)`` creates the x-operator for all spins.</span>
+
+<span class="sd">        - Spherical tensor operators: ``T(l,q,index)`` or ``T(l,q)``.</span>
+<span class="sd">          Examples:</span>
+
+<span class="sd">          - ``T(1,-1,3)`` creates the operator with ``l=1`` and ``q=-1``</span>
+<span class="sd">            for the spin at index 3.</span>
+<span class="sd">          - ``T(1,-1)`` creates the operator with ``l=1`` and ``q=-1``</span>
+<span class="sd">            for all spins.</span>
+
+<span class="sd">        - Product operators are written with ``*`` between the single-spin</span>
+<span class="sd">          operators, for example ``I(z,0) * I(z,1)``.</span>
+<span class="sd">        - Sums of operators are written with ``+`` between the terms, for</span>
+<span class="sd">          example ``I(x,0) + I(x,1)``.</span>
+<span class="sd">        - Unit operators are ignored in the input, so ``E * I(z,1)`` and</span>
+<span class="sd">          ``I(z,1)`` are interpreted identically.</span>
+
+<span class="sd">        An empty string is interpreted as the unit operator. Whitespace is</span>
+<span class="sd">        ignored, and indexing starts from zero.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    op : ndarray or csc_array</span>
+<span class="sd">        Requested operator in Hilbert space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract the size of the spin system from the spin quantum numbers.</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">spins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Allocate the operator accumulator in the configured storage format.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Parse the string into basis operators and their prefactors.</span>
+    <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+
+    <span class="c1"># Sum the parsed contributions into the final operator.</span>
+    <span class="k">for</span> <span class="n">op_def</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">op</span> <span class="o">+</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">op</span>
+
+
+<div class="viewcode-block" id="operator">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.operator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">operator</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a Hilbert-space operator for a spin system.</span>
+
+<span class="sd">    The operator may be specified using either of the two approaches below:</span>
+
+<span class="sd">    - A string. Example: ``I(z,0) * I(z,1)``.</span>
+<span class="sd">    - A one-dimensional array of integers. Example: ``[2, 2]``.</span>
+
+<span class="sd">    For string input, the supported syntax is as follows:</span>
+
+<span class="sd">    - Cartesian and ladder operators: ``I(component,index)`` or</span>
+<span class="sd">      ``I(component)``, with indexing starting from zero. Examples:</span>
+
+<span class="sd">      - ``I(x,4)`` creates the x-operator for the spin at index 4.</span>
+<span class="sd">      - ``I(x)`` creates the x-operator for all spins.</span>
+
+<span class="sd">    - Spherical tensor operators: ``T(l,q,index)`` or ``T(l,q)``.</span>
+<span class="sd">      Examples:</span>
+
+<span class="sd">      - ``T(1,-1,3)`` creates the operator with ``l=1`` and ``q=-1`` for</span>
+<span class="sd">        the spin at index 3.</span>
+<span class="sd">      - ``T(1,-1)`` creates the operator with ``l=1`` and ``q=-1`` for all</span>
+<span class="sd">        spins.</span>
+
+<span class="sd">    - Product operators are written with ``*`` between the single-spin</span>
+<span class="sd">      operators, for example ``I(z,0) * I(z,1)``.</span>
+<span class="sd">    - Sums of operators are written with ``+`` between the terms, for</span>
+<span class="sd">      example ``I(x,0) + I(x,1)``.</span>
+<span class="sd">    - Unit operators are ignored in the input, so ``E * I(z,1)`` and</span>
+<span class="sd">      ``I(z,1)`` are interpreted identically.</span>
+
+<span class="sd">    An empty operator string is interpreted as the unit operator, and all</span>
+<span class="sd">    whitespace is ignored.</span>
+
+<span class="sd">    For array input, each spin is assigned an integer ``N`` that corresponds</span>
+<span class="sd">    to a single-spin irreducible spherical tensor with rank ``l`` and</span>
+<span class="sd">    projection ``q`` according to ``N = l**2 + l - q``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        Spin system for which the operator is generated.</span>
+<span class="sd">    operator : str or list or ndarray or tuple</span>
+<span class="sd">        Operator specification in string or array form.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    op : ndarray or csc_array</span>
+<span class="sd">        Requested operator in Hilbert space.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        Raised if the array input is not one-dimensional, has an incompatible</span>
+<span class="sd">        length, or if the input type is unsupported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Parse string input with the operator-string helper.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">op_from_string</span><span class="p">(</span>
+            <span class="n">spins</span><span class="o">=</span><span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Parse array-like input as an explicit product-operator definition.</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input array must be one-dimensional.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Length of the operator array must match the number of spins.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">op_prod</span><span class="p">(</span>
+            <span class="n">spins</span><span class="o">=</span><span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+            <span class="n">op_def</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">include_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Reject unsupported input types explicitly.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid input type for &#39;operator&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">op</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_op_T</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clear the internal cache used by ``_op_T``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Remove all cached tensor operators.</span>
+    <span class="n">_op_T</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

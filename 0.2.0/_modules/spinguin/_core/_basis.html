@@ -1,0 +1,1120 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._basis &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_basis';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._basis</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Basis-set machinery for `SpinSystem`.</span>
+
+<span class="sd">The `Basis` class constructs Liouville-space basis states and provides</span>
+<span class="sd">multiple truncation strategies for reducing the basis-set dimension</span>
+<span class="sd">before simulation.</span>
+
+<span class="sd">The basis functionality is intended to be accessed through the owning</span>
+<span class="sd">`SpinSystem` instance. Example::</span>
+
+<span class="sd">    import spinguin as sg</span>
+
+<span class="sd">    spin_system = sg.SpinSystem([&quot;1H&quot;])</span>
+<span class="sd">    spin_system.basis.max_spin_order = 1</span>
+<span class="sd">    spin_system.basis.build()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">product</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterator</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.csgraph</span><span class="w"> </span><span class="kn">import</span> <span class="n">connected_components</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._interactions</span><span class="w"> </span><span class="kn">import</span> <span class="n">dd_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">arraylike_to_tuple</span><span class="p">,</span>
+    <span class="n">eliminate_small</span><span class="p">,</span>
+    <span class="n">expm_vec</span><span class="p">,</span>
+    <span class="n">isvector</span><span class="p">,</span>
+    <span class="n">norm_1</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._status</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">coherence_order</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
+
+
+<div class="viewcode-block" id="Basis">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Basis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Manages the basis set associated with a spin system.</span>
+
+<span class="sd">    The basis stores the product-operator definitions used in Liouville space</span>
+<span class="sd">    and provides methods for constructing and truncating that basis.</span>
+
+<span class="sd">    The class is designed to be instantiated and accessed through</span>
+<span class="sd">    `SpinSystem`. Example::</span>
+
+<span class="sd">        import spinguin as sg</span>
+
+<span class="sd">        spin_system = sg.SpinSystem([&quot;1H&quot;])</span>
+<span class="sd">        spin_system.basis.max_spin_order = 1</span>
+<span class="sd">        spin_system.basis.build()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_basis_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_max_spin_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the basis set for a spin system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        spin_system : SpinSystem</span>
+<span class="sd">            Spin system that owns the basis object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Store the parent spin system for later basis operations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span> <span class="o">=</span> <span class="n">spin_system</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the current basis dimension.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of basis states currently stored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maximum number of active spins (spin order)</span>
+<span class="sd">        allowed in basis operators.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or None</span>
+<span class="sd">            Largest spin order included when the basis is built. A value of</span>
+<span class="sd">            `None` indicates that the limit has not yet been set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_spin_order</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the current basis-state definitions.</span>
+
+<span class="sd">        The basis is stored as an array of shape `(N, M)`, where `N` is the</span>
+<span class="sd">        number of basis states and `M` is the number of spins. Each row encodes</span>
+<span class="sd">        a Kronecker product of irreducible spherical tensor operators. The</span>
+<span class="sd">        integer labelling follows increasing rank `l` and decreasing projection</span>
+<span class="sd">        `q`:</span>
+
+<span class="sd">        - 0 --&gt; T(0, 0)</span>
+<span class="sd">        - 1 --&gt; T(1, 1)</span>
+<span class="sd">        - 2 --&gt; T(1, 0)</span>
+<span class="sd">        - 3 --&gt; T(1, -1), and so on.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or None</span>
+<span class="sd">            Array containing the basis-state definitions, or `None` if the</span>
+<span class="sd">            basis has not yet been built.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span>
+
+    <span class="nd">@basis</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store a validated basis array and build the corresponding index map.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        basis : ndarray</span>
+<span class="sd">            Basis array of shape `(N, M)`, where `M` matches the number of</span>
+<span class="sd">            spins in the parent spin system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Validate the type and shape of the supplied basis array</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="n">basis</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Basis set must be a two-dimensional NumPy array &quot;</span>
+                             <span class="s2">&quot;of shape (N, M), where N is the number of &quot;</span>
+                             <span class="s2">&quot;basis states and M is the number of spins.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mismatch between basis set and number of spins.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Freeze the basis array to avoid accidental external modification</span>
+        <span class="n">basis</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Store the basis array and build a state-to-index lookup table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span> <span class="o">=</span> <span class="n">basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basis_dict</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">state</span><span class="p">):</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis</span><span class="p">)}</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Basis set has been set with dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@max_spin_order</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_spin_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_spin_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the maximum spin order used when building the basis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        max_spin_order : int</span>
+<span class="sd">            Largest number of active spins allowed in any product operator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Validate the supplied maximum spin order against the system size</span>
+        <span class="k">if</span> <span class="n">max_spin_order</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Maximum spin order must be at least 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_spin_order</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Maximum spin order cannot be larger than &quot;</span>
+                             <span class="s2">&quot;the number of spins in the system.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_spin_order</span> <span class="o">=</span> <span class="n">max_spin_order</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum spin order set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_spin_order</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Basis.build">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.build">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the basis set for the parent spin system (see `SpinSystem`).</span>
+
+<span class="sd">        If `max_spin_order` has not been specified explicitly, it is set to the</span>
+<span class="sd">        total number of spins in the system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Default to the full spin order if no truncation limit was specified</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_spin_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Maximum spin order not specified. &quot;</span>
+                          <span class="s2">&quot;Using the number of spins in the system.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_spin_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">nspins</span>
+
+        <span class="c1"># Construct and store the basis for the current spin system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">_make_basis</span><span class="p">(</span>
+            <span class="n">spins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+            <span class="n">max_spin_order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_spin_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Basis.indexof">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.indexof">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">indexof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the index of a basis state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        op_def : ndarray or list or tuple</span>
+<span class="sd">            A one-dimensional array, list or tuple that defines a basis state</span>
+<span class="sd">            using the integer indexing scheme. The indices are given by</span>
+<span class="sd">            `N = l^2 + l - q`, where `l` is the operator rank and `q` is the</span>
+<span class="sd">            projection. For example::</span>
+
+<span class="sd">                op_def = [0, 2, 0]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            Index of the requested state in the current basis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Ensure that a basis exists before attempting the lookup</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Basis must be built before obtaining indices. &quot;</span>
+                             <span class="s2">&quot;Call &#39;build()&#39; on the basis object first.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Convert the operator definition to the internal tuple format</span>
+        <span class="n">op_def</span> <span class="o">=</span> <span class="n">arraylike_to_tuple</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span>
+
+        <span class="c1"># Look up the requested basis state in the cached dictionary</span>
+        <span class="k">if</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_dict</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis_dict</span><span class="p">[</span><span class="n">op_def</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find </span><span class="si">{</span><span class="n">op_def</span><span class="si">}</span><span class="s2"> in the basis set.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">idx</span></div>
+
+
+<div class="viewcode-block" id="Basis.truncate_by_coherence">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_coherence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_coherence</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">coherence_orders</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="o">*</span><span class="n">objs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+        <span class="kc">None</span>
+        <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+        <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+        <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Truncate the basis set by coherence order. Coherence order</span>
+<span class="sd">        of a basis state is defined as the sum of the projections `q` of its</span>
+<span class="sd">        constituent spherical tensor operators.</span>
+
+<span class="sd">        Only basis states whose coherence order belongs to</span>
+<span class="sd">        `coherence_orders` are retained. Optionally supplied state vectors and</span>
+<span class="sd">        superoperators are converted into the truncated basis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coherence_orders : list</span>
+<span class="sd">            List of coherence orders to be retained in the basis.</span>
+<span class="sd">        *objs : tuple of {ndarray, csc_array}</span>
+<span class="sd">            Superoperators or state vectors defined in the original basis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        objs_transformed : ndarray or csc_array or tuple or None</span>
+<span class="sd">            Transformed objects in the truncated basis. If no objects are</span>
+<span class="sd">            supplied, `None` is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Truncating the basis set by coherence order...&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retaining coherence orders: </span><span class="si">{</span><span class="n">coherence_orders</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Initialise the retained basis states and the old-to-new index map</span>
+        <span class="n">truncated_basis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index_map</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Retain only basis states with the requested coherence order</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">coherence_order</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">in</span> <span class="n">coherence_orders</span><span class="p">:</span>
+                <span class="n">truncated_basis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">index_map</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="c1"># Pack the retained basis states into a NumPy array</span>
+        <span class="n">truncated_basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truncated_basis</span><span class="p">)</span>
+
+        <span class="c1"># Replace the basis without printing duplicate status information</span>
+        <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">truncated_basis</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension after truncation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Transform any supplied objects into the truncated basis</span>
+        <span class="k">if</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">objs_transformed</span> <span class="o">=</span> <span class="n">_sop_or_state_to_truncated_basis</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">index_map</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">objs_transformed</span></div>
+
+
+<div class="viewcode-block" id="Basis.truncate_by_coupling">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_coupling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_coupling</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">threshold_J</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">threshold_DD</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">objs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+        <span class="kc">None</span>
+        <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+        <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+        <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Truncate the basis based on the J- and dipole-dipole</span>
+<span class="sd">        couplings between the spins. </span>
+
+<span class="sd">        A basis state is retained if its participating spins form a connected</span>
+<span class="sd">        coupling network once weak J- and dipole-dipole couplings have</span>
+<span class="sd">        been discarded.</span>
+
+<span class="sd">        Optionally supplied state vectors and superoperators are converted into</span>
+<span class="sd">        the truncated basis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        threshold_J : float</span>
+<span class="sd">            J-couplings less than this value (in Hz) are considered to be zero.</span>
+<span class="sd">        threshold_DD : float</span>
+<span class="sd">            Dipole-dipole couplings less than this value (in Hz) are considered</span>
+<span class="sd">            to be zero.</span>
+<span class="sd">        *objs : tuple of {ndarray, csc_array}</span>
+<span class="sd">            Superoperators or state vectors defined in the original basis. These</span>
+<span class="sd">            will be converted into the truncated basis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        objs_transformed : ndarray or csc_array or tuple or None</span>
+<span class="sd">            Transformed objects in the truncated basis. If no objects are</span>
+<span class="sd">            supplied, `None` is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Truncating the basis set based on spin-spin couplings...&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Neglecting J-couplings below </span><span class="si">{</span><span class="n">threshold_J</span><span class="si">}</span><span class="s2"> Hz.&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Neglecting dipole-dipole couplings below </span><span class="si">{</span><span class="n">threshold_DD</span><span class="si">}</span><span class="s2"> Hz.&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Initialise the retained basis states and the old-to-new index map</span>
+        <span class="n">truncated_basis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index_map</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Calculate DD couplings in Hz if Cartesian coordinates are known</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dd_couplings</span> <span class="o">=</span> <span class="n">dd_constants</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nspins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">nspins</span>
+            <span class="n">dd_couplings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nspins</span><span class="p">,</span> <span class="n">nspins</span><span class="p">))</span>
+
+        <span class="c1"># Build the binary connectivity matrix from scalar couplings</span>
+        <span class="n">j_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spin_system</span><span class="o">.</span><span class="n">_J_couplings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">eliminate_small</span><span class="p">(</span><span class="n">j_connectivity</span><span class="p">,</span> <span class="n">zero_value</span><span class="o">=</span><span class="n">threshold_J</span><span class="p">)</span>
+        <span class="n">j_connectivity</span><span class="p">[</span><span class="n">j_connectivity</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Build the binary connectivity matrix from dipole-dipole couplings</span>
+        <span class="n">dd_connectivity</span> <span class="o">=</span> <span class="n">dd_couplings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">eliminate_small</span><span class="p">(</span><span class="n">dd_connectivity</span><span class="p">,</span> <span class="n">zero_value</span><span class="o">=</span><span class="n">threshold_DD</span><span class="p">)</span>
+        <span class="n">dd_connectivity</span><span class="p">[</span><span class="n">dd_connectivity</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Combine both connectivity criteria into a single graph</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">j_connectivity</span> <span class="o">+</span> <span class="n">dd_connectivity</span>
+        <span class="n">connectivity</span><span class="p">[</span><span class="n">connectivity</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Cache connected-component counts for repeated spin combinations</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Retain basis states whose active spins form a connected graph</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">):</span>
+
+            <span class="c1"># Identify the spins that participate in the current basis state</span>
+            <span class="n">idx_spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">state</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Always retain the unit operator</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_spins</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">truncated_basis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">index_map</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Analyse each active-spin pattern only once</span>
+            <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">idx_spins</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conn</span><span class="p">:</span>
+
+                <span class="c1"># Extract the connectivity subgraph for the active spins</span>
+                <span class="n">connectivity_curr</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">idx_spins</span><span class="p">,</span> <span class="n">idx_spins</span><span class="p">)]</span>
+
+                <span class="c1"># Count how many connected components are present</span>
+                <span class="n">n_components</span> <span class="o">=</span> <span class="n">connected_components</span><span class="p">(</span>
+                    <span class="n">csgraph</span> <span class="o">=</span> <span class="n">connectivity_curr</span><span class="p">,</span>
+                    <span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="n">return_labels</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Store the connectivity result for later reuse</span>
+                <span class="n">conn</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">idx_spins</span><span class="p">)]</span> <span class="o">=</span> <span class="n">n_components</span>
+
+            <span class="c1"># Retain only states whose active spins form one component</span>
+            <span class="k">if</span> <span class="n">conn</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">idx_spins</span><span class="p">)]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">truncated_basis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">index_map</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="c1"># Pack the retained basis states into a NumPy array</span>
+        <span class="n">truncated_basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">truncated_basis</span><span class="p">)</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension after truncation: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">truncated_basis</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Replace the basis without printing duplicate status information</span>
+        <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">truncated_basis</span>
+
+        <span class="c1"># Transform any supplied objects into the truncated basis</span>
+        <span class="k">if</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">objs_transformed</span> <span class="o">=</span> <span class="n">_sop_or_state_to_truncated_basis</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">index_map</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">objs_transformed</span></div>
+
+
+<div class="viewcode-block" id="Basis.truncate_by_zte">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_zte">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_zte</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">L</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+        <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">objs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Truncate the basis using Zero-Track Elimination (ZTE).</span>
+
+<span class="sd">        The method follows:</span>
+
+<span class="sd">        I. Kuprov (2008):</span>
+<span class="sd">        https://doi.org/10.1016/j.jmr.2008.08.008</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        L : ndarray or csc_array</span>
+<span class="sd">            Liouvillian superoperator</span>
+<span class="sd">        rho : ndarray or csc_array</span>
+<span class="sd">            Initial spin density vector.</span>
+<span class="sd">        *objs : tuple of {ndarray, csc_array}</span>
+<span class="sd">            Superoperators or state vectors defined in the original basis. These</span>
+<span class="sd">            will be converted into the truncated basis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        objs_transformed : tuple of {ndarray, csc_array}</span>
+<span class="sd">            Liouvillian, density vector, and any additional supplied objects in</span>
+<span class="sd">            the truncated basis. The transformed `L` and `rho` are always</span>
+<span class="sd">            included in the returned tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Truncating the basis set using zero-track elimination (ZTE)...&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Copy the initial state vector for the ZTE propagation loop</span>
+        <span class="n">rho_zte</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho_zte</span><span class="p">):</span>
+            <span class="n">rho_zte</span> <span class="o">=</span> <span class="n">rho_zte</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+        <span class="c1"># Track the largest absolute value reached by each basis state</span>
+        <span class="n">rho_max</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rho_zte</span><span class="p">)</span>
+
+        <span class="c1"># Rescale the ZTE threshold for the current state-vector amplitude</span>
+        <span class="n">zero_zte</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_zte</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">rho_max</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Normalised zero value of ZTE: </span><span class="si">{</span><span class="n">zero_zte</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set the propagation step from the Liouvillian column norm</span>
+        <span class="n">time_step</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">norm_1</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;col&#39;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time-step of ZTE set to: </span><span class="si">{</span><span class="n">time_step</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2"> s&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Estimate the number of basis states required initially</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rho_max</span> <span class="o">&gt;</span> <span class="n">zero_zte</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Basis dimension before ZTE: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Propagate until the required basis dimension stops changing</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">nsteps_zte</span><span class="p">):</span>
+
+            <span class="c1"># Propagate the state and update the recorded maxima</span>
+            <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+                <span class="n">rho_zte</span> <span class="o">=</span> <span class="n">expm_vec</span><span class="p">(</span><span class="n">L</span><span class="o">*</span><span class="n">time_step</span><span class="p">,</span> <span class="n">rho_zte</span><span class="p">,</span> <span class="n">zero_zte</span><span class="p">)</span>
+                <span class="n">rho_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">rho_max</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rho_zte</span><span class="p">))</span>
+
+            <span class="c1"># Re-estimate the required basis dimension after propagation</span>
+            <span class="n">dim_curr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rho_max</span> <span class="o">&gt;</span> <span class="n">zero_zte</span><span class="p">)</span>
+            <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ZTE step </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">nsteps_zte</span><span class="si">}</span><span class="s2">. &quot;</span>
+                   <span class="sa">f</span><span class="s2">&quot;Current basis dimension: </span><span class="si">{</span><span class="n">dim_curr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Stop once the required dimension has converged</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="n">dim_curr</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Basis dimension converged. Finishing ZTE.&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dim</span> <span class="o">=</span> <span class="n">dim_curr</span>
+
+        <span class="c1"># Extract the indices of the basis states that survive ZTE</span>
+        <span class="n">index_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rho_max</span> <span class="o">&gt;</span> <span class="n">zero_zte</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Replace the basis with the ZTE-truncated basis</span>
+        <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">index_map</span><span class="p">]</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension after ZTE: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Transform the Liouvillian, the state, and any extra objects</span>
+        <span class="n">all_objs</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="o">*</span><span class="n">objs</span><span class="p">)</span>
+        <span class="n">objs_transformed</span> <span class="o">=</span> <span class="n">_sop_or_state_to_truncated_basis</span><span class="p">(</span><span class="n">all_objs</span><span class="p">,</span> <span class="n">index_map</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">objs_transformed</span></div>
+
+
+<div class="viewcode-block" id="Basis.truncate_by_indices">
+<a class="viewcode-back" href="../../../internals.html#spinguin._core._basis.Basis.truncate_by_indices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_by_indices</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">objs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+        <span class="kc">None</span>
+        <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+        <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+        <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Truncate the basis to a user-specified set of indices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        indices : list or ndarray</span>
+<span class="sd">            List of indices that specify which basis states to retain.</span>
+<span class="sd">        *objs : tuple of {ndarray, csc_array}</span>
+<span class="sd">            Superoperators or state vectors defined in the original basis. These</span>
+<span class="sd">            will be converted into the truncated basis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        objs_transformed : ndarray or csc_array or tuple or None</span>
+<span class="sd">            Transformed objects in the truncated basis. If no objects are</span>
+<span class="sd">            supplied, `None` is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Truncating the basis set based on supplied indices...&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original dimension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Sort the retained indices to preserve the original basis order</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+        <span class="c1"># Replace the basis with the selected basis states</span>
+        <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension after truncation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Transform any supplied objects into the truncated basis</span>
+        <span class="k">if</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">objs_transformed</span> <span class="o">=</span> <span class="n">_sop_or_state_to_truncated_basis</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">objs_transformed</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_basis</span><span class="p">(</span><span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">max_spin_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a Liouville-space basis set.</span>
+
+<span class="sd">    The basis is spanned by Kronecker products of irreducible spherical tensor</span>
+<span class="sd">    operators up to the specified maximum spin order. The products themselves</span>
+<span class="sd">    are not formed explicitly. Instead, each product operator (basis state) </span>
+<span class="sd">    is represented as a tuple of integer indices.</span>
+
+<span class="sd">    Each integer corresponds to a spherical tensor operator of rank `l` and</span>
+<span class="sd">    projection `q` through the relation </span>
+<span class="sd">    </span>
+<span class="sd">    `N = l^2 + l - q`. </span>
+<span class="sd">    </span>
+<span class="sd">    The indexing scheme follows:</span>
+
+<span class="sd">    Hogben, H. J., Hore, P. J., &amp; Kuprov, I. (2010):</span>
+<span class="sd">    https://doi.org/10.1063/1.3398146</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A one-dimensional array that specifies the spin quantum numbers of the</span>
+<span class="sd">        spin system.</span>
+<span class="sd">    max_spin_order : int</span>
+<span class="sd">        Defines the maximum spin order that is considered in the basis set.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        Basis array whose rows store the integer-encoded product operators.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the total number of spins in the system</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Reject invalid maximum spin-order values</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_spin_order</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;max_spin_order&#39; must be an integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_spin_order</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;max_spin_order&#39; must be at least 1.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_spin_order</span> <span class="o">&gt;</span> <span class="n">nspins</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;max_spin_order&#39; must not be larger than number of &quot;</span>
+            <span class="s2">&quot;spins in the system.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Enumerate all subsystems with the requested spin order.</span>
+    <span class="n">subsystems</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">),</span> <span class="n">max_spin_order</span><span class="p">)</span>
+
+    <span class="c1"># Collect unique basis states in insertion order</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Build the full basis by visiting each subsystem in turn</span>
+    <span class="n">state_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">subsystem</span> <span class="ow">in</span> <span class="n">subsystems</span><span class="p">:</span>
+
+        <span class="c1"># Generate the basis states available within the current subsystem</span>
+        <span class="n">sub_basis</span> <span class="o">=</span> <span class="n">_make_subsystem_basis</span><span class="p">(</span><span class="n">spins</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">)</span>
+
+        <span class="c1"># Insert each new state once into the global basis dictionary</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">sub_basis</span><span class="p">:</span>
+
+            <span class="c1"># Skip duplicate states that have already been encountered</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">:</span>
+                <span class="n">basis</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_index</span>
+                <span class="n">state_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Convert the collected basis states to a NumPy array</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="c1"># Sort the basis so that the first spin index changes slowest.</span>
+    <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">basis</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))))</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">basis</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_subsystem_basis</span><span class="p">(</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">subsystem</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the basis set for a given subsystem.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A one-dimensional array that specifies the spin quantum numbers of the</span>
+<span class="sd">        spin system.</span>
+<span class="sd">    subsystem : tuple</span>
+<span class="sd">        Indices of the spins involved in the subsystem.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    basis : Iterator of tuple of int</span>
+<span class="sd">        Iterator over the basis set for the given subsystem, represented as</span>
+<span class="sd">        tuples.</span>
+
+<span class="sd">        For example, identity operator and z-operator for the 3rd spin:</span>
+
+<span class="sd">        `[(0, 0, 0), (0, 0, 2), ...]`</span>
+
+<span class="sd">        where the number 2 comes from the indexing scheme `N = l^2 + l - q` </span>
+<span class="sd">        for the T_{1, 0} operator of the 3rd spin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the system size and spin multiplicities</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">mults</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Assemble the available operator labels for each spin position</span>
+    <span class="n">operators</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Visit each spin position in the full spin system</span>
+    <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspins</span><span class="p">):</span>
+
+        <span class="c1"># Add all local operators for spins that belong to the subsystem</span>
+        <span class="k">if</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">subsystem</span><span class="p">:</span>
+
+            <span class="c1"># Include the full single-spin operator basis at this position</span>
+            <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">mults</span><span class="p">[</span><span class="n">spin</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="c1"># Otherwise keep only the identity operator at this position</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Form all tensor-product combinations for the subsystem basis</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">operators</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">basis</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sop_or_state_to_truncated_basis</span><span class="p">(</span>
+    <span class="n">objs</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+    <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert superoperators or state vectors into a truncated basis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    objs : tuple</span>
+<span class="sd">        Tuple of superoperators and state vectors to be converted to the</span>
+<span class="sd">        truncated basis.</span>
+<span class="sd">    index_map : list</span>
+<span class="sd">        An index map between the original basis and the truncated basis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    objs_transformed : ndarray or csc_array or tuple</span>
+<span class="sd">        Transformed object, or a tuple of transformed objects if multiple input</span>
+<span class="sd">        objects are supplied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">status</span><span class="p">(</span>
+        <span class="s2">&quot;Converting superoperators and/or state vectors to the truncated &quot;</span>
+        <span class="s2">&quot;basis...&quot;</span>
+    <span class="p">)</span>
+    <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Transform each supplied object according to whether it is a state or SOP</span>
+    <span class="n">objs_transformed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">:</span>
+
+        <span class="c1"># Retain only the selected coefficients for state vectors.</span>
+        <span class="k">if</span> <span class="n">isvector</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="n">objs_transformed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">index_map</span><span class="p">])</span>
+
+        <span class="c1"># Retain only the selected rows and columns for superoperators.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">objs_transformed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">index_map</span><span class="p">,</span> <span class="n">index_map</span><span class="p">)])</span>
+
+    <span class="c1"># Match the return shape to the number of supplied input objects</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">objs_transformed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">objs_transformed</span> <span class="o">=</span> <span class="n">objs_transformed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">objs_transformed</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">objs_transformed</span><span class="p">)</span>
+
+    <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">time_start</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">objs_transformed</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

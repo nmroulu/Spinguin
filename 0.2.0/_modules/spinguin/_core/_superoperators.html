@@ -1,0 +1,1029 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spinguin._core._superoperators &#8212; Spinguin 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_superoperators';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/spinguin_logo.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Spinguin documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics.html">Basics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../spinguin.html">Spinguin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">Sequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Internal classes</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for spinguin._core._superoperators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Liouville-space superoperator utilities for spin-dynamics simulations.</span>
+
+<span class="sd">This module provides helper functions for constructing superoperators in the</span>
+<span class="sd">full basis or in a truncated basis.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Reference the SpinSystem class for type checking.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
+
+<span class="c1"># Imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core</span><span class="w"> </span><span class="kn">import</span> <span class="n">_la</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">op_T</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">idx_to_lq</span><span class="p">,</span> <span class="n">parse_operator_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">require</span>
+
+
+
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">structure_coefficients</span><span class="p">(</span>
+    <span class="n">spin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the normalised structure coefficients for a single spin.</span>
+
+<span class="sd">    The construction follows the calculation of f_ijk in Eq. 24 of the</span>
+<span class="sd">    following paper (normalisation is not explicitly shown in the paper):</span>
+
+<span class="sd">    https://doi.org/10.1063/1.3398146</span>
+
+<span class="sd">    This function is called frequently and is cached for high performance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin : float</span>
+<span class="sd">        Spin quantum number.</span>
+<span class="sd">    side : {&#39;left&#39;, &#39;right&#39;}</span>
+<span class="sd">        Specifies the side of the multiplication.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    c : ndarray</span>
+<span class="sd">        A 3-dimensional array containing all the structure coefficients.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the Hilbert-space multiplicity of the spin.</span>
+    <span class="n">mult</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">spin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Allocate the structure-coefficient array.</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mult</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">mult</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">mult</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Loop over the left basis index `j`.</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mult</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+
+        <span class="c1"># Construct the spherical tensor corresponding to index `j`.</span>
+        <span class="n">l_j</span><span class="p">,</span> <span class="n">q_j</span> <span class="o">=</span> <span class="n">idx_to_lq</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="n">T_j</span> <span class="o">=</span> <span class="n">op_T</span><span class="p">(</span><span class="n">spin</span><span class="p">,</span> <span class="n">l_j</span><span class="p">,</span> <span class="n">q_j</span><span class="p">)</span>
+
+        <span class="c1"># Loop over the right basis index `k`.</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mult</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+
+            <span class="c1"># Construct the spherical tensor corresponding to index `k`.</span>
+            <span class="n">l_k</span><span class="p">,</span> <span class="n">q_k</span> <span class="o">=</span> <span class="n">idx_to_lq</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">T_k</span> <span class="o">=</span> <span class="n">op_T</span><span class="p">(</span><span class="n">spin</span><span class="p">,</span> <span class="n">l_k</span><span class="p">,</span> <span class="n">q_k</span><span class="p">)</span>
+
+            <span class="c1"># Compute the normalisation factor of the product operator basis.</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">T_j</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T_j</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">T_k</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T_k</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Loop over the output basis index `i`.</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mult</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+
+                <span class="c1"># Construct the spherical tensor corresponding to index `i`.</span>
+                <span class="n">l_i</span><span class="p">,</span> <span class="n">q_i</span> <span class="o">=</span> <span class="n">idx_to_lq</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">T_i</span> <span class="o">=</span> <span class="n">op_T</span><span class="p">(</span><span class="n">spin</span><span class="p">,</span> <span class="n">l_i</span><span class="p">,</span> <span class="n">q_i</span><span class="p">)</span>
+
+                <span class="c1"># Evaluate the structure coefficient for the selected side.</span>
+                <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+                    <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">T_j</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T_i</span> <span class="o">@</span> <span class="n">T_k</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">/</span> <span class="n">norm</span>
+                <span class="k">elif</span> <span class="n">side</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+                    <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">T_j</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T_k</span> <span class="o">@</span> <span class="n">T_i</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">/</span> <span class="n">norm</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;The &#39;side&#39; parameter must be either &#39;left&#39; or &#39;right&#39;.&quot;</span>
+                    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">c</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_E</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the unit superoperator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dim : int</span>
+<span class="sd">        Dimension of the basis set.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    unit : ndarray or csc_array</span>
+<span class="sd">        An array corresponding to the unit operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Construct the identity in the configured storage format.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye_array</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">unit</span>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">4096</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sop_prod</span><span class="p">(</span>
+    <span class="n">op_def_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">],</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a product superoperator from hashable byte representations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    op_def_bytes : bytes</span>
+<span class="sd">        Product-operator definition encoded as bytes.</span>
+<span class="sd">    basis_bytes : bytes</span>
+<span class="sd">        Basis-set array encoded as bytes.</span>
+<span class="sd">    spins_bytes : bytes</span>
+<span class="sd">        Spin-quantum-number array encoded as bytes.</span>
+<span class="sd">    side : {&#39;comm&#39;, &#39;left&#39;, &#39;right&#39;}</span>
+<span class="sd">        Type of superoperator to be constructed.</span>
+<span class="sd">    sparse : bool, default=True</span>
+<span class="sd">        If ``True``, return a sparse CSC array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray or csc_array</span>
+<span class="sd">        Requested product superoperator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Construct the commutation superoperator as left minus right action.</span>
+    <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">_sop_prod</span><span class="p">(</span><span class="n">op_def_bytes</span><span class="p">,</span> <span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spins_bytes</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+            <span class="o">-</span> <span class="n">_sop_prod</span><span class="p">(</span><span class="n">op_def_bytes</span><span class="p">,</span> <span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spins_bytes</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Recover the hashed operator definition, basis, and spin array.</span>
+    <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">op_def_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">op_def</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spins_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Determine the basis dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Identify the spins that participate in the product operator.</span>
+    <span class="n">idx_spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">op_def</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Obtain the basis with only participating spins</span>
+    <span class="n">sub_basis</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[:,</span> <span class="n">idx_spins</span><span class="p">]</span>
+
+    <span class="c1"># Return the unit operator if no spins participate in the operator</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_spins</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sop_E</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="c1"># Collect non-zero structure coefficients and their indices.</span>
+    <span class="n">c_jk</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Gather the single-spin structure coefficients for each active spin.</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">idx_spins</span><span class="p">:</span>
+
+        <span class="c1"># Get the structure coefficients for the current spin</span>
+        <span class="n">c_jk_n</span> <span class="o">=</span> <span class="n">structure_coefficients</span><span class="p">(</span><span class="n">spins</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">side</span><span class="p">)[</span><span class="n">op_def</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="c1"># Identify the non-zero entries of the coefficient matrix.</span>
+        <span class="n">nonzero_jk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">c_jk_n</span><span class="p">)</span>
+
+        <span class="c1"># Append the coefficients and the associated basis indices.</span>
+        <span class="n">c_jk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_jk_n</span><span class="p">[</span><span class="n">nonzero_jk</span><span class="p">])</span>
+        <span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nonzero_jk</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nonzero_jk</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Form all products of structure coefficients and their basis labels.</span>
+    <span class="n">prod_c_jk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">c_jk_n</span><span class="p">)</span> <span class="k">for</span> <span class="n">c_jk_n</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">c_jk</span><span class="p">)])</span>
+    <span class="n">op_defs_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">j</span><span class="p">)))</span>
+    <span class="n">op_defs_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">k</span><span class="p">)))</span>
+
+    <span class="c1"># Collect the matrix values and indices of the final superoperator.</span>
+    <span class="n">sop_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sop_j</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sop_k</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Match each active-spin operator pair against the full basis.</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prod_c_jk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+
+        <span class="c1"># Find basis rows matching the current active-spin operator labels.</span>
+        <span class="n">j_op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sub_basis</span> <span class="o">==</span> <span class="n">op_defs_j</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">k_op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sub_basis</span> <span class="o">==</span> <span class="n">op_defs_k</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Continue only if both operator definitions are present in the basis.</span>
+        <span class="k">if</span> <span class="n">j_op</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">k_op</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># Recover the full operator definitions from the basis.</span>
+            <span class="n">op_def_j</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[</span><span class="n">j_op</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">op_def_k</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[</span><span class="n">k_op</span><span class="p">,</span> <span class="p">:]</span>
+
+            <span class="c1"># Retain only the spectator-spin parts of the operator labels.</span>
+            <span class="n">op_def_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">op_def_j</span><span class="p">,</span> <span class="n">idx_spins</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">op_def_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">op_def_k</span><span class="p">,</span> <span class="n">idx_spins</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Spectator-spin definitions must match for a non-zero matrix</span>
+            <span class="c1"># element.</span>
+            <span class="n">ind_j</span><span class="p">,</span> <span class="n">ind_k</span> <span class="o">=</span> <span class="n">_la</span><span class="o">.</span><span class="n">find_common_rows</span><span class="p">(</span><span class="n">op_def_j</span><span class="p">,</span> <span class="n">op_def_k</span><span class="p">)</span>
+
+            <span class="c1"># Append the contributions and the corresponding matrix indices.</span>
+            <span class="n">sop_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod_c_jk</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ind_j</span><span class="p">)))</span>
+            <span class="n">sop_j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j_op</span><span class="p">[</span><span class="n">ind_j</span><span class="p">])</span>
+            <span class="n">sop_k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_op</span><span class="p">[</span><span class="n">ind_k</span><span class="p">])</span>
+
+    <span class="c1"># Special case: superoperator does not contain any non-zero elements</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sop_vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>    
+        <span class="c1"># Concatenate the collected sparse matrix data.</span>
+        <span class="c1"># 32-bit integer indices are sufficient here.</span>
+        <span class="n">sop_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">sop_j</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">sop_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">sop_k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">sop_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">sop_vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+        <span class="c1"># Construct the sparse superoperator matrix.</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">sop_vals</span><span class="p">,</span> <span class="p">(</span><span class="n">sop_j</span><span class="p">,</span> <span class="n">sop_k</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sop</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">sop</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_prod</span><span class="p">(</span>
+    <span class="n">op_def</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a product superoperator from an operator definition array.</span>
+
+<span class="sd">    This function is called frequently and is cached for high performance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    op_def : ndarray</span>
+<span class="sd">        Specifies the product operator to be generated. For example,</span>
+<span class="sd">        input ``np.array([0, 2, 0, 1])`` generates ``E*T_10*E*T_11``. The</span>
+<span class="sd">        indices for each spin are given by ``N = l^2 + l - q``, where ``l`` is</span>
+<span class="sd">        the rank and ``q`` is the projection.</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A two-dimensional array where each row contains integers that represent</span>
+<span class="sd">        a Kronecker product of single-spin irreducible spherical tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A sequence of floats describing the spin quantum numbers of the spin</span>
+<span class="sd">        system.</span>
+<span class="sd">    side : {&#39;comm&#39;, &#39;left&#39;, &#39;right&#39;}</span>
+<span class="sd">        Specifies the type of superoperator:</span>
+<span class="sd">        - &#39;comm&#39; -- commutation superoperator</span>
+<span class="sd">        - &#39;left&#39; -- left superoperator</span>
+<span class="sd">        - &#39;right&#39; -- right superoperator</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sop : ndarray or csc_array</span>
+<span class="sd">        Superoperator defined by ``op_def``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the inputs to byte strings so they can be cached.</span>
+    <span class="n">op_def_bytes</span> <span class="o">=</span> <span class="n">op_def</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="n">basis_bytes</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="n">spins_bytes</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+    <span class="c1"># Build the cached superoperator and return an independent copy.</span>
+    <span class="n">sop</span> <span class="o">=</span> <span class="n">_sop_prod</span><span class="p">(</span>
+        <span class="n">op_def_bytes</span><span class="p">,</span>
+        <span class="n">basis_bytes</span><span class="p">,</span>
+        <span class="n">spins_bytes</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">sop</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_from_string</span><span class="p">(</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">basis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a superoperator from an operator string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operator : str</span>
+<span class="sd">        Defines the superoperator to be generated. The operator string must</span>
+<span class="sd">        follow the rules below:</span>
+
+<span class="sd">        - Cartesian or ladder operator at specific index or for all spins::</span>
+
+<span class="sd">            operator = &quot;I(component, index)&quot;</span>
+<span class="sd">            operator = &quot;I(component)&quot;</span>
+
+<span class="sd">        - Spherical tensor operator at specific index or for all spins::</span>
+
+<span class="sd">            operator = &quot;T(l, q, index)&quot;</span>
+<span class="sd">            operator = &quot;T(l, q)&quot;</span>
+
+<span class="sd">        - Product operators::</span>
+
+<span class="sd">            operator = &quot;I(component1, index1) * I(component2, index2)&quot;</span>
+
+<span class="sd">        - Sum of operators::</span>
+
+<span class="sd">            operator = &quot;I(component1, index1) + I(component2, index2)&quot;</span>
+
+<span class="sd">        - Unit operators are ignored in the input. These are identical::</span>
+
+<span class="sd">            operator = &quot;E * I(component, index)&quot;</span>
+<span class="sd">            operator = &quot;I(component, index)&quot;</span>
+
+<span class="sd">        Special case: An empty ``operator`` string is considered as the unit</span>
+<span class="sd">        operator.</span>
+
+<span class="sd">        Whitespace will be ignored in the input.</span>
+
+<span class="sd">        Note that indexing starts from 0.</span>
+<span class="sd">    basis : ndarray</span>
+<span class="sd">        A two-dimensional array where each row contains integers that represent</span>
+<span class="sd">        a Kronecker product of single-spin irreducible spherical tensors.</span>
+<span class="sd">    spins : ndarray</span>
+<span class="sd">        A sequence of floats describing the spin quantum numbers of the spin</span>
+<span class="sd">        system.</span>
+<span class="sd">    side : {&#39;comm&#39;, &#39;left&#39;, &#39;right&#39;}</span>
+<span class="sd">        Specifies the type of superoperator:</span>
+<span class="sd">        - &#39;comm&#39; -- commutation superoperator</span>
+<span class="sd">        - &#39;left&#39; -- left superoperator</span>
+<span class="sd">        - &#39;right&#39; -- right superoperator</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sop : ndarray or csc_array</span>
+<span class="sd">        The requested superoperator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Determine the basis dimension and the number of spins.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Allocate the output superoperator.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">:</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Parse the operator string into operator definitions and coefficients.</span>
+    <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+
+    <span class="c1"># Accumulate the contribution of each term in the operator string.</span>
+    <span class="k">for</span> <span class="n">op_def</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">):</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop</span> <span class="o">+</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sop</span>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">4096</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sop_T_coupled</span><span class="p">(</span>
+    <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">spins_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spin_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spin_2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sparse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a coupled spherical-tensor superoperator from cached inputs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis_bytes : bytes</span>
+<span class="sd">        Basis-set array encoded as bytes.</span>
+<span class="sd">    spins_bytes : bytes</span>
+<span class="sd">        Spin-quantum-number array encoded as bytes.</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Rank of the coupled tensor.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Projection of the coupled tensor.</span>
+<span class="sd">    spin_1 : int</span>
+<span class="sd">        Index of the first spin.</span>
+<span class="sd">    spin_2 : int or None, default=None</span>
+<span class="sd">        Index of the second spin, or ``None`` for a linear interaction.</span>
+<span class="sd">    sparse : bool, default=True</span>
+<span class="sd">        If ``True``, return a sparse CSC array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray or csc_array</span>
+<span class="sd">        Coupled spherical-tensor superoperator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Recover the spin and basis arrays from their cached byte representation.</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spins_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Determine the basis dimension and the number of spins.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nspins</span> <span class="o">=</span> <span class="n">spins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Allocate the coupled superoperator.</span>
+    <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Handle bilinear two-spin interactions.</span>
+    <span class="k">if</span> <span class="n">spin_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Sum over the projections of the coupled rank-1 tensors.</span>
+        <span class="k">for</span> <span class="n">q1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">q2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+
+                <span class="c1"># Build the product-operator definition of the coupled term.</span>
+                <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                <span class="n">op_def</span><span class="p">[</span><span class="n">spin_1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">q1</span>
+                <span class="n">op_def</span><span class="p">[</span><span class="n">spin_2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">q2</span>
+
+                <span class="c1"># Combine the term using the angular-momentum coupling rule.</span>
+                <span class="n">sop</span> <span class="o">+=</span> <span class="n">_la</span><span class="o">.</span><span class="n">CG_coeff</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">*</span> \
+                       <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Handle linear single-spin interactions.</span>
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="c1"># Only the `(1, 0)` component of the second tensor contributes.</span>
+        <span class="k">for</span> <span class="n">q1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+
+            <span class="c1"># Build the product-operator definition of the coupled term.</span>
+            <span class="n">op_def</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">op_def</span><span class="p">[</span><span class="n">spin_1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">q1</span>
+
+            <span class="c1"># Combine the term using the angular-momentum coupling rule.</span>
+            <span class="n">sop</span> <span class="o">+=</span> <span class="n">_la</span><span class="o">.</span><span class="n">CG_coeff</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">*</span> \
+                   <span class="n">sop_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sop</span>
+
+
+<div class="viewcode-block" id="sop_T_coupled">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.sop_T_coupled">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_T_coupled</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spin_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spin_2</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the coupled spherical-tensor superoperator of rank `l`.</span>
+
+<span class="sd">    This function is frequently called and is cached for high performance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        The spin system for which the coupled T superoperator is going to be</span>
+<span class="sd">        generated.</span>
+<span class="sd">    l : int</span>
+<span class="sd">        Rank of the coupled operator.</span>
+<span class="sd">    q : int</span>
+<span class="sd">        Projection of the coupled operator.</span>
+<span class="sd">    spin_1 : int</span>
+<span class="sd">        Index of the first spin.</span>
+<span class="sd">    spin_2 : int, default=None</span>
+<span class="sd">        Index of the second spin. Leave empty for linear single-spin</span>
+<span class="sd">        interactions (e.g., shielding).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sop : ndarray or csc_array</span>
+<span class="sd">        Coupled spherical-tensor superoperator of rank ``l`` and</span>
+<span class="sd">        projection ``q``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">&quot;basis.basis&quot;</span><span class="p">,</span> <span class="s2">&quot;constructing coupled superoperators&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert the basis and spin arrays to bytes for caching.</span>
+    <span class="n">basis_bytes</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="n">spins_bytes</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+    <span class="c1"># Build the cached superoperator and return an independent copy.</span>
+    <span class="n">sop</span> <span class="o">=</span> <span class="n">_sop_T_coupled</span><span class="p">(</span>
+        <span class="n">basis_bytes</span><span class="p">,</span>
+        <span class="n">spins_bytes</span><span class="p">,</span>
+        <span class="n">l</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">,</span>
+        <span class="n">spin_1</span><span class="p">,</span>
+        <span class="n">spin_2</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_superoperator</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">sop</span></div>
+
+
+
+<div class="viewcode-block" id="superoperator">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.superoperator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">superoperator</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;comm&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a Liouville-space superoperator for a spin system.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        Spin system for which the superoperator is going to be generated.</span>
+<span class="sd">    operator : str or list or ndarray or tuple</span>
+<span class="sd">        Defines the superoperator to be generated.</span>
+
+<span class="sd">        **The operator can be defined with two different approaches:**</span>
+
+<span class="sd">        - A string. Example: ``I(z, 0) * I(z, 1)``.</span>
+<span class="sd">        - An array of integers. Example: ``[2, 2]``.</span>
+
+<span class="sd">        **The operator string must follow the rules below:**</span>
+
+<span class="sd">        - Cartesian or ladder operator at specific index or for all spins::</span>
+
+<span class="sd">            operator = &quot;I(component, index)&quot;</span>
+<span class="sd">            operator = &quot;I(component)&quot;</span>
+
+<span class="sd">        - Spherical tensor operator at specific index or for all spins::</span>
+
+<span class="sd">            operator = &quot;T(l, q, index)&quot;</span>
+<span class="sd">            operator = &quot;T(l, q)&quot;</span>
+
+<span class="sd">        - Product operators::</span>
+
+<span class="sd">            operator = &quot;I(component1, index1) * I(component2, index2)&quot;</span>
+
+<span class="sd">        - Sum of operators::</span>
+
+<span class="sd">            operator = &quot;I(component1, index1) + I(component2, index2)&quot;</span>
+
+<span class="sd">        - Unit operators are ignored in the input. These are identical::</span>
+
+<span class="sd">            operator = &quot;E * I(component, index)&quot;</span>
+<span class="sd">            operator = &quot;I(component, index)&quot;</span>
+
+<span class="sd">        Special case: An empty ``operator`` string is considered as the unit</span>
+<span class="sd">        operator.</span>
+
+<span class="sd">        Whitespace will be ignored in the input.</span>
+
+<span class="sd">        **The array input is defined as follows:**</span>
+
+<span class="sd">        - Each spin is given an integer *N* in the array.</span>
+<span class="sd">        - Each integer corresponds to a spherical tensor operator of rank *l*</span>
+<span class="sd">          and projection *q*: *N* = *l*^2 + *l* - *q*</span>
+
+<span class="sd">        Note that indexing starts from 0.</span>
+
+<span class="sd">    side : {&#39;comm&#39;, &#39;left&#39;, &#39;right&#39;}</span>
+<span class="sd">        The type of superoperator:</span>
+<span class="sd">        - &#39;comm&#39; -- commutation superoperator (default)</span>
+<span class="sd">        - &#39;left&#39; -- left superoperator</span>
+<span class="sd">        - &#39;right&#39; -- right superoperator</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sop : ndarray or csc_array</span>
+<span class="sd">        An array representing the requested superoperator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">&quot;basis.basis&quot;</span><span class="p">,</span> <span class="s2">&quot;constructing superoperators&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Construct the superoperator from a string specification.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_from_string</span><span class="p">(</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">basis</span><span class="o">=</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
+            <span class="n">spins</span><span class="o">=</span><span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">side</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Construct the superoperator from an explicit operator-definition array.</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+
+        <span class="c1"># Convert the input to a NumPy array.</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+
+        <span class="c1"># Validate the dimensionality and length of the operator definition.</span>
+        <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input array must be one-dimensional.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Length of the operator array must match the number of spins.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Construct the requested product superoperator.</span>
+        <span class="n">sop</span> <span class="o">=</span> <span class="n">sop_prod</span><span class="p">(</span>
+            <span class="n">op_def</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">basis</span><span class="o">=</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
+            <span class="n">spins</span><span class="o">=</span><span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">side</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Reject unsupported operator specifications.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid input type for &#39;operator&#39;. Use a string or a 1D array.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sop</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_structure_coefficients</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clear the cache of ``structure_coefficients()``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Clear the cached structure-coefficients.</span>
+    <span class="n">structure_coefficients</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_sop_prod</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clear the cache of ``_sop_prod()``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Clear the cached product superoperators.</span>
+    <span class="n">_sop_prod</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_sop_T_coupled</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clear the cache of ``_sop_T_coupled()``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Clear the cached coupled spherical-tensor superoperators.</span>
+    <span class="n">_sop_T_coupled</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Joni Eronen, Perttu Hilla
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
