@@ -21,6 +21,7 @@ from ._hamiltonian import hamiltonian
 from ._interactions import (
     dd_coupling_tensors,
     dd_constants,
+    Q_intr_tensors,
 )
 from ._liouvillian import liouvillian
 from ._molecule import Molecule
@@ -98,6 +99,7 @@ __all__ = [
     # interactions
     "dd_coupling_tensors",
     "dd_constants",
+    "Q_intr_tensors",
 
     # liouvillian
     "liouvillian",

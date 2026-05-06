@@ -111,41 +111,34 @@ def _Q_prefactor(S: float, Q_moment: float) -> float:
     return Q_prefactor
 
 # TODO: Confirm the sign convention of the quadrupolar interaction.
-def Q_intr_tensors(
-    efg: np.ndarray,
-    spins: np.ndarray,
-    quad: np.ndarray,
-) -> np.ndarray:
+def Q_intr_tensors(spin_system: SpinSystem) -> np.ndarray:
     """
     Calculate quadrupolar interaction tensors for a spin system.
 
     Parameters
     ----------
-    efg : ndarray
-        A 3-dimensional array specifying the electric field gradient tensors.
-        Must be given in atomic units.
-    spins : ndarray
-        A 1-dimensional array specifying the spin quantum numbers for each
-        spin.
-    quad : ndarray
-        A 1-dimensional array specifying the quadrupolar moments. Must be given
-        in the units of m^2.
+    spin_system: SpinSystem
+        Spin system for which the quadrupolar interaction tensors are to be
+        calculated.
         
     Returns
     -------
-    Q_tensors : ndarray
-        Quadrupolar interaction tensors.
+    ndarray
+        Quadrupolar interaction tensors for each nucleus in the spin system.
     """
 
     # Convert the electric field gradients from atomic units to ``V/m^2``.
-    Q_tensors = -9.7173624292e21 * efg
+    efg = -9.7173624292e21 * spin_system.efg
 
     # Evaluate the quadrupolar coupling prefactors for all spins.
+    spins = spin_system.spins
+    quad = spin_system.quad
     Q_prefactors = [_Q_prefactor(S, Q) for S, Q in zip(spins, quad)]
 
-    # Scale each tensor by the corresponding quadrupolar prefactor.
-    for i, val in enumerate(Q_prefactors):
-        Q_tensors[i] *= val
+    # Calculate the quadrupolar interaction tensors
+    Q_tensors = np.zeros_like(efg)
+    for i in range(spin_system.nspins):
+        Q_tensors[i] = Q_prefactors[i] * efg[i]
 
     return Q_tensors
 

@@ -715,11 +715,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     if spin_system.efg is not None:
 
         # Get the quadrupolar interaction tensors.
-        q_tensors = Q_intr_tensors(
-            spin_system.efg,
-            spin_system.spins,
-            spin_system.quad
-        )
+        q_tensors = Q_intr_tensors(spin_system)
 
         # Add all non-negligible quadrupolar interaction components.
         for spin_1 in range(spin_system.nspins):
