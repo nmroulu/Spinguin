@@ -22,6 +22,7 @@ from spinguin._core._hide_prints import HidePrints
 from spinguin._core._interactions import (
     dd_coupling_tensors,
     Q_intr_tensors,
+    resonance_frequencies,
     shielding_intr_tensors,
 )
 from spinguin._core._la import (
@@ -913,6 +914,9 @@ def _sop_R_sr2k(
         for i, spin in enumerate(spin_system.spins)
         if spin > 0.5
     ]
+
+    # Calculate the resonance frequencies for all spins.
+    omegas = resonance_frequencies(spin_system, zeeman=True, cs=True)
     
     # Accumulate SR2K contributions from each quadrupolar nucleus.
     for quad in quadrupolar:
@@ -938,12 +942,8 @@ def _sop_R_sr2k(
         T1 = np.real(T1)
         T2 = np.real(T2)
 
-        # Evaluate the Larmor frequency of the quadrupolar nucleus.
-        omega_quad = (
-            spin_system.gammas[quad]
-            * parameters.magnetic_field
-            * (1 + spin_system.chemical_shifts[quad] * 1e-6)
-        )
+        # Get the resonance frequency of the quadrupolar nucleus.
+        omega_quad = omegas[quad]
 
         # Get the spin quantum number of the quadrupolar nucleus.
         S = spin_system.spins[quad]
@@ -954,12 +954,8 @@ def _sop_R_sr2k(
             # Skip the degenerate case of identical gyromagnetic ratios.
             if not spin_system.gammas[quad] == gamma:
 
-                # Evaluate the Larmor frequency of the target spin.
-                omega_target = (
-                    spin_system.gammas[target]
-                    * parameters.magnetic_field
-                    * (1 + spin_system.chemical_shifts[target] * 1e-6)
-                )
+                # Get the resonance frequency of the target spin.
+                omega_target = omegas[target]
 
                 # Convert the scalar coupling from hertz to rad/s.
                 J = 2 * np.pi * spin_system.J_couplings[quad][target]
