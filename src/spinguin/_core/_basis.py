@@ -28,6 +28,7 @@ import scipy.sparse as sp
 from scipy.sparse.csgraph import connected_components
 
 from spinguin._core._hide_prints import HidePrints
+from spinguin._core._interactions import dd_constant
 from spinguin._core._la import (
     arraylike_to_tuple,
     eliminate_small,
@@ -38,7 +39,6 @@ from spinguin._core._la import (
 from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 from spinguin._core._utils import coherence_order
-from spinguin._core._relaxation import dd_constant
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem

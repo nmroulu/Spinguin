@@ -6,8 +6,8 @@ import unittest
 
 import numpy as np
 
+from spinguin._core._interactions import dd_constant
 from spinguin._core._nmr_isotopes import ISOTOPES
-from spinguin._core._relaxation import dd_constant
 
 
 class TestInteractions(unittest.TestCase):
