@@ -9,13 +9,11 @@ interaction tensors and different motional models.
 from __future__ import annotations
 
 import time
-import warnings
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
-from scipy.optimize import fsolve
 
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._hide_prints import HidePrints
