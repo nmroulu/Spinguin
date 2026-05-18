@@ -437,47 +437,55 @@ def operator(
     """
     Generate a Hilbert-space operator for a spin system.
 
-    The operator may be specified using either of the two approaches below:
-
-    - A string. Example: ``I(z,0) * I(z,1)``.
-    - A one-dimensional array of integers. Example: ``[2, 2]``.
-
-    For string input, the supported syntax is as follows:
-
-    - Cartesian and ladder operators: ``I(component,index)`` or
-      ``I(component)``, with indexing starting from zero. Examples:
-
-      - ``I(x,4)`` creates the x-operator for the spin at index 4.
-      - ``I(x)`` creates the x-operator for all spins.
-
-    - Spherical tensor operators: ``T(l,q,index)`` or ``T(l,q)``.
-      Examples:
-
-      - ``T(1,-1,3)`` creates the operator with ``l=1`` and ``q=-1`` for
-        the spin at index 3.
-      - ``T(1,-1)`` creates the operator with ``l=1`` and ``q=-1`` for all
-        spins.
-
-    - Product operators are written with ``*`` between the single-spin
-      operators, for example ``I(z,0) * I(z,1)``.
-    - Sums of operators are written with ``+`` between the terms, for
-      example ``I(x,0) + I(x,1)``.
-    - Unit operators are ignored in the input, so ``E * I(z,1)`` and
-      ``I(z,1)`` are interpreted identically.
-
-    An empty operator string is interpreted as the unit operator, and all
-    whitespace is ignored.
-
-    For array input, each spin is assigned an integer ``N`` that corresponds
-    to a single-spin irreducible spherical tensor with rank ``l`` and
-    projection ``q`` according to ``N = l**2 + l - q``.
-
     Parameters
     ----------
     spin_system : SpinSystem
-        Spin system for which the operator is generated.
+        Spin system for which the operator is going to be generated.
     operator : str or list or ndarray or tuple
-        Operator specification in string or array form.
+        Defines the operator to be generated.
+
+        **The operator can be defined with two different approaches:**
+
+        - A string. Example: ``I(z, 0) * I(z, 1)``.
+        - An array of integers. Example: ``[2, 2]``.
+
+        **The operator string must follow the rules below:**
+
+        - Cartesian or ladder operator at specific index or for all spins::
+
+            operator = "I(component, index)"
+            operator = "I(component)"
+
+        - Spherical tensor operator at specific index or for all spins::
+
+            operator = "T(l, q, index)"
+            operator = "T(l, q)"
+
+        - Product operators::
+
+            operator = "I(component1, index1) * I(component2, index2)"
+
+        - Sum of operators::
+
+            operator = "I(component1, index1) + I(component2, index2)"
+
+        - Unit operators are ignored in the input. These are identical::
+
+            operator = "E * I(component, index)"
+            operator = "I(component, index)"
+
+        Special case: An empty ``operator`` string is considered as the unit
+        operator.
+
+        Whitespace will be ignored in the input.
+
+        **The array input is defined as follows:**
+
+        - Each spin is given an integer *N* in the array.
+        - Each integer corresponds to a spherical tensor operator of rank *l*
+          and projection *q*: *N* = *l*^2 + *l* - *q*
+
+        Note that indexing starts from 0.
 
     Returns
     -------
