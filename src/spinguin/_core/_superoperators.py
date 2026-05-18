@@ -312,7 +312,7 @@ def sop_prod(
     return sop
 
 
-def sop_from_string(
+def _sop_from_string(
     operator: str,
     basis: np.ndarray,
     spins: np.ndarray,
@@ -607,7 +607,7 @@ def superoperator(
 
     # Construct the superoperator from a string specification.
     if isinstance(operator, str):
-        sop = sop_from_string(
+        sop = _sop_from_string(
             operator=operator,
             basis=spin_system.basis.basis,
             spins=spin_system.spins,
