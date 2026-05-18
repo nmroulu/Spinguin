@@ -313,9 +313,8 @@ def sop_prod(
 
 
 def _sop_from_string(
+    spin_system: SpinSystem,
     operator: str,
-    basis: np.ndarray,
-    spins: np.ndarray,
     side: Literal["comm", "left", "right"],
 ) -> np.ndarray | sp.csc_array:
     """
@@ -323,6 +322,8 @@ def _sop_from_string(
 
     Parameters
     ----------
+    spin_system : SpinSystem
+        The spin system for which the superoperator is going to be generated.
     operator : str
         Defines the superoperator to be generated. The operator string must
         follow the rules below:
@@ -356,12 +357,6 @@ def _sop_from_string(
         Whitespace will be ignored in the input.
 
         Note that indexing starts from 0.
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    spins : ndarray
-        A sequence of floats describing the spin quantum numbers of the spin
-        system.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator
@@ -374,22 +369,24 @@ def _sop_from_string(
         The requested superoperator.
     """
 
-    # Determine the basis dimension and the number of spins.
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
-
     # Allocate the output superoperator.
+    dim = spin_system.basis.dim
     if parameters.sparse_superoperator:
         sop = sp.csc_array((dim, dim), dtype=complex)
     else:
         sop = np.zeros((dim, dim), dtype=complex)
 
     # Parse the operator string into operator definitions and coefficients.
-    op_defs, coeffs = parse_operator_string(operator, nspins)
+    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
 
     # Accumulate the contribution of each term in the operator string.
     for op_def, coeff in zip(op_defs, coeffs):
-        sop = sop + coeff * sop_prod(op_def, basis, spins, side)
+        sop = sop + coeff * sop_prod(
+            op_def=op_def,
+            basis=spin_system.basis.basis,
+            spins=spin_system.spins,
+            side=side
+        )
 
     return sop
 
@@ -608,9 +605,8 @@ def superoperator(
     # Construct the superoperator from a string specification.
     if isinstance(operator, str):
         sop = _sop_from_string(
+            spin_system=spin_system,
             operator=operator,
-            basis=spin_system.basis.basis,
-            spins=spin_system.spins,
             side=side,
         )
 
