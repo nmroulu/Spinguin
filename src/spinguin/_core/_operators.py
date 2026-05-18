@@ -367,42 +367,61 @@ def op_prod(
 
 
 def _op_from_string(
-    spins: np.ndarray,
-    operator: str,
+    spin_system: SpinSystem,
+    operator: str | list | np.ndarray | tuple,
 ) -> np.ndarray | sp.csc_array:
     """
     Generate a Hilbert-space operator from a user-defined operator string.
 
     Parameters
     ----------
-    spins : ndarray
-        One-dimensional array of spin quantum numbers.
-    operator : str
-        Operator definition string. The supported syntax is summarised below:
+    spin_system : SpinSystem
+        Spin system for which the operator is going to be generated.
+    operator : str or list or ndarray or tuple
+        Defines the operator to be generated.
 
-        - Cartesian and ladder operators: ``I(component,index)`` or
-          ``I(component)``. Examples:
+        **The operator can be defined with two different approaches:**
 
-          - ``I(x,4)`` creates the x-operator for the spin at index 4.
-          - ``I(x)`` creates the x-operator for all spins.
+        - A string. Example: ``I(z, 0) * I(z, 1)``.
+        - An array of integers. Example: ``[2, 2]``.
 
-        - Spherical tensor operators: ``T(l,q,index)`` or ``T(l,q)``.
-          Examples:
+        **The operator string must follow the rules below:**
 
-          - ``T(1,-1,3)`` creates the operator with ``l=1`` and ``q=-1``
-            for the spin at index 3.
-          - ``T(1,-1)`` creates the operator with ``l=1`` and ``q=-1``
-            for all spins.
+        - Cartesian or ladder operator at specific index or for all spins::
 
-        - Product operators are written with ``*`` between the single-spin
-          operators, for example ``I(z,0) * I(z,1)``.
-        - Sums of operators are written with ``+`` between the terms, for
-          example ``I(x,0) + I(x,1)``.
-        - Unit operators are ignored in the input, so ``E * I(z,1)`` and
-          ``I(z,1)`` are interpreted identically.
+            operator = "I(component, index)"
+            operator = "I(component)"
 
-        An empty string is interpreted as the unit operator. Whitespace is
-        ignored, and indexing starts from zero.
+        - Spherical tensor operator at specific index or for all spins::
+
+            operator = "T(l, q, index)"
+            operator = "T(l, q)"
+
+        - Product operators::
+
+            operator = "I(component1, index1) * I(component2, index2)"
+
+        - Sum of operators::
+
+            operator = "I(component1, index1) + I(component2, index2)"
+
+        - Unit operators are ignored in the input. These are identical::
+
+            operator = "E * I(component, index)"
+            operator = "I(component, index)"
+
+        Special case: An empty ``operator`` string is considered as the unit
+        operator.
+
+        Whitespace will be ignored in the input.
+
+        **The array input is defined as follows:**
+
+        - Each spin is given an integer *N* in the array.
+        - Each integer corresponds to a spherical tensor operator of rank *l*
+          and projection *q*: *N* = *l*^2 + *l* - *q*
+
+        Note that indexing starts from 0.
 
     Returns
     -------
@@ -410,22 +429,19 @@ def _op_from_string(
         Requested operator in Hilbert space.
     """
 
-    # Extract the size of the spin system from the spin quantum numbers.
-    nspins = spins.shape[0]
-    dim = int(np.prod(2 * spins + 1))
-
     # Allocate the operator accumulator in the configured storage format.
+    dim = int(np.prod(spin_system.mults))
     if parameters.sparse_operator:
         op = sp.csc_array((dim, dim), dtype=float)
     else:
         op = np.zeros((dim, dim), dtype=float)
 
     # Parse the string into basis operators and their prefactors.
-    op_defs, coeffs = parse_operator_string(operator, nspins)
+    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
 
     # Sum the parsed contributions into the final operator.
     for op_def, coeff in zip(op_defs, coeffs):
-        op = op + coeff * op_prod(op_def, spins, include_unit=True)
+        op = op + coeff * op_prod(op_def, spin_system.spins, include_unit=True)
 
     return op
 
@@ -501,10 +517,7 @@ def operator(
 
     # Parse string input with the operator-string helper.
     if isinstance(operator, str):
-        op = _op_from_string(
-            spins=spin_system.spins,
-            operator=operator,
-        )
+        op = _op_from_string(spin_system, operator)
 
     # Parse array-like input as an explicit product-operator definition.
     elif isinstance(operator, (list, np.ndarray, tuple)):
