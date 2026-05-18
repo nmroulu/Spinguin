@@ -6,11 +6,16 @@ This module provides small helper functions for irreducible-tensor index
 conversions, operator-string parsing, and simple basis-set analysis.
 """
 
+from __future__ import annotations
+
 import math
 import re
+from typing import TYPE_CHECKING
 
 import numpy as np
 
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
 
 def _extract_arguments(operator_term: str) -> list[str]:
     """
@@ -249,14 +254,16 @@ def lq_to_idx(l: int, q: int) -> int:
 
 
 def parse_operator_string(
+    spin_system: SpinSystem,
     operator: str,
-    nspins: int,
 ) -> tuple[list[np.ndarray], list[complex]]:
     """
     Parse an operator string into basis definitions and coefficients.
 
     Parameters
     ----------
+    spin_system : SpinSystem
+        The spin system for which the operator is going to be parsed.
     operator : str
         The operator string must follow the rules below:
 
@@ -289,8 +296,6 @@ def parse_operator_string(
         Whitespace is ignored in the input.
 
         Note that indexing starts from 0.
-    nspins : int
-        Number of spins in the system.
 
     Returns
     -------
@@ -311,7 +316,7 @@ def parse_operator_string(
 
     # Return the unit operator when the input string is empty.
     if operator == "":
-        op_def = np.array([0 for _ in range(nspins)])
+        op_def = np.array([0 for _ in range(spin_system.nspins)])
         coeff = 1
         op_defs.append(op_def)
         coeffs.append(coeff)
@@ -324,14 +329,14 @@ def parse_operator_string(
     prod_ops = [
         expanded_op
         for prod_op in prod_ops
-        for expanded_op in _expand_global_operator(prod_op, nspins)
+        for expanded_op in _expand_global_operator(prod_op, spin_system.nspins)
     ]
 
     # Process each product operator separately.
     for prod_op in prod_ops:
 
         # Start from the all-unit product operator.
-        op = np.array(["E" for _ in range(nspins)], dtype="<U10")
+        op = np.array(["E" for _ in range(spin_system.nspins)], dtype="<U10")
 
         # Split the product into single-spin operator terms.
         op_terms = prod_op.split('*')

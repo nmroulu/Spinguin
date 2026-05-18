@@ -159,7 +159,7 @@ def state(
     rho = empty_state(spin_system)
 
     # Parse the operator string into basis definitions and coefficients.
-    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
 
     # Map the operator definitions to basis indices.
     idxs = [spin_system.basis.indexof(op_def) for op_def in op_defs]

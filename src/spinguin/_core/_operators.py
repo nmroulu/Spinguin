@@ -437,7 +437,7 @@ def _op_from_string(
         op = np.zeros((dim, dim), dtype=float)
 
     # Parse the string into basis operators and their prefactors.
-    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
 
     # Sum the parsed contributions into the final operator.
     for op_def, coeff in zip(op_defs, coeffs):

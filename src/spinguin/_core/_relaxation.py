@@ -909,8 +909,8 @@ def _sop_R_sr2k(
 
         # Find the operator definitions of the longitudinal and transverse
         # states
-        op_def_z, _ = parse_operator_string(f"I(z, {quad})", spin_system.nspins)
-        op_def_p, _ = parse_operator_string(f"I(+, {quad})", spin_system.nspins)
+        op_def_z, _ = parse_operator_string(spin_system, f"I(z, {quad})")
+        op_def_p, _ = parse_operator_string(spin_system, f"I(+, {quad})")
 
         # Convert operator definitions to tuples for dictionary lookup.
         op_def_z = tuple(op_def_z[0])

@@ -377,7 +377,7 @@ def _sop_from_string(
         sop = np.zeros((dim, dim), dtype=complex)
 
     # Parse the operator string into operator definitions and coefficients.
-    op_defs, coeffs = parse_operator_string(operator, spin_system.nspins)
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
 
     # Accumulate the contribution of each term in the operator string.
     for op_def, coeff in zip(op_defs, coeffs):
