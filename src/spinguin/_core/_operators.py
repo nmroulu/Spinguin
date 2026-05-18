@@ -366,7 +366,7 @@ def op_prod(
     return op
 
 
-def op_from_string(
+def _op_from_string(
     spins: np.ndarray,
     operator: str,
 ) -> np.ndarray | sp.csc_array:
@@ -493,7 +493,7 @@ def operator(
 
     # Parse string input with the operator-string helper.
     if isinstance(operator, str):
-        op = op_from_string(
+        op = _op_from_string(
             spins=spin_system.spins,
             operator=operator,
         )
