@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+- Accept input of the form "I(component, isotope)" for constructing operators,
+superoperators and states.
+
 ## 0.2.0
 - Re-write the documentation using AI.
 - Dynamic frequency shifts are included by default.
