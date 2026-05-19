@@ -325,15 +325,19 @@ def _sop_from_string(
         Defines the superoperator to be generated. The operator string must
         follow the rules below:
 
-        - Cartesian or ladder operator at specific index or for all spins::
+        - Cartesian or ladder operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "I(component, index)"
             operator = "I(component)"
+            operator = "I(component, isotope)"
 
-        - Spherical tensor operator at specific index or for all spins::
+        - Spherical tensor operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "T(l, q, index)"
             operator = "T(l, q)"
+            operator = "T(l, q, isotope)"
 
         - Product operators::
 
@@ -548,15 +552,19 @@ def superoperator(
 
         **The operator string must follow the rules below:**
 
-        - Cartesian or ladder operator at specific index or for all spins::
+        - Cartesian or ladder operator at specific index, for all spins, or for
+          all spins of the same isotope::
 
             operator = "I(component, index)"
             operator = "I(component)"
+            operator = "I(component, isotope)"
 
-        - Spherical tensor operator at specific index or for all spins::
+        - Spherical tensor operator at specific index or for all spins, or for
+          all spins of the same isotope::
 
             operator = "T(l, q, index)"
             operator = "T(l, q)"
+            operator = "T(l, q, isotope)"
 
         - Product operators::
 
