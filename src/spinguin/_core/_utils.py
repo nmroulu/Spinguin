@@ -83,22 +83,26 @@ def _split_sum_terms(operator: str) -> list[str]:
     return prod_ops
 
 
-def _expand_global_operator(prod_op: str, nspins: int) -> list[str]:
+def _expand_global_operator(spin_system: SpinSystem, prod_op: str) -> list[str]:
     """
-    Expand single-term shorthand operators that apply to all spins.
+    Expand single-term shorthand operators that apply to all spins, or for
+    all spins of the same isotope.
 
     Parameters
     ----------
+    spin_system : SpinSystem
+        The spin system for which the operator is going to be parsed.
     prod_op : str
         One additive operator term.
-    nspins : int
-        Number of spins in the system.
 
     Returns
     -------
     list of str
         Expanded operator terms.
     """
+
+    # Obtain the number of spins
+    nspins = spin_system.nspins
 
     # Keep product operators unchanged because they are already explicit.
     if '*' in prod_op:
@@ -108,20 +112,49 @@ def _expand_global_operator(prod_op: str, nspins: int) -> list[str]:
     if prod_op[0] == 'E':
         return [prod_op]
 
-    # Expand Cartesian and ladder operators that omit the spin index.
+    # Expand Cartesian and ladder operators
     if prod_op[0] == 'I':
         component = _extract_arguments(prod_op)
+        
+        # Format: I(component) -> applies to all spins
         if len(component) == 1:
             return [f"I({component[0]},{index})" for index in range(nspins)]
+            
+        # Format: I(component, isotope) -> all spins of same isotope
+        if len(component) == 2 and not component[1].isdigit():
+            isotope = component[1]
+            return [
+                f"I({component[0]},{index})" 
+                for index in range(nspins) 
+                if spin_system.isotopes[index] == isotope
+            ]
+        
+        # Format: I(component, index) -> return unchanged
         return [prod_op]
 
-    # Expand spherical tensor operators that omit the spin index.
+    # Expand spherical tensor operators
     if prod_op[0] == 'T':
         component = _extract_arguments(prod_op)
+        
+        # Format: T(l, q) -> applies to all spins
         if len(component) == 2:
             l = component[0]
             q = component[1]
             return [f"T({l},{q},{index})" for index in range(nspins)]
+            
+        # Format: T(l, q, isotope) -> all spins of same isotope
+        if len(component) == 3 and not component[2].isdigit():
+            l = component[0]
+            q = component[1]
+            isotope = component[2]
+            
+            return [
+                f"T({l},{q},{index})" 
+                for index in range(nspins) 
+                if spin_system.isotopes[index] == isotope
+            ]
+                
+        # Format: T(l, q, index) -> return unchanged
         return [prod_op]
 
     # Reject unsupported operator expressions explicitly.
@@ -267,15 +300,19 @@ def parse_operator_string(
     operator : str
         The operator string must follow the rules below:
 
-        - Cartesian or ladder operator at specific index or for all spins::
+        - Cartesian or ladder operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "I(component, index)"
             operator = "I(component)"
+            operator = "I(component, isotope)"
 
-        - Spherical tensor operator at specific index or for all spins::
+        - Spherical tensor operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "T(l, q, index)"
             operator = "T(l, q)"
+            operator = "T(l, q, isotope)"
 
         - Product operators::
 
@@ -329,7 +366,7 @@ def parse_operator_string(
     prod_ops = [
         expanded_op
         for prod_op in prod_ops
-        for expanded_op in _expand_global_operator(prod_op, spin_system.nspins)
+        for expanded_op in _expand_global_operator(spin_system, prod_op)
     ]
 
     # Process each product operator separately.

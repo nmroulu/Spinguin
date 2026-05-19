@@ -300,6 +300,74 @@ class TestOperators(unittest.TestCase):
             _test_sum_operators()
 
 
+    def test_operator_3(self):
+        """
+        Test the construction of operators using input like "I(x, 1H)".
+        """
+        # Reset parameters to defaults
+        sg.parameters.default()
+
+        # Create a test spin system.
+        ss = build_spin_system(["1H", "14N", "1H"], 3)
+
+        def _test_operator_3() -> None:
+            # Collect operators to be tested
+            cases = []
+
+            # Cartesian + ladder
+            for oper in ["x", "y", "z", "+", "-"]:
+                inputs = {}
+                refs = {}
+                inputs["1H"] = f"I({oper}, 1H)"
+                inputs["14N"] = f"I({oper}, 14N)"
+                inputs["1H_14N"] = f"I({oper}, 1H) + I({oper}, 14N)"
+                refs["1H"] = [f"I({oper}, {0})", f"I({oper}, {2})"]
+                refs["14N"] = [f"I({oper}, {1})"]
+                refs["1H_14N"] = [
+                    f"I({oper}, {0})",
+                    f"I({oper}, {1})",
+                    f"I({oper}, {2})"
+                ]
+                cases.append((inputs, refs))
+
+            # Spherical tensor
+            for l in range(2):
+                for q in range(-l, l+1):
+                    inputs = {}
+                    refs = {}
+                    inputs["1H"] = f"T({l}, {q}, 1H)"
+                    inputs["14N"] = f"T({l}, {q}, 14N)"
+                    inputs["1H_14N"] = f"T({l}, {q}, 1H) + T({l}, {q}, 14N)"
+                    refs["1H"] = [f"T({l}, {q}, {0})", f"T({l}, {q}, {2})"]
+                    refs["14N"] = [f"T({l}, {q}, {1})"]
+                    refs["1H_14N"] = [
+                        f"T({l}, {q}, {0})",
+                        f"T({l}, {q}, {1})",
+                        f"T({l}, {q}, {2})"
+                    ]
+                    cases.append((inputs, refs))
+
+            for inputs, refs in cases:
+                for key in inputs:
+                    oper = sg.operator(ss, inputs[key])
+                    oper_ref = sum(
+                        sg.operator(ss, refs[key][i])
+                        for i in range(len(refs[key]))
+                    )
+
+                    if sg.parameters.sparse_operator:
+                        oper = oper.toarray()
+                        oper_ref = oper_ref.toarray()
+
+                    # Compare the parsed operator with the reference operator.
+                    self.assertTrue(np.allclose(oper, oper_ref))
+
+        # Try operator inputs with dense and sparse backends.
+        for sparse in [False, True]:
+            sg.parameters.sparse_operator = sparse
+            _test_operator_3()
+
+
     def test_op_T_coupled(self):
         """
         Test the coupled spherical tensor operators for two spins using the
