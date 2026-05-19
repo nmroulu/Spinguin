@@ -28,9 +28,6 @@ from spinguin._core._utils import idx_to_lq, parse_operator_string
 from spinguin._core._validation import require
 
 
-
-
-
 @lru_cache(maxsize=16)
 def structure_coefficients(
     spin: float,
