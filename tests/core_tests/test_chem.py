@@ -257,3 +257,280 @@ class TestChemMethods(unittest.TestCase):
 
                 # Compare the permuted and reference states.
                 self.assertTrue(np.allclose(rho_ref, rho_perm))
+
+    def test_elementary_reaction_1(self):
+        """
+        Test the elementary reaction with an association reaction.
+        """
+
+        # Reset the global parameters before the test.
+        sg.parameters.default()
+
+        # Build the subsystem and combined-system test objects.
+        ss1 = sg.SpinSystem(["1H", "1H"])
+        ss2 = sg.SpinSystem(["1H", "1H", "1H"])
+        ss3 = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H"])
+
+        # Define the spin map between the subsystems and the full system.
+        spin_map = {
+            (0, 0): (0, 0),
+            (0, 1): (0, 2),
+            (1, 0): (0, 1),
+            (1, 1): (0, 3),
+            (1, 2): (0, 4)
+        }
+
+        # Test the elementary reaction for dense and sparse backends
+        for sparse in [False, True]:
+            sg.parameters.sparse_state = sparse
+
+            # Test with various spin order combinations
+            for max_spin_order1 in range(1, ss1.nspins+1):
+                ss1.basis.max_spin_order = max_spin_order1
+                ss1.basis.build()
+
+                for max_spin_order2 in range(1, ss2.nspins+1):
+                    ss2.basis.max_spin_order = max_spin_order2
+                    ss2.basis.build()
+
+                    for max_spin_order3 in range(2, ss3.nspins+1):
+                        ss3.basis.max_spin_order = max_spin_order3
+                        ss3.basis.build()
+
+                        # Create the input and reference states
+                        rho1 = sg.alpha_state(ss1, 0)
+                        rho2 = sg.alpha_state(ss2, 0)
+                        rho3_ref = sg.triplet_plus_state(ss3, 0, 1)
+
+                        # Perform association using elementary reaction
+                        rho3 = sg.elementary_reaction(
+                            reactant_systems=[ss1, ss2],
+                            product_systems=ss3,
+                            reactant_rhos=[rho1, rho2],
+                            spin_map=spin_map
+                        )
+
+                        # Convert to dense before comparison if required
+                        if sparse:
+                            rho3 = rho3.toarray()
+                            rho3_ref = rho3_ref.toarray()
+
+                        # Compare
+                        self.assertTrue(np.allclose(rho3, rho3_ref))
+
+    def test_elementary_reaction_2(self):
+        """
+        Test the elementary reaction with a dissociation reaction.
+        """
+
+        # Reset the global parameters before the test.
+        sg.parameters.default()
+
+        # Build the subsystem and combined-system test objects.
+        ss1 = sg.SpinSystem(["1H", "1H"])
+        ss2 = sg.SpinSystem(["1H", "1H", "1H"])
+        ss3 = sg.SpinSystem(["1H", "1H", "1H", "1H", "1H"])
+
+        # Define the spin map between the subsystems and the full system.
+        spin_map = {
+            (0, 0): (0, 0),
+            (0, 2): (0, 1),
+            (0, 1): (1, 0),
+            (0, 3): (1, 1),
+            (0, 4): (1, 2)
+        }
+
+        # Test the elementary reaction for dense and sparse backends
+        for sparse in [False, True]:
+            sg.parameters.sparse_state = sparse
+
+            # Test with various spin order combinations
+            for max_spin_order1 in range(1, ss1.nspins+1):
+                ss1.basis.max_spin_order = max_spin_order1
+                ss1.basis.build()
+
+                for max_spin_order2 in range(1, ss2.nspins+1):
+                    ss2.basis.max_spin_order = max_spin_order2
+                    ss2.basis.build()
+
+                    for max_spin_order3 in range(2, ss3.nspins+1):
+                        ss3.basis.max_spin_order = max_spin_order3
+                        ss3.basis.build()
+
+                        # Create the input and reference states
+                        rho1_ref = sg.alpha_state(ss1, 0)
+                        rho2_ref = sg.alpha_state(ss2, 0)
+                        rho3 = sg.triplet_plus_state(ss3, 0, 1)
+
+                        # Perform dissociation using elementary reaction
+                        rho1, rho2 = sg.elementary_reaction(
+                            reactant_systems=ss3,
+                            product_systems=[ss1, ss2],
+                            reactant_rhos=rho3,
+                            spin_map=spin_map
+                        )
+
+                        # Convert to dense before comparison if required
+                        if sparse:
+                            rho1 = rho1.toarray()
+                            rho2 = rho2.toarray()
+                            rho1_ref = rho1_ref.toarray()
+                            rho2_ref = rho2_ref.toarray()
+
+                        # Compare
+                        self.assertTrue(np.allclose(rho1, rho1_ref))
+                        self.assertTrue(np.allclose(rho2, rho2_ref))
+
+    def test_elementary_reaction_3(self):
+        """
+        Test the elementary reaction with a reaction A + B -> C + D.
+        """
+
+        # Reset the global parameters before the test
+        sg.parameters.default()
+
+        # Build the subsystem and combined-system test objects
+        ss1 = sg.SpinSystem(["1H", "1H"])
+        ss2 = sg.SpinSystem(["1H", "1H", "1H"])
+        ss3 = sg.SpinSystem(["1H", "1H", "1H"])
+        ss4 = sg.SpinSystem(["1H", "1H"])
+
+        # Define the spin map
+        spin_map = {
+            (0, 0): (0, 0),  # A(0) -> C(0)
+            (0, 1): (1, 0),  # A(1) -> D(0)
+            (1, 0): (0, 1),  # B(0) -> C(1)
+            (1, 1): (0, 2),  # B(1) -> C(2)
+            (1, 2): (1, 1)   # B(2) -> D(1)
+        }
+
+        # Test the elementary reaction for dense and sparse backends
+        for sparse in [False, True]:
+            sg.parameters.sparse_state = sparse
+
+            # Test with various spin order combinations.
+            for max_spin_order1 in range(1, ss1.nspins+1):
+                ss1.basis.max_spin_order = max_spin_order1
+                ss1.basis.build()
+
+                for max_spin_order2 in range(2, ss2.nspins+1):
+                    ss2.basis.max_spin_order = max_spin_order2
+                    ss2.basis.build()
+
+                    for max_spin_order3 in range(2, ss3.nspins+1):
+                        ss3.basis.max_spin_order = max_spin_order3
+                        ss3.basis.build()
+
+                        for max_spin_order4 in range(1, ss4.nspins+1):
+                            ss4.basis.max_spin_order = max_spin_order4
+                            ss4.basis.build()
+
+                            # Create the input states
+                            rho1 = sg.alpha_state(ss1, 0)
+                            rho2 = sg.triplet_plus_state(ss2, 0, 2)
+
+                            # Create the reference product states
+                            rho3_ref = sg.triplet_plus_state(ss3, 0, 1)
+                            rho4_ref = sg.alpha_state(ss4, 1)
+
+                            # Perform elementary reaction
+                            rho3, rho4 = sg.elementary_reaction(
+                                reactant_systems=[ss1, ss2],
+                                product_systems=[ss3, ss4],
+                                reactant_rhos=[rho1, rho2],
+                                spin_map=spin_map
+                            )
+
+                            # Convert to dense before comparison if required
+                            if sparse:
+                                rho3 = rho3.toarray()
+                                rho4 = rho4.toarray()
+                                rho3_ref = rho3_ref.toarray()
+                                rho4_ref = rho4_ref.toarray()
+
+                            # Compare
+                            self.assertTrue(np.allclose(rho3, rho3_ref))
+                            self.assertTrue(np.allclose(rho4, rho4_ref))
+
+    def test_elementary_reaction_4(self):
+        """
+        Test the elementary reaction error handling for invalid mappings.
+        """
+        # Reset the global parameters before the test.
+        sg.parameters.default()
+
+        # Build spin systems for the tests
+        ss1 = build_spin_system(["1H", "1H"], 2)
+        ss2 = build_spin_system(["1H", "1H", "1H"], 3)
+
+        # Create an example input state
+        rho1 = sg.alpha_state(ss1, 0)
+
+        # Error messages to be expected
+        spin_mismatch = "The number of reactant and product spins do not match"
+        missing_reactants = "Not every reactant spin is mapped."
+        missing_prodcuts = "Not every product spin is mapped."
+
+        # Spin map with spin count mismatch
+        spin_map= {
+            (0, 0): (0, 0),
+            (0, 1): (0, 1)
+        }
+        with self.assertRaisesRegex(ValueError, spin_mismatch):
+            sg.elementary_reaction(
+                reactant_systems=ss1,
+                product_systems=ss2,
+                reactant_rhos=rho1,
+                spin_map=spin_map
+            )
+
+        # Missing reactant spin in the map
+        spin_map = {
+            (0, 0): (0, 0)
+        }
+        with self.assertRaisesRegex(ValueError, missing_reactants):
+            sg.elementary_reaction(
+                reactant_systems=ss1,
+                product_systems=ss1,
+                reactant_rhos=rho1,
+                spin_map=spin_map
+            )
+
+        # Reactant spin is out of bounds
+        spin_map = {
+            (0, 0): (0, 0),
+            (0, 2): (0, 1)
+        }
+        with self.assertRaisesRegex(ValueError, missing_reactants):
+            sg.elementary_reaction(
+                reactant_systems=ss1,
+                product_systems=ss1,
+                reactant_rhos=rho1,
+                spin_map=spin_map
+            )
+
+        # Overlap in product spins
+        spin_map = {
+            (0, 0): (0, 0),
+            (0, 1): (0, 0)
+        }
+        with self.assertRaisesRegex(ValueError, missing_prodcuts):
+            sg.elementary_reaction(
+                reactant_systems=ss1,
+                product_systems=ss1,
+                reactant_rhos=rho1,
+                spin_map=spin_map
+            )
+
+        # Product spin is out of bounds
+        spin_map = {
+            (0, 0): (0, 0),
+            (0, 1): (0, 2)
+        }
+        with self.assertRaisesRegex(ValueError, missing_prodcuts):
+            sg.elementary_reaction(
+                reactant_systems=ss1,
+                product_systems=ss1,
+                reactant_rhos=rho1,
+                spin_map=spin_map
+            )

@@ -15,6 +15,7 @@ from ._cache import clear_cache
 from ._chem import (
     associate,
     dissociate,
+    elementary_reaction,
     permute_spins,
 )
 from ._hamiltonian import hamiltonian
@@ -93,6 +94,7 @@ __all__ = [
     # chem
     "associate",
     "dissociate",
+    "elementary_reaction",
     "permute_spins",
 
     # hamiltonian

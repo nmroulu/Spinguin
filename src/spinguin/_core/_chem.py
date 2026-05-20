@@ -96,6 +96,55 @@ def _validate_permutation_spin_map(
             "length of spin_map does not match the number of spins in "
             "the system or spin_map contains incorrect or overlapping indices"
         )
+    
+def _validate_elementary_reaction_spin_map(
+    reactant_systems : list[SpinSystem],
+    product_systems : list[SpinSystem],
+    spin_map : dict[tuple[int, int], tuple[int, int]]
+) -> None:
+    """
+    Validate a spin map used for an elementary reaction.
+
+    Parameters
+    ----------
+    reactant_systems : list of SpinSystem
+        List of spin systems for the reactants.
+    product_systems : list of SpinSystem
+        List of spin systems for the products.
+    spin_map : dict of tuple of int to tuple of int
+        Dictionary that maps the nuclear spins in the reactants to those in the
+        products.    
+    """
+    # Define the exact sets of spins that must exist
+    expected_reactants = set(
+        (r, rs)
+        for r, ss in enumerate(reactant_systems)
+        for rs in range(ss.nspins)
+    )
+    expected_products = set(
+        (p, ps)
+        for p, ss in enumerate(product_systems)
+        for ps in range(ss.nspins)
+    )
+
+    # Extract the user-provided mappings
+    mapped_reactants = set(spin_map.keys())
+    mapped_products_list = list(spin_map.values())
+    mapped_products_set = set(mapped_products_list)
+
+    # Check that the number of spins in the product and in the reactant match
+    if len(expected_reactants) != len(expected_products):
+        raise ValueError(
+            "The number of reactant and product spins do not match"
+        )
+
+    # Check that every reactant spin is mapped
+    if mapped_reactants != expected_reactants:
+        raise ValueError("Not every reactant spin is mapped.")
+
+    # Check that every product spin receives a map
+    if mapped_products_set != expected_products:
+        raise ValueError("Not every product spin is mapped.")
 
 
 ###############################################################################
@@ -636,6 +685,146 @@ def permute_spins(
         rho = rho.toarray()
 
     return rho
+
+
+def elementary_reaction(
+    reactant_systems: SpinSystem | list[SpinSystem],
+    product_systems: SpinSystem | list[SpinSystem],
+    reactant_rhos: np.ndarray | sp.csc_array | list[np.ndarray | sp.csc_array],
+    spin_map: dict[tuple[int, int], tuple[int, int]]
+) -> np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array, ...]:
+    """
+    Perform an elementary chemical reaction that transforms reactant states into
+    product states. If the reaction has stoichiometric coefficients greater than
+    one, specify the same reactant or product system multiple times.
+
+    Parameters
+    ----------
+    reactant_systems : SpinSystem or list of SpinSystem
+        List of spin systems for the reactants.
+    product_systems : SpinSystem or list of SpinSystem
+        List of spin systems for the products.
+    reactant_rhos : ndarray or csc_array or list of ndarray or csc_array
+        List of state vectors for the reactants. The order should match that of
+        `reactant_systems`.
+    spin_map : dict of tuple of int to tuple of int
+        Dictionary that maps the nuclear spins in the reactants to those in the
+        products. The keys are tuples specifying the reactant index and the
+        reactant spin index, and the values are identical tuples for the
+        products. Example::
+
+        spin_map = {
+            (0, 0): (0, 0),  # reactant 0, spin 0 -> product 0, spin 0
+            (0, 1): (1, 0),  # reactant 0, spin 1 -> product 1, spin 0
+            (1, 0): (0, 1),  # reactant 1, spin 0 -> product 0, spin 1
+            (1, 1): (1, 1),  # reactant 1, spin 1 -> product 1, spin 1
+        }
+
+    Returns
+    -------
+    rhos : ndarray or csc_array or tuple of ndarray or csc_array
+        State vectors for the products. The order matches that of
+        `product_systems`. A single state vector is returned if there is only
+        one product system, and a tuple of state vectors is returned if there
+        are multiple product systems.
+    """
+    # Convert single systems and states to lists for uniform processing
+    if not isinstance(reactant_systems, (list, tuple)):
+        reactant_systems = [reactant_systems]
+    if not isinstance(product_systems, (list, tuple)):
+        product_systems = [product_systems]
+    if not isinstance(reactant_rhos, (list, tuple)):
+        reactant_rhos = [reactant_rhos]
+
+    # Validate that the spin map is consistent
+    _validate_elementary_reaction_spin_map(
+        reactant_systems,
+        product_systems,
+        spin_map
+    )
+
+    # Re-organise the spin map to 
+    # (reactant, product) : [(reactant spin, product spin), ...]
+    reorganised_map = {
+        (r, p): []
+        for r in range(len(reactant_systems))
+        for p in range(len(product_systems))
+    }
+    for r in range(len(reactant_systems)):
+        for rs in range(reactant_systems[r].nspins):
+            p, ps = spin_map[(r, rs)]
+            reorganised_map[(r, p)].append((rs, ps))
+
+    # Create lookup tables for the basis sets
+    lookups = [
+        {tuple(row): idx for idx, row in enumerate(ss.basis.basis)}
+        for ss in reactant_systems
+    ]
+
+    # Generate index maps from reactant basis sets to the product basis sets
+    idx_maps = []
+    for p, product_system in enumerate(product_systems):
+        idx_map_p = []
+        idx_map_rp = []
+
+        # For every product basis state, search for matching reactant states
+        for idx_p, op_def_p in enumerate(product_system.basis.basis):
+            idx_rp = []
+            for r, reactant_system in enumerate(reactant_systems):
+                
+                # Build the corresponding reactant basis state 
+                op_def_r = np.zeros(reactant_system.nspins, dtype=int)
+                for rs, ps in reorganised_map[(r, p)]:
+                    op_def_r[rs] = op_def_p[ps]
+                op_def_r = tuple(op_def_r)
+
+                # Store the index if the state exists
+                if op_def_r in lookups[r]:
+                    idx_rp.append(lookups[r][op_def_r])
+                
+                # Otherwise skip the current product basis state completely
+                else:
+                    break
+
+            # Store the mapping if all reactant states were found
+            else:
+                idx_map_p.append(idx_p)
+                idx_map_rp.append(idx_rp)
+
+        # Transpose the reactant index map
+        idx_map_rp = [list(row) for row in zip(*idx_map_rp)]
+        
+        # Store the mapping for the current product system
+        idx_maps.append((idx_map_p, idx_map_rp))
+
+    # Calculate all product states
+    product_rhos = []
+    for p, product_system in enumerate(product_systems):
+        idx_map_p, idx_map_rp = idx_maps[p]
+
+        # Allocate an empty state vector for the product system
+        rho_p = empty_state(product_system)
+
+        # Populate the product state
+        rho_p[idx_map_p, [0]] = reactant_rhos[0][idx_map_rp[0], [0]]
+        for r in range(1, len(reactant_systems)):
+            rho_p[idx_map_p, [0]] *= reactant_rhos[r][idx_map_rp[r], [0]]
+
+        # Normalise the product state to preserve the unit operator scale
+        rho_p /= (rho_p[0, 0] * np.sqrt(np.prod(product_system.mults)))
+
+        # Convert to csc_array if using sparse
+        if parameters.sparse_state:
+            rho_p = rho_p.tocsc()
+        
+        # Store the product state
+        product_rhos.append(rho_p)
+
+    # A single state is returned if there is only one product system
+    if len(product_rhos) == 1:
+        return product_rhos[0]
+
+    return tuple(product_rhos)
 
 
 def clear_cache_associate_index_map() -> None:
