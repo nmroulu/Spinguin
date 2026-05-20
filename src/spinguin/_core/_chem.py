@@ -409,6 +409,90 @@ def _permutation_matrix(
 
     return perm
 
+@lru_cache(maxsize=16)
+def _elementary_reaction_index_map(
+    reactant_bases_bytes: tuple[tuple[bytes, int], ...],
+    product_bases_bytes: tuple[tuple[bytes, int], ...],
+    spin_map_tuple: tuple[tuple[int, int, int, int], ...]
+) -> list[tuple[list[int], list[int]]]:
+    """
+    Generate index maps for an elementary reaction.
+
+    Parameters
+    ----------
+    reactant_bases_bytes : tuple of tuple of bytes and int
+        Reactant basis sets in bytes and the corresponding number of spins.
+    product_bases_bytes : tuple of tuple of bytes and int
+        Product basis sets in bytes and the corresponding number of spins.
+    spin_map_tuple : tuple of tuple of int
+        Spin map flattened into a format ((r, rs, p, ps), ...), where
+        r and p are reactant and product system indices, and
+        rs and ps are the corresponding spin indices.
+    """
+    # Convert the reactant and product bases from bytes to NumPy arrays.
+    reactant_bases = [
+        np.frombuffer(basis_bytes, dtype=int).reshape(-1, nspins)
+        for basis_bytes, nspins in reactant_bases_bytes
+    ]
+    product_bases = [
+        np.frombuffer(basis_bytes, dtype=int).reshape(-1, nspins)
+        for basis_bytes, nspins in product_bases_bytes
+    ]
+
+    # Create lookups for the reactant bases to enable fast index retrieval
+    lookups = [
+        {tuple(row): idx for idx, row in enumerate(basis)}
+        for basis in reactant_bases
+    ]
+
+    # Re-construct the spin map
+    spin_map = {
+        (r, p): []
+        for r in range(len(reactant_bases_bytes))
+        for p in range(len(product_bases_bytes))
+    }
+    for r, rs, p, ps in spin_map_tuple:
+        spin_map[(r, p)].append((rs, ps))
+
+    # Generate index maps from reactant basis sets to the product basis sets
+    idx_maps = []
+    for p, product_basis in enumerate(product_bases):
+        idx_map_p = []
+        idx_map_rp = []
+
+        # For every product basis state, search for matching reactant states
+        for idx_p, op_def_p in enumerate(product_basis):
+            idx_rp = []
+            for r, reactant_basis in enumerate(reactant_bases):
+                
+                # Build the corresponding reactant basis state 
+                op_def_r = np.zeros(reactant_basis.shape[1], dtype=int)
+                for rs, ps in spin_map[(r, p)]:
+                    op_def_r[rs] = op_def_p[ps]
+                op_def_r = tuple(op_def_r)
+
+                # Store the index if the state exists
+                if op_def_r in lookups[r]:
+                    idx_rp.append(lookups[r][op_def_r])
+                
+                # Otherwise skip the current product basis state completely
+                else:
+                    break
+
+            # Store the mapping if all reactant states were found
+            else:
+                idx_map_p.append(idx_p)
+                idx_map_rp.append(idx_rp)
+
+        # Transpose the reactant index map
+        idx_map_rp = [list(row) for row in zip(*idx_map_rp)]
+        
+        # Store the mapping for the current product system
+        idx_maps.append((idx_map_p, idx_map_rp))
+
+    return idx_maps
+
+
 def permutation_matrix(
     spin_system: SpinSystem,
     spin_map: list[int] | tuple[int, ...] | np.ndarray,
@@ -743,59 +827,28 @@ def elementary_reaction(
         spin_map
     )
 
-    # Re-organise the spin map to 
-    # (reactant, product) : [(reactant spin, product spin), ...]
-    reorganised_map = {
-        (r, p): []
-        for r in range(len(reactant_systems))
-        for p in range(len(product_systems))
-    }
-    for r in range(len(reactant_systems)):
-        for rs in range(reactant_systems[r].nspins):
-            p, ps = spin_map[(r, rs)]
-            reorganised_map[(r, p)].append((rs, ps))
-
-    # Create lookup tables for the basis sets
-    lookups = [
-        {tuple(row): idx for idx, row in enumerate(ss.basis.basis)}
+    # Convert the reactant and product bases to bytes for hashing
+    reactant_bases_bytes = tuple(
+        (ss.basis.basis.tobytes(), ss.nspins)
         for ss in reactant_systems
-    ]
+    )
+    product_bases_bytes = tuple(
+        (ss.basis.basis.tobytes(), ss.nspins)
+        for ss in product_systems
+    )
 
-    # Generate index maps from reactant basis sets to the product basis sets
-    idx_maps = []
-    for p, product_system in enumerate(product_systems):
-        idx_map_p = []
-        idx_map_rp = []
+    # Convert the dictionary to a flattened tuple for hashing
+    spin_map_tuple = tuple(
+        (r, rs, p, ps)
+        for (r, rs), (p, ps) in spin_map.items()
+    )
 
-        # For every product basis state, search for matching reactant states
-        for idx_p, op_def_p in enumerate(product_system.basis.basis):
-            idx_rp = []
-            for r, reactant_system in enumerate(reactant_systems):
-                
-                # Build the corresponding reactant basis state 
-                op_def_r = np.zeros(reactant_system.nspins, dtype=int)
-                for rs, ps in reorganised_map[(r, p)]:
-                    op_def_r[rs] = op_def_p[ps]
-                op_def_r = tuple(op_def_r)
-
-                # Store the index if the state exists
-                if op_def_r in lookups[r]:
-                    idx_rp.append(lookups[r][op_def_r])
-                
-                # Otherwise skip the current product basis state completely
-                else:
-                    break
-
-            # Store the mapping if all reactant states were found
-            else:
-                idx_map_p.append(idx_p)
-                idx_map_rp.append(idx_rp)
-
-        # Transpose the reactant index map
-        idx_map_rp = [list(row) for row in zip(*idx_map_rp)]
-        
-        # Store the mapping for the current product system
-        idx_maps.append((idx_map_p, idx_map_rp))
+    # Generate the index maps
+    idx_maps = _elementary_reaction_index_map(
+        reactant_bases_bytes,
+        product_bases_bytes,
+        spin_map_tuple
+    )
 
     # Calculate all product states
     product_rhos = []
