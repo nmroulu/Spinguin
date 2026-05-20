@@ -3,6 +3,7 @@
 ## 0.2.1
 - Accept input of the form "I(component, isotope)" for constructing operators,
 superoperators and states.
+- Added a function for performing elementary chemical reactions.
 
 ## 0.2.0
 - Re-write the documentation using AI.
