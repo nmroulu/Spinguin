@@ -4,6 +4,8 @@
 - Accept input of the form "I(component, isotope)" for constructing operators,
 superoperators and states.
 - Added a function for performing elementary chemical reactions.
+- CSA and EFG tensors are assigned to zero arrays by default.
+- Added a function for returning the spin order of a product operator.
 
 ## 0.2.0
 - Re-write the documentation using AI.
