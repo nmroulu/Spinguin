@@ -274,12 +274,10 @@ class SpinSystem:
             spin_system.xyz = self.xyz[spins]
 
         # Transfer the shielding tensors.
-        if self.shielding is not None:
-            spin_system.shielding = self.shielding[spins]
+        spin_system.shielding = self.shielding[spins]
 
         # Transfer the electric-field-gradient tensors.
-        if self.efg is not None:
-            spin_system.efg = self.efg[spins]
+        spin_system.efg = self.efg[spins]
 
         return spin_system
 
