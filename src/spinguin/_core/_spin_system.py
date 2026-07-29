@@ -262,12 +262,10 @@ class SpinSystem:
         spin_system = SpinSystem(self.isotopes[spins])
 
         # Transfer the isotropic chemical shifts.
-        if self.chemical_shifts is not None:
-            spin_system.chemical_shifts = self.chemical_shifts[spins]
+        spin_system.chemical_shifts = self.chemical_shifts[spins]
 
         # Transfer the scalar-coupling matrix.
-        if self.J_couplings is not None:
-            spin_system.J_couplings = self.J_couplings[np.ix_(spins, spins)]
+        spin_system.J_couplings = self.J_couplings[np.ix_(spins, spins)]
 
         # Transfer the Cartesian coordinates.
         if self.xyz is not None:
