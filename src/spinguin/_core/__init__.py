@@ -85,6 +85,7 @@ from ._utils import (
     coherence_order,
     idx_to_lq,
     lq_to_idx,
+    spin_order,
 )
 
 __all__ = [
@@ -178,4 +179,5 @@ __all__ = [
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",
+    "spin_order",
 ]

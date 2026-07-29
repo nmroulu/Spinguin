@@ -104,6 +104,7 @@ from spinguin._core import (
     coherence_order,
     idx_to_lq,
     lq_to_idx,
+    spin_order,
 )
 
 # Re-export the ready-to-use pulse-sequence namespace.
@@ -202,6 +203,7 @@ __all__ = [
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",
+    "spin_order",
 
     # sequences
     "sequences",
