@@ -679,7 +679,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
                     interactions[l].append(("DD", spin_1, spin_2, V[l]))
 
     # Process all shielding interaction tensors.
-    if spin_system.shielding is not None:
+    if np.any(spin_system.shielding):
 
         # Get the shielding interaction tensors.
         sh_tensors = shielding_intr_tensors(spin_system)
@@ -695,7 +695,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
                 interactions[l].append(("CSA", spin_1, None, V[l]))
 
     # Process all quadrupolar interaction tensors.
-    if spin_system.efg is not None:
+    if np.any(spin_system.efg):
 
         # Get the quadrupolar interaction tensors.
         q_tensors = Q_intr_tensors(spin_system)
