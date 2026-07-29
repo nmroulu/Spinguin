@@ -65,8 +65,8 @@ class SpinSystem:
         self._chemical_shifts = np.zeros(self.nspins)
         self._J_couplings = np.zeros((self.nspins, self.nspins))
         self._xyz: np.ndarray | None = None
-        self._shielding: np.ndarray | None = None
-        self._efg: np.ndarray | None = None
+        self._shielding = np.zeros((self.nspins, 3, 3))
+        self._efg = np.zeros((self.nspins, 3, 3))
 
         # Validate the newly initialised object state.
         self._check_consistency()
