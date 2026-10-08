@@ -25,6 +25,7 @@ from spinguin._core._relaxation import (
     rotational_correlation_times_Perrin,
 )
 from spinguin._core._status import status
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -300,6 +301,12 @@ class RelaxationProperties:
             Raised if the required model-specific inputs are missing or if
             ``model`` is invalid.
         """
+        # Ensure that the temperature has been defined.
+        require(
+            parameters, 
+            "temperature", 
+            "calculating the rotational correlation time"
+        )
 
         # Use the isotropic Stokes-Einstein-Debye relation when requested.
         if model == "iso":
