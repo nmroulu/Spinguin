@@ -26,17 +26,17 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=4418a689" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../../_static/documentation_options.js?v=b1def801"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -44,31 +44,38 @@
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_spin_system';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -94,7 +101,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -244,11 +291,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -280,182 +334,291 @@
                 <article class="bd-article">
                   
   <h1>Source code for spinguin._core._spin_system</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">spin_system.py</span>
+<span></span><span class="sd">"""</span>
+<span class="sd">Spin-system container for the Spinguin package. This is the central</span>
+<span class="sd">class used throughout Spinguin.</span>
 
-<span class="sd">Defines a class for the spin system. Once a spin system is initialized, other</span>
-<span class="sd">modules can be used to calculate its properties.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines the ``SpinSystem`` class, which stores isotope identities</span>
+<span class="sd">together with the spin-resolved data required for Hamiltonian and relaxation</span>
+<span class="sd">calculations.</span>
+<span class="sd">"""</span>
 
-<span class="c1"># Imports</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Self</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._basis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Basis</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._relaxation_properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelaxationProperties</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._data_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_array</span><span class="p">,</span> <span class="n">read_tensors</span><span class="p">,</span> <span class="n">read_xyz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._basis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Basis</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">arraylike_to_array</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._nmr_isotopes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISOTOPES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._relaxation_properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelaxationProperties</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._status</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
 
 <div class="viewcode-block" id="SpinSystem">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.SpinSystem">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpinSystem</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Initializes a spin system with the given `isotopes`. Examples::</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Store the isotopes and associated data of a spin system.</span>
 
-<span class="sd">        spin_system = SpinSystem([&#39;1H&#39;, &#39;15N&#39;, &#39;19F&#39;])</span>
-<span class="sd">        spin_system = SpinSystem(&quot;/path/to/isotopes.txt&quot;)</span>
+<span class="sd">    .. automethod:: __init__</span>
+<span class="sd">    """</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    isotopes : list or tuple or ndarray or str</span>
-<span class="sd">        Specifies the isotopes that constitute the spin system and determine</span>
-<span class="sd">        other properties, such as spin quantum numbers and gyromagnetic</span>
-<span class="sd">        ratios.</span>
+<div class="viewcode-block" id="SpinSystem.__init__">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.SpinSystem.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotopes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialise a spin system from isotope labels.</span>
 
-<span class="sd">        Two input types are supported:</span>
+<span class="sd">        Examples::</span>
 
-<span class="sd">        - If `ArrayLike`: A 1D array of size N containing isotope names as</span>
-<span class="sd">          strings. </span>
-<span class="sd">        - If `str`: Path to the file containing the isotopes.</span>
+<span class="sd">            spin_system = SpinSystem(['1H', '15N', '19F'])</span>
+<span class="sd">            spin_system = SpinSystem("/path/to/isotopes.txt")</span>
 
-<span class="sd">        The input will be converted and stored as a NumPy array.  </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        isotopes : list or tuple or ndarray or str</span>
+<span class="sd">            Specifies the isotopes that constitute the spin system and determine</span>
+<span class="sd">            other properties, such as spin quantum numbers and gyromagnetic</span>
+<span class="sd">            ratios.</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isotopes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="sd">            Two input types are supported:</span>
 
-        <span class="c1"># Assign the isotopes</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span> <span class="o">=</span> <span class="n">read_array</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">isotopes</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">isotopes</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Isotopes should be a 1-dimensional array or a &quot;</span>
-                            <span class="s2">&quot;string.&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Set the other spin system properties</span>
+<span class="sd">            - If ``ArrayLike``: A 1D array containing isotope names as</span>
+<span class="sd">                strings.</span>
+<span class="sd">            - If ``str``: Path to the file containing the isotopes.</span>
+
+<span class="sd">            The input is converted and stored as a NumPy array.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Store the isotope labels as a NumPy array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_spin_data</span><span class="p">(</span>
+            <span class="n">isotopes</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Isotopes"</span><span class="p">,</span>
+            <span class="n">file_reader</span><span class="o">=</span><span class="n">read_array</span><span class="p">,</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Initialise the remaining spin-resolved properties.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_chemical_shifts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_J_couplings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
-        <span class="c1"># Check consistency</span>
+        <span class="c1"># Validate the newly initialised object state.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
 
-        <span class="c1"># Initialize basis set</span>
+        <span class="c1"># Create the basis-set handler for the spin system.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span> <span class="o">=</span> <span class="n">Basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="c1"># Initialize relaxation theory settings</span>
+        <span class="c1"># Create the relaxation settings for the spin system.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation</span> <span class="o">=</span> <span class="n">RelaxationProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Spin system has been created with the following isotopes:&quot;</span><span class="p">)</span>
-        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Report the newly created spin system.</span>
+        <span class="n">status</span><span class="p">(</span><span class="s2">"Spin system has been created with the following isotopes:"</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method checks the consistency of the SpinSystem object by comparing</span>
-<span class="sd">        the shapes of the attributes.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="c1"># Check that the isotopes array is one-dimensional</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_spin_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">file_reader</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">data_type</span><span class="p">:</span> <span class="nb">type</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Convert file-based or array-like input to a NumPy array.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : list or tuple or ndarray or str</span>
+<span class="sd">            Input values or a path to a text file.</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the quantity for error reporting.</span>
+<span class="sd">        file_reader : callable</span>
+<span class="sd">            Reader used when ``values`` is supplied as a file path.</span>
+<span class="sd">        data_type : type or None, default=None</span>
+<span class="sd">            Optional data type passed to ``read_array``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            Converted NumPy array.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Read values from file when a path is supplied.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">file_reader</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">file_reader</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">data_type</span><span class="p">)</span>
+
+        <span class="c1"># Convert array-like input directly to a NumPy array.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="c1"># Reject unsupported input types explicitly.</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> should be an array or a string."</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_optional_shape</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">expected_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Validate the shape of an optional spin-resolved array.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : ndarray or None</span>
+<span class="sd">            Array to be validated. ``None`` is accepted without checks.</span>
+<span class="sd">        expected_shape : tuple of int</span>
+<span class="sd">            Shape required for the given quantity.</span>
+<span class="sd">        error_message : str</span>
+<span class="sd">            Error message raised when the shape does not match.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Validation is performed for its side effect only.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Raised if ``values`` is not ``None`` and the shape is incorrect.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Accept missing optional arrays without further validation.</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Reject arrays whose shape does not match the expected one.</span>
+        <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Check that the stored spin-system data are internally consistent.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Validation is performed for its side effect only.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Check that the isotope labels form a one-dimensional array.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Isotopes must be a 1D array containing the &quot;</span>
-                             <span class="s2">&quot;names of the isotopes as strings.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Isotopes must be a 1D array containing the names of the "</span>
+                <span class="s2">"isotopes as strings."</span>
+            <span class="p">)</span>
 
-        <span class="c1"># Check that each isotope exists in the dictionary</span>
+        <span class="c1"># Check that every isotope label is defined in the isotope table.</span>
         <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">isotope</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ISOTOPES</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Isotope &#39;</span><span class="si">{</span><span class="n">isotope</span><span class="si">}</span><span class="s2">&#39; is not defined in the &quot;</span>
-                                 <span class="s2">&quot;ISOTOPES dictionary.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Isotope '</span><span class="si">{</span><span class="n">isotope</span><span class="si">}</span><span class="s2">' is not defined in the ISOTOPES "</span>
+                    <span class="s2">"dictionary."</span>
+                <span class="p">)</span>
 
-        <span class="c1"># Check that the chemical shifts array is of correct size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Chemical shifts must be a 1D array with a &quot;</span>
-                                 <span class="s2">&quot;length equal to the number of isotopes.&quot;</span><span class="p">)</span>
-            
-        <span class="c1"># Check that the J-couplings array is of correct size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;J-couplings must be a 2D array with both of &quot;</span>
-                                 <span class="s2">&quot;the dimensions equal to the number of &quot;</span> 
-                                 <span class="s2">&quot;isotopes.&quot;</span><span class="p">)</span>
-            
-        <span class="c1"># Check that the XYZ array is of correct size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;XYZ coordinates must be a 2D array with the &quot;</span>
-                                 <span class="s2">&quot;number of rows equal to the number of &quot;</span> 
-                                 <span class="s2">&quot;isotopes.&quot;</span><span class="p">)</span>
-            
-        <span class="c1"># Check that shielding tensors array is of correct size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shielding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Shielding tensors must be a 3D array with &quot;</span>
-                                 <span class="s2">&quot;the number of 3x3 tensors equal to the &quot;</span>
-                                 <span class="s2">&quot;number of isotopes.&quot;</span><span class="p">)</span>
-            
-        <span class="c1"># Check that EFG tensors array is of correct size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">efg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;EFG tensors must be a 3D array with the &quot;</span>
-                                 <span class="s2">&quot;number of 3x3 tensors equal to the number of &quot;</span>
-                                 <span class="s2">&quot;isotopes.&quot;</span><span class="p">)</span>
-            
+        <span class="c1"># Check the isotropic chemical-shift array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_shape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,),</span>
+            <span class="s2">"Chemical shifts must be a 1D array with a length equal to the "</span>
+            <span class="s2">"number of isotopes."</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check the scalar-coupling matrix.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_shape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">),</span>
+            <span class="s2">"J-couplings must be a 2D array with both dimensions equal to "</span>
+            <span class="s2">"the number of isotopes."</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check the Cartesian coordinate array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_shape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="s2">"XYZ coordinates must be a 2D array with the number of rows "</span>
+            <span class="s2">"equal to the number of isotopes."</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check the shielding-tensor array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_shape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="s2">"Shielding tensors must be a 3D array with the number of 3x3 "</span>
+            <span class="s2">"tensors equal to the number of isotopes."</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check the electric-field-gradient tensor array.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_shape</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="s2">"EFG tensors must be a 3D array with the number of 3x3 tensors "</span>
+            <span class="s2">"equal to the number of isotopes."</span><span class="p">,</span>
+        <span class="p">)</span>
+
 <div class="viewcode-block" id="SpinSystem.subsystem">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.SpinSystem.subsystem">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spins</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a new `SpinSystem` object containing only the spins indicated</span>
-<span class="sd">        by the `spins` list. The new spin system is assigned the appropriate</span>
-<span class="sd">        properties from the original spin system. However, the basis set and</span>
-<span class="sd">        relaxation properties are not copied to the new spin system.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">spins</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Create a new spin system from a selected subset of spins.</span>
+
+<span class="sd">        The basis-set and relaxation settings are reinitialised for the new</span>
+<span class="sd">        object rather than copied from the parent spin system.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        spins : list</span>
-<span class="sd">            List of indices that define which spins to include in the subsystem.</span>
+<span class="sd">            List of spin indices to be retained in the subsystem.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        sub : SpinSystem</span>
-<span class="sd">            A new `SpinSystem` object containing only the specified spins.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check that each spin has been given only once</span>
+<span class="sd">        SpinSystem</span>
+<span class="sd">            New spin system containing only the selected spins.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Raised if the selected spin indices are invalid.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Check that each selected spin index is unique.</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">spins</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spins</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Each spin must be unique in &#39;spins&#39;&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check that the spins isn&#39;t empty</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Each spin must be unique in 'spins'."</span><span class="p">)</span>
+
+        <span class="c1"># Check that at least one spin has been selected.</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spins</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;spins&#39; cannot be empty&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check that the maximum index makes sense</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"'spins' cannot be empty."</span><span class="p">)</span>
+
+        <span class="c1"># Check that the selected indices exist in the spin system.</span>
         <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">spins</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spin system does not have spin: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">spins</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Create the new SpinSystem object</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Spin system does not have spin: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">spins</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="c1"># Create the subsystem with the selected isotope labels.</span>
         <span class="n">spin_system</span> <span class="o">=</span> <span class="n">SpinSystem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">spins</span><span class="p">])</span>
 
-        <span class="c1"># Assign chemical shifts</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
+        <span class="c1"># Transfer the isotropic chemical shifts.</span>
+        <span class="n">spin_system</span><span class="o">.</span><span class="n">chemical_shifts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
 
-        <span class="c1"># Assign J-couplings</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">spins</span><span class="p">,</span> <span class="n">spins</span><span class="p">)]</span>
+        <span class="c1"># Transfer the scalar-coupling matrix.</span>
+        <span class="n">spin_system</span><span class="o">.</span><span class="n">J_couplings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">spins</span><span class="p">,</span> <span class="n">spins</span><span class="p">)]</span>
 
-        <span class="c1"># Assign XYZ</span>
+        <span class="c1"># Transfer the Cartesian coordinates.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">spin_system</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
 
-        <span class="c1"># Assign shielding tensors</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shielding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">spin_system</span><span class="o">.</span><span class="n">shielding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
+        <span class="c1"># Transfer the shielding tensors.</span>
+        <span class="n">spin_system</span><span class="o">.</span><span class="n">shielding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
 
-        <span class="c1"># Assign EFG tensors</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">efg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">spin_system</span><span class="o">.</span><span class="n">efg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
+        <span class="c1"># Transfer the electric-field-gradient tensors.</span>
+        <span class="n">spin_system</span><span class="o">.</span><span class="n">efg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="p">[</span><span class="n">spins</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">spin_system</span></div>
 
@@ -466,62 +629,63 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">isotopes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies the isotopes that constitute the spin system and determine</span>
-<span class="sd">        other properties, such as spin quantum numbers and gyromagnetic ratios.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Isotope labels that define the spin system.</span>
+
 <span class="sd">        Example::</span>
 
-<span class="sd">            np.array([&#39;1H&#39;, &#39;15N&#39;, &#39;19F&#39;])</span>
+<span class="sd">            np.array(['1H', '15N', '19F'])</span>
 
-<span class="sd">        Isotopes are set during the initialization of the spin system.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        The isotope array is defined during initialisation.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isotopes</span>
-            
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">chemical_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Chemical shifts arising from the isotropic component of the nuclear</span>
-<span class="sd">        shielding tensors. Used when calculating the coherent Hamiltonian.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Isotropic chemical shifts used in the coherent Hamiltonian.</span>
 
-<span class="sd">        - If `ArrayLike`: A 1D array of size N containing the chemical shifts</span>
-<span class="sd">          in ppm.</span>
-<span class="sd">        - If `str`: Path to the file containing the chemical shifts.</span>
+<span class="sd">        - If ``ArrayLike``: A 1D array containing the chemical shifts in ppm.</span>
+<span class="sd">        - If ``str``: Path to the file containing the chemical shifts.</span>
 
 <span class="sd">        Example::</span>
 
 <span class="sd">            spin_system.chemical_shifts = [8.49, 7.78, 7.46]</span>
 
 <span class="sd">        The input will be stored as a NumPy array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chemical_shifts</span>
-    
+
     <span class="nd">@chemical_shifts</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">chemical_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chemical_shifts</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># Assign chemical shifts</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chemical_shifts</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_chemical_shifts</span> <span class="o">=</span> <span class="n">read_array</span><span class="p">(</span><span class="n">chemical_shifts</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chemical_shifts</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_chemical_shifts</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">chemical_shifts</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Chemical shifts should be a 1-dimensional array &quot;</span>
-                            <span class="s2">&quot;or a string.&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check input consistency</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chemical_shifts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">chemical_shifts</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the chemical-shift data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chemical_shifts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_spin_data</span><span class="p">(</span>
+            <span class="n">chemical_shifts</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Chemical shifts"</span><span class="p">,</span>
+            <span class="n">file_reader</span><span class="o">=</span><span class="n">read_array</span><span class="p">,</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Validate the updated object state.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
-            
-        <span class="n">status</span><span class="p">(</span><span class="s2">&quot;Assigned the following chemical shifts:&quot;</span><span class="p">)</span>
-        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            
+
+        <span class="c1"># Report the assigned chemical shifts.</span>
+        <span class="n">status</span><span class="p">(</span><span class="s2">"Assigned the following chemical shifts:"</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chemical_shifts</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">J_couplings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies the J-coupling constants between each spin pair in the spin</span>
-<span class="sd">        system. Used when calculating the coherent Hamiltonian. Only the lower</span>
-<span class="sd">        triangle is specified.</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Scalar J-coupling matrix used in the coherent Hamiltonian.</span>
 
-<span class="sd">        - If `ArrayLike`: A 2D array of size (N, N) specifying the scalar</span>
+<span class="sd">        Only the lower triangle needs to be specified.</span>
+
+<span class="sd">        - If ``ArrayLike``: A 2D array specifying the scalar</span>
 <span class="sd">          couplings between nuclei in Hz.</span>
-<span class="sd">        - If `str`: Path to the file containing the scalar couplings.</span>
+<span class="sd">        - If ``str``: Path to the file containing the scalar couplings.</span>
 
 <span class="sd">        Example::</span>
 
@@ -532,34 +696,39 @@
 <span class="sd">            ]</span>
 
 <span class="sd">        The input will be stored as a NumPy array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_J_couplings</span>
-    
+
     <span class="nd">@J_couplings</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">J_couplings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">J_couplings</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># Assign J-couplings</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">J_couplings</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_J_couplings</span> <span class="o">=</span> <span class="n">read_array</span><span class="p">(</span><span class="n">J_couplings</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">J_couplings</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_J_couplings</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">J_couplings</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;J-couplings should be a 2-dimensional array or a &quot;</span>
-                            <span class="s2">&quot;string.&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check input consistency</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">J_couplings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">J_couplings</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the scalar-coupling matrix.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_J_couplings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_spin_data</span><span class="p">(</span>
+            <span class="n">J_couplings</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"J-couplings"</span><span class="p">,</span>
+            <span class="n">file_reader</span><span class="o">=</span><span class="n">read_array</span><span class="p">,</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Validate the updated object state.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
-        
-        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following J-couplings:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Report the assigned scalar couplings.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Assigned the following J-couplings:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">J_couplings</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Coordinates in the XYZ format for each nucleus in the spin system. Used</span>
-<span class="sd">        in Redfield relaxation theory when calculating the dipole-dipole</span>
-<span class="sd">        coupling tensors. The coordinates are defined in Å.</span>
-<span class="sd">    </span>
-<span class="sd">        - If `ArrayLike`: A 2D array of size (N, 3).</span>
-<span class="sd">        - If `str`: Path to the file containing the XYZ coordinates.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Cartesian coordinates of the nuclei in Å.</span>
+
+<span class="sd">        The coordinates are used in Redfield relaxation theory when evaluating</span>
+<span class="sd">        dipole-dipole coupling tensors and determining properties of the</span>
+<span class="sd">        parent molecule.</span>
+
+<span class="sd">        - If ``ArrayLike``: A 2D array of size (nspins, 3).</span>
+<span class="sd">        - If ``str``: Path to the file containing the XYZ coordinates.</span>
 
 <span class="sd">        Example::</span>
 
@@ -569,34 +738,36 @@
 <span class="sd">            ]</span>
 
 <span class="sd">        The input will be stored as a NumPy array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span>
-    
+
     <span class="nd">@xyz</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># Assign XYZ coordinates</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="o">=</span> <span class="n">read_xyz</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;XYZ should be a 2-dimensional array or a string.&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check input consistency</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the Cartesian coordinates.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xyz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_spin_data</span><span class="p">(</span>
+            <span class="n">xyz</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"XYZ"</span><span class="p">,</span>
+            <span class="n">file_reader</span><span class="o">=</span><span class="n">read_xyz</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Validate the updated object state.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
 
-        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following XYZ coordinates:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Report the assigned Cartesian coordinates.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Assigned the following XYZ coordinates:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Specifies the nuclear shielding tensors for each nucleus. Note that the</span>
-<span class="sd">        isotropic part of the tensor is handled by `chemical_shifts`. The</span>
-<span class="sd">        shielding tensors are used only for Redfield relaxation theory.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Nuclear shielding tensors for each spin.</span>
 
-<span class="sd">        - If `ArrayLike`: A 3D array of size (N, 3, 3) containing the 3x3</span>
+<span class="sd">        The isotropic contribution is handled separately through</span>
+<span class="sd">        ``chemical_shifts``. The full tensors are used only in Redfield</span>
+<span class="sd">        relaxation theory.</span>
+
+<span class="sd">        - If ``ArrayLike``: A 3D array of size (nspins, 3, 3) containing the 3x3</span>
 <span class="sd">          shielding tensors in ppm.</span>
-<span class="sd">        - If `str`: Path to the file containing the shielding tensors.</span>
+<span class="sd">        - If ``str``: Path to the file containing the shielding tensors.</span>
 
 <span class="sd">        Example::</span>
 
@@ -614,34 +785,35 @@
 <span class="sd">            ]</span>
 
 <span class="sd">        The input will be stored as a NumPy array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span>
-    
+
     <span class="nd">@shielding</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shielding</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># Assign shielding tensors</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shielding</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span> <span class="o">=</span> <span class="n">read_tensors</span><span class="p">(</span><span class="n">shielding</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shielding</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">shielding</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Shielding should be a 3-dimensional array or a &quot;</span>
-                            <span class="s2">&quot;string.&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check input consistency</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shielding</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">shielding</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the shielding tensors.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shielding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_spin_data</span><span class="p">(</span>
+            <span class="n">shielding</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Shielding"</span><span class="p">,</span>
+            <span class="n">file_reader</span><span class="o">=</span><span class="n">read_tensors</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Validate the updated object state.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
 
-        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following shielding tensors:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Electric field gradient tensors used for incorporating the quadrupolar</span>
-<span class="sd">        interaction relaxation mechanism.</span>
+        <span class="c1"># Report the assigned shielding tensors.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Assigned the following shielding tensors:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shielding</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
-<span class="sd">        - If `ArrayLike`: A 3D array of size (N, 3, 3) containing the 3x3 EFG</span>
-<span class="sd">          tensors in atomic units.</span>
-<span class="sd">        - If `str`: Path to the file containing the EFG tensors.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Electric-field-gradient tensors for quadrupolar relaxation.</span>
+
+<span class="sd">        - If ``ArrayLike``: A 3D array of size (nspins, 3, 3) containing the 3x3</span>
+<span class="sd">          EFG tensors in atomic units.</span>
+<span class="sd">        - If ``str``: Path to the file containing the EFG tensors.</span>
 
 <span class="sd">        Example::</span>
 
@@ -659,80 +831,122 @@
 <span class="sd">            ]</span>
 
 <span class="sd">        The input will be stored as a NumPy array.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span>
-    
+
     <span class="nd">@efg</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">efg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="c1"># Assign EFG tensors</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">efg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span> <span class="o">=</span> <span class="n">read_tensors</span><span class="p">(</span><span class="n">efg</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">efg</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">efg</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;EFG should be a 3-dimensional array or a string.&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># Check input consistency</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">efg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">efg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Store the electric-field-gradient tensors.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_efg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_spin_data</span><span class="p">(</span>
+            <span class="n">efg</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"EFG"</span><span class="p">,</span>
+            <span class="n">file_reader</span><span class="o">=</span><span class="n">read_tensors</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Validate the updated object state.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
 
-        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Assigned the following EFG tensors:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Report the assigned electric-field-gradient tensors.</span>
+        <span class="n">status</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Assigned the following EFG tensors:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">efg</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nspins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of spins in the spin system.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Number of spins in the spin system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of spins.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">)</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">spins</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Spin quantum numbers for each isotope the spin system.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Spin quantum numbers of the isotopes in the spin system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            One-dimensional array of spin quantum numbers.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">mults</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Spin multiplicities for each isotope in the `SpinSystem`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Spin multiplicities of the isotopes in the spin system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            One-dimensional array of spin multiplicities.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                          <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gammas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gyromagnetic ratios of each isotope in the `SpinSystem` in rad/s/T.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Gyromagnetic ratios of the isotopes in rad/s/T.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            One-dimensional array of gyromagnetic ratios.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e6</span>
                          <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">quad</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the quadrupolar moments in m^2.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Quadrupolar moments of the isotopes in $\mathrm{m^2}$.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            One-dimensional array of quadrupolar moments.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ISOTOPES</span><span class="p">[</span><span class="n">isotope</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-28</span>
                          <span class="k">for</span> <span class="n">isotope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotopes</span><span class="p">])</span>
-    
+
     <span class="c1">########################</span>
     <span class="c1"># BASIS SET PROPERTIES #</span>
     <span class="c1">########################</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basis</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Contains the basis set for the `SpinSystem`. Includes functionality for</span>
-<span class="sd">        restricting the maximum spin order, building the basis set, and applying</span>
-<span class="sd">        more advanced truncation to the basis set.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Basis-set handler associated with the spin system.</span>
+
+<span class="sd">        The object provides the functionality required to restrict the maximum</span>
+<span class="sd">        spin order, build the basis set, and apply more advanced truncation</span>
+<span class="sd">        strategies.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span>
-    
+
     <span class="c1">################################</span>
     <span class="c1"># RELAXATION THEORY PROPERTIES #</span>
     <span class="c1">################################</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">relaxation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RelaxationProperties</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Contains the properties that define the relaxation of the `SpinSystem`.</span>
-<span class="sd">        Allows the definition of relaxation theory, correlation time, relaxation</span>
-<span class="sd">        times, etc.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Relaxation settings associated with the spin system.</span>
+
+<span class="sd">        The object stores the relaxation-theory choice together with the</span>
+<span class="sd">        corresponding correlation times, relaxation times, and related</span>
+<span class="sd">        settings.</span>
+<span class="sd">        """</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation</span></div>
 
 </pre></div>
@@ -773,7 +987,7 @@ By Joni Eronen, Perttu Hilla
 
   <p class="copyright">
     
-      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
       <br/>
     
   </p>
@@ -797,8 +1011,8 @@ By Joni Eronen, Perttu Hilla
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

@@ -3,11 +3,11 @@
 Internal classes
 ================
 
-Spinguin contains some internal classes, which are used to improve the workflow
-by organising common functionality under a specific class. These classes are
-not meant to be instantiated by the user; rather they are already a part of the
-program and should be accessed through the exposed functionality in the public
-interface.
+Spinguin contains a number of internal classes that organise common
+functionality and support the overall workflow of the package. These classes
+are not intended to be instantiated directly by the user. Instead, they are
+part of the internal structure of the program and should be accessed through
+the exposed functionality of the public interface.
 
 .. autoclass:: spinguin._core._basis.Basis
    :members:

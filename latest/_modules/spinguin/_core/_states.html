@@ -26,17 +26,17 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=4418a689" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../../_static/documentation_options.js?v=b1def801"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -44,31 +44,38 @@
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_states';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -94,7 +101,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -244,11 +291,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -280,122 +334,120 @@
                 <article class="bd-article">
                   
   <h1>Source code for spinguin._core._states</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides functions for creating state vectors.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># Referencing SpinSystem class</span>
+<span></span><span class="sd">"""</span>
+<span class="sd">State-vector utilities for Liouville-space spin dynamics.</span>
+
+<span class="sd">This module provides helper functions for constructing Liouville-space state</span>
+<span class="sd">vectors, converting them between representations, and evaluating expectation</span>
+<span class="sd">values.</span>
+<span class="sd">"""</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
-<span class="c1"># Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">const</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">expm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">op_prod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_operator_string</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hide_prints</span><span class="w"> </span><span class="kn">import</span> <span class="n">HidePrints</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">hamiltonian</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._status</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_operator_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">require</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">state_to_truncated_basis</span><span class="p">(</span>
-    <span class="n">index_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Transforms a state vector to a truncated basis using the `index_map`,</span>
-<span class="sd">    which contains indices that determine the elements that are retained</span>
-<span class="sd">    after the transformation.</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">empty_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return an empty Liouville-space state vector. Used to initialise state</span>
+<span class="sd">    vectors before populating them with specific coefficients.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    index_map : list</span>
-<span class="sd">        Index mapping from the original basis to the truncated basis.</span>
-<span class="sd">    rho : ndarray or csc_array</span>
-<span class="sd">        State vector to be transformed.</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        Spin system for which the empty state is created.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    rho_transformed : ndarray or csc_array</span>
-<span class="sd">        State vector transformed into the truncated basis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Perform the transformation to truncated basis</span>
-    <span class="n">rho_transformed</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[</span><span class="n">index_map</span><span class="p">]</span>
+<span class="sd">    rho : ndarray or lil_array</span>
+<span class="sd">        Empty state vector.</span>
+<span class="sd">    """</span>
 
-    <span class="k">return</span> <span class="n">rho_transformed</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing an empty state"</span><span class="p">)</span>
+
+    <span class="c1"># Allocate the output state vector.</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="unit_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.unit_state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">unit_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a unit state vector, which represents the identity operator. The</span>
-<span class="sd">    output can be either normalised (trace equal to one) or unnormalised (raw</span>
-<span class="sd">    identity matrix).</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return the Liouville-space representation of the unit operator.</span>
+
+<span class="sd">    The output can be either normalised to unit trace or left in the raw</span>
+<span class="sd">    unnormalised form.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    spin_system : SpinSystem</span>
-<span class="sd">        Spin system to which the unit state is created.</span>
+<span class="sd">        Spin system for which the unit state is created.</span>
 <span class="sd">    normalized : bool, default=True</span>
-<span class="sd">        If set to True, the function will return a state vector that represents</span>
-<span class="sd">        the trace-normalized density matrix. If False, returns a state vector</span>
-<span class="sd">        that corresponds to the identity operator.</span>
+<span class="sd">        If set to ``True``, the function returns a state vector that</span>
+<span class="sd">        represents the trace-normalised density matrix. If ``False``, it</span>
+<span class="sd">        returns a state vector corresponding to the identity operator.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the unit state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;unit state.&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Initialize the state vector</span>
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the unit state"</span><span class="p">)</span>
 
-    <span class="c1"># Assign unit state coefficient</span>
+    <span class="c1"># Allocate the output state vector.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">empty_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
+
+    <span class="c1"># Set the identity-operator coefficient with the requested normalisation.</span>
     <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
         <span class="n">rho</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">rho</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
 
-    <span class="c1"># Convert to csc_array if requesting sparse</span>
+    <span class="c1"># Return the state in the configured output format.</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function returns a column vector representing the density matrix as a</span>
-<span class="sd">    linear combination of spin operators. Each element of the vector corresponds</span>
-<span class="sd">    to the coefficient of a specific spin operator in the expansion.</span>
-<span class="sd">    </span>
-<span class="sd">    Normalization:</span>
-<span class="sd">    The output of this function uses a normalised basis built from normalised</span>
-<span class="sd">    products of single-spin spherical tensor operators. However, the</span>
-<span class="sd">    coefficients are scaled so that the resulting linear combination represents</span>
-<span class="sd">    the non-normalised version of the requested operator.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Construct a state vector from an operator-string specification.</span>
 
-<span class="sd">    NOTE: This function is sometimes called often and is cached for high</span>
-<span class="sd">    performance.</span>
+<span class="sd">    The output uses the normalised spherical-tensor basis of the spin system,</span>
+<span class="sd">    but the coefficients are scaled so that the resulting linear combination</span>
+<span class="sd">    corresponds to the unnormalised version of the requested operator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -407,104 +459,102 @@
 
 <span class="sd">        - Cartesian or ladder operator at specific index or for all spins::</span>
 
-<span class="sd">            operator = &quot;I(component, index)&quot;</span>
-<span class="sd">            operator = &quot;I(component)&quot;</span>
+<span class="sd">            operator = "I(component, index)"</span>
+<span class="sd">            operator = "I(component)"</span>
 
 <span class="sd">        - Spherical tensor operator at specific index or for all spins::</span>
 
-<span class="sd">            operator = &quot;T(l, q, index)&quot;</span>
-<span class="sd">            operator = &quot;T(l, q)&quot;</span>
+<span class="sd">            operator = "T(l, q, index)"</span>
+<span class="sd">            operator = "T(l, q)"</span>
 
 <span class="sd">        - Product operators::</span>
 
-<span class="sd">            operator = &quot;I(component1, index1) * I(component2, index2)&quot;</span>
+<span class="sd">            operator = "I(component1, index1) * I(component2, index2)"</span>
 
 <span class="sd">        - Sum of operators::</span>
 
-<span class="sd">            operator = &quot;I(component1, index1) + I(component2, index2)&quot;</span>
-<span class="sd">            </span>
+<span class="sd">            operator = "I(component1, index1) + I(component2, index2)"</span>
+
 <span class="sd">        - Unit operators are ignored in the input. These are identical::</span>
 
-<span class="sd">            operator = &quot;E * I(component, index)&quot;</span>
-<span class="sd">            operator = &quot;I(component, index)&quot;</span>
-<span class="sd">        </span>
-<span class="sd">        Special case: An empty `operator` string is considered as unit operator.</span>
+<span class="sd">            operator = "E * I(component, index)"</span>
+<span class="sd">            operator = "I(component, index)"</span>
+
+<span class="sd">        Special case: An empty ``operator`` string is considered as the unit</span>
+<span class="sd">        operator.</span>
 
 <span class="sd">        Whitespace will be ignored in the input.</span>
 
-<span class="sd">        NOTE: Indexing starts from 0!</span>
+<span class="sd">        Note that indexing starts from 0.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the requested state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing a state.&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Initialize the state vector</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span>
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing a state"</span><span class="p">)</span>
 
-    <span class="c1"># Get the operator definition and coefficients</span>
-    <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+    <span class="c1"># Allocate the output state vector.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">empty_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
 
-    <span class="c1"># Get the state indices</span>
+    <span class="c1"># Parse the operator string into basis definitions and coefficients.</span>
+    <span class="n">op_defs</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">parse_operator_string</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">operator</span><span class="p">)</span>
+
+    <span class="c1"># Map the operator definitions to basis indices.</span>
     <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">indexof</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="k">for</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="n">op_defs</span><span class="p">]</span>
 
-    <span class="c1"># Assign the state</span>
+    <span class="c1"># Populate the state vector one operator term at a time.</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">op_def</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">op_defs</span><span class="p">):</span>
 
-        <span class="c1"># Find indices of the active and inactive spins</span>
-        <span class="n">idx_active</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">idx_inactive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Separate active and inactive spins in the product operator.</span>
+        <span class="n">op_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">op_def</span><span class="p">)</span>
+        <span class="n">idx_active</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">op_array</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx_inactive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">op_array</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># Calculate the norm of the active operator part if there are active</span>
-        <span class="c1"># spins</span>
+        <span class="c1"># Compute the norm of the non-unit part of the operator.</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_active</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">op_prod</span><span class="p">(</span>
+                <span class="n">op_def</span><span class="p">,</span>
+                <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span>
+                <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
-                <span class="n">op_norm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
-                    <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span>
-                <span class="p">)</span>
+                <span class="n">op_norm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">"fro"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
-                    <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span>
-                <span class="p">)</span>
+                <span class="n">op_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">"fro"</span><span class="p">)</span>
 
-        <span class="c1"># Otherwise set it to one</span>
+        <span class="c1"># Use unit norm when the operator contains no active spin factors.</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">op_norm</span> <span class="o">=</span> <span class="mi">1</span>
-        
-        <span class="c1"># Calculate the norm of the unit operator part</span>
+
+        <span class="c1"># Compute the norm contribution from inactive unit operators.</span>
         <span class="n">unit_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">[</span><span class="n">idx_inactive</span><span class="p">]))</span>
 
-        <span class="c1"># Total norm of the operator</span>
+        <span class="c1"># Combine the norm factors and store the coefficient.</span>
         <span class="n">norm</span> <span class="o">=</span> <span class="n">op_norm</span> <span class="o">*</span> <span class="n">unit_norm</span>
-
-        <span class="c1"># Set the properly normalized coefficient</span>
         <span class="n">rho</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">norm</span>
 
-    <span class="c1"># Convert to csc_array if requesting sparse</span>
+    <span class="c1"># Return the state in the configured output format.</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">rho</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="state_to_zeeman">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.state_to_zeeman">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">state_to_zeeman</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span>
+    <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Takes the state vector defined in the normalized spherical tensor basis</span>
-<span class="sd">    and converts it into a density matrix written in the Zeeman eigenbasis.</span>
-<span class="sd">    Useful for error checking.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert a Liouville-space state vector to a density matrix</span>
+<span class="sd">    in the Zeeman eigenbasis.</span>
+
+<span class="sd">    This function is mainly intended for validation and debugging.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -512,63 +562,67 @@
 <span class="sd">        Spin system whose state vector is going to be converted into a density</span>
 <span class="sd">        matrix.</span>
 <span class="sd">    rho : ndarray or csc_array</span>
-<span class="sd">        State vector defined in the normalized spherical tensor basis.</span>
+<span class="sd">        State vector defined in the normalised spherical-tensor basis.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    rho_zeeman : ndarray or csc_array</span>
 <span class="sd">        Spin density matrix defined in the Zeeman eigenbasis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before converting the &quot;</span>
-                         <span class="s2">&quot;state vector into density matrix.&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get the dimension of density matrix</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span>
+        <span class="n">spin_system</span><span class="p">,</span>
+        <span class="s2">"basis.basis"</span><span class="p">,</span>
+        <span class="s2">"converting the state vector into a density matrix"</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Initialize the spin density matrix</span>
+    <span class="c1"># Determine the Hilbert-space dimension of the density matrix.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Allocate the density matrix in the configured storage format.</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
         <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">rho_zeeman</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-    
-    <span class="c1"># Obtain indices of the non-zero coefficients from the state vector</span>
+
+    <span class="c1"># Identify the non-zero coefficients of the Liouville-space state.</span>
     <span class="n">idx_nonzero</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># Loop over the nonzero indices</span>
+    <span class="c1"># Accumulate the corresponding normalised product operators.</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idx_nonzero</span><span class="p">:</span>
 
-        <span class="c1"># Get the corresponding operator definition</span>
+        <span class="c1"># Read the operator definition associated with the basis index.</span>
         <span class="n">op_def</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
-        <span class="c1"># Get the normalized product operator in the Zeeman eigenbasis with</span>
-        <span class="c1"># normalization</span>
+        <span class="c1"># Construct and normalise the corresponding Zeeman-basis operator.</span>
         <span class="n">oper</span> <span class="o">=</span> <span class="n">op_prod</span><span class="p">(</span><span class="n">op_def</span><span class="p">,</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">spins</span><span class="p">,</span> <span class="n">include_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_operator</span><span class="p">:</span>
-            <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+            <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">"fro"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
-        
-        <span class="c1"># Add to the total density matrix</span>
+            <span class="n">oper</span> <span class="o">=</span> <span class="n">oper</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">oper</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">"fro"</span><span class="p">)</span>
+
+        <span class="c1"># Add the weighted contribution to the density matrix.</span>
         <span class="n">rho_zeeman</span> <span class="o">+=</span> <span class="n">rho</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">oper</span>
-    
+
     <span class="k">return</span> <span class="n">rho_zeeman</span></div>
+
 
 
 <div class="viewcode-block" id="alpha_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.alpha_state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">alpha_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the alpha state for a given spin-1/2 nucleus. Unit state is</span>
-<span class="sd">    assigned to the other spins.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate the alpha (spin-up) state for a selected spin-1/2 nucleus.</span>
+
+<span class="sd">    The remaining spins are assigned the unit state.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    spin_system: SpinSystem</span>
+<span class="sd">    spin_system : SpinSystem</span>
 <span class="sd">        Spin system for which the alpha state is created.</span>
 <span class="sd">    index : int</span>
 <span class="sd">        Index of the spin that has the alpha state.</span>
@@ -577,38 +631,39 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the alpha state of the given spin index.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;alpha state.&quot;</span><span class="p">)</span>
-    
-    <span class="c1"># Calculate the dimension of the full Liouville space</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the alpha state"</span><span class="p">)</span>
 
-    <span class="c1"># Make the alpha state</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
+    <span class="c1"># Determine the full Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Build the unit and longitudinal single-spin states.</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="c1"># Form the alpha-state density operator.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">unit</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="beta_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.beta_state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">beta_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the beta state for a given spin-1/2 nucleus. Unit state is</span>
-<span class="sd">    assigned to the other spins.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate the beta (spin-down) state for a selected spin-1/2 nucleus.</span>
+
+<span class="sd">    The remaining spins are assigned the unit state.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    spin_system: SpinSystem</span>
+<span class="sd">    spin_system : SpinSystem</span>
 <span class="sd">        Spin system for which the beta state is created.</span>
 <span class="sd">    index : int</span>
 <span class="sd">        Index of the spin that has the beta state.</span>
@@ -617,30 +672,32 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the beta state of the given spin index.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;beta state.&quot;</span><span class="p">)</span>
-    
-    <span class="c1"># Calculate the dimension of the full Liouville space</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the beta state"</span><span class="p">)</span>
 
-    <span class="c1"># Make the beta state</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
+    <span class="c1"># Determine the full Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Build the unit and longitudinal single-spin states.</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">I_z</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="c1"># Form the beta-state density operator.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">unit</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">I_z</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
 
 
+
 <div class="viewcode-block" id="equilibrium_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.equilibrium_state">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">equilibrium_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates the thermal equilibrium state for the spin system.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">equilibrium_state</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Construct the thermal-equilibrium state of the spin system.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -651,52 +708,53 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        Equilibrium state vector.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;equilibrium state.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">magnetic_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set the magnetic field before &quot;</span>
-                         <span class="s2">&quot;constructing the equilibrium state.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please set the temperature before &quot;</span>
-                         <span class="s2">&quot;constructing the equilibrium state.&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Build the left Hamiltonian superoperator</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the equilibrium state"</span><span class="p">)</span>
+
+    <span class="c1"># Ensure that the thermodynamic parameters have been configured.</span>
+    <span class="n">require</span><span class="p">(</span>
+        <span class="n">parameters</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">"magnetic_field"</span><span class="p">,</span> <span class="s2">"temperature"</span><span class="p">],</span>
+        <span class="s2">"constructing the equilibrium state"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Build the Boltzmann propagator and apply it to the unit state.</span>
     <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
-        <span class="n">H_left</span> <span class="o">=</span> <span class="n">hamiltonian</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+        <span class="n">H_left</span> <span class="o">=</span> <span class="n">hamiltonian</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
 
-        <span class="c1"># Get the matrix exponential corresponding to the Boltzmann distribution</span>
+        <span class="c1"># Evaluate the matrix exponential of the Boltzmann operator.</span>
         <span class="n">T</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">temperature</span>
         <span class="n">zv</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">zero_equilibrium</span>
-        <span class="k">with</span> <span class="n">HidePrints</span><span class="p">():</span>
-            <span class="n">P</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">H_left</span><span class="p">,</span> <span class="n">zv</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">hbar</span> <span class="o">/</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">H_left</span><span class="p">,</span> <span class="n">zv</span><span class="p">)</span>
 
-        <span class="c1"># Obtain the thermal equilibrium by propagating the unit state</span>
+        <span class="c1"># Propagate the unnormalised unit state to equilibrium.</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">unit</span>
 
-        <span class="c1"># Ensure the correct sparsity (might have changed during multiplication)</span>
+        <span class="c1"># Restore sparse storage if the matrix product densified the output.</span>
         <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">):</span>
             <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
 
-        <span class="c1"># Normalize: the trace of the corresponding density matrix should be one</span>
+        <span class="c1"># Normalise the state so that the density-matrix trace equals one.</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)))</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="singlet_state">
 <a class="viewcode-back" href="../../../spinguin.html#spinguin.singlet_state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">singlet_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">index_1</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span> <span class="p">:</span> <span class="nb">int</span>
+    <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the singlet state between two spin-1/2 nuclei. Unit state is</span>
-<span class="sd">    assigned to the other spins.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate the singlet state of a spin-1/2 pair.</span>
+
+<span class="sd">    The remaining spins are assigned the unit state.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -711,25 +769,25 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the singlet state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;singlet state.&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Calculate the dimension of the full Liouville space</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the singlet state"</span><span class="p">)</span>
 
-    <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="c1"># Determine the full Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
 
-    <span class="c1"># Make the singlet</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
+    <span class="c1"># Build the unit and two-spin correlation states.</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(+, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(-, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="c1"># Form the singlet-state density operator.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">unit</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="triplet_zero_state">
@@ -737,15 +795,16 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">triplet_zero_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the triplet zero state between two spin-1/2 nuclei. Unit state is</span>
-<span class="sd">    assigned to the other spins.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate the triplet-zero state of a spin-1/2 pair.</span>
+
+<span class="sd">    The remaining spins are assigned the unit state.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    spin_system: SpinSystem</span>
+<span class="sd">    spin_system : SpinSystem</span>
 <span class="sd">        Spin system for which the triplet zero state is created.</span>
 <span class="sd">    index_1 : int</span>
 <span class="sd">        Index of the first spin in the triplet zero state.</span>
@@ -756,25 +815,25 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the triplet zero state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;triplet zero state.&quot;</span><span class="p">)</span>
-    
-    <span class="c1"># Calculate the dimension of the full Liouville space</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(+,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the triplet zero state"</span><span class="p">)</span>
 
-    <span class="c1"># Make the triplet zero</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
+    <span class="c1"># Determine the full Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Build the unit and two-spin correlation states.</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">IpIm</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(+, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(-, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">ImIp</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(-, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(+, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="c1"># Form the triplet-zero density operator.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">unit</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="p">(</span><span class="n">IpIm</span> <span class="o">+</span> <span class="n">ImIp</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="triplet_plus_state">
@@ -782,11 +841,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">triplet_plus_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the triplet plus state between two spin-1/2 nuclei. Unit state is</span>
-<span class="sd">    assigned to the other spins.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate the triplet-plus state of a spin-1/2 pair.</span>
+
+<span class="sd">    The remaining spins are assigned the unit state.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -801,25 +861,25 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the triplet plus state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;triplet plus state.&quot;</span><span class="p">)</span>
-    
-    <span class="c1"># Calculate the dimension of the full Liouville space</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the triplet plus state"</span><span class="p">)</span>
 
-    <span class="c1"># Make the triplet plus</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzE</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">EIz</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
+    <span class="c1"># Determine the full Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Build the unit, single-spin, and longitudinal correlation states.</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Iz_1</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">Iz_2</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="c1"># Form the triplet-plus density operator.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">unit</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">Iz_1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">Iz_2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="triplet_minus_state">
@@ -827,11 +887,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">triplet_minus_state</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">index_1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">index_2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates the triplet minus state between two spin-1/2 nuclei. Unit state is</span>
-<span class="sd">    assigned to the other spins.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate the triplet-minus state of a spin-1/2 pair.</span>
+
+<span class="sd">    The remaining spins are assigned the unit state.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -846,25 +907,25 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        State vector corresponding to the triplet minus state.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before constructing the &quot;</span>
-                         <span class="s2">&quot;triplet minus state.&quot;</span><span class="p">)</span>
-    
-    <span class="c1"># Calculate the dimension of the full Liouville space</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get states</span>
-    <span class="n">E</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">IzE</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">EIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;I(z,</span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="s2">"basis.basis"</span><span class="p">,</span> <span class="s2">"constructing the triplet minus state"</span><span class="p">)</span>
 
-    <span class="c1"># Make the triplet minus</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">E</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzE</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">EIz</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
+    <span class="c1"># Determine the full Hilbert-space dimension.</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">mults</span><span class="p">))</span>
+
+    <span class="c1"># Build the unit, single-spin, and longitudinal correlation states.</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">unit_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Iz_1</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">Iz_2</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">IzIz</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"I(z, </span><span class="si">{</span><span class="n">index_1</span><span class="si">}</span><span class="s2">) * I(z, </span><span class="si">{</span><span class="n">index_2</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="c1"># Form the triplet-minus density operator.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">unit</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">Iz_1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">Iz_2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">dim</span> <span class="o">*</span> <span class="n">IzIz</span>
 
     <span class="k">return</span> <span class="n">rho</span></div>
+
 
 
 <div class="viewcode-block" id="measure">
@@ -872,12 +933,13 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">measure</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes the expectation value of the specified operator for a given state</span>
-<span class="sd">    vector. Assumes that the state vector `rho` represents a trace-normalized</span>
-<span class="sd">    density matrix.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute the expectation value of an operator for a given state.</span>
+
+<span class="sd">    The state vector ``rho`` is assumed to represent a trace-normalised density</span>
+<span class="sd">    matrix.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -891,50 +953,52 @@
 
 <span class="sd">        - Cartesian or ladder operator at specific index or for all spins::</span>
 
-<span class="sd">            operator = &quot;I(component, index)&quot;</span>
-<span class="sd">            operator = &quot;I(component)&quot;</span>
+<span class="sd">            operator = "I(component, index)"</span>
+<span class="sd">            operator = "I(component)"</span>
 
 <span class="sd">        - Spherical tensor operator at specific index or for all spins::</span>
 
-<span class="sd">            operator = &quot;T(l, q, index)&quot;</span>
-<span class="sd">            operator = &quot;T(l, q)&quot;</span>
+<span class="sd">            operator = "T(l, q, index)"</span>
+<span class="sd">            operator = "T(l, q)"</span>
 
 <span class="sd">        - Product operators::</span>
 
-<span class="sd">            operator = &quot;I(component1, index1) * I(component2, index2)&quot;</span>
+<span class="sd">            operator = "I(component1, index1) * I(component2, index2)"</span>
 
 <span class="sd">        - Sum of operators::</span>
 
-<span class="sd">            operator = &quot;I(component1, index1) + I(component2, index2)&quot;</span>
-<span class="sd">            </span>
+<span class="sd">            operator = "I(component1, index1) + I(component2, index2)"</span>
+
 <span class="sd">        - Unit operators are ignored in the input. These are identical::</span>
 
-<span class="sd">            operator = &quot;E * I(component, index)&quot;</span>
-<span class="sd">            operator = &quot;I(component, index)&quot;</span>
-<span class="sd">        </span>
-<span class="sd">        Special case: An empty `operator` string is considered as unit operator.</span>
+<span class="sd">            operator = "E * I(component, index)"</span>
+<span class="sd">            operator = "I(component, index)"</span>
+
+<span class="sd">        Special case: An empty ``operator`` string is considered as the unit</span>
+<span class="sd">        operator.</span>
 
 <span class="sd">        Whitespace will be ignored in the input.</span>
 
-<span class="sd">        NOTE: Indexing starts from 0!</span>
+<span class="sd">        Note that indexing starts from 0.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ex : complex</span>
 <span class="sd">        Expectation value.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the required attributes are set</span>
-    <span class="k">if</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please build the basis before measuring an &quot;</span>
-                         <span class="s2">&quot;expectation value of an operator.&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get the &quot;operator&quot; to be measured</span>
+    <span class="c1"># Ensure that the basis is available.</span>
+    <span class="n">require</span><span class="p">(</span>
+        <span class="n">spin_system</span><span class="p">,</span>
+        <span class="s2">"basis.basis"</span><span class="p">,</span>
+        <span class="s2">"measuring an expectation value of an operator"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Construct the operator state vector in the system basis.</span>
     <span class="n">oper</span> <span class="o">=</span> <span class="n">state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">operator</span><span class="p">)</span>
 
-    <span class="c1"># Perform the measurement</span>
-    <span class="n">ex</span> <span class="o">=</span> <span class="p">(</span><span class="n">oper</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">rho</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">ex</span></div>
+    <span class="c1"># Evaluate the inner product corresponding to the expectation value.</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">oper</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">rho</span><span class="p">)</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span></div>
 
 </pre></div>
 
@@ -974,7 +1038,7 @@ By Joni Eronen, Perttu Hilla
 
   <p class="copyright">
     
-      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
       <br/>
     
   </p>
@@ -998,8 +1062,8 @@ By Joni Eronen, Perttu Hilla
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

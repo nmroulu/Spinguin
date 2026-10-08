@@ -26,17 +26,17 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=4418a689" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../../_static/documentation_options.js?v=b1def801"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -44,31 +44,38 @@
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/sequences/_pulse_and_acquire';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -94,7 +101,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -244,11 +291,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -280,9 +334,16 @@
                 <article class="bd-article">
                   
   <h1>Source code for spinguin.sequences._pulse_and_acquire</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Imports</span>
+<span></span><span class="sd">"""</span>
+<span class="sd">Simple pulse-and-acquire sequence for simulating a free induction decay.</span>
+
+<span class="sd">This module provides a basic hard-pulse excitation sequence followed by</span>
+<span class="sd">direct detection of the transverse signal in the rotating frame.</span>
+<span class="sd">"""</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">spinguin._core</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sg</span>
+
 
 <div class="viewcode-block" id="pulse_and_acquire">
 <a class="viewcode-back" href="../../../sequences.html#spinguin.sequences.pulse_and_acquire">[docs]</a>
@@ -292,66 +353,89 @@
     <span class="n">center_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">npoints</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">dwell_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span>       
+    <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simple pulse-and-acquire experiment.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Perform a simple pulse-and-acquire experiment.</span>
 
 <span class="sd">    This experiment requires the following spin system properties to be defined:</span>
 
-<span class="sd">    - spin_system.basis : must be built</span>
-<span class="sd">    - spin_system.relaxation.theory</span>
-<span class="sd">    - spin_system.relaxation.thermalization : must be True</span>
+<span class="sd">    - ``spin_system.basis``: must be built</span>
+<span class="sd">    - ``spin_system.relaxation.theory``</span>
+<span class="sd">    - ``spin_system.relaxation.thermalization``: must be ``True``</span>
 
 <span class="sd">    This experiment requires the following parameters to be defined:</span>
 
-<span class="sd">    - parameters.magnetic_field : magnetic field of the spectrometer in Tesla</span>
-<span class="sd">    - parameters.temperature : temperature of the sample in Kelvin</span>
+<span class="sd">    - ``parameters.magnetic_field``: magnetic field of the spectrometer in T</span>
+<span class="sd">    - ``parameters.temperature``: temperature of the sample in K</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    spin_system : SpinSystem</span>
-<span class="sd">        Spin system to which the pulse-and-acquire experiment is performed.</span>
+<span class="sd">        Spin system on which the pulse-and-acquire experiment is performed.</span>
+<span class="sd">    isotope : str</span>
+<span class="sd">        Isotope, for example ``'1H'``, that is excited and observed.</span>
+<span class="sd">    center_frequency : float</span>
+<span class="sd">        Rotating-frame centre frequency in Hz for the observed isotope</span>
+<span class="sd">        channel.</span>
+<span class="sd">    npoints : int</span>
+<span class="sd">        Number of complex points in the simulated free induction decay.</span>
+<span class="sd">    dwell_time : float</span>
+<span class="sd">        Time step between successive data points, in seconds.</span>
+<span class="sd">    angle : float</span>
+<span class="sd">        Pulse flip angle in degrees.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    fid : ndarray</span>
 <span class="sd">        Free induction decay signal.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Obtain the Liouvillian</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        Propagated if the underlying Hamiltonian, relaxation, or equilibrium</span>
+<span class="sd">        state calculations are missing required settings, or if the requested</span>
+<span class="sd">        isotope is not present in the spin system.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Construct the Liouvillian governing the spin dynamics.</span>
     <span class="n">H</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">hamiltonian</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">relaxation</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
     <span class="n">L</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">liouvillian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
 
-    <span class="c1"># Obtain the equilibrium state</span>
+    <span class="c1"># Construct the thermal-equilibrium state.</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">equilibrium_state</span><span class="p">(</span><span class="n">spin_system</span><span class="p">)</span>
 
-    <span class="c1"># Find indices of the isotopes to be measured</span>
+    <span class="c1"># Identify the spins belonging to the observed isotope channel.</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">isotopes</span> <span class="o">==</span> <span class="n">isotope</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">indices</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Isotope </span><span class="si">{</span><span class="n">isotope</span><span class="si">}</span><span class="s2"> is not present in the spin system."</span>
+        <span class="p">)</span>
 
-    <span class="c1"># Apply pulse</span>
-    <span class="n">op_pulse</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(y,</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span>
-    <span class="n">Px</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pulse</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">op_pulse</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span>
-    <span class="n">rho</span> <span class="o">=</span> <span class="n">Px</span> <span class="o">@</span> <span class="n">rho</span>
+    <span class="c1"># Apply the hard excitation pulse to the selected isotope channel.</span>
+    <span class="n">pulse_operator_string</span> <span class="o">=</span> <span class="s2">"+"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"I(y,</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span>
+    <span class="n">pulse_operator</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">pulse</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">pulse_operator_string</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">pulse_operator</span> <span class="o">@</span> <span class="n">rho</span>
 
-    <span class="c1"># Construct the time propagator</span>
+    <span class="c1"># Construct the propagator for one dwell-time step.</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">propagator</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">dwell_time</span><span class="p">)</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">propagator_to_rotframe</span><span class="p">(</span>
-        <span class="n">spin_system</span> <span class="o">=</span> <span class="n">spin_system</span><span class="p">,</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">P</span><span class="p">,</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">dwell_time</span><span class="p">,</span>
-        <span class="n">center_frequencies</span> <span class="o">=</span> <span class="p">{</span><span class="n">isotope</span><span class="p">:</span> <span class="n">center_frequency</span><span class="p">}</span>
+        <span class="n">spin_system</span><span class="o">=</span><span class="n">spin_system</span><span class="p">,</span>
+        <span class="n">P</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
+        <span class="n">t</span><span class="o">=</span><span class="n">dwell_time</span><span class="p">,</span>
+        <span class="n">center_frequencies</span><span class="o">=</span><span class="p">{</span><span class="n">isotope</span><span class="p">:</span> <span class="n">center_frequency</span><span class="p">},</span>
     <span class="p">)</span>
 
-    <span class="c1"># Initialize an array for storing results</span>
+    <span class="c1"># Allocate the free induction decay array.</span>
     <span class="n">fid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">npoints</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
 
-    <span class="c1"># Perform the time evolution</span>
-    <span class="n">op_measure</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I(-,</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span>
+    <span class="c1"># Propagate the state and record the detected transverse signal.</span>
+    <span class="n">measurement_operator</span> <span class="o">=</span> <span class="s2">"+"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"I(-,</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npoints</span><span class="p">):</span>
-        <span class="n">fid</span><span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">op_measure</span><span class="p">)</span>
+        <span class="n">fid</span><span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">measurement_operator</span><span class="p">)</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">rho</span>
-    
+
     <span class="k">return</span> <span class="n">fid</span></div>
 
 </pre></div>
@@ -392,7 +476,7 @@ By Joni Eronen, Perttu Hilla
 
   <p class="copyright">
     
-      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
       <br/>
     
   </p>
@@ -416,8 +500,8 @@ By Joni Eronen, Perttu Hilla
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

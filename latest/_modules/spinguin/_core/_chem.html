@@ -26,17 +26,17 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=4418a689" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../../_static/documentation_options.js?v=b1def801"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -44,31 +44,38 @@
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/spinguin/_core/_chem';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://nmroulu.github.io/Spinguin/version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -94,7 +101,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -244,11 +291,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -280,21 +334,158 @@
                 <article class="bd-article">
                   
   <h1>Source code for spinguin._core._chem</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains functions responsible for chemical kinetics.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># Referencing SpinSystem class</span>
+<span></span><span class="sd">"""</span>
+<span class="sd">Chemical-exchange helpers for Liouville-space simulations.</span>
+
+<span class="sd">This module provides helper functions for simple chemical exchange operations</span>
+<span class="sd">in Liouville space, including association, dissociation, and spin-order</span>
+<span class="sd">permutation. These helpers also support non-linear chemical-kinetic</span>
+<span class="sd">workflows.</span>
+<span class="sd">"""</span>
+
+<span class="c1"># Imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">arraylike_to_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._states</span><span class="w"> </span><span class="kn">import</span> <span class="n">empty_state</span>
+
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._spin_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinSystem</span>
 
-<span class="c1"># Imports</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._la</span><span class="w"> </span><span class="kn">import</span> <span class="n">arraylike_to_array</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">spinguin._core._parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">parameters</span>
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Helper functions</span>
+<span class="c1">###############################################################################    </span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_bipartite_spin_maps</span><span class="p">(</span>
+    <span class="n">spin_system_A</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_system_B</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Validate spin maps used for association and dissociation</span>
+<span class="sd">    (error handling).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin_system_A : SpinSystem</span>
+<span class="sd">        First subsystem.</span>
+<span class="sd">    spin_system_B : SpinSystem</span>
+<span class="sd">        Second subsystem.</span>
+<span class="sd">    spin_system_C : SpinSystem</span>
+<span class="sd">        Composite system.</span>
+<span class="sd">    spin_map_A : list or tuple or ndarray</span>
+<span class="sd">        Indices of subsystem A within the composite system.</span>
+<span class="sd">    spin_map_B : list or tuple or ndarray</span>
+<span class="sd">        Indices of subsystem B within the composite system.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Check that subsystem A has the expected number of mapped spins.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spin_map_A</span><span class="p">)</span> <span class="o">!=</span> <span class="n">spin_system_A</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"length of spin_map_A does not match the number of spins "</span>
+            <span class="s2">"in spin_system_A"</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Check that subsystem B has the expected number of mapped spins.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spin_map_B</span><span class="p">)</span> <span class="o">!=</span> <span class="n">spin_system_B</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"length of spin_map_B does not match the number of spins "</span>
+            <span class="s2">"in spin_system_B"</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Check that both maps form a complete non-overlapping partition of C.</span>
+    <span class="n">spin_map_C</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">spin_map_A</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">spin_map_B</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">spin_map_C</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">spin_system_C</span><span class="o">.</span><span class="n">nspins</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"spin maps contain incorrect indices or overlapping indices"</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_permutation_spin_map</span><span class="p">(</span>
+    <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Validate a spin map used for spin permutation (error handling).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spin_system : SpinSystem</span>
+<span class="sd">        Spin system to be permuted.</span>
+<span class="sd">    spin_map : list or tuple or ndarray</span>
+<span class="sd">        Permuted spin indices.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Check that the map is a valid permutation of all spin indices.</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">spin_map</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"length of spin_map does not match the number of spins in "</span>
+            <span class="s2">"the system or spin_map contains incorrect or overlapping indices"</span>
+        <span class="p">)</span>
+    
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_elementary_reaction_spin_map</span><span class="p">(</span>
+    <span class="n">reactant_systems</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SpinSystem</span><span class="p">],</span>
+    <span class="n">product_systems</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SpinSystem</span><span class="p">],</span>
+    <span class="n">spin_map</span> <span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Validate a spin map used for an elementary reaction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reactant_systems : list of SpinSystem</span>
+<span class="sd">        List of spin systems for the reactants.</span>
+<span class="sd">    product_systems : list of SpinSystem</span>
+<span class="sd">        List of spin systems for the products.</span>
+<span class="sd">    spin_map : dict of tuple of int to tuple of int</span>
+<span class="sd">        Dictionary that maps the nuclear spins in the reactants to those in the</span>
+<span class="sd">        products.    </span>
+<span class="sd">    """</span>
+    <span class="c1"># Define the exact sets of spins that must exist</span>
+    <span class="n">expected_reactants</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">ss</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reactant_systems</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">rs</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">expected_products</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">ss</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">product_systems</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ps</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Extract the user-provided mappings</span>
+    <span class="n">mapped_reactants</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">spin_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">mapped_products_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">spin_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">mapped_products_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mapped_products_list</span><span class="p">)</span>
+
+    <span class="c1"># Check that the number of spins in the product and in the reactant match</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected_reactants</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected_products</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"The number of reactant and product spins do not match"</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Check that every reactant spin is mapped</span>
+    <span class="k">if</span> <span class="n">mapped_reactants</span> <span class="o">!=</span> <span class="n">expected_reactants</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Not every reactant spin is mapped."</span><span class="p">)</span>
+
+    <span class="c1"># Check that every product spin receives a map</span>
+    <span class="k">if</span> <span class="n">mapped_products_set</span> <span class="o">!=</span> <span class="n">expected_products</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Not every product spin is mapped."</span><span class="p">)</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># "Actual" functions</span>
+<span class="c1">###############################################################################</span>
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_dissociate_index_map</span><span class="p">(</span>
@@ -302,13 +493,14 @@
     <span class="n">basis_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">basis_C_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">spin_map_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-    <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
+    <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates arrays that map the state indices from the basis set C to basis</span>
-<span class="sd">    sets A and B. This function is used in `dissociate()`.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate index maps from a composite basis to two subsystem bases.</span>
 
-<span class="sd">    Example. Basis set C contains five spins, which are indexed as</span>
+<span class="sd">    This helper is used internally by `dissociate()`.</span>
+
+<span class="sd">    Example: Basis set C contains five spins, which are indexed as</span>
 <span class="sd">    (0, 1, 2, 3, 4). We want to dissociate this into two subsystems A and B.</span>
 <span class="sd">    Spins 0 and 2 should go to subsystem A and the rest to subsystem B. In this</span>
 <span class="sd">    case, we define the following spin maps::</span>
@@ -319,9 +511,9 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    basis_A_bytes : bytes</span>
-<span class="sd">        Basis set for the subsystem A converted to bytes.</span>
+<span class="sd">        Basis set for subsystem A converted to bytes.</span>
 <span class="sd">    basis_B_bytes : bytes</span>
-<span class="sd">        Basis set for the subsystem B converted to bytes.</span>
+<span class="sd">        Basis set for subsystem B converted to bytes.</span>
 <span class="sd">    basis_C_bytes : bytes</span>
 <span class="sd">        Basis set for the composite system C converted to bytes.</span>
 <span class="sd">    spin_map_A_bytes : bytes</span>
@@ -341,9 +533,9 @@
 <span class="sd">    index_map_CB : ndarray</span>
 <span class="sd">        Corresponding indices of the matching elements in C. The array length is</span>
 <span class="sd">        equal to `index_map_B`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="c1"># Convert bytes back to arrays</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Reconstruct the spin maps and basis arrays from cached byte strings.</span>
     <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_A_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_B_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">nspins_A</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -353,58 +545,54 @@
     <span class="n">basis_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_B_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins_B</span><span class="p">)</span>
     <span class="n">basis_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_C_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins_C</span><span class="p">)</span>
 
-    <span class="c1"># Create empty lists for the index maps</span>
+    <span class="c1"># Initialise the lists that store the subsystem-to-composite mappings.</span>
     <span class="n">index_map_A</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">index_map_CA</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">index_map_B</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">index_map_CB</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># Make a dictionary of the C basis for fast lookup</span>
+    <span class="c1"># Build a lookup table for basis states of the composite system.</span>
     <span class="n">basis_C_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis_C</span><span class="p">)}</span>
 
-    <span class="c1"># Loop over the basis set of spin system A</span>
+    <span class="c1"># Map basis states of subsystem A into the composite basis.</span>
     <span class="k">for</span> <span class="n">idx_A</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis_A</span><span class="p">):</span>
 
-        <span class="c1"># Initialize the state definition for spin system C</span>
+        <span class="c1"># Initialise the composite operator definition for the current state.</span>
         <span class="n">op_def_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
-        <span class="c1"># Map the states</span>
+        <span class="c1"># Place the subsystem operators into their composite-system positions.</span>
         <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">spin_map_A</span><span class="p">):</span>
             <span class="n">op_def_C</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
 
-        <span class="c1"># Convert to tuple for efficient searching</span>
+        <span class="c1"># Convert the state definition to a hashable tuple for lookup.</span>
         <span class="n">op_def_C</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">op_def_C</span><span class="p">)</span>
 
-        <span class="c1"># Find the index of this state in spin system C</span>
+        <span class="c1"># Store the mapping when the state exists in the composite basis.</span>
         <span class="k">if</span> <span class="n">op_def_C</span> <span class="ow">in</span> <span class="n">basis_C_lookup</span><span class="p">:</span>
             <span class="n">idx_C</span> <span class="o">=</span> <span class="n">basis_C_lookup</span><span class="p">[</span><span class="n">op_def_C</span><span class="p">]</span>
-
-            <span class="c1"># Add the indices to the index maps</span>
             <span class="n">index_map_CA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_C</span><span class="p">)</span>
             <span class="n">index_map_A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_A</span><span class="p">)</span>
 
-    <span class="c1"># Loop over the basis set of spin system B</span>
+    <span class="c1"># Map basis states of subsystem B into the composite basis.</span>
     <span class="k">for</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis_B</span><span class="p">):</span>
 
-        <span class="c1"># Initialize the state definition for spin system C</span>
+        <span class="c1"># Initialise the composite operator definition for the current state.</span>
         <span class="n">op_def_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nspins_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
-        <span class="c1"># Map the states</span>
+        <span class="c1"># Place the subsystem operators into their composite-system positions.</span>
         <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">spin_map_B</span><span class="p">):</span>
             <span class="n">op_def_C</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
 
-        <span class="c1"># Convert to tuple for efficient searching</span>
+        <span class="c1"># Convert the state definition to a hashable tuple for lookup.</span>
         <span class="n">op_def_C</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">op_def_C</span><span class="p">)</span>
 
-        <span class="c1"># Find the index of this state in spin system C</span>
+        <span class="c1"># Store the mapping when the state exists in the composite basis.</span>
         <span class="k">if</span> <span class="n">op_def_C</span> <span class="ow">in</span> <span class="n">basis_C_lookup</span><span class="p">:</span>
             <span class="n">idx_C</span> <span class="o">=</span> <span class="n">basis_C_lookup</span><span class="p">[</span><span class="n">op_def_C</span><span class="p">]</span>
-
-            <span class="c1"># Add the indices to the index maps</span>
             <span class="n">index_map_CB</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_C</span><span class="p">)</span>
             <span class="n">index_map_B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_B</span><span class="p">)</span>
 
-    <span class="c1"># Convert the lists to NumPy arrays</span>
+    <span class="c1"># Convert the accumulated mappings to NumPy arrays.</span>
     <span class="n">index_map_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_map_A</span><span class="p">)</span>
     <span class="n">index_map_CA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_map_CA</span><span class="p">)</span>
     <span class="n">index_map_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_map_B</span><span class="p">)</span>
@@ -412,24 +600,25 @@
 
     <span class="k">return</span> <span class="n">index_map_A</span><span class="p">,</span> <span class="n">index_map_CA</span><span class="p">,</span> <span class="n">index_map_B</span><span class="p">,</span> <span class="n">index_map_CB</span>
 
+
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_associate_index_map</span><span class="p">(</span>
     <span class="n">basis_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">basis_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">basis_C_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
     <span class="n">spin_map_A_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-    <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generates arrays that map the state indices from spin systems A and B to the</span>
-<span class="sd">    composite spin system C. This function is used in `associate()`.</span>
+    <span class="n">spin_map_B_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate index maps from two subsystem bases to a composite basis.</span>
 
-<span class="sd">    Example. We have spin system A that has two spins and spin system B that has</span>
+<span class="sd">    This helper is used internally by `associate()`.</span>
+
+<span class="sd">    Example: We have spin system A that has two spins and spin system B that has</span>
 <span class="sd">    three spins. These systems associate to form a composite spin system C that</span>
 <span class="sd">    has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are</span>
-<span class="sd">    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the</span>
-<span class="sd">    spin systems A and B will be indexed in spin system C by defining the spin</span>
-<span class="sd">    maps as follows::</span>
+<span class="sd">    from subsystem A and (1, 3, 4) from subsystem B. </span>
+<span class="sd">    In this case, the spin maps are defined as follows::</span>
 
 <span class="sd">        spin_map_A = np.ndarray([0, 2])</span>
 <span class="sd">        spin_map_B = np.ndarray([1, 3, 4])</span>
@@ -455,9 +644,9 @@
 <span class="sd">        Mapping of indices for spin system B.</span>
 <span class="sd">    index_map_C : ndarray</span>
 <span class="sd">        Mapping of indices for spin system C.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="c1"># Convert bytes back to arrays</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Reconstruct the spin maps and basis arrays from cached byte strings.</span>
     <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_A_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_B_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">nspins_A</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -467,93 +656,194 @@
     <span class="n">basis_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_B_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins_B</span><span class="p">)</span>
     <span class="n">basis_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_C_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins_C</span><span class="p">)</span>
 
-    <span class="c1"># Create empty lists for the index mappings</span>
+    <span class="c1"># Initialise the lists that store the subsystem-to-composite mappings.</span>
     <span class="n">index_map_A</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">index_map_B</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">index_map_C</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># Make a dictionary of the A and B basis sets for fast lookup</span>
+    <span class="c1"># Build lookup tables for the subsystem basis states.</span>
     <span class="n">basis_A_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis_A</span><span class="p">)}</span>
     <span class="n">basis_B_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis_B</span><span class="p">)}</span>
 
-    <span class="c1"># Loop over the basis states of spin system C</span>
+    <span class="c1"># Find composite states that can be assembled from both subsystems.</span>
     <span class="k">for</span> <span class="n">idx_C</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis_C</span><span class="p">):</span>
 
-        <span class="c1"># Extract the corresponding states of A and B</span>
+        <span class="c1"># Extract the subsystem states that correspond to the current state.</span>
         <span class="n">state_A</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map_A</span><span class="p">)</span>
         <span class="n">state_B</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map_B</span><span class="p">)</span>
 
-        <span class="c1"># Only include states that exist in both A and B</span>
+        <span class="c1"># Store the mapping when both subsystem states exist.</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">state_A</span> <span class="ow">in</span> <span class="n">basis_A_lookup</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">state_B</span> <span class="ow">in</span> <span class="n">basis_B_lookup</span><span class="p">):</span>
             <span class="n">index_map_A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">basis_A_lookup</span><span class="p">[</span><span class="n">state_A</span><span class="p">])</span>
             <span class="n">index_map_B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">basis_B_lookup</span><span class="p">[</span><span class="n">state_B</span><span class="p">])</span>
             <span class="n">index_map_C</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_C</span><span class="p">)</span>
 
-    <span class="c1"># Convert to NumPy arrays</span>
+    <span class="c1"># Convert the accumulated mappings to NumPy arrays.</span>
     <span class="n">index_map_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_map_A</span><span class="p">)</span>
     <span class="n">index_map_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_map_B</span><span class="p">)</span>
     <span class="n">index_map_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_map_C</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">index_map_A</span><span class="p">,</span> <span class="n">index_map_B</span><span class="p">,</span> <span class="n">index_map_C</span>
 
+
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_permutation_matrix</span><span class="p">(</span>
     <span class="n">basis_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
-    <span class="n">spin_map_bytes</span><span class="p">:</span> <span class="nb">bytes</span>
+    <span class="n">spin_map_bytes</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-    
-    <span class="c1"># Convert bytes back to arrays</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Build a cached permutation matrix for a specific basis and spin map.</span>
+<span class="sd">    (See `permutation_matrix()` for the public interface.)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis_bytes : bytes</span>
+<span class="sd">        Basis array converted to bytes.</span>
+<span class="sd">    spin_map_bytes : bytes</span>
+<span class="sd">        Permutation map converted to bytes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    csc_array</span>
+<span class="sd">        Sparse permutation matrix in CSC format.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Reconstruct the spin map and basis array from cached byte strings.</span>
     <span class="n">spin_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">spin_map_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">nspins</span> <span class="o">=</span> <span class="n">spin_map</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
 
-    <span class="c1"># Obtain the basis dimension</span>
+    <span class="c1"># Obtain the dimension of the basis.</span>
     <span class="n">dim</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># Create an empty array for the permuted indices</span>
+    <span class="c1"># Allocate the array that stores row indices after permutation.</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
-    <span class="c1"># Make a dictionary of the basis set for fast lookup</span>
+    <span class="c1"># Build a lookup table for basis states in the original ordering.</span>
     <span class="n">basis_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis</span><span class="p">)}</span>
 
-    <span class="c1"># Loop through the basis set</span>
+    <span class="c1"># Find the destination index for every permuted basis state.</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis</span><span class="p">):</span>
 
-        <span class="c1"># Find the permuted state</span>
+        <span class="c1"># Permute the current state according to the supplied spin map.</span>
         <span class="n">state_permuted</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map</span><span class="p">)</span>
 
-        <span class="c1"># Find the index of the permuted state</span>
+        <span class="c1"># Look up the permuted state in the original basis ordering.</span>
         <span class="n">idx_permuted</span> <span class="o">=</span> <span class="n">basis_lookup</span><span class="p">[</span><span class="n">state_permuted</span><span class="p">]</span>
 
-        <span class="c1"># Add to the array of indices</span>
+        <span class="c1"># Store the row index selected by the permutation.</span>
         <span class="n">indices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_permuted</span>
 
-    <span class="c1"># Initialize the permutation matrix</span>
-    <span class="n">perm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye_array</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;lil&#39;</span><span class="p">)</span>
+    <span class="c1"># Start from the identity matrix in a row-addressable sparse format.</span>
+    <span class="n">perm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye_array</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'lil'</span><span class="p">)</span>
 
-    <span class="c1"># Re-order the rows</span>
+    <span class="c1"># Reorder the rows according to the permutation indices.</span>
     <span class="n">perm</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
 
-    <span class="c1"># Convert to CSC</span>
+    <span class="c1"># Convert the matrix to CSC format for later multiplication.</span>
     <span class="n">perm</span> <span class="o">=</span> <span class="n">perm</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">perm</span>
 
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_elementary_reaction_index_map</span><span class="p">(</span>
+    <span class="n">reactant_bases_bytes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">product_bases_bytes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">spin_map_tuple</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generate index maps for an elementary reaction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reactant_bases_bytes : tuple of tuple of bytes and int</span>
+<span class="sd">        Reactant basis sets in bytes and the corresponding number of spins.</span>
+<span class="sd">    product_bases_bytes : tuple of tuple of bytes and int</span>
+<span class="sd">        Product basis sets in bytes and the corresponding number of spins.</span>
+<span class="sd">    spin_map_tuple : tuple of tuple of int</span>
+<span class="sd">        Spin map flattened into a format ((r, rs, p, ps), ...), where</span>
+<span class="sd">        r and p are reactant and product system indices, and</span>
+<span class="sd">        rs and ps are the corresponding spin indices.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Convert the reactant and product bases from bytes to NumPy arrays.</span>
+    <span class="n">reactant_bases</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">basis_bytes</span><span class="p">,</span> <span class="n">nspins</span> <span class="ow">in</span> <span class="n">reactant_bases_bytes</span>
+    <span class="p">]</span>
+    <span class="n">product_bases</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nspins</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">basis_bytes</span><span class="p">,</span> <span class="n">nspins</span> <span class="ow">in</span> <span class="n">product_bases_bytes</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Create lookups for the reactant bases to enable fast index retrieval</span>
+    <span class="n">lookups</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">):</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">basis</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">basis</span> <span class="ow">in</span> <span class="n">reactant_bases</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Re-construct the spin map</span>
+    <span class="n">spin_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reactant_bases_bytes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">product_bases_bytes</span><span class="p">))</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="n">spin_map_tuple</span><span class="p">:</span>
+        <span class="n">spin_map</span><span class="p">[(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rs</span><span class="p">,</span> <span class="n">ps</span><span class="p">))</span>
+
+    <span class="c1"># Generate index maps from reactant basis sets to the product basis sets</span>
+    <span class="n">idx_maps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">product_basis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">product_bases</span><span class="p">):</span>
+        <span class="n">idx_map_p</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">idx_map_rp</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># For every product basis state, search for matching reactant states</span>
+        <span class="k">for</span> <span class="n">idx_p</span><span class="p">,</span> <span class="n">op_def_p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">product_basis</span><span class="p">):</span>
+            <span class="n">idx_rp</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">reactant_basis</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reactant_bases</span><span class="p">):</span>
+                
+                <span class="c1"># Build the corresponding reactant basis state </span>
+                <span class="n">op_def_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">reactant_basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">rs</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="n">spin_map</span><span class="p">[(</span><span class="n">r</span><span class="p">,</span> <span class="n">p</span><span class="p">)]:</span>
+                    <span class="n">op_def_r</span><span class="p">[</span><span class="n">rs</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_def_p</span><span class="p">[</span><span class="n">ps</span><span class="p">]</span>
+                <span class="n">op_def_r</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">op_def_r</span><span class="p">)</span>
+
+                <span class="c1"># Store the index if the state exists</span>
+                <span class="k">if</span> <span class="n">op_def_r</span> <span class="ow">in</span> <span class="n">lookups</span><span class="p">[</span><span class="n">r</span><span class="p">]:</span>
+                    <span class="n">idx_rp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lookups</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">op_def_r</span><span class="p">])</span>
+                
+                <span class="c1"># Otherwise skip the current product basis state completely</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+            <span class="c1"># Store the mapping if all reactant states were found</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idx_map_p</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_p</span><span class="p">)</span>
+                <span class="n">idx_map_rp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_rp</span><span class="p">)</span>
+
+        <span class="c1"># Transpose the reactant index map</span>
+        <span class="n">idx_map_rp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">idx_map_rp</span><span class="p">)]</span>
+        
+        <span class="c1"># Store the mapping for the current product system</span>
+        <span class="n">idx_maps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx_map_p</span><span class="p">,</span> <span class="n">idx_map_rp</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">idx_maps</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">permutation_matrix</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
-    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a permutation matrix to reorder the spins in the system.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Create a permutation matrix that reorders spins in a spin system.</span>
 
-<span class="sd">    Example. Our spin system has three spins, which are indexed (0, 1, 2). We</span>
-<span class="sd">    want to perform the following permulation:</span>
+<span class="sd">    Example: The spin system has three spins, which are indexed (0, 1, 2). </span>
+<span class="sd">    We want to perform the following permutation:</span>
 
 <span class="sd">    - 0 --&gt; 2 (Spin 0 goes to position 2)</span>
 <span class="sd">    - 1 --&gt; 0 (Spin 1 goes to position 0)</span>
 <span class="sd">    - 2 --&gt; 1 (Spin 2 goes to position 1)</span>
 
-<span class="sd">    In this case, we want to assign the following map::</span>
+<span class="sd">    In this case, the spin map is defined as follows::</span>
 
 <span class="sd">        spin_map = np.array([2, 0, 1])</span>
 
@@ -572,15 +862,16 @@
 <span class="sd">    -------</span>
 <span class="sd">    perm : csc_array</span>
 <span class="sd">        The permutation matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Convert the spin map into NumPy</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Convert the supplied spin map to a NumPy array.</span>
     <span class="n">spin_map</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">spin_map</span><span class="p">)</span>
 
-    <span class="c1"># Convert the arrays to bytes for hashing</span>
+    <span class="c1"># Convert the basis and the spin map to cached byte representations.</span>
     <span class="n">basis_bytes</span> <span class="o">=</span> <span class="n">spin_system</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
     <span class="n">spin_map_bytes</span> <span class="o">=</span> <span class="n">spin_map</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 
-    <span class="c1"># Ensure that a separate copy is returned</span>
+    <span class="c1"># Return a copy so that callers cannot modify the cached matrix.</span>
     <span class="n">perm</span> <span class="o">=</span> <span class="n">_permutation_matrix</span><span class="p">(</span><span class="n">basis_bytes</span><span class="p">,</span> <span class="n">spin_map_bytes</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">perm</span>
@@ -592,14 +883,15 @@
     <span class="n">spin_system_B</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">rho_C</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Dissociates the density vector of composite system C into density vectors of</span>
-<span class="sd">    two subsystems A and B in a chemical reaction C -&gt; A + B.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Dissociate a composite density vector into two subsystem vectors.</span>
 
-<span class="sd">    Example. Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).</span>
+<span class="sd">    This function models the chemical step or reaction `C -&gt; A + B`.</span>
+
+<span class="sd">    Example: Spin system C has five spins, which are indexed as (0, 1, 2, 3, 4).</span>
 <span class="sd">    We want to dissociate this into two subsystems A and B. Spins 0 and 2 should</span>
 <span class="sd">    go to subsystem A and the rest to subsystem B. In this case, we define the</span>
 <span class="sd">    following spin maps::</span>
@@ -628,23 +920,18 @@
 <span class="sd">        State vector of spin system A.</span>
 <span class="sd">    rho_B : ndarray or csc_array</span>
 <span class="sd">        State vector of spin system B.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the spin maps are valid</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spin_map_A</span><span class="p">)</span> <span class="o">!=</span> <span class="n">spin_system_A</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;length of spin_map_A does not match the number of spins &quot;</span>
-            <span class="s2">&quot;in spin_system_A&quot;</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spin_map_B</span><span class="p">)</span> <span class="o">!=</span> <span class="n">spin_system_B</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;length of spin_map_B does not match the number of spins &quot;</span>
-            <span class="s2">&quot;in spin_system_B&quot;</span>
-        <span class="p">)</span>
-    <span class="n">spin_map_C</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map_A</span><span class="p">}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map_B</span><span class="p">})</span>
-    <span class="k">if</span> <span class="n">spin_map_C</span> <span class="o">!=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system_C</span><span class="o">.</span><span class="n">nspins</span><span class="p">)}:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;spin maps have incorrect or have overlapping indices&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Convert the spin maps to NumPy arrays</span>
+    <span class="c1"># Validate that the subsystem maps form a complete partition of C.</span>
+    <span class="n">_validate_bipartite_spin_maps</span><span class="p">(</span>
+        <span class="n">spin_system_A</span><span class="p">,</span>
+        <span class="n">spin_system_B</span><span class="p">,</span>
+        <span class="n">spin_system_C</span><span class="p">,</span>
+        <span class="n">spin_map_A</span><span class="p">,</span>
+        <span class="n">spin_map_B</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert the supplied spin maps to NumPy arrays.</span>
     <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">spin_map_A</span><span class="p">)</span>
     <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">spin_map_B</span><span class="p">)</span>
 
@@ -655,30 +942,28 @@
     <span class="n">spin_map_A_bytes</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
     <span class="n">spin_map_B_bytes</span> <span class="o">=</span> <span class="n">spin_map_B</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 
-    <span class="c1"># Get index mappings</span>
-    <span class="n">idx_A</span><span class="p">,</span> <span class="n">idx_CA</span><span class="p">,</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">idx_CB</span> <span class="o">=</span> \
-        <span class="n">_dissociate_index_map</span><span class="p">(</span>
-            <span class="n">basis_A_bytes</span><span class="p">,</span> <span class="n">basis_B_bytes</span><span class="p">,</span> <span class="n">basis_C_bytes</span><span class="p">,</span>
-            <span class="n">spin_map_A_bytes</span><span class="p">,</span> <span class="n">spin_map_B_bytes</span>
-        <span class="p">)</span>
+    <span class="c1"># Obtain the cached index mappings for the dissociation step.</span>
+    <span class="n">idx_A</span><span class="p">,</span> <span class="n">idx_CA</span><span class="p">,</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">idx_CB</span> <span class="o">=</span> <span class="n">_dissociate_index_map</span><span class="p">(</span>
+        <span class="n">basis_A_bytes</span><span class="p">,</span>
+        <span class="n">basis_B_bytes</span><span class="p">,</span>
+        <span class="n">basis_C_bytes</span><span class="p">,</span>
+        <span class="n">spin_map_A_bytes</span><span class="p">,</span>
+        <span class="n">spin_map_B_bytes</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Initialize empty state vectors</span>
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
-        <span class="n">rho_A</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">spin_system_A</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">rho_B</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">spin_system_B</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">rho_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">spin_system_A</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">rho_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">spin_system_B</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="c1"># Allocate empty state vectors for the two product systems.</span>
+    <span class="n">rho_A</span> <span class="o">=</span> <span class="n">empty_state</span><span class="p">(</span><span class="n">spin_system_A</span><span class="p">)</span>
+    <span class="n">rho_B</span> <span class="o">=</span> <span class="n">empty_state</span><span class="p">(</span><span class="n">spin_system_B</span><span class="p">)</span>
 
-    <span class="c1"># Populate the state vectors</span>
+    <span class="c1"># Transfer the matching composite populations into the subsystems.</span>
     <span class="n">rho_A</span><span class="p">[</span><span class="n">idx_A</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rho_C</span><span class="p">[</span><span class="n">idx_CA</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
     <span class="n">rho_B</span><span class="p">[</span><span class="n">idx_B</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rho_C</span><span class="p">[</span><span class="n">idx_CB</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
-    <span class="c1"># Normalize the state vectors</span>
+    <span class="c1"># Normalise the subsystem vectors to preserve the unit operator scale.</span>
     <span class="n">rho_A</span> <span class="o">=</span> <span class="n">rho_A</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho_A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system_A</span><span class="o">.</span><span class="n">mults</span><span class="p">)))</span>
     <span class="n">rho_B</span> <span class="o">=</span> <span class="n">rho_B</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho_B</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">spin_system_B</span><span class="o">.</span><span class="n">mults</span><span class="p">)))</span>
 
-    <span class="c1"># Convert to csc_array if using sparse</span>
+    <span class="c1"># Convert to csc_array if using sparse.</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
         <span class="n">rho_A</span> <span class="o">=</span> <span class="n">rho_A</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
         <span class="n">rho_B</span> <span class="o">=</span> <span class="n">rho_B</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
@@ -694,22 +979,22 @@
     <span class="n">spin_system_C</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">rho_A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
     <span class="n">rho_B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">spin_map_A</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">spin_map_B</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Combines two state vectors when spin systems associate in a chemical</span>
-<span class="sd">    reaction A + B -&gt; C.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Combine two subsystem density vectors into a composite vector.</span>
 
-<span class="sd">    Example. We have spin system A that has two spins and spin system B that has</span>
+<span class="sd">    This function models the chemical step or reaction `A + B -&gt; C`.</span>
+
+<span class="sd">    Example: We have spin system A that has two spins and spin system B that has</span>
 <span class="sd">    three spins. These systems associate to form a composite spin system C that</span>
 <span class="sd">    has five spins that are indexed (0, 1, 2, 3, 4). Of these, spins (0, 2) are</span>
-<span class="sd">    from subsystem A and (1, 3, 4) from subsystem B. We have to choose how the</span>
-<span class="sd">    spin systems A and B will be indexed in spin system C by defining the spin</span>
-<span class="sd">    maps as follows::</span>
+<span class="sd">    from subsystem A and (1, 3, 4) from subsystem B. </span>
+<span class="sd">    In this case, the spin maps are defined as follows::</span>
 
-<span class="sd">        spin_map_A = np.ndarray([0, 2])</span>
-<span class="sd">        spin_map_B = np.ndarray([1, 3, 4])</span>
+<span class="sd">        spin_map_A = np.array([0, 2])</span>
+<span class="sd">        spin_map_B = np.array([1, 3, 4])</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -732,23 +1017,18 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho_C : ndarray or csc_array</span>
 <span class="sd">        State vector of the composite spin system C.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the spin maps are valid</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spin_map_A</span><span class="p">)</span> <span class="o">!=</span> <span class="n">spin_system_A</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;length of spin_map_A does not match the number of spins &quot;</span>
-            <span class="s2">&quot;in spin_system_A&quot;</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spin_map_B</span><span class="p">)</span> <span class="o">!=</span> <span class="n">spin_system_B</span><span class="o">.</span><span class="n">nspins</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;length of spin_map_B does not match the number of spins &quot;</span>
-            <span class="s2">&quot;in spin_system_B&quot;</span>
-        <span class="p">)</span>
-    <span class="n">spin_map_C</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map_A</span><span class="p">}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map_B</span><span class="p">})</span>
-    <span class="k">if</span> <span class="n">spin_map_C</span> <span class="o">!=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system_C</span><span class="o">.</span><span class="n">nspins</span><span class="p">)}:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;spin maps have incorrect or have overlapping indices&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Convert the spin maps into NumPy</span>
+    <span class="c1"># Validate that the subsystem maps form a complete partition of C.</span>
+    <span class="n">_validate_bipartite_spin_maps</span><span class="p">(</span>
+        <span class="n">spin_system_A</span><span class="p">,</span>
+        <span class="n">spin_system_B</span><span class="p">,</span>
+        <span class="n">spin_system_C</span><span class="p">,</span>
+        <span class="n">spin_map_A</span><span class="p">,</span>
+        <span class="n">spin_map_B</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert the supplied spin maps to NumPy arrays.</span>
     <span class="n">spin_map_A</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">spin_map_A</span><span class="p">)</span>
     <span class="n">spin_map_B</span> <span class="o">=</span> <span class="n">arraylike_to_array</span><span class="p">(</span><span class="n">spin_map_B</span><span class="p">)</span>
 
@@ -759,23 +1039,22 @@
     <span class="n">spin_map_A_bytes</span> <span class="o">=</span> <span class="n">spin_map_A</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
     <span class="n">spin_map_B_bytes</span> <span class="o">=</span> <span class="n">spin_map_B</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
 
-    <span class="c1"># Calculate the index maps using cached function</span>
-    <span class="n">idx_A</span><span class="p">,</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">idx_C</span> <span class="o">=</span> \
-        <span class="n">_associate_index_map</span><span class="p">(</span>
-            <span class="n">basis_A_bytes</span><span class="p">,</span> <span class="n">basis_B_bytes</span><span class="p">,</span> <span class="n">basis_C_bytes</span><span class="p">,</span>
-            <span class="n">spin_map_A_bytes</span><span class="p">,</span> <span class="n">spin_map_B_bytes</span>
-        <span class="p">)</span>
+    <span class="c1"># Obtain the cached index mappings for the association step.</span>
+    <span class="n">idx_A</span><span class="p">,</span> <span class="n">idx_B</span><span class="p">,</span> <span class="n">idx_C</span> <span class="o">=</span> <span class="n">_associate_index_map</span><span class="p">(</span>
+        <span class="n">basis_A_bytes</span><span class="p">,</span>
+        <span class="n">basis_B_bytes</span><span class="p">,</span>
+        <span class="n">basis_C_bytes</span><span class="p">,</span>
+        <span class="n">spin_map_A_bytes</span><span class="p">,</span>
+        <span class="n">spin_map_B_bytes</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Initialize an empty state vector for the composite system</span>
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
-        <span class="n">rho_C</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lil_array</span><span class="p">((</span><span class="n">spin_system_C</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">rho_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">spin_system_C</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="c1"># Allocate an empty state vector for the composite system.</span>
+    <span class="n">rho_C</span> <span class="o">=</span> <span class="n">empty_state</span><span class="p">(</span><span class="n">spin_system_C</span><span class="p">)</span>
 
-    <span class="c1"># Combine the state vectors</span>
+    <span class="c1"># Combine the subsystem amplitudes in the composite basis.</span>
     <span class="n">rho_C</span><span class="p">[</span><span class="n">idx_C</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">rho_A</span><span class="p">[</span><span class="n">idx_A</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">rho_B</span><span class="p">[</span><span class="n">idx_B</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
-    <span class="c1"># Convert to csc_array if using sparse arrays</span>
+    <span class="c1"># Convert to csc_array if using sparse.</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
         <span class="n">rho_C</span> <span class="o">=</span> <span class="n">rho_C</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
 
@@ -787,20 +1066,19 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">permute_spins</span><span class="p">(</span>
     <span class="n">spin_system</span><span class="p">:</span> <span class="n">SpinSystem</span><span class="p">,</span>
     <span class="n">rho</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span>
-    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Permutes the state vector of a spin system to correspond to a reordering</span>
-<span class="sd">    of the spins in the system. </span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Permute a state vector to match a reordering of spins.</span>
 
-<span class="sd">    Example. Our spin system has three spins, which are indexed (0, 1, 2). We</span>
-<span class="sd">    want to perform the following permulation:</span>
+<span class="sd">    Example: Our spin system has three spins, which are indexed (0, 1, 2). We</span>
+<span class="sd">    want to perform the following permutation:</span>
 
 <span class="sd">    - 0 --&gt; 2 (Spin 0 goes to position 2)</span>
 <span class="sd">    - 1 --&gt; 0 (Spin 1 goes to position 0)</span>
 <span class="sd">    - 2 --&gt; 1 (Spin 2 goes to position 1)</span>
 
-<span class="sd">    In this case, we want to assign the following map::</span>
+<span class="sd">    In this case, the spin map is defined as follows::</span>
 
 <span class="sd">        spin_map = np.array([2, 0, 1])</span>
 
@@ -817,21 +1095,18 @@
 <span class="sd">    -------</span>
 <span class="sd">    rho : ndarray or csc_array</span>
 <span class="sd">        Permuted state vector of the spin system.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check that the spin map is valid</span>
-    <span class="k">if</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spin_map</span><span class="p">}</span> <span class="o">!=</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spin_system</span><span class="o">.</span><span class="n">nspins</span><span class="p">)}:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;length of spin_map does not match the number of spins in &quot;</span>
-            <span class="s2">&quot;the system or spin_map contains incorrect or overlapping indices&quot;</span>
-        <span class="p">)</span>
+<span class="sd">    """</span>
 
-    <span class="c1"># Get the permutation matrix</span>
+    <span class="c1"># Validate that the permutation map contains each spin exactly once.</span>
+    <span class="n">_validate_permutation_spin_map</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">spin_map</span><span class="p">)</span>
+
+    <span class="c1"># Build the permutation matrix for the requested spin ordering.</span>
     <span class="n">perm</span> <span class="o">=</span> <span class="n">permutation_matrix</span><span class="p">(</span><span class="n">spin_system</span><span class="p">,</span> <span class="n">spin_map</span><span class="p">)</span>
 
-    <span class="c1"># Apply the permutation to the density vector</span>
+    <span class="c1"># Apply the permutation matrix to the state vector.</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="n">perm</span> <span class="o">@</span> <span class="n">rho</span>
 
-    <span class="c1"># Ensure the correct return type</span>
+    <span class="c1"># Convert to sparse if the result is dense and sparsity is desired.</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">):</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span> <span class="ow">and</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">rho</span><span class="p">):</span>
@@ -840,25 +1115,143 @@
     <span class="k">return</span> <span class="n">rho</span></div>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_associate_index_map</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function clears the cache from the `_associate_index_map()` function.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Clear the cache</span>
+
+<div class="viewcode-block" id="elementary_reaction">
+<a class="viewcode-back" href="../../../spinguin.html#spinguin.elementary_reaction">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">elementary_reaction</span><span class="p">(</span>
+    <span class="n">reactant_systems</span><span class="p">:</span> <span class="n">SpinSystem</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">SpinSystem</span><span class="p">],</span>
+    <span class="n">product_systems</span><span class="p">:</span> <span class="n">SpinSystem</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">SpinSystem</span><span class="p">],</span>
+    <span class="n">reactant_rhos</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">],</span>
+    <span class="n">spin_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Perform an elementary chemical reaction that transforms reactant states into</span>
+<span class="sd">    product states. If the reaction has stoichiometric coefficients greater than</span>
+<span class="sd">    one, specify the same reactant or product system multiple times.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reactant_systems : SpinSystem or list of SpinSystem</span>
+<span class="sd">        List of spin systems for the reactants.</span>
+<span class="sd">    product_systems : SpinSystem or list of SpinSystem</span>
+<span class="sd">        List of spin systems for the products.</span>
+<span class="sd">    reactant_rhos : ndarray or csc_array or list of ndarray or csc_array</span>
+<span class="sd">        List of state vectors for the reactants. The order should match that of</span>
+<span class="sd">        `reactant_systems`.</span>
+<span class="sd">    spin_map : dict of tuple of int to tuple of int</span>
+<span class="sd">        Dictionary that maps the nuclear spins in the reactants to those in the</span>
+<span class="sd">        products. The keys are tuples specifying the reactant index and the</span>
+<span class="sd">        reactant spin index, and the values are identical tuples for the</span>
+<span class="sd">        products. Example::</span>
+
+<span class="sd">        spin_map = {</span>
+<span class="sd">            (0, 0): (0, 0),  # reactant 0, spin 0 -&gt; product 0, spin 0</span>
+<span class="sd">            (0, 1): (1, 0),  # reactant 0, spin 1 -&gt; product 1, spin 0</span>
+<span class="sd">            (1, 0): (0, 1),  # reactant 1, spin 0 -&gt; product 0, spin 1</span>
+<span class="sd">            (1, 1): (1, 1),  # reactant 1, spin 1 -&gt; product 1, spin 1</span>
+<span class="sd">        }</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rhos : ndarray or csc_array or tuple of ndarray or csc_array</span>
+<span class="sd">        State vectors for the products. The order matches that of</span>
+<span class="sd">        `product_systems`. A single state vector is returned if there is only</span>
+<span class="sd">        one product system, and a tuple of state vectors is returned if there</span>
+<span class="sd">        are multiple product systems.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Convert single systems and states to lists for uniform processing</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reactant_systems</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">reactant_systems</span> <span class="o">=</span> <span class="p">[</span><span class="n">reactant_systems</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">product_systems</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">product_systems</span> <span class="o">=</span> <span class="p">[</span><span class="n">product_systems</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reactant_rhos</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">reactant_rhos</span> <span class="o">=</span> <span class="p">[</span><span class="n">reactant_rhos</span><span class="p">]</span>
+
+    <span class="c1"># Validate that the spin map is consistent</span>
+    <span class="n">_validate_elementary_reaction_spin_map</span><span class="p">(</span>
+        <span class="n">reactant_systems</span><span class="p">,</span>
+        <span class="n">product_systems</span><span class="p">,</span>
+        <span class="n">spin_map</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert the reactant and product bases to bytes for hashing</span>
+    <span class="n">reactant_bases_bytes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="n">ss</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">reactant_systems</span>
+    <span class="p">)</span>
+    <span class="n">product_bases_bytes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="n">ss</span><span class="o">.</span><span class="n">nspins</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">product_systems</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert the dictionary to a flattened tuple for hashing</span>
+    <span class="n">spin_map_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rs</span><span class="p">),</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span> <span class="ow">in</span> <span class="n">spin_map</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Generate the index maps</span>
+    <span class="n">idx_maps</span> <span class="o">=</span> <span class="n">_elementary_reaction_index_map</span><span class="p">(</span>
+        <span class="n">reactant_bases_bytes</span><span class="p">,</span>
+        <span class="n">product_bases_bytes</span><span class="p">,</span>
+        <span class="n">spin_map_tuple</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Calculate all product states</span>
+    <span class="n">product_rhos</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">product_system</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">product_systems</span><span class="p">):</span>
+        <span class="n">idx_map_p</span><span class="p">,</span> <span class="n">idx_map_rp</span> <span class="o">=</span> <span class="n">idx_maps</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+
+        <span class="c1"># Allocate an empty state vector for the product system</span>
+        <span class="n">rho_p</span> <span class="o">=</span> <span class="n">empty_state</span><span class="p">(</span><span class="n">product_system</span><span class="p">)</span>
+
+        <span class="c1"># Populate the product state</span>
+        <span class="n">rho_p</span><span class="p">[</span><span class="n">idx_map_p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">reactant_rhos</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">idx_map_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">reactant_systems</span><span class="p">)):</span>
+            <span class="n">rho_p</span><span class="p">[</span><span class="n">idx_map_p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*=</span> <span class="n">reactant_rhos</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">idx_map_rp</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+        <span class="c1"># Normalise the product state to preserve the unit operator scale</span>
+        <span class="n">rho_p</span> <span class="o">/=</span> <span class="p">(</span><span class="n">rho_p</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">product_system</span><span class="o">.</span><span class="n">mults</span><span class="p">)))</span>
+
+        <span class="c1"># Convert to csc_array if using sparse</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">sparse_state</span><span class="p">:</span>
+            <span class="n">rho_p</span> <span class="o">=</span> <span class="n">rho_p</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+        
+        <span class="c1"># Store the product state</span>
+        <span class="n">product_rhos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rho_p</span><span class="p">)</span>
+
+    <span class="c1"># A single state is returned if there is only one product system</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">product_rhos</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">product_rhos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">product_rhos</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_associate_index_map</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Clear the cache used by `_associate_index_map()`.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Reset the cached association index maps.</span>
     <span class="n">_associate_index_map</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_dissociate_index_map</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function clears the cache from the `_dissociate_index_map()` function.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Clear the cache</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_dissociate_index_map</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Clear the cache used by `_dissociate_index_map()`.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Reset the cached dissociation index maps.</span>
     <span class="n">_dissociate_index_map</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_permutation_matrix</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function clears the cache from the `_permutation_matrix()` function.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Clear the cache</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clear_cache_permutation_matrix</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Clear the cache used by `_permutation_matrix()`.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Reset the cached permutation matrices.</span>
     <span class="n">_permutation_matrix</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 </pre></div>
 
@@ -898,7 +1291,7 @@ By Joni Eronen, Perttu Hilla
 
   <p class="copyright">
     
-      © Copyright 2025, Joni Eronen, Perttu Hilla.
+      © Copyright 2026, Joni Eronen, Perttu Hilla.
       <br/>
     
   </p>
@@ -922,8 +1315,8 @@ By Joni Eronen, Perttu Hilla
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>
