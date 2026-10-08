@@ -285,8 +285,8 @@ class RelaxationProperties:
         model : {"iso", "aniso"}, default="iso"
             Rotational-diffusion model used in the calculation.
         r : float, default=None
-            Effective hydrodynamic radius in metres. Required for the isotropic
-            model.
+            Effective hydrodynamic radius in Å. If None, the radius is estimated
+            using the molecule geometry.
         scaling_factor : float, default=1.0
             Scaling factor applied to the calculated correlation times.
 
@@ -310,11 +310,13 @@ class RelaxationProperties:
 
         # Use the isotropic Stokes-Einstein-Debye relation when requested.
         if model == "iso":
-            if r is None:
+            if r is None and self.molecule is None:
                 raise ValueError(
-                    "Hydrodynamic radius 'r' must be provided for the "
-                    "isotropic model."
+                    "Provide hydrodynamic radius 'r', or assign the 'molecule' "
+                    "attribute to estimate 'r' based on molecule geometry."
                 )
+            if r is None:
+                r = self.molecule.hydrodynamic_radius
             self.tau_c = (
                 rotational_correlation_time_SED(
                     parameters.temperature, eta, r, 2

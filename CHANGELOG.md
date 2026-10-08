@@ -6,6 +6,8 @@ superoperators and states.
 - Added a function for performing elementary chemical reactions.
 - CSA and EFG tensors are assigned to zero arrays by default.
 - Added a function for returning the spin order of a product operator.
+- Hydrodynamic radius can now be estimated from the molecule geometry when
+calculating the isotropic rotational correlation time.
 
 ## 0.2.0
 - Re-write the documentation using AI.
