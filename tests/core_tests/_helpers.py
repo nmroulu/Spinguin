@@ -60,6 +60,9 @@ def test_data_path(filename: str) -> str:
 
     return os.path.join(test_data_dir, filename)
 
+# Prevent pytest from collecting the helper as a test when it is imported.
+test_data_path.__test__ = False
+
 def spherical_tensor(l: int, q: int) -> np.ndarray:
     """
     Construct a spherical tensor in the Cartesian basis for testing.

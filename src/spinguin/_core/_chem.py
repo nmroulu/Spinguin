@@ -894,8 +894,8 @@ def equilibrium_concentrations(
     subject to the mass balance constraints
         [A]_eq + [AB]_eq = c_A0
         [B]_eq + [AB]_eq = c_B0,
-    which is
-        K_eq*c_A0*c_B0 - (K_eq*c_A0 + K_eq*c_B0 + 1) + K_eq*[AB]_eq^2 = 0.
+    which gives the quadratic equation for [AB]_eq
+        K_eq*[AB]_eq^2 - (K_eq*c_A0 + K_eq*c_B0 + 1)*[AB]_eq + K_eq*c_A0*c_B0 = 0.
 
     Parameters
     ----------
@@ -944,6 +944,7 @@ def equilibrium_concentrations(
 
     return c_A_eq, c_B_eq, c_AB_eq
 
+
 def equilibrium_two_site_populations(
     K_eq: float, 
     c_A0: float,
@@ -968,8 +969,8 @@ def equilibrium_two_site_populations(
     -------
     p_A_eq : float
         Equilibrium population of site A.
-    p_B_eq : float
-        Equilibrium population of site B.
+    p_AB_eq : float
+        Equilibrium population of site AB.
     """
     # Calculate the equilibrium concentrations of species A, B, and AB.
     c_A_eq, _, c_AB_eq = equilibrium_concentrations(K_eq, c_A0, c_B0)
@@ -977,12 +978,12 @@ def equilibrium_two_site_populations(
     # Calculate the total concentration of sites A and AB.
     c_total = c_A_eq + c_AB_eq
 
-    # Calculate the equilibrium populations of sites A and B by normalising 
+    # Calculate the equilibrium populations of sites A and AB by normalising
     # with respect to the total concentration.
     p_A_eq = c_A_eq / c_total
-    p_B_eq = c_AB_eq / c_total
+    p_AB_eq = c_AB_eq / c_total
 
-    return p_A_eq, p_B_eq
+    return p_A_eq, p_AB_eq
 
 
 def clear_cache_associate_index_map() -> None:

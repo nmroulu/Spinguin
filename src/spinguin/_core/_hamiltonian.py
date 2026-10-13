@@ -16,6 +16,7 @@ from scipy.sparse import csc_array
 
 from spinguin._core._interactions import resonance_frequencies
 from spinguin._core._la import eliminate_small
+from spinguin._core._nmr_isotopes import gamma
 from spinguin._core._parameters import parameters
 from spinguin._core._status import status
 from spinguin._core._superoperators import superoperator
@@ -191,25 +192,31 @@ def _sop_H_J(
 
 def rotating_frame_irradiation_hamiltonian(
     spin_system: SpinSystem,
+    isotope: str,
     B1: float,
     phase: float=0,
     side: Literal["comm", "left", "right"]="comm",
 ) -> np.ndarray | csc_array:
     """
-    Construct the Hamiltonian for continuous-wave
-    transverse irradiation.
+    Construct the Hamiltonian for continuous-wave transverse irradiation of all
+    spins of the given isotope.
 
     NOTE:
     The returned Hamiltonian assumes that the laboratory-frame Hamiltonian has
     already been transformed to the rotating frame corresponding to the
-    irradiation frequency, and that the rotating-wave approximation holds.
+    irradiation frequency, and that the rotating-wave approximation holds. The
+    irradiation field is taken to be linearly polarised, so that only its
+    co-rotating component of amplitude B1/2 is retained. Spins of other
+    isotopes are not irradiated.
 
     Parameters
     ----------
     spin_system : SpinSystem
         Spin system for which the irradiation Hamiltonian is constructed.
+    isotope : str
+        Isotope whose spins are irradiated (e.g. '1H').
     B1 : float
-        Amplitude of the transverse irradiation field in T.
+        Amplitude of the linearly polarised transverse irradiation field in T.
     phase : float, default=0
         Phase angle of the irradiation in degrees.
     side : {'comm', 'left', 'right'}
@@ -235,18 +242,15 @@ def rotating_frame_irradiation_hamiltonian(
     # Convert the irradiation phase angle from degrees to radians.
     phase = phase * np.pi / 180
 
-    # Precompute the phase factors that weight the transverse operators.
-    cos_phase = np.cos(phase)
-    sin_phase = np.sin(phase)
+    # Calculate the nutation frequency of the co-rotating field component.
+    omega_1 = 1 / 2 * B1 * gamma(isotope, "rad/s")
 
-    # Initialise the irradiation Hamiltonian superoperator.
-    sop_H = _empty_hamiltonian(spin_system)
+    # Construct the transverse superoperators for all spins of the isotope.
+    Ix = superoperator(spin_system, f"I(x, {isotope})", side)
+    Iy = superoperator(spin_system, f"I(y, {isotope})", side)
 
-    # Accumulate the transverse irradiation contribution for each spin.
-    for n, gamma in enumerate(spin_system.gammas):
-        Ix = superoperator(spin_system, f"I(x, {n})", side)
-        Iy = superoperator(spin_system, f"I(y, {n})", side)
-        sop_H -= 1 / 2 * B1 * gamma * (Ix * cos_phase + Iy * sin_phase)
+    # Combine the transverse superoperators according to the irradiation phase.
+    sop_H = -omega_1 * (np.cos(phase)*Ix + np.sin(phase)*Iy)
 
     # Remove very small values to improve sparsity and numerical cleanliness.
     eliminate_small(sop_H, parameters.zero_hamiltonian)
