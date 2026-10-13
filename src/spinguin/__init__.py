@@ -23,6 +23,7 @@ from spinguin._core import (
     permute_spins,
 
     # hamiltonian
+    rotating_frame_irradiation_hamiltonian,
     hamiltonian,
 
     # interactions
@@ -119,6 +120,7 @@ __all__ = [
     "permute_spins",
 
     # core: hamiltonian
+    "rotating_frame_irradiation_hamiltonian",
     "hamiltonian",
 
     # core: interactions

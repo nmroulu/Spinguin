@@ -96,6 +96,14 @@ class TestRotframe(unittest.TestCase):
         L_rot = sg.rotating_frame(ss, L, ["1H", "14N"], [cH, cN])
         P_rot = sg.propagator(L_rot, dt)
 
+        # Verify that a single centre frequency is broadcast correctly.
+        L_rot_single = sg.rotating_frame(ss, L, ["1H", "14N"], cH)
+        L_rot_list = sg.rotating_frame(ss, L, ["1H", "14N"], [cH, cH])
+        self.assertTrue(np.allclose(
+            L_rot_single.toarray(),
+            L_rot_list.toarray(),
+        ))
+
         # Build the measurement operator for the proton signal.
         op_measure = "+".join(f"I(-,{i})" for i in indices)
 

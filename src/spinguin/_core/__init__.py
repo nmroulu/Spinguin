@@ -17,7 +17,10 @@ from ._chem import (
     dissociate,
     permute_spins,
 )
-from ._hamiltonian import hamiltonian
+from ._hamiltonian import (
+    rotating_frame_irradiation_hamiltonian,
+    hamiltonian,
+)
 from ._interactions import (
     dd_coupling_tensors,
     dd_constants,
@@ -96,6 +99,7 @@ __all__ = [
     "permute_spins",
 
     # hamiltonian
+    "rotating_frame_irradiation_hamiltonian",
     "hamiltonian",
 
     # interactions

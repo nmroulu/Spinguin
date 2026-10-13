@@ -189,6 +189,74 @@ def _sop_H_J(
     return sop_H
 
 
+def rotating_frame_irradiation_hamiltonian(
+    spin_system: SpinSystem,
+    B1: float,
+    phase: float=0,
+    side: Literal["comm", "left", "right"]="comm",
+) -> np.ndarray | csc_array:
+    """
+    Construct the Hamiltonian for continuous-wave
+    transverse irradiation.
+
+    NOTE:
+    The returned Hamiltonian assumes that the laboratory-frame Hamiltonian has
+    already been transformed to the rotating frame corresponding to the
+    irradiation frequency, and that the rotating-wave approximation holds.
+
+    Parameters
+    ----------
+    spin_system : SpinSystem
+        Spin system for which the irradiation Hamiltonian is constructed.
+    B1 : float
+        Amplitude of the transverse irradiation field in T.
+    phase : float, default=0
+        Phase angle of the irradiation in degrees.
+    side : {'comm', 'left', 'right'}
+        Type of superoperator:
+
+        - 'comm' -- commutation superoperator (default)
+        - 'left' -- left multiplication superoperator
+        - 'right' -- right multiplication superoperator
+
+    Returns
+    -------
+    H_rf : ndarray or csc_array
+        Irradiation Hamiltonian superoperator.
+    """
+
+    # Ensure that the basis has been built before constructing the Hamiltonian.
+    require(
+        spin_system,
+        "basis.basis",
+        "constructing the irradiation Hamiltonian",
+    )
+
+    # Convert the irradiation phase angle from degrees to radians.
+    phase = phase * np.pi / 180
+
+    # Precompute the phase factors that weight the transverse operators.
+    cos_phase = np.cos(phase)
+    sin_phase = np.sin(phase)
+
+    # Initialise the irradiation Hamiltonian superoperator.
+    sop_H = _empty_hamiltonian(spin_system)
+
+    # Accumulate the transverse irradiation contribution for each spin.
+    for n, gamma in enumerate(spin_system.gammas):
+        Ix = superoperator(spin_system, f"I(x, {n})", side)
+        Iy = superoperator(spin_system, f"I(y, {n})", side)
+        sop_H -= 1 / 2 * B1 * gamma * (Ix * cos_phase + Iy * sin_phase)
+
+    # Remove very small values to improve sparsity and numerical cleanliness.
+    eliminate_small(sop_H, parameters.zero_hamiltonian)
+
+    # Notify the user of the completion of the irradiation Hamiltonian construction.
+    status("Irradiation Hamiltonian constructed.\n")
+
+    return sop_H
+
+
 def hamiltonian(
     spin_system: SpinSystem,
     interactions: list[

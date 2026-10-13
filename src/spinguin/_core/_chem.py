@@ -360,6 +360,110 @@ def _permutation_matrix(
 
     return perm
 
+def equilibrium_concentrations(
+    K_eq: float, 
+    c_A0: float, 
+    c_B0: float
+) -> tuple[float, float, float]:
+    """
+    Calculate the equilibrium concentrations of species in a 
+    chemical exchange system of the form A + B <-> AB.
+
+    Solves the quadratic equation
+        K_eq = [AB]_eq / ([A]_eq * [B]_eq)
+    subject to the mass balance constraints
+        [A]_eq + [AB]_eq = c_A0
+        [B]_eq + [AB]_eq = c_B0,
+    which is
+        K_eq*c_A0*c_B0 - (K_eq*c_A0 + K_eq*c_B0 + 1) + K_eq*[AB]_eq^2 = 0.
+
+    Parameters
+    ----------
+    K_eq : float
+        Equilibrium constant for the reaction A + B <-> AB.
+    c_A0 : float
+        Initial concentration of species A.
+    c_B0 : float
+        Initial concentration of species B.
+
+    Returns
+    -------
+    c_A_eq : float
+        Equilibrium concentration of species A.
+    c_B_eq : float
+        Equilibrium concentration of species B.
+    c_AB_eq : float
+        Equilibrium concentration of species AB.
+    """
+    # Coefficients of the quadratic equation for [AB]_eq.
+    a = K_eq
+    b = -(K_eq*c_A0 + K_eq*c_B0 + 1)
+    c = K_eq*c_A0*c_B0
+
+    # Calculate the discriminant and check for non-negativity.
+    discriminant = b**2 - 4*a*c
+    if discriminant < 0:
+        raise ValueError("No real solution for equilibrium concentrations.")
+
+    # Calculate the two roots of the quadratic equation for [AB]_eq and
+    # select the physically meaningful one that lies within the mass balance limits.
+    root1 = (-b + np.sqrt(discriminant)) / (2*a)
+    root2 = (-b - np.sqrt(discriminant)) / (2*a)
+    c_AB_eq = None
+    for root in (root1, root2):
+        if 0 <= root <= min(c_A0, c_B0):
+            c_AB_eq = root
+            break
+
+    if c_AB_eq is None:
+        raise ValueError("No physically meaningful solution for equilibrium concentrations.")
+
+    # Calculate the equilibrium concentrations of species A and B using mass balance.
+    c_A_eq = c_A0 - c_AB_eq
+    c_B_eq = c_B0 - c_AB_eq
+
+    return c_A_eq, c_B_eq, c_AB_eq
+
+def equilibrium_two_site_populations(
+    K_eq: float, 
+    c_A0: float,
+    c_B0: float
+) -> tuple[float, float]:
+    """
+    Calculate the equilibrium populations of sites A and AB in a chemically exchanging
+    system of the form A + B <-> AB. Uses the `equilibrium_concentrations()` function 
+    to compute the equilibrium concentrations and then converts these to populations
+    by normalising with respect to the total concentration of A + AB.
+
+    Parameters
+    ----------
+    K_eq : float
+        Equilibrium constant for the reaction A + B <-> AB.
+    c_A0 : float
+        Initial concentration of species A.
+    c_B0 : float
+        Initial concentration of species B.
+
+    Returns
+    -------
+    p_A_eq : float
+        Equilibrium population of site A.
+    p_B_eq : float
+        Equilibrium population of site B.
+    """
+    # Calculate the equilibrium concentrations of species A, B, and AB.
+    c_A_eq, _, c_AB_eq = equilibrium_concentrations(K_eq, c_A0, c_B0)
+
+    # Calculate the total concentration of sites A and AB.
+    c_total = c_A_eq + c_AB_eq
+
+    # Calculate the equilibrium populations of sites A and B by normalising 
+    # with respect to the total concentration.
+    p_A_eq = c_A_eq / c_total
+    p_B_eq = c_AB_eq / c_total
+
+    return p_A_eq, p_B_eq
+
 def permutation_matrix(
     spin_system: SpinSystem,
     spin_map: list[int] | tuple[int, ...] | np.ndarray,

@@ -89,7 +89,7 @@ def rotating_frame(
     spin_system: SpinSystem,
     L: np.ndarray | sp.csc_array,
     isotopes: list[str],
-    center_frequencies: list[float]=[],
+    center_frequencies: float | list[float]=[],
     orders: list[int]=[],
 ) -> np.ndarray | sp.csc_array:
     """
@@ -103,9 +103,10 @@ def rotating_frame(
         Liouvillian superoperator in the laboratory frame.
     isotopes : list of str
         List of isotopes whose rotating frames are applied.
-    center_frequencies : list of float, default=[]
-        List of centre frequencies in ppm for each isotope. If empty,
-        zero is used for all isotopes.
+    center_frequencies : float or list of float, default=[]
+        Centre frequency in ppm used for all isotopes, or a list of centre
+        frequencies in ppm for each isotope. If empty, zero is used for all
+        isotopes.
     orders : list of int, default=[]
         List of integers that define the order of the rotating frame for each
         isotope. If empty, the default value defined in
@@ -129,7 +130,9 @@ def rotating_frame(
         raise ValueError("Must specify at least one isotope.")
     if len(orders) not in (0, len(isotopes)):
         raise ValueError("Lengths of orders and isotopes must match.")
+    single_center_frequency = np.isscalar(center_frequencies)
     if not (
+        single_center_frequency or
         len(center_frequencies) == len(isotopes) or
         len(center_frequencies) == 0
     ):
@@ -151,7 +154,9 @@ def rotating_frame(
     # Fill optional inputs with default values when needed.
     if len(orders) == 0:
         orders = [parameters.rotating_frame_order for _ in range(len(isotopes))]
-    if len(center_frequencies) == 0:
+    if single_center_frequency:
+        center_frequencies = [center_frequencies for _ in range(len(isotopes))]
+    elif len(center_frequencies) == 0:
         center_frequencies = [0 for _ in range(len(isotopes))]
 
     # Calculate the resonance frequencies that define the interaction frames.

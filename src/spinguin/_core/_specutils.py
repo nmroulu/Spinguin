@@ -164,7 +164,7 @@ def spectral_width_to_dwell_time(
         B = parameters.magnetic_field
 
     # Convert the spectral width from ppm to Hz.
-    spectral_width_hz = spectral_width * 1e-6 * gamma(isotope, "Hz") * B
+    spectral_width_hz = np.abs(spectral_width * 1e-6 * gamma(isotope, "Hz") * B)
 
     # Invert the spectral width to obtain the dwell time.
     dwell_time = 1 / spectral_width_hz
@@ -172,7 +172,11 @@ def spectral_width_to_dwell_time(
     return dwell_time
 
 
-def time_axis(npoints: int, time_step: float) -> np.ndarray:
+def time_axis(
+    npoints: int, 
+    time_step: float, 
+    start_time: float=0
+) -> np.ndarray:
     """
     Generate a uniformly spaced time axis.
 
@@ -182,14 +186,20 @@ def time_axis(npoints: int, time_step: float) -> np.ndarray:
         Number of points.
     time_step : float
         Time step in seconds.
+    start_time : float, default=0
+        Starting time of the axis in seconds.
 
     Returns
     -------
     ndarray
-        One-dimensional time axis with ``npoints`` samples.
+        One-dimensional time axis with ``npoints`` samples, starting at
+        ``start_time`` and incrementing by ``time_step``.
     """
 
     # Construct the uniformly sampled time axis.
-    t_axis = np.linspace(0, npoints * time_step, npoints, endpoint=False)
+    t_axis = np.linspace(start_time, 
+                         start_time + npoints * time_step, 
+                         npoints, 
+                         endpoint=False)
 
     return t_axis
