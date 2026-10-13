@@ -195,3 +195,50 @@ class Molecule:
 
         # Look up the isotope masses in the isotope database.
         return np.array([ISOTOPES[isotope][3] for isotope in self.isotopes])
+
+    @property
+    def volume(self) -> float:
+        """
+        Volume of the molecule, calculated using numerical integration.
+
+        Returns
+        -------
+        volume : float
+            Volume of the molecule (in Å^3).
+        """
+        # Radius of an atom
+        r = 1.2
+
+        # Create a uniform 3D grid around the molecule
+        dim = 100
+        a_min = np.min(self.xyz) - r
+        a_max = np.max(self.xyz) + r
+        a = np.linspace(a_min, a_max, dim)
+        xg, yg, zg = np.meshgrid(a, a, a, indexing="ij")
+
+        # Calculate the number of points inside the molecule
+        inside = np.zeros((dim, dim, dim), dtype=bool)
+        for (xm, ym, zm) in self.xyz:
+            inside |= ((xm-xg)**2 + (ym-yg)**2 + (zm-zg)**2 <= r**2)
+        n = np.sum(inside)
+
+        # Volume of the molecule is proportional to the ratio of points inside
+        V = (n / dim**3) * (a_max - a_min)**3
+
+        return V
+
+    @property
+    def hydrodynamic_radius(self) -> float:
+        """
+        Hydrodynamic radius of the molecule, estimated by calculating the
+        volume of the molecule and approximating the molecule as a sphere.
+
+        Returns
+        -------
+        hydrodynamic_radius : float
+            Hydrodynamic radius of the molecule (in Å).
+        """
+        # Approximate the molecule as a sphere and calculate its radius
+        r = (3/4 * self.volume / np.pi)**(1/3)
+
+        return r

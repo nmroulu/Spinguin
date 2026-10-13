@@ -50,3 +50,24 @@ class TestUtils(unittest.TestCase):
         # Compare the calculated coherence orders with the known values.
         for state, reference_order in test_cases:
             self.assertEqual(sg.coherence_order(state), reference_order)
+
+    def test_spin_order(self):
+        """
+        Test the calculation of spin orders for given states.
+        """
+
+        # Define reference states and their expected spin orders.
+        test_cases = [
+            (np.array([0]), 0),
+            (np.array([1]), 1),
+            (np.array([2]), 1),
+            (np.array([0, 0]), 0),
+            (np.array([1, 0]), 1),
+            (np.array([0, 2]), 1),
+            (np.array([1, 4]), 2),
+            (np.array([0, 1, 2, 0, 4, 0, 6, 0, 8]), 5),
+        ]
+
+        # Compare the calculated spin orders with the known values.
+        for state, reference_order in test_cases:
+            self.assertEqual(sg.spin_order(state), reference_order)

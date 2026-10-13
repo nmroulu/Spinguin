@@ -298,3 +298,43 @@ class TestRelaxation(unittest.TestCase):
         
         # Compare the repeated calculation with the reference.
         self.assertTrue(np.allclose(R.toarray(), R_ref.toarray()))
+
+    def test_auto_tau_c_iso(self):
+        """
+        Test calculating the rotational correlation time using the isotropic
+        model.
+        """
+        # Set the global simulation parameters.
+        sg.parameters.default()
+        sg.parameters.temperature = 293
+
+        # Solvent viscosity
+        eta = 0.59e-3
+        
+        # Create the spin system
+        ss = sg.SpinSystem(test_data_path("isotopes_pyridine.txt"))
+
+        # Error is raised if hydrodynamic radius or molecule is not specified
+        with self.assertRaises(ValueError):
+            ss.relaxation.auto_tau_c(eta, "iso")
+
+        # Calculate correlation time using molecule structure
+        ss.relaxation.molecule = sg.Molecule(
+            isotopes = test_data_path("isotopes_pyridine.txt"),
+            xyz = test_data_path("xyz_pyridine.txt")
+        )
+        ss.relaxation.auto_tau_c(eta, "iso")
+        tau_c_1 = ss.relaxation.tau_c
+
+        # Re-calculate correlation time using custom hydrodynamic radius
+        r = 2.5
+        ss.relaxation.auto_tau_c(eta, "iso", r)
+        tau_c_2 = ss.relaxation.tau_c
+
+        # Confirm that the values are not the same
+        self.assertTrue(tau_c_1 != tau_c_2)
+
+        # Confirm that the results are reasonable (< 30% off)
+        tau_c_ref = 7.5e-12
+        self.assertTrue(abs(tau_c_1 - tau_c_ref)/tau_c_ref < 0.3)
+        self.assertTrue(abs(tau_c_2 - tau_c_ref)/tau_c_ref < 0.3)

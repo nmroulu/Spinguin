@@ -28,9 +28,6 @@ from spinguin._core._utils import idx_to_lq, parse_operator_string
 from spinguin._core._validation import require
 
 
-
-
-
 @lru_cache(maxsize=16)
 def structure_coefficients(
     spin: float,
@@ -312,10 +309,9 @@ def sop_prod(
     return sop
 
 
-def sop_from_string(
+def _sop_from_string(
+    spin_system: SpinSystem,
     operator: str,
-    basis: np.ndarray,
-    spins: np.ndarray,
     side: Literal["comm", "left", "right"],
 ) -> np.ndarray | sp.csc_array:
     """
@@ -323,19 +319,25 @@ def sop_from_string(
 
     Parameters
     ----------
+    spin_system : SpinSystem
+        The spin system for which the superoperator is going to be generated.
     operator : str
         Defines the superoperator to be generated. The operator string must
         follow the rules below:
 
-        - Cartesian or ladder operator at specific index or for all spins::
+        - Cartesian or ladder operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "I(component, index)"
             operator = "I(component)"
+            operator = "I(component, isotope)"
 
-        - Spherical tensor operator at specific index or for all spins::
+        - Spherical tensor operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "T(l, q, index)"
             operator = "T(l, q)"
+            operator = "T(l, q, isotope)"
 
         - Product operators::
 
@@ -356,12 +358,6 @@ def sop_from_string(
         Whitespace will be ignored in the input.
 
         Note that indexing starts from 0.
-    basis : ndarray
-        A two-dimensional array where each row contains integers that represent
-        a Kronecker product of single-spin irreducible spherical tensors.
-    spins : ndarray
-        A sequence of floats describing the spin quantum numbers of the spin
-        system.
     side : {'comm', 'left', 'right'}
         Specifies the type of superoperator:
         - 'comm' -- commutation superoperator
@@ -374,22 +370,24 @@ def sop_from_string(
         The requested superoperator.
     """
 
-    # Determine the basis dimension and the number of spins.
-    dim = basis.shape[0]
-    nspins = spins.shape[0]
-
     # Allocate the output superoperator.
+    dim = spin_system.basis.dim
     if parameters.sparse_superoperator:
         sop = sp.csc_array((dim, dim), dtype=complex)
     else:
         sop = np.zeros((dim, dim), dtype=complex)
 
     # Parse the operator string into operator definitions and coefficients.
-    op_defs, coeffs = parse_operator_string(operator, nspins)
+    op_defs, coeffs = parse_operator_string(spin_system, operator)
 
     # Accumulate the contribution of each term in the operator string.
     for op_def, coeff in zip(op_defs, coeffs):
-        sop = sop + coeff * sop_prod(op_def, basis, spins, side)
+        sop = sop + coeff * sop_prod(
+            op_def=op_def,
+            basis=spin_system.basis.basis,
+            spins=spin_system.spins,
+            side=side
+        )
 
     return sop
 
@@ -554,15 +552,19 @@ def superoperator(
 
         **The operator string must follow the rules below:**
 
-        - Cartesian or ladder operator at specific index or for all spins::
+        - Cartesian or ladder operator at specific index, for all spins, or for
+          all spins of the same isotope::
 
             operator = "I(component, index)"
             operator = "I(component)"
+            operator = "I(component, isotope)"
 
-        - Spherical tensor operator at specific index or for all spins::
+        - Spherical tensor operator at specific index or for all spins, or for
+          all spins of the same isotope::
 
             operator = "T(l, q, index)"
             operator = "T(l, q)"
+            operator = "T(l, q, isotope)"
 
         - Product operators::
 
@@ -607,10 +609,9 @@ def superoperator(
 
     # Construct the superoperator from a string specification.
     if isinstance(operator, str):
-        sop = sop_from_string(
+        sop = _sop_from_string(
+            spin_system=spin_system,
             operator=operator,
-            basis=spin_system.basis.basis,
-            spins=spin_system.spins,
             side=side,
         )
 

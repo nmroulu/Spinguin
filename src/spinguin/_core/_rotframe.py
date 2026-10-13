@@ -88,9 +88,9 @@ def _auxiliary_matrix_rotframe_expm(
 def rotating_frame(
     spin_system: SpinSystem,
     L: np.ndarray | sp.csc_array,
-    isotopes: list[str],
+    isotopes: str | list[str],
     center_frequencies: float | list[float]=[],
-    orders: list[int]=[],
+    orders: int | list[int]=[],
 ) -> np.ndarray | sp.csc_array:
     """
     Transform a Liouvillian into one or more rotating frames.
@@ -101,15 +101,14 @@ def rotating_frame(
         Spin system whose Liouvillian is going to be transformed.
     L : ndarray or csc_array
         Liouvillian superoperator in the laboratory frame.
-    isotopes : list of str
-        List of isotopes whose rotating frames are applied.
+    isotopes : str or list of str
+        Isotope or list of isotopes whose rotating frames are applied.
     center_frequencies : float or list of float, default=[]
-        Centre frequency in ppm used for all isotopes, or a list of centre
-        frequencies in ppm for each isotope. If empty, zero is used for all
-        isotopes.
-    orders : list of int, default=[]
-        List of integers that define the order of the rotating frame for each
-        isotope. If empty, the default value defined in
+        Centre frequency or list of centre frequencies in ppm for each isotope.
+        If empty, zero is used for all isotopes.
+    orders : int or list of int, default=[]
+        Order or list of integers that define the order of the rotating frame
+        for each isotope. If empty, the default value defined in
         ``parameters.rotating_frame_order`` is used for all isotopes.
 
     Returns
@@ -124,6 +123,14 @@ def rotating_frame(
 
     # Ensure that the working basis has been built.
     require(spin_system, "basis.basis", "transforming to the rotating frame")
+
+    # Normalize inputs to lists for uniform processing.
+    if isinstance(isotopes, str):
+        isotopes = [isotopes]
+    if isinstance(center_frequencies, (int, float)):
+        center_frequencies = [float(center_frequencies)]
+    if isinstance(orders, int):
+        orders = [orders]
 
     # Validate the basic input list lengths.
     if len(isotopes) == 0:

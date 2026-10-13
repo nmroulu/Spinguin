@@ -6,11 +6,16 @@ This module provides small helper functions for irreducible-tensor index
 conversions, operator-string parsing, and simple basis-set analysis.
 """
 
+from __future__ import annotations
+
 import math
 import re
+from typing import TYPE_CHECKING
 
 import numpy as np
 
+if TYPE_CHECKING:
+    from spinguin._core._spin_system import SpinSystem
 
 def _extract_arguments(operator_term: str) -> list[str]:
     """
@@ -78,22 +83,26 @@ def _split_sum_terms(operator: str) -> list[str]:
     return prod_ops
 
 
-def _expand_global_operator(prod_op: str, nspins: int) -> list[str]:
+def _expand_global_operator(spin_system: SpinSystem, prod_op: str) -> list[str]:
     """
-    Expand single-term shorthand operators that apply to all spins.
+    Expand single-term shorthand operators that apply to all spins, or for
+    all spins of the same isotope.
 
     Parameters
     ----------
+    spin_system : SpinSystem
+        The spin system for which the operator is going to be parsed.
     prod_op : str
         One additive operator term.
-    nspins : int
-        Number of spins in the system.
 
     Returns
     -------
     list of str
         Expanded operator terms.
     """
+
+    # Obtain the number of spins
+    nspins = spin_system.nspins
 
     # Keep product operators unchanged because they are already explicit.
     if '*' in prod_op:
@@ -103,20 +112,49 @@ def _expand_global_operator(prod_op: str, nspins: int) -> list[str]:
     if prod_op[0] == 'E':
         return [prod_op]
 
-    # Expand Cartesian and ladder operators that omit the spin index.
+    # Expand Cartesian and ladder operators
     if prod_op[0] == 'I':
         component = _extract_arguments(prod_op)
+        
+        # Format: I(component) -> applies to all spins
         if len(component) == 1:
             return [f"I({component[0]},{index})" for index in range(nspins)]
+            
+        # Format: I(component, isotope) -> all spins of same isotope
+        if len(component) == 2 and not component[1].isdigit():
+            isotope = component[1]
+            return [
+                f"I({component[0]},{index})" 
+                for index in range(nspins) 
+                if spin_system.isotopes[index] == isotope
+            ]
+        
+        # Format: I(component, index) -> return unchanged
         return [prod_op]
 
-    # Expand spherical tensor operators that omit the spin index.
+    # Expand spherical tensor operators
     if prod_op[0] == 'T':
         component = _extract_arguments(prod_op)
+        
+        # Format: T(l, q) -> applies to all spins
         if len(component) == 2:
             l = component[0]
             q = component[1]
             return [f"T({l},{q},{index})" for index in range(nspins)]
+            
+        # Format: T(l, q, isotope) -> all spins of same isotope
+        if len(component) == 3 and not component[2].isdigit():
+            l = component[0]
+            q = component[1]
+            isotope = component[2]
+            
+            return [
+                f"T({l},{q},{index})" 
+                for index in range(nspins) 
+                if spin_system.isotopes[index] == isotope
+            ]
+                
+        # Format: T(l, q, index) -> return unchanged
         return [prod_op]
 
     # Reject unsupported operator expressions explicitly.
@@ -249,26 +287,32 @@ def lq_to_idx(l: int, q: int) -> int:
 
 
 def parse_operator_string(
+    spin_system: SpinSystem,
     operator: str,
-    nspins: int,
 ) -> tuple[list[np.ndarray], list[complex]]:
     """
     Parse an operator string into basis definitions and coefficients.
 
     Parameters
     ----------
+    spin_system : SpinSystem
+        The spin system for which the operator is going to be parsed.
     operator : str
         The operator string must follow the rules below:
 
-        - Cartesian or ladder operator at specific index or for all spins::
+        - Cartesian or ladder operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "I(component, index)"
             operator = "I(component)"
+            operator = "I(component, isotope)"
 
-        - Spherical tensor operator at specific index or for all spins::
+        - Spherical tensor operator at specific index, for all spins, or for
+          all spins of same isotope::
 
             operator = "T(l, q, index)"
             operator = "T(l, q)"
+            operator = "T(l, q, isotope)"
 
         - Product operators::
 
@@ -289,8 +333,6 @@ def parse_operator_string(
         Whitespace is ignored in the input.
 
         Note that indexing starts from 0.
-    nspins : int
-        Number of spins in the system.
 
     Returns
     -------
@@ -311,7 +353,7 @@ def parse_operator_string(
 
     # Return the unit operator when the input string is empty.
     if operator == "":
-        op_def = np.array([0 for _ in range(nspins)])
+        op_def = np.array([0 for _ in range(spin_system.nspins)])
         coeff = 1
         op_defs.append(op_def)
         coeffs.append(coeff)
@@ -324,14 +366,14 @@ def parse_operator_string(
     prod_ops = [
         expanded_op
         for prod_op in prod_ops
-        for expanded_op in _expand_global_operator(prod_op, nspins)
+        for expanded_op in _expand_global_operator(spin_system, prod_op)
     ]
 
     # Process each product operator separately.
     for prod_op in prod_ops:
 
         # Start from the all-unit product operator.
-        op = np.array(["E" for _ in range(nspins)], dtype="<U10")
+        op = np.array(["E" for _ in range(spin_system.nspins)], dtype="<U10")
 
         # Split the product into single-spin operator terms.
         op_terms = prod_op.split('*')

@@ -15,6 +15,7 @@ from ._cache import clear_cache
 from ._chem import (
     associate,
     dissociate,
+    elementary_reaction,
     permute_spins,
 )
 from ._hamiltonian import (
@@ -87,6 +88,7 @@ from ._utils import (
     coherence_order,
     idx_to_lq,
     lq_to_idx,
+    spin_order,
 )
 
 __all__ = [
@@ -96,6 +98,7 @@ __all__ = [
     # chem
     "associate",
     "dissociate",
+    "elementary_reaction",
     "permute_spins",
 
     # hamiltonian
@@ -180,4 +183,5 @@ __all__ = [
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",
+    "spin_order",
 ]

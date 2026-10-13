@@ -65,8 +65,8 @@ class SpinSystem:
         self._chemical_shifts = np.zeros(self.nspins)
         self._J_couplings = np.zeros((self.nspins, self.nspins))
         self._xyz: np.ndarray | None = None
-        self._shielding: np.ndarray | None = None
-        self._efg: np.ndarray | None = None
+        self._shielding = np.zeros((self.nspins, 3, 3))
+        self._efg = np.zeros((self.nspins, 3, 3))
 
         # Validate the newly initialised object state.
         self._check_consistency()
@@ -262,24 +262,20 @@ class SpinSystem:
         spin_system = SpinSystem(self.isotopes[spins])
 
         # Transfer the isotropic chemical shifts.
-        if self.chemical_shifts is not None:
-            spin_system.chemical_shifts = self.chemical_shifts[spins]
+        spin_system.chemical_shifts = self.chemical_shifts[spins]
 
         # Transfer the scalar-coupling matrix.
-        if self.J_couplings is not None:
-            spin_system.J_couplings = self.J_couplings[np.ix_(spins, spins)]
+        spin_system.J_couplings = self.J_couplings[np.ix_(spins, spins)]
 
         # Transfer the Cartesian coordinates.
         if self.xyz is not None:
             spin_system.xyz = self.xyz[spins]
 
         # Transfer the shielding tensors.
-        if self.shielding is not None:
-            spin_system.shielding = self.shielding[spins]
+        spin_system.shielding = self.shielding[spins]
 
         # Transfer the electric-field-gradient tensors.
-        if self.efg is not None:
-            spin_system.efg = self.efg[spins]
+        spin_system.efg = self.efg[spins]
 
         return spin_system
 

@@ -20,6 +20,7 @@ from spinguin._core import (
     # chem
     associate,
     dissociate,
+    elementary_reaction,
     permute_spins,
 
     # hamiltonian
@@ -104,6 +105,7 @@ from spinguin._core import (
     coherence_order,
     idx_to_lq,
     lq_to_idx,
+    spin_order,
 )
 
 # Re-export the ready-to-use pulse-sequence namespace.
@@ -117,6 +119,7 @@ __all__ = [
     # core: chem
     "associate",
     "dissociate",
+    "elementary_reaction",
     "permute_spins",
 
     # core: hamiltonian
@@ -192,7 +195,8 @@ __all__ = [
     "triplet_plus_state",
     "triplet_zero_state",
     "unit_state",
-    
+    "elementary_reaction",
+
     # core: superoperators
     "sop_T_coupled",
     "superoperator",
@@ -201,6 +205,7 @@ __all__ = [
     "coherence_order",
     "idx_to_lq",
     "lq_to_idx",
+    "spin_order",
 
     # sequences
     "sequences",

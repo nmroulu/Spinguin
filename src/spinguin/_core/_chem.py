@@ -96,6 +96,55 @@ def _validate_permutation_spin_map(
             "length of spin_map does not match the number of spins in "
             "the system or spin_map contains incorrect or overlapping indices"
         )
+    
+def _validate_elementary_reaction_spin_map(
+    reactant_systems : list[SpinSystem],
+    product_systems : list[SpinSystem],
+    spin_map : dict[tuple[int, int], tuple[int, int]]
+) -> None:
+    """
+    Validate a spin map used for an elementary reaction.
+
+    Parameters
+    ----------
+    reactant_systems : list of SpinSystem
+        List of spin systems for the reactants.
+    product_systems : list of SpinSystem
+        List of spin systems for the products.
+    spin_map : dict of tuple of int to tuple of int
+        Dictionary that maps the nuclear spins in the reactants to those in the
+        products.    
+    """
+    # Define the exact sets of spins that must exist
+    expected_reactants = set(
+        (r, rs)
+        for r, ss in enumerate(reactant_systems)
+        for rs in range(ss.nspins)
+    )
+    expected_products = set(
+        (p, ps)
+        for p, ss in enumerate(product_systems)
+        for ps in range(ss.nspins)
+    )
+
+    # Extract the user-provided mappings
+    mapped_reactants = set(spin_map.keys())
+    mapped_products_list = list(spin_map.values())
+    mapped_products_set = set(mapped_products_list)
+
+    # Check that the number of spins in the product and in the reactant match
+    if len(expected_reactants) != len(expected_products):
+        raise ValueError(
+            "The number of reactant and product spins do not match"
+        )
+
+    # Check that every reactant spin is mapped
+    if mapped_reactants != expected_reactants:
+        raise ValueError("Not every reactant spin is mapped.")
+
+    # Check that every product spin receives a map
+    if mapped_products_set != expected_products:
+        raise ValueError("Not every product spin is mapped.")
 
 
 ###############################################################################
@@ -360,109 +409,89 @@ def _permutation_matrix(
 
     return perm
 
-def equilibrium_concentrations(
-    K_eq: float, 
-    c_A0: float, 
-    c_B0: float
-) -> tuple[float, float, float]:
+@lru_cache(maxsize=16)
+def _elementary_reaction_index_map(
+    reactant_bases_bytes: tuple[tuple[bytes, int], ...],
+    product_bases_bytes: tuple[tuple[bytes, int], ...],
+    spin_map_tuple: tuple[tuple[int, int, int, int], ...]
+) -> list[tuple[list[int], list[int]]]:
     """
-    Calculate the equilibrium concentrations of species in a 
-    chemical exchange system of the form A + B <-> AB.
-
-    Solves the quadratic equation
-        K_eq = [AB]_eq / ([A]_eq * [B]_eq)
-    subject to the mass balance constraints
-        [A]_eq + [AB]_eq = c_A0
-        [B]_eq + [AB]_eq = c_B0,
-    which is
-        K_eq*c_A0*c_B0 - (K_eq*c_A0 + K_eq*c_B0 + 1) + K_eq*[AB]_eq^2 = 0.
+    Generate index maps for an elementary reaction.
 
     Parameters
     ----------
-    K_eq : float
-        Equilibrium constant for the reaction A + B <-> AB.
-    c_A0 : float
-        Initial concentration of species A.
-    c_B0 : float
-        Initial concentration of species B.
-
-    Returns
-    -------
-    c_A_eq : float
-        Equilibrium concentration of species A.
-    c_B_eq : float
-        Equilibrium concentration of species B.
-    c_AB_eq : float
-        Equilibrium concentration of species AB.
+    reactant_bases_bytes : tuple of tuple of bytes and int
+        Reactant basis sets in bytes and the corresponding number of spins.
+    product_bases_bytes : tuple of tuple of bytes and int
+        Product basis sets in bytes and the corresponding number of spins.
+    spin_map_tuple : tuple of tuple of int
+        Spin map flattened into a format ((r, rs, p, ps), ...), where
+        r and p are reactant and product system indices, and
+        rs and ps are the corresponding spin indices.
     """
-    # Coefficients of the quadratic equation for [AB]_eq.
-    a = K_eq
-    b = -(K_eq*c_A0 + K_eq*c_B0 + 1)
-    c = K_eq*c_A0*c_B0
+    # Convert the reactant and product bases from bytes to NumPy arrays.
+    reactant_bases = [
+        np.frombuffer(basis_bytes, dtype=int).reshape(-1, nspins)
+        for basis_bytes, nspins in reactant_bases_bytes
+    ]
+    product_bases = [
+        np.frombuffer(basis_bytes, dtype=int).reshape(-1, nspins)
+        for basis_bytes, nspins in product_bases_bytes
+    ]
 
-    # Calculate the discriminant and check for non-negativity.
-    discriminant = b**2 - 4*a*c
-    if discriminant < 0:
-        raise ValueError("No real solution for equilibrium concentrations.")
+    # Create lookups for the reactant bases to enable fast index retrieval
+    lookups = [
+        {tuple(row): idx for idx, row in enumerate(basis)}
+        for basis in reactant_bases
+    ]
 
-    # Calculate the two roots of the quadratic equation for [AB]_eq and
-    # select the physically meaningful one that lies within the mass balance limits.
-    root1 = (-b + np.sqrt(discriminant)) / (2*a)
-    root2 = (-b - np.sqrt(discriminant)) / (2*a)
-    c_AB_eq = None
-    for root in (root1, root2):
-        if 0 <= root <= min(c_A0, c_B0):
-            c_AB_eq = root
-            break
+    # Re-construct the spin map
+    spin_map = {
+        (r, p): []
+        for r in range(len(reactant_bases_bytes))
+        for p in range(len(product_bases_bytes))
+    }
+    for r, rs, p, ps in spin_map_tuple:
+        spin_map[(r, p)].append((rs, ps))
 
-    if c_AB_eq is None:
-        raise ValueError("No physically meaningful solution for equilibrium concentrations.")
+    # Generate index maps from reactant basis sets to the product basis sets
+    idx_maps = []
+    for p, product_basis in enumerate(product_bases):
+        idx_map_p = []
+        idx_map_rp = []
 
-    # Calculate the equilibrium concentrations of species A and B using mass balance.
-    c_A_eq = c_A0 - c_AB_eq
-    c_B_eq = c_B0 - c_AB_eq
+        # For every product basis state, search for matching reactant states
+        for idx_p, op_def_p in enumerate(product_basis):
+            idx_rp = []
+            for r, reactant_basis in enumerate(reactant_bases):
+                
+                # Build the corresponding reactant basis state 
+                op_def_r = np.zeros(reactant_basis.shape[1], dtype=int)
+                for rs, ps in spin_map[(r, p)]:
+                    op_def_r[rs] = op_def_p[ps]
+                op_def_r = tuple(op_def_r)
 
-    return c_A_eq, c_B_eq, c_AB_eq
+                # Store the index if the state exists
+                if op_def_r in lookups[r]:
+                    idx_rp.append(lookups[r][op_def_r])
+                
+                # Otherwise skip the current product basis state completely
+                else:
+                    break
 
-def equilibrium_two_site_populations(
-    K_eq: float, 
-    c_A0: float,
-    c_B0: float
-) -> tuple[float, float]:
-    """
-    Calculate the equilibrium populations of sites A and AB in a chemically exchanging
-    system of the form A + B <-> AB. Uses the `equilibrium_concentrations()` function 
-    to compute the equilibrium concentrations and then converts these to populations
-    by normalising with respect to the total concentration of A + AB.
+            # Store the mapping if all reactant states were found
+            else:
+                idx_map_p.append(idx_p)
+                idx_map_rp.append(idx_rp)
 
-    Parameters
-    ----------
-    K_eq : float
-        Equilibrium constant for the reaction A + B <-> AB.
-    c_A0 : float
-        Initial concentration of species A.
-    c_B0 : float
-        Initial concentration of species B.
+        # Transpose the reactant index map
+        idx_map_rp = [list(row) for row in zip(*idx_map_rp)]
+        
+        # Store the mapping for the current product system
+        idx_maps.append((idx_map_p, idx_map_rp))
 
-    Returns
-    -------
-    p_A_eq : float
-        Equilibrium population of site A.
-    p_B_eq : float
-        Equilibrium population of site B.
-    """
-    # Calculate the equilibrium concentrations of species A, B, and AB.
-    c_A_eq, _, c_AB_eq = equilibrium_concentrations(K_eq, c_A0, c_B0)
+    return idx_maps
 
-    # Calculate the total concentration of sites A and AB.
-    c_total = c_A_eq + c_AB_eq
-
-    # Calculate the equilibrium populations of sites A and B by normalising 
-    # with respect to the total concentration.
-    p_A_eq = c_A_eq / c_total
-    p_B_eq = c_AB_eq / c_total
-
-    return p_A_eq, p_B_eq
 
 def permutation_matrix(
     spin_system: SpinSystem,
@@ -740,6 +769,115 @@ def permute_spins(
         rho = rho.toarray()
 
     return rho
+
+
+def elementary_reaction(
+    reactant_systems: SpinSystem | list[SpinSystem],
+    product_systems: SpinSystem | list[SpinSystem],
+    reactant_rhos: np.ndarray | sp.csc_array | list[np.ndarray | sp.csc_array],
+    spin_map: dict[tuple[int, int], tuple[int, int]]
+) -> np.ndarray | sp.csc_array | tuple[np.ndarray | sp.csc_array, ...]:
+    """
+    Perform an elementary chemical reaction that transforms reactant states into
+    product states. If the reaction has stoichiometric coefficients greater than
+    one, specify the same reactant or product system multiple times.
+
+    Parameters
+    ----------
+    reactant_systems : SpinSystem or list of SpinSystem
+        List of spin systems for the reactants.
+    product_systems : SpinSystem or list of SpinSystem
+        List of spin systems for the products.
+    reactant_rhos : ndarray or csc_array or list of ndarray or csc_array
+        List of state vectors for the reactants. The order should match that of
+        `reactant_systems`.
+    spin_map : dict of tuple of int to tuple of int
+        Dictionary that maps the nuclear spins in the reactants to those in the
+        products. The keys are tuples specifying the reactant index and the
+        reactant spin index, and the values are identical tuples for the
+        products. Example::
+
+        spin_map = {
+            (0, 0): (0, 0),  # reactant 0, spin 0 -> product 0, spin 0
+            (0, 1): (1, 0),  # reactant 0, spin 1 -> product 1, spin 0
+            (1, 0): (0, 1),  # reactant 1, spin 0 -> product 0, spin 1
+            (1, 1): (1, 1),  # reactant 1, spin 1 -> product 1, spin 1
+        }
+
+    Returns
+    -------
+    rhos : ndarray or csc_array or tuple of ndarray or csc_array
+        State vectors for the products. The order matches that of
+        `product_systems`. A single state vector is returned if there is only
+        one product system, and a tuple of state vectors is returned if there
+        are multiple product systems.
+    """
+    # Convert single systems and states to lists for uniform processing
+    if not isinstance(reactant_systems, (list, tuple)):
+        reactant_systems = [reactant_systems]
+    if not isinstance(product_systems, (list, tuple)):
+        product_systems = [product_systems]
+    if not isinstance(reactant_rhos, (list, tuple)):
+        reactant_rhos = [reactant_rhos]
+
+    # Validate that the spin map is consistent
+    _validate_elementary_reaction_spin_map(
+        reactant_systems,
+        product_systems,
+        spin_map
+    )
+
+    # Convert the reactant and product bases to bytes for hashing
+    reactant_bases_bytes = tuple(
+        (ss.basis.basis.tobytes(), ss.nspins)
+        for ss in reactant_systems
+    )
+    product_bases_bytes = tuple(
+        (ss.basis.basis.tobytes(), ss.nspins)
+        for ss in product_systems
+    )
+
+    # Convert the dictionary to a flattened tuple for hashing
+    spin_map_tuple = tuple(
+        (r, rs, p, ps)
+        for (r, rs), (p, ps) in spin_map.items()
+    )
+
+    # Generate the index maps
+    idx_maps = _elementary_reaction_index_map(
+        reactant_bases_bytes,
+        product_bases_bytes,
+        spin_map_tuple
+    )
+
+    # Calculate all product states
+    product_rhos = []
+    for p, product_system in enumerate(product_systems):
+        idx_map_p, idx_map_rp = idx_maps[p]
+
+        # Allocate an empty state vector for the product system
+        rho_p = empty_state(product_system)
+
+        # Populate the product state
+        rho_p[idx_map_p, [0]] = reactant_rhos[0][idx_map_rp[0], [0]]
+        for r in range(1, len(reactant_systems)):
+            rho_p[idx_map_p, [0]] *= reactant_rhos[r][idx_map_rp[r], [0]]
+
+        # Normalise the product state to preserve the unit operator scale
+        rho_p /= (rho_p[0, 0] * np.sqrt(np.prod(product_system.mults)))
+
+        # Convert to csc_array if using sparse
+        if parameters.sparse_state:
+            rho_p = rho_p.tocsc()
+        
+        # Store the product state
+        product_rhos.append(rho_p)
+
+    # A single state is returned if there is only one product system
+    if len(product_rhos) == 1:
+        return product_rhos[0]
+
+    return tuple(product_rhos)
 
 
 def clear_cache_associate_index_map() -> None:

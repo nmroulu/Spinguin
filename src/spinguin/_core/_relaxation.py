@@ -9,13 +9,11 @@ interaction tensors and different motional models.
 from __future__ import annotations
 
 import time
-import warnings
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
-from scipy.optimize import fsolve
 
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._hide_prints import HidePrints
@@ -300,27 +298,15 @@ def moment_of_inertia_equivalent_ellipsoid(
     # Calculate the total molecular mass.
     total_mass = np.sum(masses)
 
-    # Define the nonlinear system for the equivalent ellipsoid semi-axes.
-    def equations(semi_axes: np.ndarray) -> list[float]:
-        a_x, a_y, a_z = semi_axes
-        eq1 = (1/5) * total_mass * (a_y**2 + a_z**2) - eigenvalues[0]
-        eq2 = (1/5) * total_mass * (a_x**2 + a_z**2) - eigenvalues[1]
-        eq3 = (1/5) * total_mass * (a_x**2 + a_y**2) - eigenvalues[2]
-        return [eq1, eq2, eq3]
+    # Solve for the semi-axes squared
+    a_x2 = 5/(2*total_mass)*(-eigenvalues[0] + eigenvalues[1] + eigenvalues[2])
+    a_y2 = 5/(2*total_mass)*(eigenvalues[0] - eigenvalues[1] + eigenvalues[2])
+    a_z2 = 5/(2*total_mass)*(eigenvalues[0] + eigenvalues[1] - eigenvalues[2])
 
-    # Build an initial guess from a sphere with the same largest inertia.
-    initial_guess = np.sqrt(5/2 * eigenvalues[2] / total_mass) * np.ones(3)
-
-    # TODO: Check this
-    # Solve the nonlinear system while suppressing numerical warnings.
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        a_x, a_y, a_z = fsolve(
-            equations,
-            initial_guess,
-            maxfev=10000,
-            xtol=1e-15,
-        )
+    # Calculate the semi-axes, ensuring non-negativity due to numerics.
+    a_x = np.sqrt(np.maximum(a_x2, 0))
+    a_y = np.sqrt(np.maximum(a_y2, 0))
+    a_z = np.sqrt(np.maximum(a_z2, 0))
 
     return np.array([a_x, a_y, a_z])
 
@@ -693,7 +679,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
                     interactions[l].append(("DD", spin_1, spin_2, V[l]))
 
     # Process all shielding interaction tensors.
-    if spin_system.shielding is not None:
+    if np.any(spin_system.shielding):
 
         # Get the shielding interaction tensors.
         sh_tensors = shielding_intr_tensors(spin_system)
@@ -709,7 +695,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
                 interactions[l].append(("CSA", spin_1, None, V[l]))
 
     # Process all quadrupolar interaction tensors.
-    if spin_system.efg is not None:
+    if np.any(spin_system.efg):
 
         # Get the quadrupolar interaction tensors.
         q_tensors = Q_intr_tensors(spin_system)
@@ -923,8 +909,8 @@ def _sop_R_sr2k(
 
         # Find the operator definitions of the longitudinal and transverse
         # states
-        op_def_z, _ = parse_operator_string(f"I(z, {quad})", spin_system.nspins)
-        op_def_p, _ = parse_operator_string(f"I(+, {quad})", spin_system.nspins)
+        op_def_z, _ = parse_operator_string(spin_system, f"I(z, {quad})")
+        op_def_p, _ = parse_operator_string(spin_system, f"I(+, {quad})")
 
         # Convert operator definitions to tuples for dictionary lookup.
         op_def_z = tuple(op_def_z[0])
