@@ -137,9 +137,7 @@ def rotating_frame(
         raise ValueError("Must specify at least one isotope.")
     if len(orders) not in (0, len(isotopes)):
         raise ValueError("Lengths of orders and isotopes must match.")
-    single_center_frequency = np.isscalar(center_frequencies)
     if not (
-        single_center_frequency or
         len(center_frequencies) == len(isotopes) or
         len(center_frequencies) == 0
     ):
@@ -161,9 +159,7 @@ def rotating_frame(
     # Fill optional inputs with default values when needed.
     if len(orders) == 0:
         orders = [parameters.rotating_frame_order for _ in range(len(isotopes))]
-    if single_center_frequency:
-        center_frequencies = [center_frequencies for _ in range(len(isotopes))]
-    elif len(center_frequencies) == 0:
+    if len(center_frequencies) == 0:
         center_frequencies = [0 for _ in range(len(isotopes))]
 
     # Calculate the resonance frequencies that define the interaction frames.
