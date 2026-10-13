@@ -228,8 +228,9 @@ class RelaxationProperties:
             spin_system.relaxation.tau_c = 50e-12
 
         For anisotropic rotational diffusion, an array of three values is used,
-        corresponding to the principal components of the diffusion tensor.
-        Example::
+        corresponding to the principal components of the diffusion tensor
+        along `Molecule.principal_axes` of the assigned molecule, in ascending
+        order of the principal moments of inertia. Example::
 
             spin_system.relaxation.tau_c = [50e-12, 100e-12, 150e-12]
         """
@@ -276,7 +277,11 @@ class RelaxationProperties:
 
         The correlation time is evaluated either from the
         Stokes-Einstein-Debye relation for isotropic rotational diffusion or
-        from Perrin theory for anisotropic rotational diffusion.
+        from Perrin theory for anisotropic rotational diffusion. Both models
+        use stick boundary conditions and the van der Waals solid of the
+        assigned molecule: the isotropic model uses the sphere of equal volume
+        (`Molecule.hydrodynamic_radius`), and the anisotropic model uses the
+        ellipsoid of `Molecule.semi_axes` along `Molecule.principal_axes`.
 
         Parameters
         ----------
@@ -288,7 +293,15 @@ class RelaxationProperties:
             Effective hydrodynamic radius in Å. If None, the radius is estimated
             using the molecule geometry.
         scaling_factor : float, default=1.0
-            Scaling factor applied to the calculated correlation times.
+            Empirical scaling factor applied to the calculated correlation
+            times. It corrects the stick boundary conditions and depends on the
+            solute and the solvent, so it should be fitted to experimental
+            relaxation data where possible. Slippery solvents, in which the
+            solute interacts weakly with solvent molecules of similar or larger
+            size, give values much smaller than 1 (e.g. about 0.1 for neat
+            benzene). Sticky solvents, in which the solute is hydrogen bonded
+            or strongly solvated, give values of about 1 (e.g. about 1 for
+            hexamethylenetetramine in D2O).
 
         Returns
         -------
@@ -331,8 +344,7 @@ class RelaxationProperties:
                     "before calling auto_tau_c with the anisotropic model."
                 )
             self.tau_c = rotational_correlation_times_Perrin(
-                self.molecule.masses,
-                self.molecule.xyz,
+                self.molecule.semi_axes,
                 parameters.temperature,
                 eta,
                 2,
@@ -540,7 +552,8 @@ class RelaxationProperties:
         """
         Return the molecule associated with the spin system.
 
-        The molecule is used to define the rotational principal axes. The
+        The molecule is used to define the rotational principal axes, which
+        are the principal axes of inertia of its van der Waals solid. The
         value is ``None`` until a molecule is assigned explicitly.
         """
 

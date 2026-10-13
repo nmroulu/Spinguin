@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+- The automatic rotational correlation times use the van der Waals solid of
+the molecule with Bondi radii. The isotropic model uses the sphere of equal
+volume and the anisotropic model uses an ellipsoid with the inertia axis ratios
+of the solid, scaled to the same volume. This replaces the uniform 1.2 Å atomic
+radius and the 1 Å correction of the semi-axes.
+- The principal axes of anisotropic rotational diffusion are the principal axes
+of inertia of the van der Waals solid instead of those of the nuclear masses.
+- Added `Molecule.elements`, `Molecule.vdw_radii` (custom radii can be
+assigned), `Molecule.principal_axes` and `Molecule.semi_axes`.
+- The Perrin integrals are evaluated exactly with Carlson elliptic integrals.
+- Fixed the frame transformation of anisotropic rotational diffusion: the
+interaction tensors were rotated with the inverse rotation, and a left-handed
+set of principal axes could not be reached by a proper rotation. Anisotropic
+results were correct only for molecules given in their principal-axis frame.
+Added a test of the invariance of the relaxation rates to the molecular
+orientation.
+- Documented `scaling_factor` of `auto_tau_c` as an empirical, solvent-dependent
+parameter.
+
 ## 0.2.1
 - Accept input of the form "I(component, isotope)" for constructing operators,
 superoperators and states.

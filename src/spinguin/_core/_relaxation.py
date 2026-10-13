@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 import scipy.constants as const
 import scipy.sparse as sp
+from scipy.special import elliprd
 
 from spinguin._core._hamiltonian import hamiltonian
 from spinguin._core._hide_prints import HidePrints
@@ -174,153 +175,18 @@ def rotational_correlation_time_SED(
 
     return tau_c
 
-def center_of_mass(
-    masses: np.ndarray,
-    coords: np.ndarray,
-) -> np.ndarray:
-    """
-    Calculate the centre of mass of a molecule.
-
-    Parameters
-    ----------
-    masses : ndarray
-        A 1-dimensional array specifying the atomic masses of each atom
-        in the molecule.
-        Must be given in atomic mass units (u).
-    coords : ndarray
-        A 2-dimensional array specifying the cartesian coordinates in
-        the XYZ format for each atom in the molecule.
-        Must be given in the units of Å.
-
-    Returns
-    -------
-    center_of_mass : ndarray
-        Centre-of-mass coordinates in units of Å.
-    """
-    # Compute the total molecular mass.
-    total_mass = np.sum(masses)
-
-    # Evaluate the mass-weighted Cartesian mean position.
-    return np.sum(masses[:, np.newaxis] * coords, axis=0) / total_mass
-
-def moment_of_inertia_tensor(
-    masses: np.ndarray,
-    coords: np.ndarray,
-) -> np.ndarray:
-    """
-    Calculate the moment of inertia tensor of a molecule.
-
-    Parameters
-    ----------
-    masses : ndarray
-        A 1-dimensional array specifying the atomic masses of each atom
-        in the molecule.
-        Must be given in atomic mass units (u).
-    coords : ndarray
-        A 2-dimensional array specifying the cartesian coordinates in
-        the XYZ format for each atom in the molecule.
-        Must be given in the units of Å.
-
-    Returns
-    -------
-    I : ndarray
-        Moment of inertia tensor in units of u·Å².
-    """
-
-    # Determine the number of atoms in the molecule.
-    natoms = masses.shape[0]
-
-    # Determine the centre of mass of the molecule.
-    center_of_mass_coords = center_of_mass(masses, coords)
-
-    # Shift the Cartesian coordinates to the centre-of-mass frame.
-    coords_centered = coords - center_of_mass_coords
-
-    # Allocate the moment of inertia tensor.
-    I = np.zeros((3, 3))
-
-    # Accumulate the Cartesian tensor elements atom by atom.
-    for i in range(natoms):
-        x, y, z = coords_centered[i]
-        m = masses[i]
-
-        # Update the tensor elements from the current atom.
-        I[0, 0] += m * (y**2 + z**2)
-        I[1, 1] += m * (x**2 + z**2)
-        I[2, 2] += m * (x**2 + y**2)
-        I[0, 1] -= m * x * y
-        I[0, 2] -= m * x * z
-        I[1, 2] -= m * y * z
-
-    # Complete the symmetric lower-triangular tensor elements.
-    I[1, 0] = I[0, 1]
-    I[2, 0] = I[0, 2]
-    I[2, 1] = I[1, 2]
-
-    return I
-
-def moment_of_inertia_equivalent_ellipsoid(
-    masses: np.ndarray,
-    coords: np.ndarray,
-) -> np.ndarray:
-    """
-    Calculate the semi-axes of the mass-equivalent ellipsoid.
-
-    The semi-axes are determined from the equations
-
-        I_1 = (1/5) * M * (a_y^2 + a_z^2)
-        I_2 = (1/5) * M * (a_x^2 + a_z^2)
-        I_3 = (1/5) * M * (a_x^2 + a_y^2)
-
-    where ``I_1``, ``I_2``, and ``I_3`` are the eigenvalues of the moment of
-    inertia tensor, ``M`` is the total mass of the molecule, and ``a_x``,
-    ``a_y``, and ``a_z`` are the semi-axes of the ellipsoid.
-
-    Parameters
-    ----------
-    masses : ndarray
-        A 1-dimensional array specifying the atomic masses of each atom
-        in the molecule, given in atomic mass units (u).
-    coords : ndarray
-        A 2-dimensional array specifying the Cartesian coordinates in
-        the XYZ format for each atom in the molecule, given in units of Å.
-
-    Returns
-    -------
-    semi_axes : ndarray
-        Semi-axes of the mass-equivalent ellipsoid in units of Å, calculated
-        as described above.
-    """
-    # Calculate the moment of inertia tensor and its eigenvalues.
-    I = moment_of_inertia_tensor(masses, coords)
-    eigenvalues, _ = np.linalg.eigh(I)
-
-    # Calculate the total molecular mass.
-    total_mass = np.sum(masses)
-
-    # Solve for the semi-axes squared
-    a_x2 = 5/(2*total_mass)*(-eigenvalues[0] + eigenvalues[1] + eigenvalues[2])
-    a_y2 = 5/(2*total_mass)*(eigenvalues[0] - eigenvalues[1] + eigenvalues[2])
-    a_z2 = 5/(2*total_mass)*(eigenvalues[0] + eigenvalues[1] - eigenvalues[2])
-
-    # Calculate the semi-axes, ensuring non-negativity due to numerics.
-    a_x = np.sqrt(np.maximum(a_x2, 0))
-    a_y = np.sqrt(np.maximum(a_y2, 0))
-    a_z = np.sqrt(np.maximum(a_z2, 0))
-
-    return np.array([a_x, a_y, a_z])
-
 def Perrin_integrals(
     a_x: float,
     a_y: float,
     a_z: float,
-    num_points: int = int(1e6),
 ) -> tuple[float, float, float]:
     """
     Calculate the Perrin integrals for an ellipsoid.
 
-    A variable substitution is used to map the infinite integration domain to
-    the interval ``[0, 1)``.
+    The integral ``P = int_0^inf ds / [(a_x^2 + s) Delta(s)]``, with
+    ``Delta(s) = sqrt((a_x^2 + s)(a_y^2 + s)(a_z^2 + s))``, and the analogous
+    integrals ``Q`` and ``R`` are evaluated exactly with the Carlson symmetric
+    elliptic integral of the second kind, ``P = 2/3 R_D(a_y^2, a_z^2, a_x^2)``.
 
     Parameters
     ----------
@@ -330,8 +196,6 @@ def Perrin_integrals(
         Semi-axis a_y of the ellipsoid in units of Å.
     a_z : float
         Semi-axis a_z of the ellipsoid in units of Å.
-    num_points : int, optional
-        Number of points for the integration. Default is 1e6.
 
     Returns
     -------
@@ -342,23 +206,10 @@ def Perrin_integrals(
     R : float
         Perrin R integral for the ellipsoid.
     """
-    # Map the semi-infinite integration range to the interval ``[0, 1)``.
-    t = np.linspace(0, 1, num_points, endpoint=False)
-    s = t / (1 - t)
-    jacobian = 1 / (1 - t)**2
-
-    # Evaluate the three Perrin integrands including the Jacobian factor.
-    integrand_P = \
-        1 / np.sqrt((a_x**2 + s) ** 3 * (a_y**2 + s) * (a_z**2 + s)) * jacobian
-    integrand_Q = \
-        1 / np.sqrt((a_y**2 + s) ** 3 * (a_z**2 + s) * (a_x**2 + s)) * jacobian
-    integrand_R = \
-        1 / np.sqrt((a_z**2 + s) ** 3 * (a_x**2 + s) * (a_y**2 + s)) * jacobian
-
-    # Integrate the three transformed functions over the finite interval.
-    P = np.trapezoid(integrand_P, t)
-    Q = np.trapezoid(integrand_Q, t)
-    R = np.trapezoid(integrand_R, t)
+    # Evaluate the three integrals as Carlson elliptic integrals.
+    P = 2/3 * elliprd(a_y**2, a_z**2, a_x**2)
+    Q = 2/3 * elliprd(a_z**2, a_x**2, a_y**2)
+    R = 2/3 * elliprd(a_x**2, a_y**2, a_z**2)
 
     return P, Q, R
 
@@ -434,8 +285,7 @@ def rotational_diffusion_constants_Perrin(
     return D_rs
 
 def rotational_correlation_times_Perrin(
-    masses: np.ndarray,
-    coords: np.ndarray,
+    semi_axes: np.ndarray,
     T: float,
     eta: float,
     l: int,
@@ -445,13 +295,9 @@ def rotational_correlation_times_Perrin(
 
     Parameters
     ----------
-    masses : ndarray
-        A 1-dimensional array specifying the atomic masses of each atom
-        in the molecule. Must be given in atomic mass units (u).
-    coords : ndarray
-        A 2-dimensional array specifying the Cartesian coordinates in
-        the XYZ format for each atom in the molecule. Must be given in
-        the units of Å.
+    semi_axes : ndarray
+        Semi-axes of the ellipsoid in Å along the principal axes, for example
+        `Molecule.semi_axes`.
     T : float
         Temperature in Kelvin.
     eta : float
@@ -462,17 +308,9 @@ def rotational_correlation_times_Perrin(
     Returns
     -------
     tau_cs : ndarray
-        Rotational correlation times along the principal axes in seconds.
-        The output is an array of shape (3,) corresponding to the three
-        principal axes of the ellipsoid.
+        Rotational correlation times ``1/(l(l+1) D_i)`` about the three
+        principal axes in seconds.
     """
-    # Calculate the semi-axes of the mass-equivalent ellipsoid.
-    semi_axes = moment_of_inertia_equivalent_ellipsoid(masses, coords)
-
-    # Add a minimum hydrodynamic thickness to avoid unrealistically thin axes.
-    # TODO: Calibrate this
-    semi_axes += 1.0
-
     # Calculate the principal-axis rotational diffusion constants.
     D_rs = rotational_diffusion_constants_Perrin(
         T,
@@ -571,8 +409,9 @@ def _process_interaction_tensor(
     V : ndarray
         Cartesian interaction tensor.
     R : ndarray
-        Rotation operator that rotates the interaction tensor to the rotational
-        principal axis frame. For isotropic rotational diffusion, R is a unit
+        Rotation matrix whose columns are the rotational principal axes in the
+        laboratory frame. The tensor is transformed to the principal-axis frame
+        as ``R.T @ V @ R``. For isotropic rotational diffusion, R is a unit
         matrix.
     dge : dict
         Eigenvectors of the rotational diffusion generator for ranks l = 1 and
@@ -604,7 +443,7 @@ def _process_interaction_tensor(
         return V_lp
 
     # Rotate the tensor into the rotational principal-axis frame.
-    V = R @ V @ R.T
+    V = R.T @ V @ R
 
     # Express the rotated tensor in spherical tensor notation.
     V = cartesian_tensor_to_spherical_tensor(V)
@@ -654,10 +493,7 @@ def _process_interactions(spin_system: SpinSystem, dge: dict) -> dict:
     if iso:
         R = np.eye(3)
     else:
-        masses = spin_system.relaxation.molecule.masses
-        coords = spin_system.relaxation.molecule.xyz
-        moi_tensor = moment_of_inertia_tensor(masses, coords)
-        _, rot_principal_axes = np.linalg.eigh(moi_tensor)
+        rot_principal_axes = spin_system.relaxation.molecule.principal_axes
         lab_frame = np.eye(3)
         R = rotation_matrix_to_align_axes(lab_frame, rot_principal_axes.T)
 

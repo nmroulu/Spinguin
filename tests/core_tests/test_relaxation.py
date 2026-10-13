@@ -334,7 +334,97 @@ class TestRelaxation(unittest.TestCase):
         # Confirm that the values are not the same
         self.assertTrue(tau_c_1 != tau_c_2)
 
-        # Confirm that the results are reasonable (< 30% off)
-        tau_c_ref = 7.5e-12
+        # Confirm that the results are reasonable (< 30% off). The reference
+        # uses the Bondi van der Waals volume of pyridine (r = 2.66 Å).
+        tau_c_ref = 11.4e-12
         self.assertTrue(abs(tau_c_1 - tau_c_ref)/tau_c_ref < 0.3)
         self.assertTrue(abs(tau_c_2 - tau_c_ref)/tau_c_ref < 0.3)
+
+    def test_auto_tau_c_aniso(self):
+        """
+        Test calculating the rotational correlation times using the
+        anisotropic model.
+        """
+        # Set the global simulation parameters.
+        sg.parameters.default()
+        sg.parameters.temperature = 293
+
+        # Solvent viscosity
+        eta = 0.59e-3
+
+        # Create a spin system whose molecule is a single carbon atom.
+        ss = sg.SpinSystem(["13C"])
+        ss.relaxation.molecule = sg.Molecule(["13C"], [[0, 0, 0]])
+
+        # Calculate the correlation times of both models for the sphere.
+        ss.relaxation.auto_tau_c(eta, "iso")
+        tau_c_iso = ss.relaxation.tau_c
+        ss.relaxation.auto_tau_c(eta, "aniso")
+        tau_c_aniso = ss.relaxation.tau_c
+
+        # Confirm that the Perrin model reduces to the isotropic model.
+        self.assertTrue(np.allclose(tau_c_aniso, tau_c_iso, rtol=1e-6))
+
+        # Confirm that the scaling factor multiplies all correlation times.
+        ss.relaxation.auto_tau_c(eta, "aniso", scaling_factor=0.1)
+        self.assertTrue(np.allclose(ss.relaxation.tau_c, 0.1*tau_c_aniso))
+
+        # Create the pyridine spin system and its molecule.
+        ss = sg.SpinSystem(test_data_path("isotopes_pyridine.txt"))
+        ss.relaxation.molecule = sg.Molecule(
+            isotopes = test_data_path("isotopes_pyridine.txt"),
+            xyz = test_data_path("xyz_pyridine.txt")
+        )
+
+        # Calculate the anisotropic correlation times of pyridine.
+        ss.relaxation.auto_tau_c(eta, "aniso")
+        tau_c = ss.relaxation.tau_c
+
+        # Confirm that rotation about the ring normal is the slowest.
+        self.assertTrue(tau_c[0] < tau_c[1] < tau_c[2])
+
+        # Confirm that the results are reasonable (< 30% off).
+        tau_c_ref = np.array([12.1e-12, 13.0e-12, 15.6e-12])
+        self.assertTrue(np.all(np.abs(tau_c - tau_c_ref)/tau_c_ref < 0.3))
+
+    def test_relaxation_aniso_rotation_invariance(self):
+        """
+        Test that the anisotropic Redfield relaxation rate does not depend on
+        the orientation of the molecule in the laboratory frame.
+        """
+        # Set the global simulation parameters.
+        sg.parameters.default()
+        sg.parameters.magnetic_field = 9.4
+        sg.parameters.temperature = 293
+
+        # Define an asymmetric three-spin molecule and its correlation times.
+        isotopes = ["13C", "1H", "1H"]
+        xyz = np.array([[0.0, 0.0, 0.0], [1.1, 0.0, 0.0], [-0.4, 1.0, 0.3]])
+        tau_c = [10e-12, 20e-12, 40e-12]
+
+        # Calculate the 13C z-magnetisation relaxation rate for random orientations.
+        rng = np.random.default_rng(1)
+        rates = []
+        for _ in range(4):
+
+            # Rotate the molecule by a random proper rotation.
+            q, _ = np.linalg.qr(rng.normal(size=(3, 3)))
+            q *= np.sign(np.linalg.det(q))
+            xyz_rotated = xyz @ q.T
+
+            # Build the spin system with anisotropic rotational diffusion.
+            ss = sg.SpinSystem(isotopes)
+            ss.xyz = xyz_rotated
+            ss.basis.build()
+            ss.relaxation.theory = "redfield"
+            ss.relaxation.tau_c = tau_c
+            ss.relaxation.molecule = sg.Molecule(isotopes, xyz_rotated)
+
+            # Project the relaxation superoperator onto the 13C magnetisation.
+            R = sg.relaxation(ss).toarray()
+            rho = np.ravel(sg.state(ss, "I(z, 0)"))
+            rates.append(np.real(rho.conj() @ R @ rho / (rho.conj() @ rho)))
+
+        # Confirm that all orientations give the same rate. The tolerance
+        # allows for the grid sampling of the van der Waals solid.
+        self.assertTrue(np.allclose(rates, rates[0], rtol=1e-3))
