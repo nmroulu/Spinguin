@@ -19,6 +19,13 @@ Added a test of the invariance of the relaxation rates to the molecular
 orientation.
 - Documented `scaling_factor` of `auto_tau_c` as an empirical, solvent-dependent
 parameter.
+- Added `rotating_frame_irradiation_hamiltonian` for continuous-wave
+irradiation of one isotope in the rotating frame. The phase convention matches
+`pulse`: irradiation with phase 0 or 90 degrees rotates about +x or +y for both
+signs of the gyromagnetic ratio. Added tests against hard pulses, analytic
+rotations, off-resonance nutation and the steady state of the Bloch equations
+under irradiation with thermalised relaxation.
+- `time_axis` accepts a start time.
 
 ## 0.2.1
 - Accept input of the form "I(component, isotope)" for constructing operators,

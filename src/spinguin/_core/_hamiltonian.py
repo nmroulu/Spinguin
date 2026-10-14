@@ -198,13 +198,31 @@ def rotating_frame_irradiation_hamiltonian(
     side: Literal["comm", "left", "right"]="comm",
 ) -> np.ndarray | csc_array:
     """
-    Construct the Hamiltonian for continuous-wave transverse irradiation of all
-    spins of the given isotope.
+    Construct the rotating-frame Hamiltonian for continuous-wave transverse
+    irradiation of all spins of the given isotope. The Hamiltonian is defined
+    as
+
+    $$
+    H_rf = w1 * sum_k [cos(phase) * I_x(k) + sin(phase) * I_y(k)],
+    $$
+
+    where the sum runs over the spins of the irradiated isotope and the
+    nutation frequency w1 = |gamma| * B1 / 2 is positive for both signs of
+    the gyromagnetic ratio gamma. Irradiation with a given phase for time t
+    therefore produces the same rotation as `pulse()` with the corresponding
+    transverse operator and the angle w1 * t. For gamma < 0, the phase equals
+    the phase of the laboratory-frame field B1 * cos(W * t + phase). For
+    gamma > 0, the x component of the laboratory-frame field is reversed with
+    respect to this convention.
 
     NOTE:
-    The returned Hamiltonian assumes that the laboratory-frame Hamiltonian has
-    already been transformed to the rotating frame corresponding to the
-    irradiation frequency, and that the rotating-wave approximation holds. The
+    The Hamiltonian is time-independent only in the frame that rotates at the
+    irradiation frequency. The Liouvillian must therefore be transformed with
+    `rotating_frame()`, using the irradiation frequency as the centre
+    frequency of the irradiated isotope, before the irradiation Hamiltonian is
+    added, for example ``L = rotating_frame(...) - 1j * H_rf``. Transforming
+    the propagator with `propagator_to_rotframe()` is not compatible with
+    irradiation. The rotating-wave approximation is assumed, and the
     irradiation field is taken to be linearly polarised, so that only its
     co-rotating component of amplitude B1/2 is retained. Spins of other
     isotopes are not irradiated.
@@ -242,15 +260,16 @@ def rotating_frame_irradiation_hamiltonian(
     # Convert the irradiation phase angle from degrees to radians.
     phase = phase * np.pi / 180
 
-    # Calculate the nutation frequency of the co-rotating field component.
-    omega_1 = 1 / 2 * B1 * gamma(isotope, "rad/s")
+    # Calculate the nutation frequency of the co-rotating field component, which
+    # is positive for both signs of the gyromagnetic ratio.
+    omega_1 = 1 / 2 * B1 * abs(gamma(isotope, "rad/s"))
 
     # Construct the transverse superoperators for all spins of the isotope.
     Ix = superoperator(spin_system, f"I(x, {isotope})", side)
     Iy = superoperator(spin_system, f"I(y, {isotope})", side)
 
     # Combine the transverse superoperators according to the irradiation phase.
-    sop_H = -omega_1 * (np.cos(phase)*Ix + np.sin(phase)*Iy)
+    sop_H = omega_1 * (np.cos(phase)*Ix + np.sin(phase)*Iy)
 
     # Remove very small values to improve sparsity and numerical cleanliness.
     eliminate_small(sop_H, parameters.zero_hamiltonian)
