@@ -4,7 +4,9 @@ Chemical-exchange helpers for Liouville-space simulations.
 This module provides helper functions for simple chemical exchange operations
 in Liouville space, including association, dissociation, and spin-order
 permutation. These helpers also support non-linear chemical-kinetic
-workflows.
+workflows. In addition, the module provides linear (Bloch-McConnell level)
+exchange between sites with identical bases at chemical equilibrium, where the
+exchange enters the Liouvillian of the ensemble directly.
 """
 
 # Imports
@@ -15,10 +17,12 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import scipy.sparse as sp
+from scipy.linalg import block_diag
 
 from spinguin._core._la import arraylike_to_array
 from spinguin._core._parameters import parameters
 from spinguin._core._states import empty_state
+from spinguin._core._validation import require
 
 if TYPE_CHECKING:
     from spinguin._core._spin_system import SpinSystem
@@ -145,6 +149,75 @@ def _validate_elementary_reaction_spin_map(
     # Check that every product spin receives a map
     if mapped_products_set != expected_products:
         raise ValueError("Not every product spin is mapped.")
+
+
+def _validate_exchange_sites(
+    spin_systems: list[SpinSystem],
+) -> None:
+    """
+    Validate that the spin systems of chemically exchanging sites have
+    identical bases (error handling).
+
+    Parameters
+    ----------
+    spin_systems : list of SpinSystem
+        Spin systems of the exchanging sites.
+    """
+
+    # Ensure that the basis of each site has been built.
+    for spin_system in spin_systems:
+        require(spin_system, "basis.basis", "setting up chemical exchange")
+
+    # Check that all sites contain the same isotopes in the same order.
+    isotopes = spin_systems[0].isotopes
+    for spin_system in spin_systems[1:]:
+        if not np.array_equal(spin_system.isotopes, isotopes):
+            raise ValueError(
+                "all exchanging sites must contain the same isotopes in the "
+                "same order"
+            )
+
+    # Check that all sites share the same basis set.
+    basis = spin_systems[0].basis.basis
+    for spin_system in spin_systems[1:]:
+        if not np.array_equal(spin_system.basis.basis, basis):
+            raise ValueError("all exchanging sites must have identical bases")
+
+
+def _validate_exchange_matrix(
+    K: np.ndarray,
+    nsites: int,
+) -> None:
+    """
+    Validate an exchange matrix of first-order rate constants
+    (error handling).
+
+    Parameters
+    ----------
+    K : ndarray
+        Exchange matrix of shape (nsites, nsites).
+    nsites : int
+        Number of exchanging sites.
+    """
+
+    # Check that the exchange matrix has one row and column per site.
+    if K.shape != (nsites, nsites):
+        raise ValueError(
+            "shape of the exchange matrix does not match the number of sites"
+        )
+
+    # Check that the off-diagonal rate constants are non-negative.
+    off_diagonal = K - np.diag(np.diag(K))
+    if np.any(off_diagonal < 0):
+        raise ValueError(
+            "off-diagonal elements of the exchange matrix must be "
+            "non-negative"
+        )
+
+    # Check that the exchange conserves the total population.
+    tolerance = 1e-10 * max(1, np.abs(K).max())
+    if not np.allclose(K.sum(axis=0), 0, atol=tolerance):
+        raise ValueError("columns of the exchange matrix must sum to zero")
 
 
 ###############################################################################
@@ -984,6 +1057,256 @@ def equilibrium_two_site_populations(
     p_AB_eq = c_AB_eq / c_total
 
     return p_A_eq, p_AB_eq
+
+
+def two_site_exchange_matrix(
+    k_ex: float,
+    populations: list[float] | tuple[float, float] | np.ndarray,
+) -> np.ndarray:
+    """
+    Construct the exchange matrix of two-site chemical exchange A <-> B at
+    chemical equilibrium.
+
+    The populations evolve as dP/dt = K P, where P = (p_A, p_B). The
+    exchange matrix is
+
+        K = k_ex * [[-p_B,  p_A],
+                    [ p_B, -p_A]],
+
+    so that the rate constant of A -> B is k_ex * p_B, the rate constant of
+    B -> A is k_ex * p_A, and their sum is the total exchange rate k_ex. For
+    the binding equilibrium A + B <-> AB with populations from
+    `equilibrium_two_site_populations()`, k_ex * p_AB is the pseudo-first-order
+    association rate constant k_on * [B] and k_ex * p_A is the dissociation
+    rate constant k_off.
+
+    Parameters
+    ----------
+    k_ex : float
+        Total exchange rate in s^-1.
+    populations : list or tuple or ndarray
+        Equilibrium populations (p_A, p_B) of the two sites. These must sum to
+        one.
+
+    Returns
+    -------
+    K : ndarray
+        Exchange matrix of shape (2, 2) in s^-1.
+    """
+
+    # Extract the equilibrium populations of the two sites.
+    p_A, p_B = populations
+
+    # Construct the population-conserving exchange matrix.
+    K = k_ex * np.array([
+        [-p_B, p_A],
+        [p_B, -p_A],
+    ])
+
+    return K
+
+
+def exchange_liouvillian(
+    spin_systems: list[SpinSystem],
+    liouvillians: list[np.ndarray | sp.csc_array],
+    K: np.ndarray,
+) -> np.ndarray | sp.csc_array:
+    """
+    Construct the Liouvillian of linear chemical exchange between sites that
+    have identical spin systems and bases (Bloch-McConnell level).
+
+    The state of the exchanging ensemble is the concatenation of the
+    population-weighted state vectors of the sites (see `exchange_state()`).
+    Its Liouvillian is
+
+        L = diag(L_1, L_2, ..., L_S) + kron(K, 1),
+
+    where L_s is the Liouvillian of site s, K is the exchange matrix and 1 is
+    the unit matrix of the dimension of the basis. The chemical kinetics are
+    assumed to be at equilibrium, so that the exchange is linear in the state.
+
+    NOTE:
+    A rotating-frame transformation with `rotating_frame()` and irradiation
+    with `rotating_frame_irradiation_hamiltonian()` must be applied to the
+    Liouvillian of each site before calling this function. The ``K`` argument
+    of `liouvillian()` is not used for exchange between sites.
+
+    Parameters
+    ----------
+    spin_systems : list of SpinSystem
+        Spin systems of the exchanging sites. All sites must contain the same
+        isotopes and have identical bases.
+    liouvillians : list of ndarray or csc_array
+        Liouvillians of the sites, in the same order as ``spin_systems``.
+    K : ndarray
+        Exchange matrix in s^-1, of shape (S, S) for S sites. The element
+        K[i, j] is the first-order rate constant of the exchange from site j to
+        site i, and each column sums to zero, so that the populations evolve
+        as dP/dt = K P. For two sites, see `two_site_exchange_matrix()`.
+
+    Returns
+    -------
+    L : ndarray or csc_array
+        Liouvillian of the exchanging ensemble.
+
+    Raises
+    ------
+    ValueError
+        Raised if the sites do not have identical bases, if the number or the
+        shapes of the Liouvillians do not match the sites, or if the exchange
+        matrix is invalid.
+    """
+
+    # Validate the sites and the exchange matrix.
+    _validate_exchange_sites(spin_systems)
+    K = np.asarray(K, dtype=float)
+    _validate_exchange_matrix(K, len(spin_systems))
+
+    # Check that there is one Liouvillian of matching dimension per site.
+    dim = spin_systems[0].basis.dim
+    if len(liouvillians) != len(spin_systems):
+        raise ValueError(
+            "number of Liouvillians does not match the number of sites"
+        )
+    for L_site in liouvillians:
+        if L_site.shape != (dim, dim):
+            raise ValueError(
+                "shape of a Liouvillian does not match the basis dimension"
+            )
+
+    # Combine the site Liouvillians and the exchange superoperator.
+    if parameters.sparse_superoperator:
+        L_sites = sp.block_diag(
+            [sp.csc_array(L_site) for L_site in liouvillians],
+            format="csc",
+        )
+        L_exchange = sp.kron(
+            sp.csc_array(K),
+            sp.eye_array(dim, format="csc"),
+            format="csc",
+        )
+    else:
+        L_sites = block_diag(*[
+            L_site.toarray() if sp.issparse(L_site) else L_site
+            for L_site in liouvillians
+        ])
+        L_exchange = np.kron(K, np.eye(dim))
+    L = L_sites + L_exchange
+
+    return L
+
+
+def exchange_state(
+    spin_systems: list[SpinSystem],
+    rhos: list[np.ndarray | sp.csc_array],
+    populations: list[float] | tuple[float, ...] | np.ndarray,
+) -> np.ndarray | sp.csc_array:
+    """
+    Construct the state vector of an ensemble of chemically exchanging sites
+    by concatenating the population-weighted state vectors of the sites.
+
+    For the equilibrium state of the ensemble to be stationary under
+    `exchange_liouvillian()`, the populations must satisfy K P = 0. The
+    populations may also be given as concentrations, because only their
+    ratios enter the dynamics. The expectation value of an operator in the
+    ensemble is the sum of the expectation values in the weighted site states
+    returned by `split_exchange_state()`.
+
+    Parameters
+    ----------
+    spin_systems : list of SpinSystem
+        Spin systems of the exchanging sites. All sites must contain the same
+        isotopes and have identical bases.
+    rhos : list of ndarray or csc_array
+        Trace-normalised state vectors of the sites, in the same order as
+        ``spin_systems``.
+    populations : list or tuple or ndarray
+        Populations of the sites, in the same order as ``spin_systems``.
+
+    Returns
+    -------
+    rho : ndarray or csc_array
+        Population-weighted state vector of the exchanging ensemble.
+
+    Raises
+    ------
+    ValueError
+        Raised if the sites do not have identical bases, or if the number of
+        state vectors or populations does not match the number of sites.
+    """
+
+    # Validate the sites and the numbers of states and populations.
+    _validate_exchange_sites(spin_systems)
+    if len(rhos) != len(spin_systems) or len(populations) != len(spin_systems):
+        raise ValueError(
+            "numbers of state vectors and populations must match the number "
+            "of sites"
+        )
+
+    # Weight the state vector of each site by its population.
+    weighted_rhos = [p * rho_site for rho_site, p in zip(rhos, populations)]
+
+    # Concatenate the weighted state vectors of the sites.
+    if parameters.sparse_state:
+        rho = sp.vstack(
+            [sp.csc_array(rho_site) for rho_site in weighted_rhos],
+            format="csc",
+        )
+    else:
+        rho = np.concatenate([
+            rho_site.toarray() if sp.issparse(rho_site) else rho_site
+            for rho_site in weighted_rhos
+        ])
+
+    return rho
+
+
+def split_exchange_state(
+    spin_systems: list[SpinSystem],
+    rho: np.ndarray | sp.csc_array,
+) -> list[np.ndarray | sp.csc_array]:
+    """
+    Split the state vector of an ensemble of chemically exchanging sites into
+    the population-weighted state vectors of the sites.
+
+    The expectation value of an operator in a weighted site state, obtained
+    with `measure()`, is the population-weighted contribution of that site to
+    the expectation value of the ensemble.
+
+    Parameters
+    ----------
+    spin_systems : list of SpinSystem
+        Spin systems of the exchanging sites. All sites must contain the same
+        isotopes and have identical bases.
+    rho : ndarray or csc_array
+        Population-weighted state vector of the exchanging ensemble.
+
+    Returns
+    -------
+    rhos : list of ndarray or csc_array
+        Population-weighted state vectors of the sites, in the same order as
+        ``spin_systems``.
+
+    Raises
+    ------
+    ValueError
+        Raised if the sites do not have identical bases, or if the length of
+        the state vector does not match the sites.
+    """
+
+    # Validate the sites and the length of the state vector.
+    _validate_exchange_sites(spin_systems)
+    dim = spin_systems[0].basis.dim
+    if rho.shape[0] != len(spin_systems) * dim:
+        raise ValueError(
+            "length of the state vector does not match the number of sites "
+            "and the basis dimension"
+        )
+
+    # Extract the block of each site from the concatenated state vector.
+    rhos = [rho[s*dim:(s+1)*dim] for s in range(len(spin_systems))]
+
+    return rhos
 
 
 def clear_cache_associate_index_map() -> None:

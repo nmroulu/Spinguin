@@ -26,6 +26,15 @@ signs of the gyromagnetic ratio. Added tests against hard pulses, analytic
 rotations, off-resonance nutation and the steady state of the Bloch equations
 under irradiation with thermalised relaxation.
 - `time_axis` accepts a start time.
+- Added linear (Bloch-McConnell level) chemical exchange between any number of
+sites with identical bases at chemical equilibrium:
+`exchange_liouvillian` (block-diagonal site Liouvillians plus kron(K, 1)),
+`exchange_state` and `split_exchange_state` (population-weighted state of the
+ensemble), and `two_site_exchange_matrix`. Exported
+`equilibrium_concentrations` and `equilibrium_two_site_populations` for the
+binding equilibrium A + B <-> AB. Added tests against the Bloch-McConnell
+equations for the transverse signal and for the steady state under
+irradiation of one site.
 
 ## 0.2.1
 - Accept input of the form "I(component, isotope)" for constructing operators,

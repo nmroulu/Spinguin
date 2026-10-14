@@ -21,7 +21,13 @@ from spinguin._core import (
     associate,
     dissociate,
     elementary_reaction,
+    equilibrium_concentrations,
+    equilibrium_two_site_populations,
+    exchange_liouvillian,
+    exchange_state,
     permute_spins,
+    split_exchange_state,
+    two_site_exchange_matrix,
 
     # hamiltonian
     rotating_frame_irradiation_hamiltonian,
@@ -120,7 +126,13 @@ __all__ = [
     "associate",
     "dissociate",
     "elementary_reaction",
+    "equilibrium_concentrations",
+    "equilibrium_two_site_populations",
+    "exchange_liouvillian",
+    "exchange_state",
     "permute_spins",
+    "split_exchange_state",
+    "two_site_exchange_matrix",
 
     # core: hamiltonian
     "rotating_frame_irradiation_hamiltonian",
