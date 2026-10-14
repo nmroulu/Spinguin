@@ -179,6 +179,10 @@ class TestHamiltonian(unittest.TestCase):
             self.assertTrue(np.allclose(P @ rho_z_H, pul @ rho_z_H))
             self.assertTrue(np.allclose(P @ rho_z_C, rho_z_C))
 
+            # Irradiation of an isotope absent from the system must raise.
+            with self.assertRaises(ValueError):
+                sg.rotating_frame_irradiation_hamiltonian(ss, "15N", B1)
+
 
     def test_irradiation_steady_state(self):
         """

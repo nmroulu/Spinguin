@@ -225,7 +225,10 @@ def rotating_frame_irradiation_hamiltonian(
     irradiation. The rotating-wave approximation is assumed, and the
     irradiation field is taken to be linearly polarised, so that only its
     co-rotating component of amplitude B1/2 is retained. Spins of other
-    isotopes are not irradiated.
+    isotopes are not irradiated. A relaxation superoperator calculated with
+    Redfield theory does not include the effect of the irradiation on the
+    relaxation, which is valid when w1 is much smaller than the inverse of the
+    rotational correlation time.
 
     Parameters
     ----------
@@ -248,6 +251,11 @@ def rotating_frame_irradiation_hamiltonian(
     -------
     H_rf : ndarray or csc_array
         Irradiation Hamiltonian superoperator.
+
+    Raises
+    ------
+    ValueError
+        Raised if the irradiated isotope is not present in the spin system.
     """
 
     # Ensure that the basis has been built before constructing the Hamiltonian.
@@ -256,6 +264,12 @@ def rotating_frame_irradiation_hamiltonian(
         "basis.basis",
         "constructing the irradiation Hamiltonian",
     )
+
+    # Check that the irradiated isotope exists in the spin system.
+    if isotope not in spin_system.isotopes:
+        raise ValueError(
+            f"Isotope {isotope} is not present in the spin system."
+        )
 
     # Convert the irradiation phase angle from degrees to radians.
     phase = phase * np.pi / 180
