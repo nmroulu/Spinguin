@@ -27,5 +27,5 @@ before-all = [
 ]
 
 [tool.cibuildwheel.macos.environment]
-CPPFLAGS = "-I$(brew --prefix libomp)/include"
-LDFLAGS = "-L$(brew --prefix libomp)/lib"
+CPPFLAGS = "-I/tmp/openmp/include"
+LDFLAGS = "-L/tmp/openmp/lib -Wl,-rpath,/tmp/openmp/lib"
