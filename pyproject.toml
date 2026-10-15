@@ -19,3 +19,10 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 skip = ["*-win32"]
 test-command = "python -m unittest discover {project}/tests"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install libomp"
+
+[tool.cibuildwheel.macos.environment]
+CPPFLAGS = "-I$(brew --prefix libomp)/include"
+LDFLAGS = "-L$(brew --prefix libomp)/lib"

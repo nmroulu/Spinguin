@@ -11,8 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Build on Linux and Windows.
-        os: [ubuntu-latest, windows-latest]
+        # Build on Linux, Windows, and MacOS.
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
 
     steps:
       # Fetch the repository contents.
