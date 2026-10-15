@@ -21,7 +21,10 @@ skip = ["*-win32"]
 test-command = "python -m unittest discover {project}/tests"
 
 [tool.cibuildwheel.macos]
-before-all = "brew install libomp"
+before-all = [
+    "brew install micromamba",
+    "micromamba create -y -p /tmp/openmp -c conda-forge llvm-openmp",
+]
 
 [tool.cibuildwheel.macos.environment]
 CPPFLAGS = "-I$(brew --prefix libomp)/include"
