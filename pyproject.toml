@@ -27,5 +27,6 @@ before-all = [
 ]
 
 [tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET=11.0
 CPPFLAGS = "-I/tmp/openmp/include"
 LDFLAGS = "-L/tmp/openmp/lib -Wl,-rpath,/tmp/openmp/lib"
