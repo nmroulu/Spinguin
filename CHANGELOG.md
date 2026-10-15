@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2
+- Add builds for MacOS.
+
 ## 0.2.1
 - Accept input of the form "I(component, isotope)" for constructing operators,
 superoperators and states.
