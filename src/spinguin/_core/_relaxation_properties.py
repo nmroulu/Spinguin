@@ -230,7 +230,10 @@ class RelaxationProperties:
         For anisotropic rotational diffusion, an array of three values is used,
         corresponding to the principal components of the diffusion tensor
         along `Molecule.principal_axes` of the assigned molecule, in ascending
-        order of the principal moments of inertia. Example::
+        order of the principal moments of the geometric inertia tensor of its
+        van der Waals solid (descending order of the eigenvalues of its
+        gyration tensor), that is, from the longest to the shortest semi-axis
+        in `Molecule.semi_axes`. Example::
 
             spin_system.relaxation.tau_c = [50e-12, 100e-12, 150e-12]
         """
@@ -553,7 +556,8 @@ class RelaxationProperties:
         Return the molecule associated with the spin system.
 
         The molecule is used to define the rotational principal axes, which
-        are the principal axes of inertia of its van der Waals solid. The
+        are the principal axes of the geometric inertia tensor of its van der
+        Waals solid (see `Molecule.principal_axes`). The
         value is ``None`` until a molecule is assigned explicitly.
         """
 

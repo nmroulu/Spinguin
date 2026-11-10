@@ -7,6 +7,13 @@ labels, Cartesian nuclear coordinates, and isotope masses.
 It also describes the van der Waals solid of the molecule,
 which defines the molecular volume and the ellipsoid used
 in the automatic rotational correlation times.
+
+The van der Waals solid is a purely geometric object. It is
+treated as a body of uniform density, so that its inertia
+tensor depends only on its shape and not on the nuclear
+masses. This is the appropriate choice for rotational
+diffusion, because the hydrodynamic friction depends only
+on the shape of the molecule.
 """
 
 # Imports
@@ -54,8 +61,8 @@ def _sample_vdw_solid(
     Sample the van der Waals solid of a molecule on a uniform Cartesian grid.
 
     The solid is the union of atomic spheres. Each voxel inside the solid
-    carries the same weight, so that the solid is treated as a body of uniform
-    density.
+    carries the same weight, so that the moments describe only the shape of
+    the solid and not the distribution of the nuclear masses.
 
     Parameters
     ----------
@@ -71,8 +78,8 @@ def _sample_vdw_solid(
     volume : float
         Volume of the solid in Å^3.
     covariance : ndarray
-        Second central moments of the solid per unit volume in Å^2, with
-        shape `(3, 3)`.
+        Gyration tensor of the solid, that is, its second central moments per
+        unit volume, in Å^2 with shape `(3, 3)`.
     """
 
     # Construct the voxel-centre axes of a grid enclosing all atomic spheres.
@@ -380,15 +387,16 @@ class Molecule:
 
     def _vdw_solid(self) -> tuple[float, np.ndarray]:
         """
-        Return the volume and the central second moments of the van der Waals
-        solid, sampling the solid only once.
+        Return the volume and the gyration tensor of the van der Waals solid,
+        sampling the solid only once.
 
         Returns
         -------
         volume : float
             Volume of the solid in Å^3.
         covariance : ndarray
-            Second central moments of the solid per unit volume in Å^2.
+            Gyration tensor of the solid (second central moments per unit
+            volume) in Å^2.
         """
 
         # Sample the solid on the first request and reuse the result.
@@ -401,8 +409,12 @@ class Molecule:
 
     def _principal_moments(self) -> tuple[np.ndarray, np.ndarray]:
         """
-        Diagonalise the inertia tensor of the uniform-density van der Waals
-        solid per unit mass.
+        Diagonalise the geometric inertia tensor of the van der Waals solid,
+        that is, the inertia tensor per unit mass of the solid filled with
+        uniform density. It depends only on the shape of the solid. It is
+        obtained from the gyration tensor ``S`` as ``I = tr(S) 1 - S``, so
+        both tensors have the same principal axes, with the order of the
+        principal moments reversed.
 
         Returns
         -------
@@ -413,7 +425,7 @@ class Molecule:
             `moments`.
         """
 
-        # Construct the inertia tensor from the central second moments.
+        # Construct the geometric inertia tensor from the gyration tensor.
         _, covariance = self._vdw_solid()
         inertia = np.trace(covariance) * np.eye(3) - covariance
 
@@ -459,15 +471,18 @@ class Molecule:
     @property
     def principal_axes(self) -> np.ndarray:
         """
-        Principal axes of the inertia tensor of the van der Waals solid of
-        uniform density. They define the frame of anisotropic rotational
-        diffusion.
+        Principal axes of the geometric inertia tensor of the van der Waals
+        solid, which are also the principal axes of its gyration tensor. They
+        define the frame of anisotropic rotational diffusion.
+        The nuclear masses do not enter, because the hydrodynamic friction
+        depends only on the shape of the molecule.
 
         Returns
         -------
         principal_axes : ndarray
             Unit vectors of the principal axes as the columns of a 3x3 array,
-            in ascending order of the principal moments. The axes form a
+            in ascending order of the principal moments of inertia (descending
+            order of the gyration-tensor eigenvalues). The axes form a
             right-handed frame, so that they can be reached from the
             laboratory frame by a proper rotation.
         """
@@ -487,8 +502,9 @@ class Molecule:
         Semi-axes of the ellipsoid that represents the molecule in Perrin
         theory.
 
-        The axis ratios are those of the ellipsoid that has the inertia tensor
-        of the uniform van der Waals solid. For a uniform ellipsoid of mass
+        The axis ratios are those of the uniform ellipsoid that has the same
+        geometric inertia tensor as the van der Waals solid, so that the
+        semi-axes are in descending order. For a uniform ellipsoid of mass
         ``M``, the principal moments are ``I_x = M (a_y^2 + a_z^2) / 5`` and
         cyclic permutations. The ellipsoid is scaled to the van der Waals
         volume, so that the ellipsoid of a spherical top is the sphere of
