@@ -35,7 +35,7 @@ def _get_openmp_flags() -> tuple[list[str], list[str]]:
 
     # Define the compiler and linker flags for Linux compilers.
     elif sys.platform.startswith("linux"):
-        extra_compile_args = ["-fopenmp", "-Ofast", "-march=native"]
+        extra_compile_args = ["-fopenmp", "-Ofast"]
         extra_link_args = ["-fopenmp"]
 
     # Define the compiler and linker flags for macOS.
