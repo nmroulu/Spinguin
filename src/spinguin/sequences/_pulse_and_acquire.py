@@ -38,7 +38,7 @@ def pulse_and_acquire(
     isotope : str
         Isotope, for example ``'1H'``, that is excited and observed.
     center_frequency : float
-        Rotating-frame centre frequency in Hz for the observed isotope
+        Rotating-frame centre frequency in ppm for the observed isotope
         channel.
     npoints : int
         Number of complex points in the simulated free induction decay.
