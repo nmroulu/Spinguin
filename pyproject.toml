@@ -1,6 +1,6 @@
 [project]
 name = "spinguin"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = ["numpy >= 2.0.0", "scipy >= 1.14.1", "sympy >= 1.13.1", "tqdm >= 4.67.1"]
 requires-python = ">=3.11"
 authors = [
@@ -19,3 +19,14 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 skip = ["*-win32"]
 test-command = "python -m unittest discover {project}/tests"
+
+[tool.cibuildwheel.macos]
+before-all = [
+    "brew install micromamba",
+    "micromamba create -y -p /tmp/openmp -c conda-forge llvm-openmp",
+]
+
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET=11.0
+CPPFLAGS = "-I/tmp/openmp/include"
+LDFLAGS = "-L/tmp/openmp/lib -Wl,-rpath,/tmp/openmp/lib"

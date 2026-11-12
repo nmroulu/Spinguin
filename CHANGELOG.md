@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 ## Unreleased
 - The automatic rotational correlation times use the van der Waals solid of
 the molecule with Bondi radii. The isotropic model uses the sphere of equal
@@ -35,6 +36,10 @@ ensemble), and `two_site_exchange_matrix`. Exported
 binding equilibrium A + B <-> AB. Added tests against the Bloch-McConnell
 equations for the transverse signal and for the steady state under
 irradiation of one site.
+=======
+## 0.2.2
+- Add builds for MacOS.
+>>>>>>> origin/dev
 
 ## 0.2.1
 - Accept input of the form "I(component, isotope)" for constructing operators,
